@@ -1,12 +1,16 @@
 # OneFlow UI
 
-OneFlow 设计系统组件库，基于 Vue 3 + TypeScript 构建。
+[![npm version](https://img.shields.io/npm/v/@oneflowui/ui.svg)](https://www.npmjs.com/package/@oneflowui/ui)
+[![npm downloads](https://img.shields.io/npm/dm/@oneflowui/ui.svg)](https://www.npmjs.com/package/@oneflowui/ui)
+[![license](https://img.shields.io/npm/l/@oneflowui/ui.svg)](https://github.com/qixi54/oneui/blob/main/LICENSE)
+
+Vue 3 + TypeScript 任务管理视图组件库，包含 Table、Kanban、Gantt、Gallery、AI Chat、Dashboard 等 75 个组件。
 
 ## 安装
 
 ```bash
 # pnpm（推荐）
-pnpm add oneflow-ui
+pnpm add @oneflowui/ui
 
 # npm
 npm install oneflow-ui
