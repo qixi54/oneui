@@ -10,6 +10,45 @@ Vue 3 + TypeScript 任务管理视图组件库，75 个组件开箱即用。
 
 ---
 
+## 预览
+
+<table>
+  <tr>
+    <td align="center"><b>Kanban 看板</b></td>
+    <td align="center"><b>DataTable 数据表格</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/kanban.png" alt="Kanban" /></td>
+    <td><img src="screenshots/table.png" alt="DataTable" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Gantt 甘特图</b></td>
+    <td align="center"><b>Dashboard 仪表盘</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/gantt.png" alt="Gantt" /></td>
+    <td><img src="screenshots/dashboard.png" alt="Dashboard" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>AI Chat 对话组件</b></td>
+    <td align="center"><b>DetailLayout 详情页</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/ai.png" alt="AI Chat" /></td>
+    <td><img src="screenshots/detail.png" alt="Detail" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>RichTextEditor 富文本</b></td>
+    <td align="center"><b>MermaidChart 图表</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/editor.png" alt="Editor" /></td>
+    <td><img src="screenshots/mermaid.png" alt="Mermaid" /></td>
+  </tr>
+</table>
+
+---
+
 ## 安装
 
 ```bash
