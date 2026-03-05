@@ -1,0 +1,83 @@
+<script setup lang="ts">
+import { computed, type Component } from "vue";
+import * as LucideIcons from "lucide-vue-next";
+
+const props = defineProps<{
+  icon: string;
+  label: string;
+  active?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "click", event: MouseEvent): void;
+}>();
+
+function toPascalCase(name: string): string {
+  return (
+    name
+      .split("-")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join("") + "Icon"
+  );
+}
+
+const iconComponent = computed<Component | undefined>(() => {
+  const key = toPascalCase(props.icon);
+  return (LucideIcons as unknown as Record<string, Component>)[key];
+});
+
+function handleClick(event: MouseEvent) {
+  emit("click", event);
+}
+</script>
+
+<template>
+  <button class="of-toolbar-btn" :class="{ 'of-toolbar-btn--active': active }" @click="handleClick">
+    <component :is="iconComponent" class="of-toolbar-btn__icon" :size="13" />
+    <span class="of-toolbar-btn__label">{{ label }}</span>
+  </button>
+</template>
+
+<style scoped>
+.of-toolbar-btn {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 5px 10px !important;
+  background: transparent !important;
+  border: 1px solid var(--of-color-gray-200) !important;
+  border-radius: var(--of-radius-md) !important;
+  cursor: pointer !important;
+  font-family: var(--of-font-sans) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  color: var(--of-color-gray-600) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  transition: var(--of-transition-fast) !important;
+}
+
+.of-toolbar-btn .of-toolbar-btn__icon {
+  color: var(--of-color-gray-500) !important;
+  flex-shrink: 0;
+}
+
+.of-toolbar-btn:hover:not(.of-toolbar-btn--active) {
+  background: var(--of-color-gray-50) !important;
+}
+
+.of-toolbar-btn--active {
+  background: var(--of-color-primary-50) !important;
+  color: var(--of-color-primary-600) !important;
+  border-color: var(--of-color-primary-200) !important;
+}
+
+.of-toolbar-btn--active .of-toolbar-btn__icon {
+  color: var(--of-color-primary-600) !important;
+}
+
+.of-toolbar-btn__label {
+  line-height: 1;
+}
+</style>

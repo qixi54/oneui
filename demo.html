@@ -1,0 +1,3422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OneFlow UI — 组件预览</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+/* ─── CSS Variables ─────────────────────────────────────── */
+:root {
+  --of-color-primary-50:  #EEF2FF;
+  --of-color-primary-100: #E0E7FF;
+  --of-color-primary-500: #6366F1;
+  --of-color-primary-600: #4F46E5;
+  --of-color-gray-50:  #F8FAFC;
+  --of-color-gray-100: #F1F5F9;
+  --of-color-gray-200: #E2E8F0;
+  --of-color-gray-300: #CBD5E1;
+  --of-color-gray-400: #94A3B8;
+  --of-color-gray-500: #64748B;
+  --of-color-gray-600: #475569;
+  --of-color-gray-700: #334155;
+  --of-color-gray-800: #1E293B;
+  --of-color-gray-900: #0F172A;
+  --of-color-bg-canvas:   #F1F5F9;
+  --of-color-bg-elevated: #FFFFFF;
+  --of-font-sans: 'Inter', sans-serif;
+  --of-font-mono: 'JetBrains Mono', monospace;
+  --of-shadow-card: 0 1px 8px 0 rgba(0,0,0,0.06);
+  --of-shadow-card-hover: 0 4px 16px 0 rgba(0,0,0,0.1);
+  --of-shadow-panel: 0 2px 12px 0 rgba(0,0,0,0.06);
+  --of-navbar-height: 56px;
+  --of-sidebar-width: 240px;
+  --of-statusbar-height: 32px;
+}
+
+/* ─── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--of-font-sans);
+  background: var(--of-color-bg-canvas);
+  color: var(--of-color-gray-900);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* ─── Demo Shell ────────────────────────────────────────── */
+.demo-page { min-height: 100vh; padding: 32px; }
+.demo-title {
+  font-size: 22px; font-weight: 700; color: var(--of-color-gray-900);
+  margin-bottom: 4px;
+}
+.demo-subtitle { font-size: 13px; color: var(--of-color-gray-500); margin-bottom: 32px; }
+
+.demo-section { margin-bottom: 48px; }
+.demo-section-title {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--of-color-gray-400); text-transform: uppercase;
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--of-color-gray-200);
+}
+.demo-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.demo-card {
+  background: var(--of-color-bg-elevated);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--of-shadow-panel);
+  border: 1px solid var(--of-color-gray-200);
+}
+.demo-label {
+  font-size: 11px; color: var(--of-color-gray-400); font-weight: 500;
+  margin-bottom: 12px; display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1. APP LAYOUT SHELL
+══════════════════════════════════════════════════════════════ */
+.app-shell {
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--of-color-gray-200);
+  box-shadow: var(--of-shadow-panel);
+  height: 600px; display: flex; flex-direction: column;
+}
+
+/* Navbar */
+.of-navbar {
+  height: var(--of-navbar-height);
+  background: var(--of-color-bg-elevated);
+  border-bottom: 1px solid var(--of-color-gray-200);
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 16px;
+  flex-shrink: 0;
+}
+.of-nav-logo { display: flex; align-items: center; gap: 8px; }
+.of-nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--of-color-primary-500);
+  display: flex; align-items: center; justify-content: center;
+}
+.of-nav-logo-mark svg { width: 16px; height: 16px; color: #fff; }
+.of-nav-logo-name { font-size: 15px; font-weight: 700; color: var(--of-color-gray-900); }
+.of-nav-search {
+  flex: 0 0 280px; height: 36px; border-radius: 8px;
+  background: var(--of-color-gray-50);
+  border: 1px solid var(--of-color-gray-200);
+  display: flex; align-items: center; padding: 0 12px; gap: 8px;
+}
+.of-nav-search svg { width: 14px; height: 14px; color: var(--of-color-gray-400); }
+.of-nav-search span { font-size: 13px; color: var(--of-color-gray-400); }
+.of-nav-spacer { flex: 1; }
+.of-nav-notify {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; cursor: pointer;
+}
+.of-nav-notify:hover { background: var(--of-color-gray-100); }
+.of-nav-notify svg { width: 18px; height: 18px; color: var(--of-color-gray-500); }
+.of-nav-notify-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #EF4444; border: 1.5px solid #fff;
+}
+.of-nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--of-color-primary-500);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #fff; cursor: pointer;
+}
+
+/* Body Row */
+.of-body-row { display: flex; flex: 1; overflow: hidden; }
+
+/* Sidebar */
+.of-sidebar {
+  width: var(--of-sidebar-width); flex-shrink: 0;
+  background: var(--of-color-bg-elevated);
+  border-right: 1px solid var(--of-color-gray-200);
+  padding: 16px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  overflow-y: auto;
+}
+.of-sidebar-section-label {
+  font-size: 10px; font-weight: 600; color: var(--of-color-gray-400);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 10px; margin-top: 8px;
+}
+.of-sidebar-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer;
+  font-size: 13px; color: var(--of-color-gray-600);
+  transition: all 0.15s;
+}
+.of-sidebar-item:hover { background: var(--of-color-gray-100); }
+.of-sidebar-item.active {
+  background: var(--of-color-primary-50);
+  color: var(--of-color-primary-600);
+  font-weight: 500;
+}
+.of-sidebar-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+.of-sidebar-badge {
+  margin-left: auto; font-size: 10px; font-weight: 600;
+  background: var(--of-color-gray-200); color: var(--of-color-gray-600);
+  padding: 1px 6px; border-radius: 10px;
+}
+
+/* Main Content */
+.of-main-content { flex: 1; overflow: auto; padding: 24px 32px; }
+
+/* Status Bar */
+.of-statusbar {
+  height: var(--of-statusbar-height);
+  background: var(--of-color-bg-elevated);
+  border-top: 1px solid var(--of-color-gray-200);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 12px; flex-shrink: 0;
+}
+.of-statusbar svg { width: 14px; height: 14px; color: #22C55E; }
+.of-statusbar-text { font-size: 12px; color: var(--of-color-gray-400); }
+.of-statusbar-spacer { flex: 1; }
+.of-statusbar-shortcuts { font-size: 12px; color: var(--of-color-gray-400); }
+.of-statusbar-ver { font-size: 12px; color: var(--of-color-gray-300); }
+
+/* ═══════════════════════════════════════════════════════════
+   2. VIEW TABS + TOOLBAR
+══════════════════════════════════════════════════════════════ */
+.of-view-tabs { display: flex; align-items: center; border-bottom: 1px solid var(--of-color-gray-200); }
+.of-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 16px; cursor: pointer;
+  font-size: 13px; font-weight: 500;
+  color: var(--of-color-gray-500);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+.of-tab:hover { color: var(--of-color-gray-700); }
+.of-tab.active { color: var(--of-color-primary-500); border-bottom-color: var(--of-color-primary-500); }
+.of-tab svg { width: 14px; height: 14px; }
+.of-tab-add { display: flex; align-items: center; gap: 4px; padding: 6px 10px; cursor: pointer; font-size: 12px; color: var(--of-color-gray-400); }
+.of-tab-add svg { width: 14px; height: 14px; }
+
+.of-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 0;
+}
+.of-toolbar-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 6px;
+  border: 1px solid var(--of-color-gray-200);
+  font-size: 12px; color: var(--of-color-gray-600);
+  cursor: pointer; background: #fff;
+  transition: all 0.15s;
+}
+.of-toolbar-btn:hover { background: var(--of-color-gray-50); }
+.of-toolbar-btn.active {
+  background: var(--of-color-primary-50);
+  border-color: var(--of-color-primary-200);
+  color: var(--of-color-primary-600);
+}
+.of-toolbar-btn svg { width: 13px; height: 13px; color: var(--of-color-gray-500); }
+.of-toolbar-spacer { flex: 1; }
+
+/* ═══════════════════════════════════════════════════════════
+   3. TABLE VIEW
+══════════════════════════════════════════════════════════════ */
+.of-table { border: 1px solid var(--of-color-gray-200); border-radius: 8px; overflow: hidden; width: 100%; }
+.of-table-header {
+  display: flex; align-items: center;
+  background: var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-color-gray-200);
+  padding: 10px 12px;
+}
+.of-th {
+  font-size: 12px; font-weight: 600;
+  color: var(--of-color-gray-500);
+  display: flex; align-items: center; gap: 4px;
+}
+.of-th svg { width: 12px; height: 12px; color: var(--of-color-gray-400); }
+.of-td-check { width: 32px; flex-shrink: 0; }
+.of-td-id { width: 100px; flex-shrink: 0; }
+.of-td-title { flex: 1; min-width: 0; }
+.of-td-status { width: 100px; flex-shrink: 0; justify-content: center; }
+.of-td-role { width: 90px; flex-shrink: 0; justify-content: center; }
+.of-td-pri { width: 70px; flex-shrink: 0; justify-content: center; }
+.of-td-time { width: 100px; flex-shrink: 0; justify-content: center; }
+
+.of-table-row {
+  display: flex; align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--of-color-gray-100);
+  cursor: pointer; transition: background 0.1s;
+}
+.of-table-row:last-child { border-bottom: none; }
+.of-table-row:hover { background: var(--of-color-gray-50); }
+.of-table-row.selected { background: var(--of-color-primary-50); }
+
+.of-td { display: flex; align-items: center; }
+.of-td-id-val { font-size: 12px; font-weight: 500; color: var(--of-color-primary-500); }
+.of-td-title-val { font-size: 13px; color: var(--of-color-gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.of-td-time-val { font-size: 12px; color: var(--of-color-gray-400); }
+
+.of-new-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px; cursor: pointer;
+  font-size: 13px; color: var(--of-color-gray-400);
+  transition: background 0.1s;
+}
+.of-new-row:hover { background: var(--of-color-gray-50); color: var(--of-color-gray-600); }
+.of-new-row svg { width: 14px; height: 14px; }
+
+/* checkbox */
+.of-checkbox { width: 14px; height: 14px; cursor: pointer; accent-color: var(--of-color-primary-500); }
+
+/* ═══════════════════════════════════════════════════════════
+   4. BADGES
+══════════════════════════════════════════════════════════════ */
+.of-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 10px;
+  font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.of-badge-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.badge-todo        { color: #64748B; background: #F1F5F9; }
+.badge-progress    { color: #2563EB; background: #DBEAFE; }
+.badge-blocked     { color: #D97706; background: #FEF3C7; }
+.badge-done        { color: #22C55E; background: #DCFCE7; }
+.badge-p0          { color: #DC2626; background: #FEE2E2; }
+.badge-p1          { color: #D97706; background: #FEF3C7; }
+.badge-p2          { color: #2563EB; background: #DBEAFE; }
+.badge-p3          { color: #64748B; background: #F1F5F9; }
+.badge-role        { color: #4F46E5; background: #EEF2FF; }
+
+/* ═══════════════════════════════════════════════════════════
+   5. KANBAN
+══════════════════════════════════════════════════════════════ */
+.of-kanban-board {
+  display: flex; gap: 16px; overflow-x: auto;
+  padding: 4px 0 16px; align-items: flex-start;
+}
+.of-kanban-col {
+  width: 280px; flex-shrink: 0;
+  background: var(--of-color-gray-50);
+  border-radius: 10px; padding: 16px 12px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.of-col-header {
+  display: flex; align-items: center; gap: 8px;
+}
+.of-col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.of-col-title { font-size: 13px; font-weight: 600; color: var(--of-color-gray-700); }
+.of-col-count { font-size: 12px; color: var(--of-color-gray-400); }
+.of-col-spacer { flex: 1; }
+.of-col-add { width: 20px; height: 20px; cursor: pointer; color: var(--of-color-gray-400); }
+.of-col-add svg { width: 16px; height: 16px; }
+
+.of-kanban-card {
+  background: #fff; border-radius: 8px;
+  border: 1px solid var(--of-color-gray-200);
+  padding: 12px 14px;
+  box-shadow: var(--of-shadow-card);
+  display: flex; flex-direction: column; gap: 10px;
+  cursor: pointer; transition: all 0.2s;
+}
+.of-kanban-card:hover { box-shadow: var(--of-shadow-card-hover); border-color: var(--of-color-gray-300); }
+.of-card-title { font-size: 13px; font-weight: 500; color: var(--of-color-gray-900); line-height: 1.5; }
+.of-card-meta { display: flex; align-items: center; gap: 6px; }
+.of-card-id { font-size: 11px; font-weight: 500; color: var(--of-color-primary-500); }
+.of-card-date { font-size: 11px; color: var(--of-color-gray-400); }
+.of-card-spacer { flex: 1; }
+.of-card-role { font-size: 10px; font-weight: 500; color: #4F46E5; background: #EEF2FF; padding: 2px 7px; border-radius: 10px; }
+.of-card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.of-quick-add {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; height: 38px;
+  background: #fff; border-radius: 8px;
+  border: 1px solid var(--of-color-gray-200);
+  cursor: pointer;
+}
+.of-quick-add svg { width: 14px; height: 14px; color: var(--of-color-gray-400); }
+.of-quick-add span { font-size: 12px; color: var(--of-color-gray-400); }
+
+/* ═══════════════════════════════════════════════════════════
+   6. GALLERY VIEW
+══════════════════════════════════════════════════════════════ */
+.of-gallery { display: flex; flex-wrap: wrap; gap: 16px; }
+.of-gallery-card {
+  width: 260px; background: #fff;
+  border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--of-color-gray-200);
+  box-shadow: var(--of-shadow-card);
+  cursor: pointer; transition: all 0.2s;
+}
+.of-gallery-card:hover { transform: translateY(-2px); box-shadow: var(--of-shadow-card-hover); }
+.of-gallery-banner { height: 6px; width: 100%; }
+.of-gallery-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.of-gallery-title { font-size: 14px; font-weight: 600; color: var(--of-color-gray-900); }
+.of-gallery-desc {
+  font-size: 12px; color: var(--of-color-gray-500);
+  line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.of-gallery-divider { height: 1px; background: var(--of-color-gray-100); }
+.of-gallery-props { display: flex; flex-direction: column; gap: 8px; }
+.of-gallery-prop { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--of-color-gray-500); }
+.of-gallery-prop svg { width: 12px; height: 12px; color: var(--of-color-gray-400); }
+.of-gallery-prop-val { font-size: 11px; color: var(--of-color-gray-700); margin-left: auto; font-weight: 500; }
+.of-gallery-footer { display: flex; align-items: center; gap: 6px; }
+.of-gallery-id { font-size: 11px; font-weight: 500; color: var(--of-color-primary-500); }
+.of-gallery-fsp { flex: 1; }
+.of-gallery-time { font-size: 11px; color: var(--of-color-gray-400); }
+
+/* ═══════════════════════════════════════════════════════════
+   7. GANTT / TIMELINE
+══════════════════════════════════════════════════════════════ */
+.of-gantt { border: 1px solid var(--of-color-gray-200); border-radius: 8px; overflow: hidden; }
+.of-gantt-header {
+  display: flex; background: var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-color-gray-200);
+}
+.of-gantt-header-label {
+  width: 240px; flex-shrink: 0; padding: 8px 12px;
+  font-size: 11px; font-weight: 600; color: var(--of-color-gray-400);
+  border-right: 1px solid var(--of-color-gray-200);
+}
+.of-gantt-dates {
+  flex: 1; display: flex;
+  padding: 8px 0;
+}
+.of-gantt-date {
+  flex: 1; text-align: center;
+  font-size: 10px; color: var(--of-color-gray-400);
+}
+.of-gantt-date.today { color: var(--of-color-primary-500); font-weight: 600; }
+
+.of-gantt-row {
+  display: flex; align-items: center;
+  border-bottom: 1px solid var(--of-color-gray-100);
+}
+.of-gantt-row:last-child { border-bottom: none; }
+.of-gantt-label {
+  width: 240px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px;
+  border-right: 1px solid var(--of-color-gray-200);
+}
+.of-gantt-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.of-gantt-task-name { font-size: 12px; font-weight: 500; color: var(--of-color-gray-800); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.of-gantt-chart {
+  flex: 1; height: 40px; position: relative; padding: 8px 0;
+}
+.of-gantt-bar {
+  position: absolute; top: 8px; height: 24px;
+  border-radius: 6px;
+  display: flex; align-items: center; padding: 0 10px;
+  font-size: 10px; font-weight: 500; white-space: nowrap; overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   8. EDITOR BLOCKS
+══════════════════════════════════════════════════════════════ */
+.of-content-block {
+  background: var(--of-color-gray-50); border-radius: 8px;
+  padding: 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.of-content-block p { font-size: 13px; color: var(--of-color-gray-700); line-height: 1.6; }
+
+.of-blockquote {
+  background: #F8FAFC;
+  border-left: 3px solid #000;
+  padding: 12px 16px;
+}
+.of-blockquote p { font-size: 13px; color: var(--of-color-gray-500); line-height: 1.6; }
+
+.of-code-block {
+  background: #1E293B; border-radius: 6px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.of-code-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.of-code-lang { font-size: 11px; color: #94A3B8; font-family: var(--of-font-mono); }
+.of-code-copy {
+  margin-left: auto; cursor: pointer; padding: 2px 8px;
+  border-radius: 4px; border: 1px solid #334155;
+  font-size: 11px; color: #94A3B8; background: transparent;
+  display: flex; align-items: center; gap: 4px;
+}
+.of-code-copy svg { width: 12px; height: 12px; }
+.of-code-line {
+  font-size: 12px; color: #E2E8F0;
+  font-family: var(--of-font-mono); line-height: 1.7;
+}
+.of-code-line.comment { color: #64748B; }
+
+.of-ref-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #EEF2FF; border-radius: 4px;
+  padding: 2px 8px; cursor: pointer;
+  font-size: 12px; font-weight: 500; color: var(--of-color-primary-500);
+  transition: background 0.15s;
+}
+.of-ref-link:hover { background: #E0E7FF; }
+.of-ref-link svg { width: 10px; height: 10px; }
+
+/* ═══════════════════════════════════════════════════════════
+   9. DETAIL LAYOUT
+══════════════════════════════════════════════════════════════ */
+.of-detail-layout {
+  display: flex; border: 1px solid var(--of-color-gray-200);
+  border-radius: 10px; overflow: hidden;
+  background: #fff;
+}
+.of-detail-main {
+  flex: 1; min-width: 0;
+  padding: 24px 32px;
+  border-right: 1px solid var(--of-color-gray-200);
+  display: flex; flex-direction: column; gap: 24px;
+}
+.of-detail-title { font-size: 22px; font-weight: 700; color: var(--of-color-gray-900); }
+.of-detail-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.of-detail-section-label { font-size: 14px; font-weight: 600; color: var(--of-color-gray-700); }
+
+.of-prop-panel { width: 320px; flex-shrink: 0; padding: 20px; }
+.of-prop-panel-title { font-size: 14px; font-weight: 600; color: var(--of-color-gray-700); margin-bottom: 16px; }
+.of-prop-row {
+  width: 100%; padding: 8px 0;
+  display: flex; align-items: center;
+  border-bottom: 1px solid var(--of-color-gray-100);
+}
+.of-prop-row:last-child { border-bottom: none; }
+.of-prop-key { font-size: 12px; font-weight: 500; color: var(--of-color-gray-500); width: 80px; flex-shrink: 0; }
+.of-prop-val-area { display: flex; align-items: center; gap: 4px; flex: 1; }
+.of-prop-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 8px;
+  font-size: 11px; font-weight: 500;
+}
+.of-prop-plain { font-size: 12px; color: var(--of-color-gray-700); }
+
+/* Comment */
+.of-comment {
+  display: flex; gap: 10px;
+  padding: 0 0 12px 12px;
+  border-bottom: 1px solid var(--of-color-gray-100);
+}
+.of-comment:last-child { border-bottom: none; padding-bottom: 0; }
+.of-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--of-color-primary-500);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #fff;
+  flex-shrink: 0;
+}
+.of-comment-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.of-comment-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.of-comment-author { font-size: 12px; font-weight: 600; color: var(--of-color-gray-800); }
+.of-comment-action { font-size: 12px; color: var(--of-color-gray-500); }
+.of-comment-time { font-size: 11px; color: var(--of-color-gray-400); }
+.of-comment-content { font-size: 12px; color: var(--of-color-gray-600); line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════════════ */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.w-full { width: 100%; }
+</style>
+</head>
+<body>
+<div class="demo-page">
+
+  <div class="demo-title">OneFlow UI — 组件预览</div>
+  <div class="demo-subtitle">基于 oneflow设计.pen 设计稿，所有组件数据驱动，可通过 colorMap props 自定义显示</div>
+
+  <!-- ═══ 1. APP SHELL ═══════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">应用布局 (AppLayout · Navbar · Sidebar · StatusBar)</div>
+    <div class="app-shell">
+      <!-- Navbar -->
+      <div class="of-navbar">
+        <div class="of-nav-logo">
+          <div class="of-nav-logo-mark">
+            <i data-lucide="zap" style="width:16px;height:16px;color:#fff;"></i>
+          </div>
+          <span class="of-nav-logo-name">OneFlow</span>
+        </div>
+        <div class="of-nav-search">
+          <i data-lucide="search" style="width:14px;height:14px;color:#94A3B8;"></i>
+          <span>⌘K 搜索...</span>
+        </div>
+        <div class="of-nav-spacer"></div>
+        <div class="of-nav-notify">
+          <i data-lucide="bell" style="width:18px;height:18px;color:#64748B;"></i>
+          <div class="of-nav-notify-dot"></div>
+        </div>
+        <div class="of-nav-avatar">G</div>
+      </div>
+
+      <!-- Body -->
+      <div class="of-body-row">
+        <!-- Sidebar -->
+        <div class="of-sidebar">
+          <div class="of-sidebar-section-label">导航</div>
+          <div class="of-sidebar-item active">
+            <i data-lucide="layout-dashboard" style="width:15px;height:15px;"></i>
+            项目看板
+          </div>
+          <div class="of-sidebar-item">
+            <i data-lucide="list-checks" style="width:15px;height:15px;"></i>
+            任务列表
+            <span class="of-sidebar-badge">12</span>
+          </div>
+          <div class="of-sidebar-item">
+            <i data-lucide="file-text" style="width:15px;height:15px;"></i>
+            文档库
+          </div>
+          <div class="of-sidebar-item">
+            <i data-lucide="gantt-chart" style="width:15px;height:15px;"></i>
+            时间线
+          </div>
+          <div class="of-sidebar-section-label">工作区</div>
+          <div class="of-sidebar-item">
+            <i data-lucide="settings" style="width:15px;height:15px;"></i>
+            设置
+          </div>
+        </div>
+
+        <!-- Main -->
+        <div class="of-main-content">
+          <!-- View Tabs -->
+          <div class="of-view-tabs">
+            <div class="of-tab active">
+              <i data-lucide="table-2" style="width:14px;height:14px;"></i> 表格
+            </div>
+            <div class="of-tab">
+              <i data-lucide="kanban" style="width:14px;height:14px;"></i> 看板
+            </div>
+            <div class="of-tab">
+              <i data-lucide="layout-grid" style="width:14px;height:14px;"></i> 画廊
+            </div>
+            <div class="of-tab">
+              <i data-lucide="gantt-chart" style="width:14px;height:14px;"></i> 时间线
+            </div>
+            <div class="of-tab-add">
+              <i data-lucide="plus" style="width:14px;height:14px;"></i> 添加视图
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="of-toolbar">
+            <div class="of-toolbar-btn active">
+              <i data-lucide="list-filter"></i> 筛选
+            </div>
+            <div class="of-toolbar-btn">
+              <i data-lucide="arrow-up-down"></i> 排序
+            </div>
+            <div class="of-toolbar-btn">
+              <i data-lucide="group"></i> 分组
+            </div>
+            <div class="of-toolbar-spacer"></div>
+            <div class="of-toolbar-btn">
+              <i data-lucide="plus"></i> 新建任务
+            </div>
+          </div>
+
+          <!-- Mini Table Preview -->
+          <div class="of-table">
+            <div class="of-table-header">
+              <div class="of-td of-td-check"><input type="checkbox" class="of-checkbox"></div>
+              <div class="of-th of-td-id">任务 ID <i data-lucide="chevrons-up-down"></i></div>
+              <div class="of-th of-td-title">标题</div>
+              <div class="of-th of-td-status">状态</div>
+              <div class="of-th of-td-role">角色</div>
+              <div class="of-th of-td-pri">优先级</div>
+              <div class="of-th of-td-time">更新时间</div>
+            </div>
+            <div class="of-table-row selected">
+              <div class="of-td of-td-check"><input type="checkbox" class="of-checkbox" checked></div>
+              <div class="of-td of-td-id"><span class="of-td-id-val">ZHO-BE-012</span></div>
+              <div class="of-td of-td-title"><span class="of-td-title-val">实现认证中间件重构</span></div>
+              <div class="of-td of-td-status"><span class="of-badge badge-blocked"><span class="of-badge-dot" style="background:#D97706;"></span>已阻塞</span></div>
+              <div class="of-td of-td-role"><span class="of-badge badge-role">BE</span></div>
+              <div class="of-td of-td-pri"><span class="of-badge badge-p0">P0</span></div>
+              <div class="of-td of-td-time"><span class="of-td-time-val">02-11 10:30</span></div>
+            </div>
+            <div class="of-table-row">
+              <div class="of-td of-td-check"><input type="checkbox" class="of-checkbox"></div>
+              <div class="of-td of-td-id"><span class="of-td-id-val">ZHO-FE-008</span></div>
+              <div class="of-td of-td-title"><span class="of-td-title-val">实现画廊视图拖拽排序功能</span></div>
+              <div class="of-td of-td-status"><span class="of-badge badge-progress">进行中</span></div>
+              <div class="of-td of-td-role"><span class="of-badge badge-role">FE</span></div>
+              <div class="of-td of-td-pri"><span class="of-badge badge-p1">P1</span></div>
+              <div class="of-td of-td-time"><span class="of-td-time-val">02-12 14:20</span></div>
+            </div>
+            <div class="of-table-row">
+              <div class="of-td of-td-check"><input type="checkbox" class="of-checkbox"></div>
+              <div class="of-td of-td-id"><span class="of-td-id-val">ZHO-QA-003</span></div>
+              <div class="of-td of-td-title"><span class="of-td-title-val">接口回归测试 — 任务模块</span></div>
+              <div class="of-td of-td-status"><span class="of-badge badge-todo">待处理</span></div>
+              <div class="of-td of-td-role"><span class="of-badge badge-role">QA</span></div>
+              <div class="of-td of-td-pri"><span class="of-badge badge-p2">P2</span></div>
+              <div class="of-td of-td-time"><span class="of-td-time-val">02-10 09:00</span></div>
+            </div>
+            <div class="of-table-row">
+              <div class="of-td of-td-check"><input type="checkbox" class="of-checkbox"></div>
+              <div class="of-td of-td-id"><span class="of-td-id-val">ZHO-BE-009</span></div>
+              <div class="of-td of-td-title"><span class="of-td-title-val">数据库索引优化</span></div>
+              <div class="of-td of-td-status"><span class="of-badge badge-done">已完成</span></div>
+              <div class="of-td of-td-role"><span class="of-badge badge-role">BE</span></div>
+              <div class="of-td of-td-pri"><span class="of-badge badge-p3">P3</span></div>
+              <div class="of-td of-td-time"><span class="of-td-time-val">02-08 16:45</span></div>
+            </div>
+            <div class="of-new-row">
+              <i data-lucide="plus" style="width:14px;height:14px;"></i>
+              新建任务
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="of-statusbar">
+        <i data-lucide="circle-check" style="width:14px;height:14px;color:#22C55E;"></i>
+        <span class="of-statusbar-text">所有更改已同步</span>
+        <div class="of-statusbar-spacer"></div>
+        <span class="of-statusbar-shortcuts">⌘N 新建  ·  ⌘K 搜索  ·  ? 快捷键</span>
+        <span class="of-statusbar-ver">v1.0.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 2. KANBAN ════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">看板视图 (KanbanBoard · KanbanColumn · KanbanCard · QuickAddRow)</div>
+    <div class="of-kanban-board">
+      <!-- 待处理列 -->
+      <div class="of-kanban-col">
+        <div class="of-col-header">
+          <div class="of-col-dot" style="background:#94A3B8;"></div>
+          <span class="of-col-title">待处理</span>
+          <span class="of-col-count">3</span>
+          <div class="of-col-spacer"></div>
+          <div class="of-col-add"><i data-lucide="plus" style="width:16px;height:16px;color:#94A3B8;"></i></div>
+        </div>
+        <div class="of-kanban-card">
+          <div class="of-card-title">设计系统组件库文档</div>
+          <div class="of-card-meta">
+            <span class="of-card-id">ZHO-FE-015</span>
+            <span class="of-card-date">02-15</span>
+            <span class="of-card-spacer"></span>
+            <span class="of-card-role">FE</span>
+          </div>
+          <div class="of-card-tags">
+            <span class="of-badge badge-p2">P2</span>
+            <span class="of-badge badge-todo">待处理</span>
+          </div>
+        </div>
+        <div class="of-kanban-card">
+          <div class="of-card-title">用户权限模块单元测试</div>
+          <div class="of-card-meta">
+            <span class="of-card-id">ZHO-QA-007</span>
+            <span class="of-card-date">02-18</span>
+            <span class="of-card-spacer"></span>
+            <span class="of-card-role">QA</span>
+          </div>
+          <div class="of-card-tags">
+            <span class="of-badge badge-p3">P3</span>
+            <span class="of-badge badge-todo">待处理</span>
+          </div>
+        </div>
+        <div class="of-quick-add">
+          <i data-lucide="plus" style="width:14px;height:14px;color:#94A3B8;"></i>
+          <span>快速创建任务，按 Enter 提交</span>
+        </div>
+      </div>
+
+      <!-- 进行中列 -->
+      <div class="of-kanban-col">
+        <div class="of-col-header">
+          <div class="of-col-dot" style="background:#2563EB;"></div>
+          <span class="of-col-title">进行中</span>
+          <span class="of-col-count">2</span>
+          <div class="of-col-spacer"></div>
+          <div class="of-col-add"><i data-lucide="plus" style="width:16px;height:16px;color:#94A3B8;"></i></div>
+        </div>
+        <div class="of-kanban-card">
+          <div class="of-card-title">实现画廊视图拖拽排序功能</div>
+          <div class="of-card-meta">
+            <span class="of-card-id">ZHO-FE-008</span>
+            <span class="of-card-date">02-12</span>
+            <span class="of-card-spacer"></span>
+            <span class="of-card-role">FE</span>
+          </div>
+          <div class="of-card-tags">
+            <span class="of-badge badge-p1">P1</span>
+            <span class="of-badge badge-progress">进行中</span>
+          </div>
+        </div>
+        <div class="of-quick-add">
+          <i data-lucide="plus" style="width:14px;height:14px;color:#94A3B8;"></i>
+          <span>快速创建任务，按 Enter 提交</span>
+        </div>
+      </div>
+
+      <!-- 已阻塞列 -->
+      <div class="of-kanban-col">
+        <div class="of-col-header">
+          <div class="of-col-dot" style="background:#D97706;"></div>
+          <span class="of-col-title">已阻塞</span>
+          <span class="of-col-count">1</span>
+          <div class="of-col-spacer"></div>
+          <div class="of-col-add"><i data-lucide="plus" style="width:16px;height:16px;color:#94A3B8;"></i></div>
+        </div>
+        <div class="of-kanban-card">
+          <div class="of-card-title">实现认证中间件重构</div>
+          <div class="of-card-meta">
+            <span class="of-card-id">ZHO-BE-012</span>
+            <span class="of-card-date">02-11</span>
+            <span class="of-card-spacer"></span>
+            <span class="of-card-role">BE</span>
+          </div>
+          <div class="of-card-tags">
+            <span class="of-badge badge-p0">P0</span>
+            <span class="of-badge badge-blocked"><span class="of-badge-dot" style="background:#D97706;"></span>已阻塞</span>
+          </div>
+        </div>
+        <div class="of-quick-add">
+          <i data-lucide="plus" style="width:14px;height:14px;color:#94A3B8;"></i>
+          <span>快速创建任务，按 Enter 提交</span>
+        </div>
+      </div>
+
+      <!-- 已完成列 -->
+      <div class="of-kanban-col">
+        <div class="of-col-header">
+          <div class="of-col-dot" style="background:#22C55E;"></div>
+          <span class="of-col-title">已完成</span>
+          <span class="of-col-count">4</span>
+          <div class="of-col-spacer"></div>
+          <div class="of-col-add"><i data-lucide="plus" style="width:16px;height:16px;color:#94A3B8;"></i></div>
+        </div>
+        <div class="of-kanban-card">
+          <div class="of-card-title">数据库索引优化</div>
+          <div class="of-card-meta">
+            <span class="of-card-id">ZHO-BE-009</span>
+            <span class="of-card-date">02-08</span>
+            <span class="of-card-spacer"></span>
+            <span class="of-card-role">BE</span>
+          </div>
+          <div class="of-card-tags">
+            <span class="of-badge badge-p3">P3</span>
+            <span class="of-badge badge-done">已完成</span>
+          </div>
+        </div>
+        <div class="of-quick-add">
+          <i data-lucide="plus" style="width:14px;height:14px;color:#94A3B8;"></i>
+          <span>快速创建任务，按 Enter 提交</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 3. GALLERY VIEW ══════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">画廊视图 (GalleryView · GalleryCard)</div>
+    <div class="of-gallery">
+      <div class="of-gallery-card">
+        <div class="of-gallery-banner" style="background:#BFDBFE;"></div>
+        <div class="of-gallery-body">
+          <div class="of-gallery-title">实现认证中间件重构</div>
+          <div class="of-gallery-desc">对现有认证中间件进行架构重构，提升可维护性和性能，支持多种认证策略切换。</div>
+          <div class="of-gallery-divider"></div>
+          <div class="of-gallery-props">
+            <div class="of-gallery-prop">
+              <i data-lucide="user" style="width:12px;height:12px;color:#94A3B8;"></i>
+              负责角色
+              <span class="of-gallery-prop-val"><span class="of-badge badge-role" style="font-size:10px;padding:1px 6px;">BE</span></span>
+            </div>
+            <div class="of-gallery-prop">
+              <i data-lucide="flag" style="width:12px;height:12px;color:#94A3B8;"></i>
+              优先级
+              <span class="of-gallery-prop-val"><span class="of-badge badge-p0" style="font-size:10px;padding:1px 6px;">P0</span></span>
+            </div>
+          </div>
+          <div class="of-gallery-footer">
+            <span class="of-gallery-id">ZHO-BE-012</span>
+            <span class="of-gallery-fsp"></span>
+            <span class="of-gallery-time">02-11</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="of-gallery-card">
+        <div class="of-gallery-banner" style="background:#BBF7D0;"></div>
+        <div class="of-gallery-body">
+          <div class="of-gallery-title">画廊视图拖拽排序</div>
+          <div class="of-gallery-desc">基于 vue-draggable-plus 实现画廊卡片的拖拽重排，支持跨列移动，动画流畅。</div>
+          <div class="of-gallery-divider"></div>
+          <div class="of-gallery-props">
+            <div class="of-gallery-prop">
+              <i data-lucide="user" style="width:12px;height:12px;color:#94A3B8;"></i>
+              负责角色
+              <span class="of-gallery-prop-val"><span class="of-badge badge-role" style="font-size:10px;padding:1px 6px;">FE</span></span>
+            </div>
+            <div class="of-gallery-prop">
+              <i data-lucide="flag" style="width:12px;height:12px;color:#94A3B8;"></i>
+              优先级
+              <span class="of-gallery-prop-val"><span class="of-badge badge-p1" style="font-size:10px;padding:1px 6px;">P1</span></span>
+            </div>
+          </div>
+          <div class="of-gallery-footer">
+            <span class="of-gallery-id">ZHO-FE-008</span>
+            <span class="of-gallery-fsp"></span>
+            <span class="of-gallery-time">02-12</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="of-gallery-card">
+        <div class="of-gallery-banner" style="background:#FDE68A;"></div>
+        <div class="of-gallery-body">
+          <div class="of-gallery-title">接口回归测试覆盖</div>
+          <div class="of-gallery-desc">对任务、文档、Issue 等核心模块的所有 API 接口进行全量回归测试。</div>
+          <div class="of-gallery-divider"></div>
+          <div class="of-gallery-props">
+            <div class="of-gallery-prop">
+              <i data-lucide="user" style="width:12px;height:12px;color:#94A3B8;"></i>
+              负责角色
+              <span class="of-gallery-prop-val"><span class="of-badge badge-role" style="font-size:10px;padding:1px 6px;">QA</span></span>
+            </div>
+            <div class="of-gallery-prop">
+              <i data-lucide="flag" style="width:12px;height:12px;color:#94A3B8;"></i>
+              优先级
+              <span class="of-gallery-prop-val"><span class="of-badge badge-p2" style="font-size:10px;padding:1px 6px;">P2</span></span>
+            </div>
+          </div>
+          <div class="of-gallery-footer">
+            <span class="of-gallery-id">ZHO-QA-003</span>
+            <span class="of-gallery-fsp"></span>
+            <span class="of-gallery-time">02-10</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 添加按钮 -->
+      <div style="width:260px;min-height:180px;border:1.5px dashed #CBD5E1;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+        <i data-lucide="plus" style="width:20px;height:20px;color:#94A3B8;"></i>
+        <span style="font-size:13px;color:#94A3B8;">添加</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 4. TIMELINE (GANTT) ══════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">时间线视图 (GanttTimeline · GanttRow)</div>
+    <div class="of-gantt">
+      <div class="of-gantt-header">
+        <div class="of-gantt-header-label">任务</div>
+        <div class="of-gantt-dates">
+          <div class="of-gantt-date">02/01</div>
+          <div class="of-gantt-date">02/05</div>
+          <div class="of-gantt-date">02/09</div>
+          <div class="of-gantt-date today">02/13</div>
+          <div class="of-gantt-date">02/17</div>
+          <div class="of-gantt-date">02/21</div>
+          <div class="of-gantt-date">02/25</div>
+          <div class="of-gantt-date">03/01</div>
+        </div>
+      </div>
+      <!-- Row 1 -->
+      <div class="of-gantt-row">
+        <div class="of-gantt-label">
+          <div class="of-gantt-status-dot" style="background:#DC2626;"></div>
+          <span class="of-gantt-task-name">认证中间件重构</span>
+          <span class="of-badge badge-p0" style="font-size:10px;padding:1px 5px;">P0</span>
+        </div>
+        <div class="of-gantt-chart">
+          <div class="of-gantt-bar" style="left:5%;width:28%;background:#FEE2E2;color:#DC2626;">
+            02/03 — 02/14
+          </div>
+        </div>
+      </div>
+      <!-- Row 2 -->
+      <div class="of-gantt-row">
+        <div class="of-gantt-label">
+          <div class="of-gantt-status-dot" style="background:#2563EB;"></div>
+          <span class="of-gantt-task-name">画廊视图拖拽功能</span>
+          <span class="of-badge badge-p1" style="font-size:10px;padding:1px 5px;">P1</span>
+        </div>
+        <div class="of-gantt-chart">
+          <div class="of-gantt-bar" style="left:20%;width:35%;background:#FEF3C7;color:#D97706;">
+            02/08 — 02/20
+          </div>
+        </div>
+      </div>
+      <!-- Row 3 -->
+      <div class="of-gantt-row">
+        <div class="of-gantt-label">
+          <div class="of-gantt-status-dot" style="background:#22C55E;"></div>
+          <span class="of-gantt-task-name">接口回归测试</span>
+          <span class="of-badge badge-p2" style="font-size:10px;padding:1px 5px;">P2</span>
+        </div>
+        <div class="of-gantt-chart">
+          <div class="of-gantt-bar" style="left:40%;width:30%;background:#BFDBFE;color:#1E40AF;">
+            02/14 — 02/24
+          </div>
+        </div>
+      </div>
+      <!-- Row 4 -->
+      <div class="of-gantt-row">
+        <div class="of-gantt-label">
+          <div class="of-gantt-status-dot" style="background:#64748B;"></div>
+          <span class="of-gantt-task-name">数据库索引优化</span>
+          <span class="of-badge badge-p3" style="font-size:10px;padding:1px 5px;">P3</span>
+        </div>
+        <div class="of-gantt-chart">
+          <div class="of-gantt-bar" style="left:60%;width:25%;background:#F1F5F9;color:#64748B;">
+            02/20 — 03/01
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 5. EDITOR BLOCKS ════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">内容编辑器 (ContentBlock · BlockQuote · CodeBlock · RefLink)</div>
+    <div class="demo-card" style="max-width:700px;display:flex;flex-direction:column;gap:16px;">
+
+      <div class="of-content-block">
+        <p>这是一段描述文本，支持多行显示。可以在实例中通过 descendants 覆盖内容，用于任务详情、文档正文等场景。</p>
+        <p style="color:#94A3B8;">第二段内容可以展示更多详情和上下文信息，支持纯文字和行内组件混排。</p>
+      </div>
+
+      <div class="of-blockquote">
+        <p>架构师在做技术选型时，应优先考虑团队已有技术栈的成熟度，避免引入维护成本过高的新技术。<br>
+        <span style="color:#94A3B8;">— 摘自 DECISION-2026-001</span></p>
+      </div>
+
+      <div class="of-code-block">
+        <div class="of-code-header">
+          <span class="of-code-lang">bash</span>
+          <button class="of-code-copy">
+            <i data-lucide="copy" style="width:12px;height:12px;color:#94A3B8;"></i>
+            复制
+          </button>
+        </div>
+        <div class="of-code-line">curl -X POST http://flowapi.local/api/task/create \</div>
+        <div class="of-code-line">  -H "Content-Type: application/json" \</div>
+        <div class="of-code-line">  -d '{"config":{"project":"ZHO","channel":"main"},</div>
+        <div class="of-code-line">      "task":{"title":"新建任务","assignee":"BE","priority":"P1"}}'</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:13px;color:#334155;">相关文档：</span>
+        <span class="of-ref-link">
+          wiki:GLOBAL-API-STANDARDS
+          <i data-lucide="external-link" style="width:10px;height:10px;"></i>
+        </span>
+        <span class="of-ref-link">
+          task:ZHO-BE-012
+        </span>
+        <span class="of-ref-link">
+          memo:2026-02-11
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 6. DETAIL LAYOUT ══════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">任务详情 (DetailLayout · PropPanel · PropRow · CommentItem)</div>
+    <div class="of-detail-layout">
+      <!-- 左侧主内容 -->
+      <div class="of-detail-main">
+        <div class="of-detail-title">实现认证中间件重构</div>
+        <div class="of-detail-meta">
+          <span class="of-badge badge-blocked"><span class="of-badge-dot" style="background:#D97706;"></span>已阻塞</span>
+          <span class="of-badge badge-p0">P0</span>
+          <span class="of-badge badge-role">BE</span>
+        </div>
+
+        <div>
+          <div class="of-detail-section-label" style="margin-bottom:12px;">描述</div>
+          <div class="of-content-block">
+            <p>对现有认证中间件进行架构重构，提升可维护性和性能，支持多种认证策略动态切换。</p>
+            <p style="color:#94A3B8;">依赖 OAuth2 服务完成后方可继续，预计 02/15 解除阻塞。</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="of-detail-section-label" style="margin-bottom:12px;">活动记录</div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="of-comment">
+              <div class="of-avatar" style="background:#6366F1;">B</div>
+              <div class="of-comment-body">
+                <div class="of-comment-header">
+                  <span class="of-comment-author">BE Agent</span>
+                  <span class="of-comment-action">完成了代码提交</span>
+                  <span class="of-comment-time">3 小时前</span>
+                </div>
+                <div class="of-comment-content">commit: auth-middleware-v2 分支已推送，待 OAuth2 服务就绪后合并。</div>
+              </div>
+            </div>
+            <div class="of-comment">
+              <div class="of-avatar" style="background:#D97706;color:#fff;">A</div>
+              <div class="of-comment-body">
+                <div class="of-comment-header">
+                  <span class="of-comment-author">ARCH</span>
+                  <span class="of-comment-action">更新了状态</span>
+                  <span class="of-comment-time">1 天前</span>
+                </div>
+                <div class="of-comment-content">OAuth2 服务延期，该任务标记为已阻塞，等待解除。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧属性面板 -->
+      <div class="of-prop-panel">
+        <div class="of-prop-panel-title">属性</div>
+        <div class="of-prop-row">
+          <span class="of-prop-key">状态</span>
+          <div class="of-prop-val-area">
+            <span class="of-prop-badge" style="color:#D97706;background:#FEF3C7;">
+              <span class="of-badge-dot" style="background:#D97706;"></span>已阻塞
+            </span>
+          </div>
+        </div>
+        <div class="of-prop-row">
+          <span class="of-prop-key">优先级</span>
+          <div class="of-prop-val-area">
+            <span class="of-prop-badge" style="color:#DC2626;background:#FEE2E2;">P0</span>
+          </div>
+        </div>
+        <div class="of-prop-row">
+          <span class="of-prop-key">负责角色</span>
+          <div class="of-prop-val-area">
+            <span class="of-prop-badge" style="color:#4F46E5;background:#EEF2FF;">BE</span>
+          </div>
+        </div>
+        <div class="of-prop-row">
+          <span class="of-prop-key">创建时间</span>
+          <div class="of-prop-val-area">
+            <span class="of-prop-plain">2026-02-05</span>
+          </div>
+        </div>
+        <div class="of-prop-row">
+          <span class="of-prop-key">截止日期</span>
+          <div class="of-prop-val-area">
+            <span class="of-prop-plain">2026-02-20</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 7. BADGES ════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">徽章系统 (ColorMap 数据驱动，支持任意自定义值)</div>
+    <div class="demo-card" style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <span class="demo-label">状态徽章（内置默认，可通过 statusColorMap 完全覆盖）</span>
+        <div class="demo-row">
+          <span class="of-badge badge-todo">待处理</span>
+          <span class="of-badge badge-progress">进行中</span>
+          <span class="of-badge badge-blocked"><span class="of-badge-dot" style="background:#D97706;"></span>已阻塞</span>
+          <span class="of-badge badge-done">已完成</span>
+        </div>
+      </div>
+      <div>
+        <span class="demo-label">优先级徽章（内置 P0-P3，可自定义为 urgent/high/medium/low 等任意值）</span>
+        <div class="demo-row">
+          <span class="of-badge badge-p0">P0</span>
+          <span class="of-badge badge-p1">P1</span>
+          <span class="of-badge badge-p2">P2</span>
+          <span class="of-badge badge-p3">P3</span>
+        </div>
+        <div class="demo-row" style="margin-top:8px;">
+          <span style="font-size:12px;color:#94A3B8;">自定义值示例：</span>
+          <span class="of-badge" style="color:#DC2626;background:#FEE2E2;">紧急</span>
+          <span class="of-badge" style="color:#D97706;background:#FEF3C7;">高</span>
+          <span class="of-badge" style="color:#2563EB;background:#DBEAFE;">中</span>
+          <span class="of-badge" style="color:#64748B;background:#F1F5F9;">低</span>
+        </div>
+      </div>
+      <div>
+        <span class="demo-label">角色 / 自定义徽章</span>
+        <div class="demo-row">
+          <span class="of-badge badge-role">BE</span>
+          <span class="of-badge badge-role">FE</span>
+          <span class="of-badge badge-role">QA</span>
+          <span class="of-badge badge-role">ARCH</span>
+          <span class="of-badge badge-role">PM</span>
+          <span class="of-badge" style="color:#7C3AED;background:#EDE9FE;">审核中</span>
+          <span class="of-badge" style="color:#0891B2;background:#CFFAFE;">部署中</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       AI 原生组件
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">AI 思考状态 · AiThinking</div>
+    <div class="demo-card" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+      <!-- md size -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div class="ai-thinking ai-thinking--md">
+          <span class="ai-thinking__dot"></span>
+          <span class="ai-thinking__dot"></span>
+          <span class="ai-thinking__dot"></span>
+        </div>
+        <span style="font-size:11px;color:#94A3B8;">size=md（默认）</span>
+      </div>
+      <!-- sm size -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div class="ai-thinking ai-thinking--sm">
+          <span class="ai-thinking__dot"></span>
+          <span class="ai-thinking__dot"></span>
+          <span class="ai-thinking__dot"></span>
+        </div>
+        <span style="font-size:11px;color:#94A3B8;">size=sm</span>
+      </div>
+      <!-- in context -->
+      <div style="display:flex;align-items:flex-end;gap:12px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🤖</div>
+        <div class="ai-thinking ai-thinking--md">
+          <span class="ai-thinking__dot"></span>
+          <span class="ai-thinking__dot"></span>
+          <span class="ai-thinking__dot"></span>
+        </div>
+      </div>
+      <span style="font-size:11px;color:#94A3B8;margin-left:4px;">实际对话场景中的位置</span>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-section-title">流式输出光标 · AiStreamingCursor</div>
+    <div class="demo-card" style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <span class="demo-label">光标插入文本末尾</span>
+        <div style="font-size:14px;color:#1E293B;line-height:1.8;margin-top:8px;">
+          正在为你生成内容，这是一段持续输出的文字流...
+          <span class="ai-cursor"></span>
+        </div>
+      </div>
+      <div>
+        <span class="demo-label">标题级别</span>
+        <div style="font-size:20px;font-weight:600;color:#1E293B;margin-top:8px;">
+          深度学习在自然语言处理中的应用<span class="ai-cursor"></span>
+        </div>
+      </div>
+      <div>
+        <span class="demo-label">代码块内</span>
+        <div style="background:#1E293B;color:#E2E8F0;padding:12px 16px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;margin-top:8px;">
+          <span style="color:#7C9DFF;">const</span> result = <span style="color:#86EFAC;">await</span> llm.generate(prompt)<span class="ai-cursor" style="background:#E2E8F0;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-section-title">AI 消息气泡 · AiMessageBubble / UserMessageBubble</div>
+    <div class="demo-card" style="display:flex;flex-direction:column;gap:0;">
+      <!-- User message -->
+      <div class="msg-row msg-row--user">
+        <div class="msg-bubble msg-bubble--user">
+          帮我写一份项目架构方案，要包含前后端技术选型和部署方案
+        </div>
+        <div class="msg-avatar msg-avatar--user">G</div>
+      </div>
+      <!-- AI message -->
+      <div class="msg-row msg-row--ai">
+        <div class="msg-avatar msg-avatar--ai">🤖</div>
+        <div style="display:flex;flex-direction:column;gap:4px;max-width:580px;">
+          <div style="font-size:11px;font-weight:600;color:#6366F1;margin-left:2px;">OneFlow AI</div>
+          <div class="msg-bubble msg-bubble--ai">
+            好的！以下是项目架构方案：<br><br>
+            <strong>前端技术栈</strong><br>
+            • Vue 3 + TypeScript + Vite<br>
+            • Pinia 状态管理<br>
+            • oneflow-ui 组件库
+          </div>
+          <div style="font-size:11px;color:#94A3B8;margin-left:2px;">10:24</div>
+        </div>
+      </div>
+      <!-- AI streaming -->
+      <div class="msg-row msg-row--ai">
+        <div class="msg-avatar msg-avatar--ai">🤖</div>
+        <div style="display:flex;flex-direction:column;gap:4px;max-width:580px;">
+          <div style="font-size:11px;font-weight:600;color:#6366F1;margin-left:2px;">OneFlow AI <span style="font-weight:400;color:#94A3B8;">· 流式输出中</span></div>
+          <div class="msg-bubble msg-bubble--ai">
+            <strong>后端技术栈</strong><br>
+            • FastAPI + Python 3.11<br>
+            • PostgreSQL + Redis 缓存<span class="ai-cursor" style="vertical-align:middle;"></span>
+          </div>
+        </div>
+      </div>
+      <!-- User message 2 -->
+      <div class="msg-row msg-row--user">
+        <div class="msg-bubble msg-bubble--user">
+          部署方案用 Docker + K8s 可以吗？
+        </div>
+        <div class="msg-avatar msg-avatar--user">G</div>
+      </div>
+      <!-- Error message -->
+      <div class="msg-row msg-row--ai">
+        <div class="msg-avatar msg-avatar--ai">🤖</div>
+        <div style="display:flex;flex-direction:column;gap:4px;max-width:580px;">
+          <div class="msg-bubble msg-bubble--ai msg-bubble--error">
+            <i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline;margin-right:6px;vertical-align:middle;"></i>
+            请求超时，请重试
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-section-title">AI 完整对话界面 · AiMessageList + AiSender</div>
+    <div class="demo-card" style="padding:0;overflow:hidden;height:520px;display:flex;flex-direction:column;">
+      <!-- Chat header -->
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid #E2E8F0;background:#fff;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:16px;">🤖</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#1E293B;">OneFlow AI 助手</div>
+          <div style="font-size:11px;color:#22C55E;">● 在线</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button class="icon-btn"><i data-lucide="rotate-ccw" style="width:15px;height:15px;"></i></button>
+          <button class="icon-btn"><i data-lucide="maximize-2" style="width:15px;height:15px;"></i></button>
+        </div>
+      </div>
+      <!-- Message list -->
+      <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:4px;background:#F8FAFC;">
+        <div class="msg-row msg-row--ai">
+          <div class="msg-avatar msg-avatar--ai">🤖</div>
+          <div style="display:flex;flex-direction:column;gap:4px;max-width:520px;">
+            <div style="font-size:11px;font-weight:600;color:#6366F1;margin-left:2px;">OneFlow AI</div>
+            <div class="msg-bubble msg-bubble--ai">你好！我是 OneFlow AI 助手。有什么可以帮你的？</div>
+            <div style="font-size:11px;color:#94A3B8;margin-left:2px;">10:00</div>
+          </div>
+        </div>
+        <div class="msg-row msg-row--user">
+          <div class="msg-bubble msg-bubble--user">帮我分析下这个组件库的架构</div>
+          <div class="msg-avatar msg-avatar--user">U</div>
+        </div>
+        <div class="msg-row msg-row--ai">
+          <div class="msg-avatar msg-avatar--ai">🤖</div>
+          <div style="display:flex;flex-direction:column;gap:4px;max-width:520px;">
+            <div style="font-size:11px;font-weight:600;color:#6366F1;margin-left:2px;">OneFlow AI</div>
+            <div class="msg-bubble msg-bubble--ai">
+              oneflow-ui 采用模块化架构设计，分为以下几层：<br><br>
+              <strong>组件层</strong>：按视图类型组织（table/kanban/gallery/timeline/editor/detail/ai）<br>
+              <strong>Composables 层</strong>：useBadge、useTable、useTableFilter、useAiChat 等<br>
+              <strong>类型层</strong>：ColorMap、BadgeConfig 等数据驱动接口<br><br>
+              核心理念是<strong>数据驱动</strong>——状态、优先级等枚举值完全由调用方定义。
+            </div>
+            <div style="font-size:11px;color:#94A3B8;margin-left:2px;">10:01</div>
+          </div>
+        </div>
+        <div id="thinking-indicator" style="display:none;" class="msg-row msg-row--ai">
+          <div class="msg-avatar msg-avatar--ai">🤖</div>
+          <div class="ai-thinking ai-thinking--md">
+            <span class="ai-thinking__dot"></span>
+            <span class="ai-thinking__dot"></span>
+            <span class="ai-thinking__dot"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Sender -->
+      <div style="padding:12px 16px;border-top:1px solid #E2E8F0;background:#fff;flex-shrink:0;">
+        <div class="ai-sender" id="ai-sender">
+          <div style="display:flex;gap:6px;align-items:center;padding:0 4px 8px;border-bottom:1px solid #F1F5F9;">
+            <button class="sender-tool-btn"><i data-lucide="paperclip" style="width:14px;height:14px;"></i></button>
+            <button class="sender-tool-btn"><i data-lucide="image" style="width:14px;height:14px;"></i></button>
+            <button class="sender-tool-btn"><i data-lucide="code-2" style="width:14px;height:14px;"></i></button>
+            <span style="font-size:11px;color:#94A3B8;margin-left:auto;">Shift+Enter 换行</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:8px;padding-top:8px;">
+            <textarea
+              id="chat-input"
+              class="sender-textarea"
+              placeholder="输入消息，Enter 发送..."
+              rows="1"
+              onkeydown="handleChatKey(event)"
+              oninput="autoResize(this)"
+            ></textarea>
+            <button class="sender-send-btn" id="send-btn" onclick="sendMessage()">
+              <i data-lucide="arrow-up" style="width:16px;height:16px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       表格增强：筛选面板 · TableFilterPanel
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">多条件筛选面板 · TableFilterPanel</div>
+    <div class="demo-card" style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- 面板本体 -->
+      <div class="filter-panel">
+        <div class="filter-panel__header">
+          <span class="filter-panel__title">筛选</span>
+          <span style="font-size:11px;color:#94A3B8;">已激活 2 个条件</span>
+          <button class="icon-btn" style="margin-left:auto;"><i data-lucide="x" style="width:13px;height:13px;"></i></button>
+        </div>
+        <!-- Condition 1 -->
+        <div class="filter-condition">
+          <span class="filter-cond-label">当</span>
+          <select class="filter-select" style="max-width:110px;">
+            <option selected>标题</option>
+            <option>状态</option>
+            <option>优先级</option>
+            <option>负责人</option>
+          </select>
+          <select class="filter-select">
+            <option selected>包含</option>
+            <option>不包含</option>
+            <option>等于</option>
+            <option>开头是</option>
+          </select>
+          <input class="filter-input" value="登录" placeholder="输入值..." />
+          <button class="filter-remove-btn"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
+        </div>
+        <!-- Logic toggle -->
+        <div class="filter-condition">
+          <span style="display:flex;gap:3px;">
+            <button class="logic-btn logic-btn--active">且</button>
+            <button class="logic-btn">或</button>
+          </span>
+          <select class="filter-select" style="max-width:110px;">
+            <option>状态</option>
+            <option selected>优先级</option>
+            <option>标题</option>
+          </select>
+          <select class="filter-select">
+            <option selected>等于</option>
+            <option>不等于</option>
+          </select>
+          <input class="filter-input" value="P0" />
+          <button class="filter-remove-btn"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
+        </div>
+        <!-- Add condition -->
+        <div class="filter-condition">
+          <span style="display:flex;gap:3px;">
+            <button class="logic-btn logic-btn--active">且</button>
+            <button class="logic-btn">或</button>
+          </span>
+          <select class="filter-select" style="max-width:110px;">
+            <option selected>负责人</option>
+            <option>状态</option>
+          </select>
+          <select class="filter-select">
+            <option selected>不为空</option>
+            <option>为空</option>
+          </select>
+          <span style="flex:1;"></span>
+          <button class="filter-remove-btn"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
+        </div>
+        <div class="filter-panel__footer">
+          <button class="filter-add-btn"><i data-lucide="plus" style="width:12px;height:12px;"></i> 添加条件</button>
+          <button style="font-size:12px;color:#94A3B8;background:none;border:none;cursor:pointer;margin-left:auto;font-family:inherit;">清除全部</button>
+        </div>
+      </div>
+
+      <!-- 使用说明 -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="info-chip"><i data-lucide="filter" style="width:12px;height:12px;"></i> 支持 AND / OR 逻辑切换</div>
+        <div class="info-chip"><i data-lucide="type" style="width:12px;height:12px;"></i> 字符串操作符：包含/等于/开头/为空 等 8 种</div>
+        <div class="info-chip"><i data-lucide="hash" style="width:12px;height:12px;"></i> 数字操作符：大于/小于/等于 等 8 种</div>
+        <div class="info-chip"><i data-lucide="layers" style="width:12px;height:12px;"></i> 无限叠加条件</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       列管理器 · TableColumnManager
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">列管理器 · TableColumnManager（可见性 + 拖拽排序）</div>
+    <div class="demo-card" style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+      <!-- Column manager panel -->
+      <div class="col-manager">
+        <div class="col-manager__header">
+          <span class="col-manager__title">管理列</span>
+          <button class="icon-btn"><i data-lucide="x" style="width:13px;height:13px;"></i></button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <button class="col-action-btn"><i data-lucide="eye" style="width:11px;height:11px;"></i> 显示全部</button>
+          <button class="col-action-btn"><i data-lucide="eye-off" style="width:11px;height:11px;"></i> 隐藏全部</button>
+        </div>
+        <div class="col-manager__list">
+          <div class="col-manager-row">
+            <span class="col-drag"><i data-lucide="grip-vertical" style="width:13px;height:13px;"></i></span>
+            <input type="checkbox" checked class="col-check" />
+            <span class="col-label">标题</span>
+          </div>
+          <div class="col-manager-row">
+            <span class="col-drag"><i data-lucide="grip-vertical" style="width:13px;height:13px;"></i></span>
+            <input type="checkbox" checked class="col-check" />
+            <span class="col-label">状态</span>
+          </div>
+          <div class="col-manager-row">
+            <span class="col-drag"><i data-lucide="grip-vertical" style="width:13px;height:13px;"></i></span>
+            <input type="checkbox" class="col-check" />
+            <span class="col-label col-label--dimmed">优先级</span>
+          </div>
+          <div class="col-manager-row">
+            <span class="col-drag"><i data-lucide="grip-vertical" style="width:13px;height:13px;"></i></span>
+            <input type="checkbox" checked class="col-check" />
+            <span class="col-label">负责人</span>
+          </div>
+          <div class="col-manager-row">
+            <span class="col-drag"><i data-lucide="grip-vertical" style="width:13px;height:13px;"></i></span>
+            <input type="checkbox" class="col-check" />
+            <span class="col-label col-label--dimmed">创建时间</span>
+          </div>
+          <div class="col-manager-row">
+            <span class="col-drag"><i data-lucide="grip-vertical" style="width:13px;height:13px;"></i></span>
+            <input type="checkbox" checked class="col-check" />
+            <span class="col-label">截止日期</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview table -->
+      <div style="flex:1;min-width:300px;">
+        <div style="font-size:12px;color:#64748B;margin-bottom:10px;">对应表格预览（隐藏了「优先级」「创建时间」列）</div>
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>标题</th>
+              <th>状态</th>
+              <th>负责人</th>
+              <th>截止日期</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>用户登录模块</td>
+              <td><span class="of-badge" style="color:#2563EB;background:#DBEAFE;">进行中</span></td>
+              <td>张三</td>
+              <td>03/15</td>
+            </tr>
+            <tr>
+              <td>数据看板设计</td>
+              <td><span class="of-badge" style="color:#22C55E;background:#DCFCE7;">已完成</span></td>
+              <td>李四</td>
+              <td>03/10</td>
+            </tr>
+            <tr>
+              <td>API 接口文档</td>
+              <td><span class="of-badge" style="color:#D97706;background:#FEF3C7;">已阻塞</span></td>
+              <td>王五</td>
+              <td>03/20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       表格工具栏完整组合演示
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">表格工具栏完整组合 · 筛选 + 列管理 + Excel 导出 + 分页</div>
+    <div class="demo-card" style="padding:0;overflow:hidden;">
+      <!-- Toolbar -->
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #E2E8F0;flex-wrap:wrap;">
+        <button class="toolbar-btn toolbar-btn--active">
+          <i data-lucide="filter" style="width:13px;height:13px;"></i> 筛选
+          <span style="background:#6366F1;color:white;font-size:10px;padding:1px 5px;border-radius:10px;margin-left:2px;">2</span>
+        </button>
+        <button class="toolbar-btn">
+          <i data-lucide="columns-3" style="width:13px;height:13px;"></i> 列
+        </button>
+        <button class="toolbar-btn">
+          <i data-lucide="arrow-up-down" style="width:13px;height:13px;"></i> 排序
+        </button>
+        <button class="toolbar-btn">
+          <i data-lucide="group" style="width:13px;height:13px;"></i> 分组
+        </button>
+        <div style="flex:1;"></div>
+        <button class="toolbar-btn">
+          <i data-lucide="search" style="width:13px;height:13px;"></i>
+        </button>
+        <button class="excel-btn">
+          <i data-lucide="download" style="width:14px;height:14px;"></i> 导出 Excel
+        </button>
+        <button class="toolbar-btn toolbar-btn--primary">
+          <i data-lucide="plus" style="width:13px;height:13px;"></i> 新建任务
+        </button>
+      </div>
+      <!-- Filter bar (active) -->
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:#EEF2FF;border-bottom:1px solid #C7D2FE;font-size:12px;flex-wrap:wrap;">
+        <i data-lucide="filter" style="width:13px;height:13px;color:#6366F1;"></i>
+        <span style="color:#4338CA;font-weight:500;">筛选条件：</span>
+        <span class="filter-tag">标题 包含 "登录" <button onclick="this.parentNode.remove()" style="background:none;border:none;cursor:pointer;color:#6366F1;padding:0 0 0 3px;">×</button></span>
+        <span style="color:#6366F1;">且</span>
+        <span class="filter-tag">优先级 等于 P0 <button onclick="this.parentNode.remove()" style="background:none;border:none;cursor:pointer;color:#6366F1;padding:0 0 0 3px;">×</button></span>
+        <button style="color:#6366F1;background:none;border:none;cursor:pointer;font-size:11px;margin-left:4px;font-family:inherit;">+ 添加条件</button>
+        <button style="color:#94A3B8;background:none;border:none;cursor:pointer;font-size:11px;margin-left:auto;font-family:inherit;">清除全部</button>
+      </div>
+      <!-- Table -->
+      <div style="overflow-x:auto;">
+        <table class="preview-table preview-table--full">
+          <thead>
+            <tr>
+              <th style="width:32px;"><input type="checkbox" /></th>
+              <th style="min-width:240px;">标题 <i data-lucide="arrow-up" style="width:11px;height:11px;display:inline;"></i></th>
+              <th>状态</th>
+              <th>优先级</th>
+              <th>负责人</th>
+              <th>截止日期</th>
+              <th style="width:60px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" checked /></td>
+              <td style="font-weight:500;">用户登录模块优化</td>
+              <td><span class="of-badge" style="color:#2563EB;background:#DBEAFE;">进行中</span></td>
+              <td><span class="of-badge badge-p0">P0</span></td>
+              <td>张三</td>
+              <td>03/15</td>
+              <td style="text-align:center;"><button class="icon-btn"><i data-lucide="more-horizontal" style="width:13px;height:13px;"></i></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td style="font-weight:500;">API 登录接口文档编写</td>
+              <td><span class="of-badge" style="color:#D97706;background:#FEF3C7;">已阻塞</span></td>
+              <td><span class="of-badge badge-p0">P0</span></td>
+              <td>王五</td>
+              <td>03/20</td>
+              <td style="text-align:center;"><button class="icon-btn"><i data-lucide="more-horizontal" style="width:13px;height:13px;"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #E2E8F0;font-size:12px;color:#64748B;flex-wrap:wrap;gap:8px;">
+        <span>共 <strong>2</strong> 条（已筛选，原始共 24 条）</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="margin-right:4px;">每页</span>
+          <select style="font-size:12px;border:1px solid #E2E8F0;border-radius:6px;padding:3px 6px;background:#fff;color:#334155;">
+            <option>20</option>
+            <option>50</option>
+            <option>100</option>
+          </select>
+          <span style="margin:0 4px;">条</span>
+          <button class="page-btn" disabled><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button>
+          <button class="page-btn page-btn--active">1</button>
+          <button class="page-btn" disabled><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       useTable · 分页 + 排序 状态演示
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">useTable · 分页 / 排序 / 行选择 交互演示</div>
+    <div class="demo-card" style="padding:0;overflow:hidden;">
+      <!-- Selection bar (shown when rows selected) -->
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#F0F9FF;border-bottom:1px solid #BAE6FD;font-size:12px;">
+        <input type="checkbox" checked />
+        <span style="color:#0369A1;font-weight:500;">已选 <strong>3</strong> 行</span>
+        <button style="font-size:12px;color:#0369A1;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> 批量删除</button>
+        <button style="font-size:12px;color:#0369A1;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;"><i data-lucide="tag" style="width:13px;height:13px;"></i> 批量标记</button>
+        <button style="font-size:12px;color:#0369A1;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:13px;height:13px;"></i> 导出选中</button>
+        <button style="margin-left:auto;font-size:12px;color:#64748B;background:none;border:none;cursor:pointer;font-family:inherit;">取消选择</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="preview-table preview-table--full">
+          <thead>
+            <tr>
+              <th style="width:32px;"><input type="checkbox" /></th>
+              <th>
+                <span style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                  标题 <i data-lucide="arrow-up" style="width:11px;height:11px;color:#6366F1;"></i>
+                </span>
+              </th>
+              <th>
+                <span style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                  状态 <i data-lucide="chevrons-up-down" style="width:11px;height:11px;color:#CBD5E1;"></i>
+                </span>
+              </th>
+              <th>
+                <span style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                  优先级 <i data-lucide="chevrons-up-down" style="width:11px;height:11px;color:#CBD5E1;"></i>
+                </span>
+              </th>
+              <th>负责人</th>
+              <th>
+                <span style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                  截止日期 <i data-lucide="chevrons-up-down" style="width:11px;height:11px;color:#CBD5E1;"></i>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#F0F9FF;">
+              <td><input type="checkbox" checked /></td>
+              <td style="font-weight:500;">用户登录模块</td>
+              <td><span class="of-badge" style="color:#2563EB;background:#DBEAFE;">进行中</span></td>
+              <td><span class="of-badge badge-p0">P0</span></td>
+              <td>张三</td>
+              <td>03/15</td>
+            </tr>
+            <tr style="background:#F0F9FF;">
+              <td><input type="checkbox" checked /></td>
+              <td style="font-weight:500;">数据看板设计</td>
+              <td><span class="of-badge" style="color:#22C55E;background:#DCFCE7;">已完成</span></td>
+              <td><span class="of-badge badge-p1">P1</span></td>
+              <td>李四</td>
+              <td>03/10</td>
+            </tr>
+            <tr style="background:#F0F9FF;">
+              <td><input type="checkbox" checked /></td>
+              <td style="font-weight:500;">API 接口文档</td>
+              <td><span class="of-badge" style="color:#D97706;background:#FEF3C7;">已阻塞</span></td>
+              <td><span class="of-badge badge-p0">P0</span></td>
+              <td>王五</td>
+              <td>03/20</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td style="font-weight:500;">单元测试覆盖</td>
+              <td><span class="of-badge badge-todo">待处理</span></td>
+              <td><span class="of-badge badge-p2">P2</span></td>
+              <td>赵六</td>
+              <td>03/25</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td style="font-weight:500;">性能优化专项</td>
+              <td><span class="of-badge badge-todo">待处理</span></td>
+              <td><span class="of-badge badge-p1">P1</span></td>
+              <td>钱七</td>
+              <td>03/30</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination full -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #E2E8F0;font-size:12px;color:#64748B;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span>共 <strong>48</strong> 条</span>
+          <span style="color:#CBD5E1;">|</span>
+          <span>每页</span>
+          <select style="font-size:12px;border:1px solid #E2E8F0;border-radius:6px;padding:3px 6px;background:#fff;color:#334155;">
+            <option>10</option>
+            <option selected>20</option>
+            <option>50</option>
+          </select>
+          <span>条</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button class="page-btn"><i data-lucide="chevrons-left" style="width:13px;height:13px;"></i></button>
+          <button class="page-btn"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button>
+          <button class="page-btn page-btn--active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span style="padding:0 4px;color:#94A3B8;">…</span>
+          <button class="page-btn">5</button>
+          <button class="page-btn"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
+          <button class="page-btn"><i data-lucide="chevrons-right" style="width:13px;height:13px;"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       Composables 说明卡片
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">Composables 使用示例</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+
+      <div class="composable-card">
+        <div class="composable-card__header">
+          <span class="composable-badge">useAiChat</span>
+          <span class="composable-desc">AI 对话状态管理</span>
+        </div>
+        <pre class="composable-code">const { messages, isGenerating, send, cancel } = useAiChat({
+  sendRequest: async (content) => {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    })
+    return res.body // ReadableStream
+  },
+  parseChunk: (data) => data?.answer ?? null,
+  typewriter: true,         // 打字机效果
+  typewriterSpeed: 20,      // ms/字符
+})</pre>
+      </div>
+
+      <div class="composable-card">
+        <div class="composable-card__header">
+          <span class="composable-badge">useStream</span>
+          <span class="composable-desc">通用流式处理</span>
+        </div>
+        <pre class="composable-code">const { isStreaming, start, cancel } = useStream({
+  mode: 'sse',  // 'raw' | 'sse'
+  onData: (parsed) => {
+    fullText.value += parsed.answer
+  },
+  onDone: () => console.log('完成'),
+})
+// 绑定到 fetch Response.body
+await start(response.body)</pre>
+      </div>
+
+      <div class="composable-card">
+        <div class="composable-card__header">
+          <span class="composable-badge">useTable</span>
+          <span class="composable-desc">表格状态管理</span>
+        </div>
+        <pre class="composable-code">const { data, pagination, sort,
+  toggleSort, setPage, selectedCount,
+  toggleRowSelection, isAllSelected,
+} = useTable({
+  data: rawRows,
+  pageSize: 20,
+  // 服务端分页：
+  serverSide: true,
+  onFetch: async ({ page, pageSize, sort }) =>
+    api.getTasks({ page, pageSize, sort }),
+})</pre>
+      </div>
+
+      <div class="composable-card">
+        <div class="composable-card__header">
+          <span class="composable-badge">useTableFilter</span>
+          <span class="composable-desc">多条件筛选</span>
+        </div>
+        <pre class="composable-code">const { conditions, addCondition,
+  updateCondition, filterData, isActive,
+} = useTableFilter({ columns })
+
+// 与 useTable 组合使用：
+const filtered = computed(() =>
+  filterData(rawRows.value)
+)
+table.setData(filtered.value)</pre>
+      </div>
+
+      <div class="composable-card">
+        <div class="composable-card__header">
+          <span class="composable-badge">useTypewriter</span>
+          <span class="composable-desc">打字机效果</span>
+        </div>
+        <pre class="composable-code">const { displayText, isTyping,
+  append, reset, flush
+} = useTypewriter({ speed: 20 })
+
+// 流式输出时逐字显示：
+onChunk: (text) => append(text)
+
+// 紧急停止时直接完成：
+cancel: () => flush()</pre>
+      </div>
+
+      <div class="composable-card">
+        <div class="composable-card__header">
+          <span class="composable-badge">useBadge + ColorMap</span>
+          <span class="composable-desc">数据驱动徽章</span>
+        </div>
+        <pre class="composable-code">// 完全自定义状态映射：
+const myStatusMap: ColorMap = {
+  draft:     { text:'#64748B', bg:'#F1F5F9', label:'草稿' },
+  reviewing: { text:'#7C3AED', bg:'#EDE9FE', label:'审核中' },
+  published: { text:'#22C55E', bg:'#DCFCE7', label:'已发布' },
+}
+// 传给任意组件：
+&lt;DataTable :statusColorMap="myStatusMap" /&gt;</pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ NEW: StatisticCard ═══════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">统计卡片 (StatisticCard)</div>
+    <div class="demo-row" style="flex-wrap:wrap;gap:12px;">
+      <div class="stat-card">
+        <div class="stat-icon-wrap" style="background:#DBEAFE;">
+          <i data-lucide="database" style="width:22px;height:22px;color:#2563EB;"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">1,234</div>
+          <div class="stat-label">知识库数量</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap" style="background:#DCFCE7;">
+          <i data-lucide="check-circle-2" style="width:22px;height:22px;color:#16A34A;"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">98.6%</div>
+          <div class="stat-label">任务完成率</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap" style="background:#FEF3C7;">
+          <i data-lucide="clock" style="width:22px;height:22px;color:#D97706;"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">42</div>
+          <div class="stat-label">待处理任务</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap" style="background:#EDE9FE;">
+          <i data-lucide="bot" style="width:22px;height:22px;color:#7C3AED;"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">8</div>
+          <div class="stat-label">活跃 AI Agent</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap" style="background:#FEE2E2;">
+          <i data-lucide="alert-triangle" style="width:22px;height:22px;color:#DC2626;"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">3</div>
+          <div class="stat-label">阻塞中任务</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ NEW: EmptyState ═══════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">空状态 (EmptyState)</div>
+    <div class="demo-row" style="gap:16px;flex-wrap:wrap;">
+      <!-- 基础空态 -->
+      <div class="demo-card" style="flex:1;min-width:260px;display:flex;align-items:center;justify-content:center;min-height:200px;">
+        <div class="empty-state">
+          <i data-lucide="inbox" style="width:40px;height:40px;color:#CBD5E1;"></i>
+          <div class="empty-state__title">暂无数据</div>
+          <div class="empty-state__desc">当前列表为空，快来创建第一条记录吧</div>
+          <button class="empty-state__btn">
+            <i data-lucide="plus" style="width:13px;height:13px;"></i> 新建任务
+          </button>
+        </div>
+      </div>
+      <!-- 搜索无结果 -->
+      <div class="demo-card" style="flex:1;min-width:260px;display:flex;align-items:center;justify-content:center;min-height:200px;">
+        <div class="empty-state">
+          <i data-lucide="search-x" style="width:40px;height:40px;color:#CBD5E1;"></i>
+          <div class="empty-state__title">未找到匹配结果</div>
+          <div class="empty-state__desc">尝试调整筛选条件或关键词</div>
+          <button class="empty-state__btn empty-state__btn--ghost">清除筛选</button>
+        </div>
+      </div>
+      <!-- AI 无对话 -->
+      <div class="demo-card" style="flex:1;min-width:260px;display:flex;align-items:center;justify-content:center;min-height:200px;">
+        <div class="empty-state">
+          <i data-lucide="message-square-dashed" style="width:40px;height:40px;color:#CBD5E1;"></i>
+          <div class="empty-state__title">开始你的第一个对话</div>
+          <div class="empty-state__desc">输入问题，AI 助手随时为你解答</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ NEW: ButtonGroup ══════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">按钮组 (ButtonGroup)</div>
+    <div class="demo-card" style="display:flex;flex-direction:column;gap:24px;">
+
+      <div>
+        <span class="demo-label">2 列 — 视图切换（无图标）</span>
+        <div class="btn-group btn-group--2" id="bg1">
+          <button class="btn-group-item btn-group-item--active" onclick="selectBtnGroup('bg1',this)">列表视图</button>
+          <button class="btn-group-item" onclick="selectBtnGroup('bg1',this)">卡片视图</button>
+        </div>
+      </div>
+
+      <div>
+        <span class="demo-label">3 列 — 搜索模式（带图标）</span>
+        <div class="btn-group btn-group--3" id="bg2">
+          <button class="btn-group-item" onclick="selectBtnGroup('bg2',this)">
+            <i data-lucide="search" style="width:14px;height:14px;"></i> 全文搜索
+          </button>
+          <button class="btn-group-item btn-group-item--active" onclick="selectBtnGroup('bg2',this)">
+            <i data-lucide="cpu" style="width:14px;height:14px;"></i> 向量搜索
+          </button>
+          <button class="btn-group-item" onclick="selectBtnGroup('bg2',this)">
+            <i data-lucide="sliders" style="width:14px;height:14px;"></i> 混合搜索
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <span class="demo-label">4 列 — 优先级选择</span>
+        <div class="btn-group btn-group--4" id="bg3">
+          <button class="btn-group-item btn-group-item--active" onclick="selectBtnGroup('bg3',this)" style="color:#DC2626;">P0 紧急</button>
+          <button class="btn-group-item" onclick="selectBtnGroup('bg3',this)">P1 高</button>
+          <button class="btn-group-item" onclick="selectBtnGroup('bg3',this)">P2 中</button>
+          <button class="btn-group-item" onclick="selectBtnGroup('bg3',this)">P3 低</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ NEW: RangeSlider ══════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">范围滑块 (RangeSlider)</div>
+    <div class="demo-card" style="max-width:480px;display:flex;flex-direction:column;gap:24px;">
+
+      <div class="range-field">
+        <div class="range-field__label">
+          <span>最大输出长度</span>
+          <span class="range-field__val" id="rv1">1000</span>
+        </div>
+        <input type="range" class="range-input" min="100" max="4000" step="100" value="1000"
+          oninput="document.getElementById('rv1').textContent=this.value" />
+        <div class="range-field__desc">调整 AI 单次回复的最大 Token 数量</div>
+      </div>
+
+      <div class="range-field">
+        <div class="range-field__label">
+          <span>温度 (Temperature)</span>
+          <span class="range-field__val" id="rv2">0.7</span>
+        </div>
+        <input type="range" class="range-input" min="0" max="1" step="0.1" value="0.7"
+          oninput="document.getElementById('rv2').textContent=Number(this.value).toFixed(1)" />
+        <div class="range-field__desc">值越高回复越发散，值越低越保守</div>
+      </div>
+
+      <div class="range-field">
+        <div class="range-field__label">
+          <span>每页显示条数</span>
+          <span class="range-field__val" id="rv3">20</span>
+        </div>
+        <input type="range" class="range-input" min="10" max="100" step="10" value="20"
+          oninput="document.getElementById('rv3').textContent=this.value" />
+        <div class="range-field__desc">分页大小，影响首屏加载数量</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ NEW: DropdownMenu ═════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">下拉操作菜单 (DropdownMenu)</div>
+    <div class="demo-card" style="display:flex;flex-direction:column;gap:0;">
+      <!-- 模拟一个表格行 + 行末操作菜单 -->
+      <div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--of-color-gray-100);background:var(--of-color-gray-50);font-size:12px;font-weight:600;color:var(--of-color-gray-500);">
+        <span style="flex:1;">任务标题</span>
+        <span style="width:80px;">状态</span>
+        <span style="width:60px;text-align:right;">操作</span>
+      </div>
+      <div class="dd-row">
+        <span class="dd-title">实现认证中间件重构</span>
+        <span class="of-badge badge-blocked" style="width:80px;justify-content:center;">已阻塞</span>
+        <div class="dd-actions" style="position:relative;">
+          <button class="dd-trigger" onclick="toggleDropdown('dd1')">
+            <i data-lucide="more-horizontal" style="width:16px;height:16px;"></i>
+          </button>
+          <div class="dd-menu" id="dd1" style="display:none;">
+            <button class="dd-item" onclick="closeDropdown('dd1')"><i data-lucide="edit-2" style="width:13px;height:13px;"></i> 编辑</button>
+            <button class="dd-item" onclick="closeDropdown('dd1')"><i data-lucide="copy" style="width:13px;height:13px;"></i> 复制链接</button>
+            <button class="dd-item" onclick="closeDropdown('dd1')"><i data-lucide="tag" style="width:13px;height:13px;"></i> 标记完成</button>
+            <div class="dd-divider"></div>
+            <button class="dd-item dd-item--danger" onclick="closeDropdown('dd1')"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> 删除</button>
+          </div>
+        </div>
+      </div>
+      <div class="dd-row">
+        <span class="dd-title">画廊视图拖拽排序功能</span>
+        <span class="of-badge badge-progress" style="width:80px;justify-content:center;">进行中</span>
+        <div class="dd-actions" style="position:relative;">
+          <button class="dd-trigger" onclick="toggleDropdown('dd2')">
+            <i data-lucide="more-horizontal" style="width:16px;height:16px;"></i>
+          </button>
+          <div class="dd-menu" id="dd2" style="display:none;">
+            <button class="dd-item" onclick="closeDropdown('dd2')"><i data-lucide="edit-2" style="width:13px;height:13px;"></i> 编辑</button>
+            <button class="dd-item" onclick="closeDropdown('dd2')"><i data-lucide="copy" style="width:13px;height:13px;"></i> 复制链接</button>
+            <button class="dd-item" onclick="closeDropdown('dd2')"><i data-lucide="check" style="width:13px;height:13px;"></i> 标记完成</button>
+            <div class="dd-divider"></div>
+            <button class="dd-item dd-item--danger" onclick="closeDropdown('dd2')"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> 删除</button>
+          </div>
+        </div>
+      </div>
+      <div class="dd-row">
+        <span class="dd-title">接口回归测试 — 任务模块</span>
+        <span class="of-badge badge-todo" style="width:80px;justify-content:center;">待处理</span>
+        <div class="dd-actions" style="position:relative;">
+          <button class="dd-trigger" onclick="toggleDropdown('dd3')">
+            <i data-lucide="more-horizontal" style="width:16px;height:16px;"></i>
+          </button>
+          <div class="dd-menu" id="dd3" style="display:none;">
+            <button class="dd-item" onclick="closeDropdown('dd3')"><i data-lucide="edit-2" style="width:13px;height:13px;"></i> 编辑</button>
+            <button class="dd-item" onclick="closeDropdown('dd3')"><i data-lucide="copy" style="width:13px;height:13px;"></i> 复制链接</button>
+            <button class="dd-item" onclick="closeDropdown('dd3')"><i data-lucide="play" style="width:13px;height:13px;"></i> 开始执行</button>
+            <div class="dd-divider"></div>
+            <button class="dd-item dd-item--danger" onclick="closeDropdown('dd3')"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> 删除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ NEW: useMarkdown ══════════════════════════════════ -->
+  <div class="demo-section">
+    <div class="demo-section-title">Markdown 渲染 (useMarkdown)</div>
+    <div class="demo-card" style="max-width:700px;display:flex;flex-direction:column;gap:16px;">
+
+      <!-- 渲染效果 -->
+      <div>
+        <span class="demo-label">渲染效果</span>
+        <div class="md-preview">
+          <h2 style="font-size:16px;font-weight:700;color:var(--of-color-gray-900);margin:0 0 10px;">项目架构方案</h2>
+          <p style="font-size:13px;color:var(--of-color-gray-700);line-height:1.7;margin:0 0 12px;">以下是推荐的前后端技术栈，支持水平扩展：</p>
+          <ul style="font-size:13px;color:var(--of-color-gray-700);line-height:1.8;padding-left:20px;margin:0 0 14px;">
+            <li><strong>前端</strong>：Vue 3 + TypeScript + Vite + oneflow-ui</li>
+            <li><strong>后端</strong>：FastAPI + Python 3.11 + PostgreSQL</li>
+            <li><strong>AI 层</strong>：OpenAI API + 本地向量数据库</li>
+          </ul>
+          <!-- code block -->
+          <div class="md-code-block">
+            <div class="md-code-header">
+              <span class="md-code-lang">bash</span>
+              <button class="md-code-copy" onclick="navigator.clipboard.writeText('npm install oneflow-ui')">
+                <i data-lucide="copy" style="width:11px;height:11px;"></i> 复制
+              </button>
+            </div>
+            <pre class="md-code-pre"><span style="color:#94A3B8;"># 安装组件库</span>
+<span style="color:#86EFAC;">npm</span> install oneflow-ui
+<span style="color:#86EFAC;">npm</span> install marked highlight.js</pre>
+          </div>
+          <blockquote class="md-blockquote">
+            <p style="margin:0;font-size:13px;color:var(--of-color-gray-500);line-height:1.6;">
+              💡 useMarkdown 支持 <code style="font-family:var(--of-font-mono);font-size:12px;background:#F1F5F9;padding:1px 5px;border-radius:4px;">showCopyButton</code> 选项，开启后代码块自动添加复制按钮。
+            </p>
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- composable 用法 -->
+      <div>
+        <span class="demo-label">Composable 用法</span>
+        <div class="composable-card" style="border-radius:8px;">
+          <div class="composable-card__header">
+            <span class="composable-badge">useMarkdown</span>
+            <span class="composable-desc">Markdown 渲染 + 代码高亮</span>
+          </div>
+          <pre class="composable-code">const { renderMarkdown } = useMarkdown({ showCopyButton: true })
+
+// 在模板中：
+&lt;div v-html="renderMarkdown(aiMessage.content)" /&gt;</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+/* ─── AI 组件样式 ────────────────────────────────────────── */
+@keyframes ofDotBounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+@keyframes ofCursorBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes msgSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ai-thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #F1F5F9;
+  border-radius: 0 12px 12px 12px;
+}
+.ai-thinking--sm { padding: 6px 10px; gap: 3px; }
+.ai-thinking__dot {
+  border-radius: 50%;
+  background: #64748B;
+  animation: ofDotBounce 1.4s ease-in-out infinite;
+}
+.ai-thinking--md .ai-thinking__dot { width: 7px; height: 7px; }
+.ai-thinking--sm .ai-thinking__dot { width: 5px; height: 5px; }
+.ai-thinking__dot:nth-child(1) { animation-delay: 0s; }
+.ai-thinking__dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-thinking__dot:nth-child(3) { animation-delay: 0.4s; }
+
+.ai-cursor {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: #334155;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: ofCursorBlink 1s infinite;
+}
+
+.msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 6px 0;
+  animation: msgSlideIn 0.3s ease-out;
+}
+.msg-row--user { flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700;
+  flex-shrink: 0;
+}
+.msg-avatar--ai   { background: #EEF2FF; }
+.msg-avatar--user { background: #6366F1; color: #fff; font-size: 13px; }
+
+.msg-bubble {
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  max-width: 580px;
+}
+.msg-bubble--ai {
+  background: #F1F5F9;
+  color: #1E293B;
+  border-radius: 0 12px 12px 12px;
+}
+.msg-bubble--user {
+  background: #4F46E5;
+  color: #fff;
+  border-radius: 12px 0 12px 12px;
+}
+.msg-bubble--error {
+  background: #FEF2F2;
+  color: #DC2626;
+  border-radius: 0 12px 12px 12px;
+  font-size: 12px;
+}
+
+/* AI Sender */
+.ai-sender {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+.ai-sender:focus-within { border-color: #818CF8; box-shadow: 0 0 0 3px #EEF2FF; }
+.sender-textarea {
+  width: 100%; resize: none;
+  border: none; outline: none;
+  font-family: var(--of-font-sans);
+  font-size: 13px; color: #1E293B;
+  line-height: 1.5; max-height: 132px;
+  overflow-y: auto; background: transparent;
+}
+.sender-tool-btn {
+  width: 26px; height: 26px;
+  border: none; background: transparent;
+  color: #94A3B8; border-radius: 6px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.sender-tool-btn:hover { background: #F1F5F9; color: #475569; }
+.sender-send-btn {
+  width: 32px; height: 32px; flex-shrink: 0;
+  border: none; border-radius: 8px;
+  background: #4F46E5; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.sender-send-btn:hover { background: #4338CA; transform: scale(1.05); }
+
+/* ─── Filter Panel ──────────────────────────────────────── */
+.filter-panel {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  max-width: 560px;
+}
+.filter-panel__header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+}
+.filter-panel__title {
+  font-size: 13px; font-weight: 600; color: #1E293B;
+}
+.filter-condition {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 0;
+}
+.filter-cond-label {
+  font-size: 12px; color: #64748B;
+  width: 28px; text-align: center; flex-shrink: 0;
+}
+.filter-select {
+  font-size: 12px; font-family: var(--of-font-sans);
+  border: 1px solid #E2E8F0; border-radius: 6px;
+  padding: 4px 8px; background: #fff; color: #334155; outline: none;
+  cursor: pointer;
+}
+.filter-input {
+  flex: 1; min-width: 80px;
+  font-size: 12px; font-family: var(--of-font-sans);
+  border: 1px solid #E2E8F0; border-radius: 6px;
+  padding: 4px 8px; background: #fff; color: #334155; outline: none;
+}
+.filter-input:focus, .filter-select:focus { border-color: #818CF8; }
+.logic-btn {
+  font-size: 11px; padding: 2px 7px;
+  border: 1px solid #E2E8F0; border-radius: 4px;
+  background: #fff; cursor: pointer; color: #64748B; font-family: var(--of-font-sans);
+}
+.logic-btn--active {
+  background: #EEF2FF; border-color: #A5B4FC;
+  color: #4338CA; font-weight: 600;
+}
+.filter-remove-btn {
+  width: 24px; height: 24px; flex-shrink: 0;
+  border: none; background: transparent; cursor: pointer;
+  color: #CBD5E1; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.filter-remove-btn:hover { color: #DC2626; background: #FEE2E2; }
+.filter-panel__footer {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid #F1F5F9;
+}
+.filter-add-btn {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; font-family: var(--of-font-sans);
+  color: #4F46E5; background: none; border: none; cursor: pointer;
+  padding: 4px 8px; border-radius: 6px;
+}
+.filter-add-btn:hover { background: #EEF2FF; }
+
+/* info chips */
+.info-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: #475569;
+  background: #F8FAFC; border: 1px solid #E2E8F0;
+  border-radius: 20px; padding: 4px 10px;
+}
+
+/* filter tag (in active bar) */
+.filter-tag {
+  display: inline-flex; align-items: center;
+  background: #EEF2FF; border: 1px solid #C7D2FE;
+  border-radius: 4px; padding: 2px 8px;
+  color: #4338CA; font-size: 11px;
+}
+
+/* ─── Column Manager ────────────────────────────────────── */
+.col-manager {
+  border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 14px 16px; background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  min-width: 220px;
+}
+.col-manager__header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.col-manager__title { font-size: 13px; font-weight: 600; color: #1E293B; }
+.col-manager__list { display: flex; flex-direction: column; }
+.col-action-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-family: var(--of-font-sans);
+  color: #64748B; background: #F8FAFC;
+  border: 1px solid #E2E8F0; border-radius: 6px;
+  padding: 3px 8px; cursor: pointer;
+}
+.col-action-btn:hover { background: #F1F5F9; }
+.col-manager-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid #F8FAFC;
+}
+.col-manager-row:last-child { border-bottom: none; }
+.col-drag { color: #CBD5E1; cursor: grab; display: flex; align-items: center; }
+.col-drag:hover { color: #94A3B8; }
+.col-check { cursor: pointer; }
+.col-label { font-size: 12px; color: #334155; flex: 1; }
+.col-label--dimmed { color: #94A3B8; text-decoration: line-through; }
+
+/* ─── Toolbar & Table ───────────────────────────────────── */
+.toolbar-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-family: var(--of-font-sans);
+  color: #475569; background: #fff;
+  border: 1px solid #E2E8F0; border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+}
+.toolbar-btn:hover { background: #F8FAFC; border-color: #CBD5E1; }
+.toolbar-btn--active {
+  background: #EEF2FF; border-color: #A5B4FC; color: #4338CA;
+}
+.toolbar-btn--primary {
+  background: #4F46E5; border-color: #4F46E5; color: #fff;
+}
+.toolbar-btn--primary:hover { background: #4338CA; border-color: #4338CA; }
+
+.excel-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-family: var(--of-font-sans);
+  color: #334155; background: #fff;
+  border: 1px solid #E2E8F0; border-radius: 6px;
+  padding: 5px 12px; cursor: pointer; white-space: nowrap;
+}
+.excel-btn:hover { background: #F8FAFC; border-color: #CBD5E1; }
+
+.preview-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px; font-family: var(--of-font-sans);
+}
+.preview-table--full { min-width: 600px; }
+.preview-table th {
+  background: #F8FAFC; padding: 8px 12px;
+  text-align: left; font-weight: 600;
+  color: #475569; border-bottom: 1px solid #E2E8F0;
+  white-space: nowrap;
+}
+.preview-table td {
+  padding: 9px 12px; color: #334155;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: middle;
+}
+.preview-table tr:last-child td { border-bottom: none; }
+.preview-table tr:hover td { background: #F8FAFC; }
+
+/* pagination */
+.page-btn {
+  min-width: 28px; height: 28px; padding: 0 6px;
+  border: 1px solid #E2E8F0; border-radius: 6px;
+  background: #fff; color: #475569;
+  font-size: 12px; font-family: var(--of-font-sans);
+  cursor: pointer; display: inline-flex;
+  align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.page-btn:hover:not(:disabled) { background: #F8FAFC; border-color: #CBD5E1; }
+.page-btn--active { background: #4F46E5; border-color: #4F46E5; color: #fff; }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── Composable Cards ──────────────────────────────────── */
+.composable-card {
+  background: #fff; border: 1px solid #E2E8F0;
+  border-radius: 12px; overflow: hidden;
+}
+.composable-card__header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid #F1F5F9;
+  background: #FAFAFA;
+}
+.composable-badge {
+  font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  background: #4F46E5; color: #fff;
+  padding: 2px 8px; border-radius: 4px;
+  white-space: nowrap;
+}
+.composable-desc {
+  font-size: 12px; color: #64748B;
+}
+.composable-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; line-height: 1.7;
+  color: #334155; background: #F8FAFC;
+  padding: 14px 16px; margin: 0;
+  overflow-x: auto; white-space: pre;
+}
+
+/* ─── StatisticCard ─────────────────────────────────────── */
+.stat-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: 10px;
+  box-shadow: var(--of-shadow-card);
+  min-width: 180px;
+}
+.stat-icon-wrap {
+  width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.stat-body { display: flex; flex-direction: column; gap: 2px; }
+.stat-value { font-size: 20px; font-weight: 700; color: var(--of-color-gray-900); }
+.stat-label { font-size: 12px; color: var(--of-color-gray-500); }
+
+/* ─── EmptyState ────────────────────────────────────────── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; text-align: center; padding: 24px 16px;
+}
+.empty-state__title {
+  font-size: 15px; font-weight: 600; color: var(--of-color-gray-700);
+}
+.empty-state__desc {
+  font-size: 13px; color: var(--of-color-gray-400);
+  max-width: 220px; line-height: 1.5;
+}
+.empty-state__btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 4px; padding: 6px 14px;
+  background: var(--of-color-primary-600); color: #fff;
+  border: none; border-radius: 6px;
+  font-size: 13px; font-weight: 500; font-family: var(--of-font-sans);
+  cursor: pointer; transition: background 0.15s;
+}
+.empty-state__btn:hover { background: var(--of-color-primary-700); }
+.empty-state__btn--ghost {
+  background: transparent; color: var(--of-color-gray-500);
+  border: 1px solid var(--of-color-gray-200);
+}
+.empty-state__btn--ghost:hover { background: var(--of-color-gray-50); }
+
+/* ─── ButtonGroup ───────────────────────────────────────── */
+.btn-group {
+  display: grid; gap: 6px; margin-top: 8px;
+}
+.btn-group--2 { grid-template-columns: repeat(2, 1fr); max-width: 320px; }
+.btn-group--3 { grid-template-columns: repeat(3, 1fr); max-width: 480px; }
+.btn-group--4 { grid-template-columns: repeat(4, 1fr); max-width: 480px; }
+.btn-group-item {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 12px;
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: 8px;
+  background: var(--of-color-bg-elevated);
+  color: var(--of-color-gray-600);
+  font-size: 13px; font-weight: 500; font-family: var(--of-font-sans);
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-group-item:hover:not(.btn-group-item--active) {
+  background: var(--of-color-gray-50);
+  border-color: var(--of-color-gray-300);
+}
+.btn-group-item--active {
+  background: var(--of-color-primary-600);
+  border-color: var(--of-color-primary-600);
+  color: #fff;
+}
+
+/* ─── RangeSlider ───────────────────────────────────────── */
+.range-field { display: flex; flex-direction: column; gap: 6px; }
+.range-field__label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 500; color: var(--of-color-gray-700);
+}
+.range-field__val {
+  font-size: 13px; font-weight: 600; color: var(--of-color-primary-600);
+  font-family: var(--of-font-mono);
+}
+.range-input {
+  width: 100%; height: 5px;
+  border-radius: 999px;
+  background: var(--of-color-gray-200);
+  outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--of-color-primary-600);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+.range-input::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--of-color-primary-600);
+  border: 2px solid #fff; cursor: pointer;
+}
+.range-field__desc { font-size: 12px; color: var(--of-color-gray-400); }
+
+/* ─── DropdownMenu ──────────────────────────────────────── */
+.dd-row {
+  display: flex; align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--of-color-gray-100);
+  transition: background 0.1s;
+}
+.dd-row:last-child { border-bottom: none; }
+.dd-row:hover { background: var(--of-color-gray-50); }
+.dd-title { flex: 1; font-size: 13px; color: var(--of-color-gray-800); }
+.dd-actions { width: 60px; display: flex; justify-content: flex-end; }
+.dd-trigger {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: none; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--of-color-gray-400); transition: all 0.15s;
+}
+.dd-trigger:hover { background: var(--of-color-gray-100); color: var(--of-color-gray-700); }
+.dd-menu {
+  position: absolute; top: 100%; right: 0; z-index: 100;
+  min-width: 160px; margin-top: 4px;
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+.dd-item {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 8px 12px;
+  border: none; background: transparent;
+  font-size: 13px; font-family: var(--of-font-sans);
+  color: var(--of-color-gray-700);
+  cursor: pointer; text-align: left; transition: background 0.1s;
+}
+.dd-item:hover { background: var(--of-color-gray-50); }
+.dd-item--danger { color: #DC2626; }
+.dd-item--danger:hover { background: #FEF2F2; }
+.dd-divider { height: 1px; background: var(--of-color-gray-100); margin: 2px 0; }
+
+/* ─── Markdown Preview ──────────────────────────────────── */
+.md-preview {
+  padding: 16px 20px;
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: 8px;
+  background: var(--of-color-bg-elevated);
+  margin-top: 8px;
+}
+.md-code-block {
+  background: #1E293B; border-radius: 8px; overflow: hidden; margin: 10px 0;
+}
+.md-code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; border-bottom: 1px solid #334155;
+}
+.md-code-lang { font-size: 11px; color: #94A3B8; font-family: var(--of-font-mono); }
+.md-code-copy {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; color: #94A3B8; font-family: var(--of-font-sans);
+  background: none; border: 1px solid #334155; border-radius: 4px;
+  padding: 2px 8px; cursor: pointer;
+}
+.md-code-copy:hover { color: #E2E8F0; border-color: #475569; }
+.md-code-pre {
+  font-family: var(--of-font-mono); font-size: 12px;
+  color: #E2E8F0; line-height: 1.7;
+  padding: 12px 16px; margin: 0; overflow-x: auto;
+}
+.md-blockquote {
+  border-left: 3px solid var(--of-color-gray-300);
+  background: var(--of-color-gray-50);
+  padding: 10px 14px; border-radius: 0 6px 6px 0;
+  margin: 10px 0 0;
+}
+</style>
+
+/* ─── Breadcrumb ────────────────────────────────────────── */
+.of-breadcrumb__list {
+  display: flex; align-items: center; flex-wrap: wrap;
+  list-style: none; padding: 0; margin: 0; gap: 0;
+}
+.of-breadcrumb__item {
+  display: flex; align-items: center;
+}
+.of-breadcrumb__link {
+  font-size: 13px; color: var(--of-color-gray-500);
+  text-decoration: none; padding: 2px 4px; border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.of-breadcrumb__link:hover { color: var(--of-color-primary-600); background: var(--of-color-primary-50); }
+.of-breadcrumb__link--active { color: var(--of-color-gray-800); font-weight: 500; cursor: default; }
+.of-breadcrumb__link--active:hover { background: transparent; color: var(--of-color-gray-800); }
+.of-breadcrumb__separator {
+  font-size: 12px; color: var(--of-color-gray-300);
+  margin: 0 2px; user-select: none;
+}
+.of-breadcrumb__icon-sep {
+  display: flex; align-items: center;
+  color: var(--of-color-gray-300); margin: 0 4px;
+}
+
+/* ─── Tabs ──────────────────────────────────────────────── */
+.of-tabs { display: flex; flex-direction: column; gap: 0; }
+/* Line variant */
+.of-tabs--line .of-tabs__nav {
+  display: flex; align-items: flex-end;
+  border-bottom: 2px solid var(--of-color-gray-200);
+  gap: 0;
+}
+.of-tabs--line .of-tabs__tab {
+  padding: 8px 16px; font-size: 13px; font-family: var(--of-font-sans);
+  font-weight: 500; color: var(--of-color-gray-500);
+  background: none; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.of-tabs--line .of-tabs__tab:hover { color: var(--of-color-gray-700); }
+.of-tabs--line .of-tabs__tab--active {
+  color: var(--of-color-primary-600);
+  border-bottom-color: var(--of-color-primary-600);
+}
+/* Card variant */
+.of-tabs--card .of-tabs__nav {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--of-color-gray-100);
+  border-radius: 8px; padding: 4px;
+  width: fit-content;
+}
+.of-tabs--card .of-tabs__tab {
+  padding: 6px 14px; font-size: 13px; font-family: var(--of-font-sans);
+  font-weight: 500; color: var(--of-color-gray-500);
+  background: none; border: none; cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.of-tabs--card .of-tabs__tab:hover { color: var(--of-color-gray-700); }
+.of-tabs--card .of-tabs__tab--active {
+  background: var(--of-color-bg-elevated);
+  color: var(--of-color-gray-800);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.of-tabs__panel { padding: 16px 0; font-size: 13px; color: var(--of-color-gray-600); }
+.of-tabs__panel[hidden] { display: none; }
+
+/* ─── Modal / Dialog ────────────────────────────────────── */
+.of-modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.of-modal-overlay--open { opacity: 1; pointer-events: auto; }
+.of-modal {
+  background: var(--of-color-bg-elevated);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  width: 480px; max-width: calc(100vw - 32px);
+  transform: scale(0.95) translateY(-8px);
+  transition: transform 0.2s, opacity 0.2s;
+  opacity: 0;
+}
+.of-modal-overlay--open .of-modal {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+.of-modal__header {
+  display: flex; align-items: center;
+  padding: 16px 20px 0;
+  gap: 10px;
+}
+.of-modal__title {
+  flex: 1; font-size: 15px; font-weight: 600; color: var(--of-color-gray-900);
+}
+.of-modal__close {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: none; background: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--of-color-gray-400); transition: all 0.15s;
+}
+.of-modal__close:hover { background: var(--of-color-gray-100); color: var(--of-color-gray-700); }
+.of-modal__body {
+  padding: 16px 20px;
+  font-size: 13px; color: var(--of-color-gray-600); line-height: 1.6;
+}
+.of-modal__footer {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 0 20px 20px;
+}
+.of-modal__btn {
+  padding: 7px 16px; border-radius: 7px;
+  font-size: 13px; font-family: var(--of-font-sans); font-weight: 500;
+  cursor: pointer; transition: all 0.15s; border: 1px solid transparent;
+}
+.of-modal__btn--cancel {
+  background: var(--of-color-bg-elevated);
+  border-color: var(--of-color-gray-200);
+  color: var(--of-color-gray-600);
+}
+.of-modal__btn--cancel:hover { background: var(--of-color-gray-50); }
+.of-modal__btn--confirm {
+  background: var(--of-color-primary-600); color: #fff;
+}
+.of-modal__btn--confirm:hover { background: #4338CA; }
+.of-modal__btn--danger {
+  background: #DC2626; color: #fff;
+}
+.of-modal__btn--danger:hover { background: #B91C1C; }
+
+/* ─── Toast ─────────────────────────────────────────────── */
+.of-toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.of-toast {
+  display: flex; align-items: flex-start; gap: 10px;
+  min-width: 280px; max-width: 380px;
+  padding: 12px 14px;
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  pointer-events: auto;
+  transform: translateX(120%);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  opacity: 0;
+}
+.of-toast--show { transform: translateX(0); opacity: 1; }
+.of-toast--hide { transform: translateX(120%); opacity: 0; }
+.of-toast__icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 12px; margin-top: 1px;
+}
+.of-toast--info    .of-toast__icon { color: #3B82F6; }
+.of-toast--success .of-toast__icon { color: #16A34A; }
+.of-toast--warning .of-toast__icon { color: #D97706; }
+.of-toast--error   .of-toast__icon { color: #DC2626; }
+.of-toast--info    { border-left: 3px solid #3B82F6; }
+.of-toast--success { border-left: 3px solid #16A34A; }
+.of-toast--warning { border-left: 3px solid #D97706; }
+.of-toast--error   { border-left: 3px solid #DC2626; }
+.of-toast__body { flex: 1; min-width: 0; }
+.of-toast__title { font-size: 13px; font-weight: 600; color: var(--of-color-gray-800); margin-bottom: 2px; }
+.of-toast__desc  { font-size: 12px; color: var(--of-color-gray-500); line-height: 1.5; }
+.of-toast__close {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border: none; background: none; cursor: pointer;
+  color: var(--of-color-gray-300); display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; transition: all 0.15s;
+}
+.of-toast__close:hover { color: var(--of-color-gray-600); background: var(--of-color-gray-100); }
+
+/* ─── SplitPane ─────────────────────────────────────────── */
+.of-split-pane {
+  display: flex; width: 100%; height: 300px;
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: 10px; overflow: hidden;
+  background: var(--of-color-bg-elevated);
+}
+.of-split-pane__left {
+  width: 60%; min-width: 100px; max-width: 80%;
+  display: flex; flex-direction: column;
+  border-right: 0 solid var(--of-color-gray-200);
+  overflow: hidden; flex-shrink: 0;
+}
+.of-split-pane__right {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+.of-split-pane__handle {
+  width: 5px; flex-shrink: 0;
+  background: var(--of-color-gray-100);
+  border-left: 1px solid var(--of-color-gray-200);
+  border-right: 1px solid var(--of-color-gray-200);
+  cursor: col-resize; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.of-split-pane__handle:hover, .of-split-pane__handle--dragging { background: var(--of-color-primary-100); }
+.of-split-pane__handle::after {
+  content: ''; display: block;
+  width: 3px; height: 24px;
+  border-radius: 2px; background: var(--of-color-gray-300);
+}
+.of-split-pane__panel-header {
+  padding: 10px 14px; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--of-color-gray-400);
+  background: var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-color-gray-200);
+  flex-shrink: 0;
+}
+.of-split-pane__panel-body {
+  flex: 1; padding: 14px; overflow: auto;
+  font-size: 13px; color: var(--of-color-gray-600); line-height: 1.65;
+}
+</style>
+
+<script>
+  // 初始化 Lucide 图标
+  lucide.createIcons();
+
+  // ─── Tabs 交互 ────────────────────────────────────────────
+  function switchTab(navEl, panelPrefix, idx) {
+    const tabs = navEl.querySelectorAll('.of-tabs__tab')
+    tabs.forEach(t => t.classList.remove('of-tabs__tab--active'))
+    tabs[idx].classList.add('of-tabs__tab--active')
+    const panels = document.querySelectorAll(`[id^="${panelPrefix}"]`)
+    panels.forEach((p, i) => { p.hidden = i !== idx })
+  }
+
+  // ─── Modal 交互 ───────────────────────────────────────────
+  function openModal(id) {
+    const overlay = document.getElementById(id)
+    overlay.classList.add('of-modal-overlay--open')
+  }
+  function closeModal(id) {
+    const overlay = document.getElementById(id)
+    overlay.classList.remove('of-modal-overlay--open')
+  }
+  // 点击遮罩关闭
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.of-modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('of-modal-overlay--open')
+      })
+    })
+  })
+
+  // ─── Toast 交互 ───────────────────────────────────────────
+  const TOAST_CONFIG = {
+    info:    { icon: 'info',          title: '提示信息',     desc: '这是一条普通的提示消息，用于告知用户状态。' },
+    success: { icon: 'check-circle',  title: '操作成功',     desc: '数据已成功保存，所有更改已生效。' },
+    warning: { icon: 'alert-triangle',title: '注意警告',     desc: '当前操作存在风险，请确认后继续。' },
+    error:   { icon: 'x-circle',      title: '出现错误',     desc: '请求失败，请检查网络连接后重试。' },
+  }
+  let toastId = 0
+  function showToast(type) {
+    const container = document.getElementById('toast-container')
+    const cfg = TOAST_CONFIG[type]
+    const id = 'toast-' + (++toastId)
+    const el = document.createElement('div')
+    el.className = `of-toast of-toast--${type}`
+    el.id = id
+    el.innerHTML = `
+      <div class="of-toast__icon">
+        <i data-lucide="${cfg.icon}" style="width:16px;height:16px;"></i>
+      </div>
+      <div class="of-toast__body">
+        <div class="of-toast__title">${cfg.title}</div>
+        <div class="of-toast__desc">${cfg.desc}</div>
+      </div>
+      <button class="of-toast__close" onclick="dismissToast('${id}')">
+        <i data-lucide="x" style="width:14px;height:14px;"></i>
+      </button>
+    `
+    container.appendChild(el)
+    lucide.createIcons()
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => el.classList.add('of-toast--show'))
+    })
+    setTimeout(() => dismissToast(id), 4000)
+  }
+  function dismissToast(id) {
+    const el = document.getElementById(id)
+    if (!el) return
+    el.classList.remove('of-toast--show')
+    el.classList.add('of-toast--hide')
+    setTimeout(() => el.remove(), 350)
+  }
+
+  // ─── SplitPane 拖拽交互 ───────────────────────────────────
+  (function() {
+    let dragging = false, startX, startW, pane, handle
+    function onMouseMove(e) {
+      if (!dragging) return
+      const dx = e.clientX - startX
+      const container = pane.closest('.of-split-pane')
+      const totalW = container.offsetWidth
+      const newW = Math.max(120, Math.min(totalW - 120, startW + dx))
+      pane.style.width = newW + 'px'
+    }
+    function onMouseUp() {
+      dragging = false
+      handle && handle.classList.remove('of-split-pane__handle--dragging')
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+    window.initSplitPane = function(handleId) {
+      handle = document.getElementById(handleId)
+      pane = handle.previousElementSibling
+      handle.addEventListener('mousedown', e => {
+        dragging = true
+        startX = e.clientX
+        startW = pane.offsetWidth
+        handle.classList.add('of-split-pane__handle--dragging')
+        document.body.style.cursor = 'col-resize'
+        document.body.style.userSelect = 'none'
+        e.preventDefault()
+      })
+    }
+  })()
+
+  // ─── DropdownMenu 交互 ────────────────────────────────────
+  function toggleDropdown(id) {
+    const menu = document.getElementById(id)
+    const isOpen = menu.style.display !== 'none'
+    // 先关所有
+    document.querySelectorAll('.dd-menu').forEach(m => m.style.display = 'none')
+    if (!isOpen) menu.style.display = 'block'
+  }
+  function closeDropdown(id) {
+    document.getElementById(id).style.display = 'none'
+  }
+  // 点空白关闭
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.dd-actions')) {
+      document.querySelectorAll('.dd-menu').forEach(m => m.style.display = 'none')
+    }
+  })
+
+  // ─── ButtonGroup 交互 ─────────────────────────────────────
+  function selectBtnGroup(groupId, clickedBtn) {
+    const group = document.getElementById(groupId)
+    group.querySelectorAll('.btn-group-item').forEach(b => b.classList.remove('btn-group-item--active'))
+    clickedBtn.classList.add('btn-group-item--active')
+  }
+
+  // ─── AI 对话演示 ─────────────────────────────────────────
+  const DEMO_REPLIES = [
+    '好的！Docker + Kubernetes 是非常成熟的部署方案。\n\n建议架构：\n• Namespace 按环境隔离（dev/staging/prod）\n• Deployment + HPA 自动扩缩容\n• Ingress + TLS 证书管理\n• PersistentVolume 持久化存储',
+    '当然可以！以下是推荐的 CI/CD 流程：\n\n1. GitHub Actions 触发构建\n2. Docker 镜像推送到私有仓库\n3. kubectl apply 更新 Deployment\n4. 健康检查通过后流量切换',
+    '关于监控方案，推荐以下技术栈：\n• Prometheus + Grafana 指标监控\n• ELK Stack 日志收集与分析\n• Sentry 错误追踪\n• Uptime Kuma 可用性监控',
+  ]
+  let replyIndex = 0
+
+  function autoResize(el) {
+    el.style.height = 'auto'
+    el.style.height = Math.min(el.scrollHeight, 132) + 'px'
+  }
+
+  function handleChatKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chat-input')
+    const content = input.value.trim()
+    if (!content) return
+
+    const messages = document.getElementById('chat-messages')
+    const thinking = document.getElementById('thinking-indicator')
+
+    // Add user message
+    const userRow = document.createElement('div')
+    userRow.className = 'msg-row msg-row--user'
+    userRow.innerHTML = `
+      <div class="msg-bubble msg-bubble--user">${content.replace(/\n/g,'<br>')}</div>
+      <div class="msg-avatar msg-avatar--user">U</div>
+    `
+    messages.insertBefore(userRow, thinking)
+
+    // Clear input
+    input.value = ''
+    input.style.height = 'auto'
+
+    // Show thinking
+    thinking.style.display = 'flex'
+    messages.scrollTop = messages.scrollHeight
+
+    // Simulate streaming reply after 1.2s
+    setTimeout(() => {
+      thinking.style.display = 'none'
+      const reply = DEMO_REPLIES[replyIndex % DEMO_REPLIES.length]
+      replyIndex++
+
+      const aiRow = document.createElement('div')
+      aiRow.className = 'msg-row msg-row--ai'
+      aiRow.innerHTML = `
+        <div class="msg-avatar msg-avatar--ai">🤖</div>
+        <div style="display:flex;flex-direction:column;gap:4px;max-width:520px;">
+          <div style="font-size:11px;font-weight:600;color:#6366F1;margin-left:2px;">OneFlow AI</div>
+          <div class="msg-bubble msg-bubble--ai" id="streaming-bubble-${replyIndex}"><span class="ai-cursor"></span></div>
+        </div>
+      `
+      messages.insertBefore(aiRow, thinking)
+      messages.scrollTop = messages.scrollHeight
+
+      // Typewriter effect
+      const bubble = document.getElementById(`streaming-bubble-${replyIndex}`)
+      let i = 0
+      const chars = reply.split('')
+      const timer = setInterval(() => {
+        if (i < chars.length) {
+          const char = chars[i] === '\n' ? '<br>' : chars[i]
+          bubble.innerHTML = reply.slice(0,i+1).replace(/\n/g,'<br>') + '<span class="ai-cursor"></span>'
+          i++
+          messages.scrollTop = messages.scrollHeight
+        } else {
+          bubble.innerHTML = reply.replace(/\n/g,'<br>')
+          clearInterval(timer)
+          lucide.createIcons()
+        }
+      }, 18)
+    }, 1200)
+  }
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     NEW COMPONENTS DEMO (追加区块)
+════════════════════════════════════════════════════════════ -->
+
+<!-- Toast 容器（全局，固定定位） -->
+<div class="of-toast-container" id="toast-container"></div>
+
+<!-- Modal 遮罩 -->
+<div class="of-modal-overlay" id="modal-basic">
+  <div class="of-modal" role="dialog" aria-modal="true" aria-labelledby="modal-basic-title">
+    <div class="of-modal__header">
+      <span class="of-modal__title" id="modal-basic-title">确认删除记录</span>
+      <button class="of-modal__close" onclick="closeModal('modal-basic')" aria-label="关闭">
+        <i data-lucide="x" style="width:16px;height:16px;"></i>
+      </button>
+    </div>
+    <div class="of-modal__body">
+      <p>你确定要删除「项目报告 2024-Q4」吗？</p>
+      <p style="margin-top:8px;padding:10px 12px;background:#FEF2F2;border-radius:8px;color:#DC2626;font-size:12px;">此操作不可撤销，相关数据将永久清除。</p>
+    </div>
+    <div class="of-modal__footer">
+      <button class="of-modal__btn of-modal__btn--cancel" onclick="closeModal('modal-basic')">取消</button>
+      <button class="of-modal__btn of-modal__btn--danger" onclick="closeModal('modal-basic')">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="of-modal-overlay" id="modal-form">
+  <div class="of-modal" role="dialog" aria-modal="true" aria-labelledby="modal-form-title">
+    <div class="of-modal__header">
+      <span class="of-modal__title" id="modal-form-title">新建工作项</span>
+      <button class="of-modal__close" onclick="closeModal('modal-form')" aria-label="关闭">
+        <i data-lucide="x" style="width:16px;height:16px;"></i>
+      </button>
+    </div>
+    <div class="of-modal__body" style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:12px;font-weight:500;color:var(--of-color-gray-700);">标题</label>
+        <input type="text" placeholder="输入工作项标题..." style="padding:8px 10px;border:1px solid var(--of-color-gray-200);border-radius:7px;font-size:13px;font-family:var(--of-font-sans);outline:none;transition:border-color 0.15s;" onfocus="this.style.borderColor='#818CF8'" onblur="this.style.borderColor='var(--of-color-gray-200)'" />
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:12px;font-weight:500;color:var(--of-color-gray-700);">优先级</label>
+        <select style="padding:8px 10px;border:1px solid var(--of-color-gray-200);border-radius:7px;font-size:13px;font-family:var(--of-font-sans);outline:none;background:var(--of-color-bg-elevated);">
+          <option>P0 - 紧急</option>
+          <option selected>P1 - 高</option>
+          <option>P2 - 中</option>
+          <option>P3 - 低</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:12px;font-weight:500;color:var(--of-color-gray-700);">描述</label>
+        <textarea rows="3" placeholder="可选，输入详细说明..." style="padding:8px 10px;border:1px solid var(--of-color-gray-200);border-radius:7px;font-size:13px;font-family:var(--of-font-sans);outline:none;resize:vertical;transition:border-color 0.15s;" onfocus="this.style.borderColor='#818CF8'" onblur="this.style.borderColor='var(--of-color-gray-200)'"></textarea>
+      </div>
+    </div>
+    <div class="of-modal__footer">
+      <button class="of-modal__btn of-modal__btn--cancel" onclick="closeModal('modal-form')">取消</button>
+      <button class="of-modal__btn of-modal__btn--confirm" onclick="closeModal('modal-form')">创建</button>
+    </div>
+  </div>
+</div>
+
+<div class="demo-page" style="padding-top:0;">
+
+  <!-- ── Breadcrumb 面包屑 ─────────────────────────────────── -->
+  <div class="demo-section">
+    <div class="demo-section-title">Breadcrumb 面包屑</div>
+
+    <div class="demo-row">
+      <div class="demo-card" style="flex:1;min-width:320px;">
+        <span class="demo-label">默认 / 分隔符</span>
+        <nav aria-label="面包屑导航">
+          <ol class="of-breadcrumb__list">
+            <li class="of-breadcrumb__item">
+              <a href="#" class="of-breadcrumb__link">首页</a>
+              <span class="of-breadcrumb__separator">/</span>
+            </li>
+            <li class="of-breadcrumb__item">
+              <a href="#" class="of-breadcrumb__link">工作台</a>
+              <span class="of-breadcrumb__separator">/</span>
+            </li>
+            <li class="of-breadcrumb__item">
+              <a href="#" class="of-breadcrumb__link">项目列表</a>
+              <span class="of-breadcrumb__separator">/</span>
+            </li>
+            <li class="of-breadcrumb__item">
+              <span class="of-breadcrumb__link of-breadcrumb__link--active">项目详情</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <div class="demo-card" style="flex:1;min-width:320px;">
+        <span class="demo-label">图标分隔符</span>
+        <nav aria-label="面包屑导航">
+          <ol class="of-breadcrumb__list">
+            <li class="of-breadcrumb__item">
+              <a href="#" class="of-breadcrumb__link" style="display:flex;align-items:center;gap:4px;">
+                <i data-lucide="home" style="width:13px;height:13px;"></i> 首页
+              </a>
+              <span class="of-breadcrumb__icon-sep"><i data-lucide="chevron-right" style="width:14px;height:14px;"></i></span>
+            </li>
+            <li class="of-breadcrumb__item">
+              <a href="#" class="of-breadcrumb__link">设置</a>
+              <span class="of-breadcrumb__icon-sep"><i data-lucide="chevron-right" style="width:14px;height:14px;"></i></span>
+            </li>
+            <li class="of-breadcrumb__item">
+              <span class="of-breadcrumb__link of-breadcrumb__link--active">个人信息</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tabs 标签页 ──────────────────────────────────────── -->
+  <div class="demo-section">
+    <div class="demo-section-title">Tabs 标签页</div>
+
+    <div class="demo-row">
+      <!-- Line variant -->
+      <div class="demo-card" style="flex:1;min-width:320px;">
+        <span class="demo-label">Line 变体（下划线）</span>
+        <div class="of-tabs of-tabs--line">
+          <nav class="of-tabs__nav" id="tabs-line-nav">
+            <button class="of-tabs__tab of-tabs__tab--active" onclick="switchTab(document.getElementById('tabs-line-nav'),'tab-line-',0)">概览</button>
+            <button class="of-tabs__tab" onclick="switchTab(document.getElementById('tabs-line-nav'),'tab-line-',1)">任务</button>
+            <button class="of-tabs__tab" onclick="switchTab(document.getElementById('tabs-line-nav'),'tab-line-',2)">文档</button>
+            <button class="of-tabs__tab" onclick="switchTab(document.getElementById('tabs-line-nav'),'tab-line-',3)">成员</button>
+          </nav>
+          <div id="tab-line-0" class="of-tabs__panel">这里是「概览」面板内容，展示项目关键指标与近期活动。</div>
+          <div id="tab-line-1" class="of-tabs__panel" hidden>这里是「任务」面板内容，包含任务列表、进度追踪与分配情况。</div>
+          <div id="tab-line-2" class="of-tabs__panel" hidden>这里是「文档」面板内容，展示项目相关文档与知识库链接。</div>
+          <div id="tab-line-3" class="of-tabs__panel" hidden>这里是「成员」面板内容，管理项目团队成员与权限。</div>
+        </div>
+      </div>
+
+      <!-- Card variant -->
+      <div class="demo-card" style="flex:1;min-width:320px;">
+        <span class="demo-label">Card 变体（胶囊）</span>
+        <div class="of-tabs of-tabs--card">
+          <nav class="of-tabs__nav" id="tabs-card-nav">
+            <button class="of-tabs__tab of-tabs__tab--active" onclick="switchTab(document.getElementById('tabs-card-nav'),'tab-card-',0)">全部</button>
+            <button class="of-tabs__tab" onclick="switchTab(document.getElementById('tabs-card-nav'),'tab-card-',1)">进行中</button>
+            <button class="of-tabs__tab" onclick="switchTab(document.getElementById('tabs-card-nav'),'tab-card-',2)">已完成</button>
+          </nav>
+          <div id="tab-card-0" class="of-tabs__panel">显示所有状态的工作项（共 42 条）。</div>
+          <div id="tab-card-1" class="of-tabs__panel" hidden>显示进行中的工作项（共 18 条）。</div>
+          <div id="tab-card-2" class="of-tabs__panel" hidden>显示已完成的工作项（共 24 条）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal / Dialog 弹窗 ──────────────────────────────── -->
+  <div class="demo-section">
+    <div class="demo-section-title">Modal / Dialog 弹窗</div>
+
+    <div class="demo-card" style="max-width:600px;">
+      <span class="demo-label">点击按钮触发弹窗</span>
+      <div class="demo-row" style="margin-bottom:0;">
+        <button class="toolbar-btn toolbar-btn--primary" onclick="openModal('modal-basic')">
+          <i data-lucide="trash-2" style="width:14px;height:14px;"></i> 删除确认弹窗
+        </button>
+        <button class="toolbar-btn" onclick="openModal('modal-form')">
+          <i data-lucide="plus" style="width:14px;height:14px;"></i> 表单弹窗
+        </button>
+      </div>
+      <div style="margin-top:16px;padding:12px 14px;background:var(--of-color-gray-50);border-radius:8px;border:1px solid var(--of-color-gray-200);">
+        <div style="font-size:11px;font-weight:600;color:var(--of-color-gray-400);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em;">特性</div>
+        <ul style="font-size:12px;color:var(--of-color-gray-600);line-height:2;list-style:none;display:flex;flex-direction:column;gap:2px;">
+          <li><i data-lucide="check" style="width:12px;height:12px;display:inline;color:#16A34A;"></i> 点击遮罩/关闭按钮关闭</li>
+          <li><i data-lucide="check" style="width:12px;height:12px;display:inline;color:#16A34A;"></i> 缩放 + 上移入场动画</li>
+          <li><i data-lucide="check" style="width:12px;height:12px;display:inline;color:#16A34A;"></i> 支持确认/取消/危险三种 Footer 按钮</li>
+          <li><i data-lucide="check" style="width:12px;height:12px;display:inline;color:#16A34A;"></i> 支持表单内容区</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast 通知 ────────────────────────────────────────── -->
+  <div class="demo-section">
+    <div class="demo-section-title">Toast 通知</div>
+
+    <div class="demo-card" style="max-width:600px;">
+      <span class="demo-label">点击触发不同类型的 Toast（右上角显示）</span>
+      <div class="demo-row" style="margin-bottom:0;">
+        <button class="toolbar-btn" onclick="showToast('info')" style="border-left:3px solid #3B82F6;">
+          <i data-lucide="info" style="width:14px;height:14px;color:#3B82F6;"></i> Info
+        </button>
+        <button class="toolbar-btn" onclick="showToast('success')" style="border-left:3px solid #16A34A;">
+          <i data-lucide="check-circle" style="width:14px;height:14px;color:#16A34A;"></i> Success
+        </button>
+        <button class="toolbar-btn" onclick="showToast('warning')" style="border-left:3px solid #D97706;">
+          <i data-lucide="alert-triangle" style="width:14px;height:14px;color:#D97706;"></i> Warning
+        </button>
+        <button class="toolbar-btn" onclick="showToast('error')" style="border-left:3px solid #DC2626;">
+          <i data-lucide="x-circle" style="width:14px;height:14px;color:#DC2626;"></i> Error
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SplitPane 分栏 ────────────────────────────────────── -->
+  <div class="demo-section">
+    <div class="demo-section-title">SplitPane 左右分栏</div>
+
+    <div class="demo-card" style="padding:16px;">
+      <span class="demo-label">拖拽中间手柄调整左右宽度</span>
+      <div class="of-split-pane" id="split-demo">
+        <div class="of-split-pane__left" id="split-left">
+          <div class="of-split-pane__panel-header">左侧面板 · 文件树</div>
+          <div class="of-split-pane__panel-body">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:var(--of-color-primary-50);color:var(--of-color-primary-600);font-size:12px;">
+                <i data-lucide="folder-open" style="width:14px;height:14px;"></i> src/components
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;padding-left:18px;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--of-color-gray-600);padding:3px 6px;border-radius:4px;cursor:pointer;" onmouseover="this.style.background='var(--of-color-gray-50)'" onmouseout="this.style.background=''"><i data-lucide="file-code" style="width:13px;height:13px;color:var(--of-color-gray-400);"></i> Button.vue</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--of-color-gray-600);padding:3px 6px;border-radius:4px;cursor:pointer;" onmouseover="this.style.background='var(--of-color-gray-50)'" onmouseout="this.style.background=''"><i data-lucide="file-code" style="width:13px;height:13px;color:var(--of-color-gray-400);"></i> Modal.vue</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--of-color-primary-600);font-weight:500;padding:3px 6px;border-radius:4px;background:var(--of-color-primary-50);cursor:pointer;"><i data-lucide="file-code" style="width:13px;height:13px;"></i> Tabs.vue</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--of-color-gray-600);padding:3px 6px;border-radius:4px;cursor:pointer;" onmouseover="this.style.background='var(--of-color-gray-50)'" onmouseout="this.style.background=''"><i data-lucide="file-code" style="width:13px;height:13px;color:var(--of-color-gray-400);"></i> Toast.vue</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--of-color-gray-600);padding:3px 6px;border-radius:4px;cursor:pointer;" onmouseover="this.style.background='var(--of-color-gray-50)'" onmouseout="this.style.background=''"><i data-lucide="file-code" style="width:13px;height:13px;color:var(--of-color-gray-400);"></i> SplitPane.vue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="of-split-pane__handle" id="split-handle" title="拖拽调整宽度"></div>
+        <div class="of-split-pane__right">
+          <div class="of-split-pane__panel-header">右侧面板 · 代码预览</div>
+          <div class="of-split-pane__panel-body" style="font-family:var(--of-font-mono);font-size:12px;line-height:1.8;color:#334155;">
+<span style="color:#7C3AED;">&lt;template&gt;</span>
+  <span style="color:#1E293B;">&lt;div</span> <span style="color:#0369A1;">class</span>=<span style="color:#16A34A;">"of-tabs"</span><span style="color:#1E293B;">&gt;</span>
+    <span style="color:#1E293B;">&lt;nav</span> <span style="color:#0369A1;">class</span>=<span style="color:#16A34A;">"of-tabs__nav"</span><span style="color:#1E293B;">&gt;</span>
+      <span style="color:#1E293B;">&lt;button</span>
+        <span style="color:#0369A1;">v-for</span>=<span style="color:#16A34A;">"tab in tabs"</span>
+        <span style="color:#0369A1;">:key</span>=<span style="color:#16A34A;">"tab.key"</span>
+        <span style="color:#0369A1;">:class</span>=<span style="color:#16A34A;">"tabClass(tab)"</span>
+        <span style="color:#0369A1;">@click</span>=<span style="color:#16A34A;">"active = tab.key"</span>
+      <span style="color:#1E293B;">&gt;{{ tab.label }}&lt;/button&gt;</span>
+    <span style="color:#1E293B;">&lt;/nav&gt;</span>
+    <span style="color:#1E293B;">&lt;slot</span> <span style="color:#0369A1;">:name</span>=<span style="color:#16A34A;">"active"</span> <span style="color:#1E293B;">/&gt;</span>
+  <span style="color:#1E293B;">&lt;/div&gt;</span>
+<span style="color:#7C3AED;">&lt;/template&gt;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MermaidChart 说明 ─────────────────────────────────── -->
+  <div class="demo-section">
+    <div class="demo-section-title">MermaidChart 图表组件</div>
+
+    <div class="demo-row">
+      <div class="demo-card" style="flex:1;min-width:320px;">
+        <span class="demo-label">使用说明</span>
+        <div style="font-size:13px;color:var(--of-color-gray-600);line-height:1.7;margin-bottom:12px;">
+          <p>MermaidChart 组件通过引入 Mermaid CDN 渲染流程图、时序图、甘特图等。在 Vue 组件中使用如下：</p>
+        </div>
+        <div class="composable-card">
+          <div class="composable-card__header">
+            <span class="composable-badge">Vue</span>
+            <span class="composable-desc">组件引入示例</span>
+          </div>
+          <pre class="composable-code">&lt;!-- index.html 引入 Mermaid CDN --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Vue 组件使用 --&gt;
+&lt;MermaidChart :code="flowCode" /&gt;
+
+&lt;!-- flowCode 示例值 --&gt;
+const flowCode = `
+graph TD
+  A[开始] --&gt; B{条件判断}
+  B --&gt;|是| C[执行操作]
+  B --&gt;|否| D[跳过]
+  C --&gt; E[结束]
+  D --&gt; E
+`</pre>
+        </div>
+      </div>
+
+      <div class="demo-card" style="flex:1;min-width:320px;">
+        <span class="demo-label">支持的图表类型</span>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--of-color-gray-200);border-radius:8px;background:var(--of-color-gray-50);">
+            <div style="width:32px;height:32px;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;">
+              <i data-lucide="git-branch" style="width:16px;height:16px;color:#4F46E5;"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--of-color-gray-800);">Flowchart · 流程图</div>
+              <div style="font-size:11px;color:var(--of-color-gray-500);">graph TD / LR / RL</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--of-color-gray-200);border-radius:8px;background:var(--of-color-gray-50);">
+            <div style="width:32px;height:32px;border-radius:8px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;">
+              <i data-lucide="arrow-right-left" style="width:16px;height:16px;color:#16A34A;"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--of-color-gray-800);">Sequence · 时序图</div>
+              <div style="font-size:11px;color:var(--of-color-gray-500);">sequenceDiagram</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--of-color-gray-200);border-radius:8px;background:var(--of-color-gray-50);">
+            <div style="width:32px;height:32px;border-radius:8px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;">
+              <i data-lucide="calendar-range" style="width:16px;height:16px;color:#D97706;"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--of-color-gray-800);">Gantt · 甘特图</div>
+              <div style="font-size:11px;color:var(--of-color-gray-500);">gantt</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--of-color-gray-200);border-radius:8px;background:var(--of-color-gray-50);">
+            <div style="width:32px;height:32px;border-radius:8px;background:#FDF4FF;display:flex;align-items:center;justify-content:center;">
+              <i data-lucide="boxes" style="width:16px;height:16px;color:#9333EA;"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--of-color-gray-800);">Class / Entity · 类图 / ER图</div>
+              <div style="font-size:11px;color:var(--of-color-gray-500);">classDiagram / erDiagram</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;font-size:12px;color:#92400E;display:flex;align-items:flex-start;gap:6px;">
+          <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;"></i>
+          <span>实际渲染需在页面引入 Mermaid CDN（约 500KB），建议按需异步加载。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // SplitPane 初始化
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.initSplitPane) initSplitPane('split-handle')
+    lucide.createIcons()
+  })
+</script>
+</body>
+</html>

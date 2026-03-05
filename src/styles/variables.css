@@ -1,0 +1,108 @@
+/* OneFlow UI Design Tokens
+ * 基于 oneflow设计.pen 设计稿提取的 CSS 变量
+ */
+
+:root {
+  /* ─── Primary Colors ─── */
+  --of-color-primary-50: #eef2ff;
+  --of-color-primary-100: #e0e7ff;
+  --of-color-primary-200: #c7d2fe;
+  --of-color-primary-300: #a5b4fc;
+  --of-color-primary-400: #818cf8;
+  --of-color-primary-500: #6366f1;
+  --of-color-primary-600: #4f46e5;
+  --of-color-primary-700: #4338ca;
+  --of-color-primary-800: #3730a3;
+  --of-color-primary-900: #312e81;
+
+  /* ─── Gray Scale ─── */
+  --of-color-gray-50: #f8fafc;
+  --of-color-gray-100: #f1f5f9;
+  --of-color-gray-200: #e2e8f0;
+  --of-color-gray-300: #cbd5e1;
+  --of-color-gray-400: #94a3b8;
+  --of-color-gray-500: #64748b;
+  --of-color-gray-600: #475569;
+  --of-color-gray-700: #334155;
+  --of-color-gray-800: #1e293b;
+  --of-color-gray-900: #0f172a;
+
+  /* ─── Status Colors ─── */
+  --of-color-success: #22c55e;
+  --of-color-success-light: #dcfce7;
+  --of-color-warning: #d97706;
+  --of-color-warning-light: #fef3c7;
+  --of-color-error: #dc2626;
+  --of-color-error-light: #fee2e2;
+  --of-color-info: #2563eb;
+  --of-color-info-light: #dbeafe;
+
+  /* ─── Background ─── */
+  --of-color-bg-canvas: #f1f5f9;
+  --of-color-bg-elevated: #ffffff;
+
+  /* ─── Priority Badge Colors ─── */
+  --of-priority-p0-text: #dc2626;
+  --of-priority-p0-bg: #fee2e2;
+  --of-priority-p1-text: #d97706;
+  --of-priority-p1-bg: #fef3c7;
+  --of-priority-p2-text: #2563eb;
+  --of-priority-p2-bg: #dbeafe;
+  --of-priority-p3-text: #64748b;
+  --of-priority-p3-bg: #f1f5f9;
+
+  /* ─── Status Badge Colors ─── */
+  --of-status-todo-text: #64748b;
+  --of-status-todo-bg: #f1f5f9;
+  --of-status-in-progress-text: #2563eb;
+  --of-status-in-progress-bg: #dbeafe;
+  --of-status-blocked-text: #d97706;
+  --of-status-blocked-bg: #fef3c7;
+  --of-status-done-text: #22c55e;
+  --of-status-done-bg: #dcfce7;
+
+  /* ─── Typography ─── */
+  --of-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --of-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  /* ─── Spacing ─── */
+  --of-spacing-1: 4px;
+  --of-spacing-2: 8px;
+  --of-spacing-3: 12px;
+  --of-spacing-4: 16px;
+  --of-spacing-5: 20px;
+  --of-spacing-6: 24px;
+  --of-spacing-8: 32px;
+  --of-spacing-10: 40px;
+
+  /* ─── Border Radius ─── */
+  --of-radius-sm: 4px;
+  --of-radius-md: 6px;
+  --of-radius-lg: 8px;
+  --of-radius-xl: 10px;
+  --of-radius-full: 9999px;
+
+  /* ─── Shadows ─── */
+  --of-shadow-card: 0 1px 8px 0 rgba(0, 0, 0, 0.04);
+  --of-shadow-card-hover: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
+  --of-shadow-panel: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  --of-shadow-modal: 0 8px 32px 0 rgba(0, 0, 0, 0.12);
+
+  /* ─── Borders ─── */
+  --of-border-color: var(--of-color-gray-200);
+  --of-border: 1px solid var(--of-border-color);
+
+  /* ─── Layout ─── */
+  --of-navbar-height: 56px;
+  --of-sidebar-width: 240px;
+  --of-statusbar-height: 32px;
+
+  /* ─── Transitions ─── */
+  --of-transition-fast: all 0.15s ease;
+  --of-transition-normal: all 0.2s ease;
+  --of-transition-slow: all 0.3s ease;
+
+  /* ─── Kanban ─── */
+  --of-kanban-column-width: 280px;
+  --of-kanban-card-width: 280px;
+}

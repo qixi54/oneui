@@ -1,0 +1,167 @@
+/* Markdown Code Block Styles */
+
+.of-code-block-wrapper {
+  display: block !important;
+  margin: 1rem 0 !important;
+  border-radius: var(--of-radius-lg, 8px) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--of-color-gray-200, #e5e7eb) !important;
+  background: var(--of-color-bg-canvas, #ffffff) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.of-code-block-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.625rem 1rem !important;
+  background: #3f3f46 !important;
+  color: #a1a1a1 !important;
+  font-size: 12px !important;
+}
+
+.of-code-block-lang {
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.of-markdown-copy-btn {
+  padding: 0.375rem 0.5rem !important;
+  background: transparent !important;
+  color: #a1a1a1 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  transition: all 200ms !important;
+}
+
+.of-markdown-copy-btn:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.of-code-block-pre {
+  margin: 0 !important;
+  padding: 1rem !important;
+  background: #1e1e1e !important;
+  overflow-x: auto !important;
+  border-radius: 0 !important;
+}
+
+.of-code-block-pre code {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #e8e8e8 !important;
+}
+
+/* Prose markdown styles for rendered content */
+.of-prose {
+  color: var(--of-color-text, #1f2937) !important;
+  line-height: 1.6 !important;
+}
+
+.of-prose h1,
+.of-prose h2,
+.of-prose h3,
+.of-prose h4,
+.of-prose h5,
+.of-prose h6 {
+  color: var(--of-color-text, #1f2937) !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 600 !important;
+}
+
+.of-prose h1 {
+  font-size: 2em !important;
+}
+.of-prose h2 {
+  font-size: 1.5em !important;
+}
+.of-prose h3 {
+  font-size: 1.25em !important;
+}
+
+.of-prose p {
+  margin: 1em 0 !important;
+}
+
+.of-prose strong {
+  font-weight: 600 !important;
+  color: var(--of-color-text, #1f2937) !important;
+}
+
+.of-prose em {
+  font-style: italic !important;
+}
+
+.of-prose blockquote {
+  margin: 1em 0 !important;
+  padding-left: 1em !important;
+  border-left: 3px solid var(--of-color-gray-300, #d1d5db) !important;
+  color: var(--of-color-text-secondary, #6b7280) !important;
+}
+
+.of-prose ul,
+.of-prose ol {
+  margin: 1em 0 !important;
+  padding-left: 2em !important;
+}
+
+.of-prose li {
+  margin: 0.5em 0 !important;
+}
+
+.of-prose a {
+  color: var(--of-color-primary-600, #2563eb) !important;
+  text-decoration: none !important;
+  transition: color 200ms !important;
+}
+
+.of-prose a:hover {
+  color: var(--of-color-primary-700, #1d4ed8) !important;
+  text-decoration: underline !important;
+}
+
+.of-prose table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 1em 0 !important;
+}
+
+.of-prose th,
+.of-prose td {
+  border: 1px solid var(--of-color-gray-200, #e5e7eb) !important;
+  padding: 0.75em !important;
+  text-align: left !important;
+}
+
+.of-prose th {
+  background: var(--of-color-gray-50, #f9fafb) !important;
+  font-weight: 600 !important;
+}
+
+.of-prose pre {
+  background: #1e1e1e !important;
+  color: #e8e8e8 !important;
+  padding: 1em !important;
+  border-radius: var(--of-radius-md, 6px) !important;
+  overflow-x: auto !important;
+  margin: 1em 0 !important;
+}
+
+.of-prose code {
+  background: var(--of-color-gray-100, #f3f4f6) !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace !important;
+  font-size: 0.9em !important;
+}
+
+.of-prose pre code {
+  background: transparent !important;
+  padding: 0 !important;
+}
