@@ -77,6 +77,16 @@ import {
   // Table enhanced
   TableFilterPanel,
   TableColumnManager,
+  // 新增原子组件
+  Badge,
+  ProgressBar,
+  StatusIndicator,
+  Switch as OneSwitch,
+  Stepper,
+  Accordion,
+  Drawer,
+  SidePanel,
+  ActivityTimeline,
 } from "../index";
 import type {
   TabItem,
@@ -124,6 +134,7 @@ const sections = [
   { key: "auxiliary", label: "辅助组件" },
   { key: "ai", label: "AI 组件" },
   { key: "composables", label: "Composables" },
+  { key: "new-atoms", label: "新原子组件" },
 ];
 
 // ── Tabs ──
@@ -690,6 +701,41 @@ function handleInlineEditCommit(
     (row as any)[fieldId] = value as any;
   }
 }
+
+// ── 新原子组件 demo 数据 ──
+const switchVal = ref(false);
+const progressVal = ref(60);
+const drawerOpen = ref(false);
+const sidePanelOpen = ref(false);
+const stepperCurrent = ref(1);
+const accordionVal = ref<string[]>(['item1']);
+const accordionMultiVal = ref<string[]>([]);
+
+const stepperItems = [
+  { label: '提交申请', description: '填写基本信息' },
+  { label: '审批中', description: '等待上级确认' },
+  { label: '技术评审', description: 'ARCH 架构师评审' },
+  { label: '完成', description: '流程结束' },
+];
+
+const accordionItems = [
+  { key: 'item1', title: '什么是 OneUI？' },
+  { key: 'item2', title: '如何快速开始？' },
+  { key: 'item3', title: '支持按需引入吗？' },
+];
+const accordionContents: Record<string, string> = {
+  item1: 'OneUI 是基于 Vue 3 + TypeScript 的任务管理视图组件库，提供 75+ 个开箱即用的组件，涵盖 Table、Kanban、Gantt、AI Chat 等业务场景组件。',
+  item2: '通过 pnpm add @oneflowui/ui 安装，然后 import OneflowUI from "@oneflowui/ui" 并 app.use(OneflowUI) 全局注册即可使用所有组件。',
+  item3: '支持。通过命名导出方式按需引入：import { KanbanBoard, DataTable } from "@oneflowui/ui"，配合 Tree-shaking 减少打包体积。',
+};
+
+const timelineItems = [
+  { action: '任务创建', actor: 'PM', detail: '由 PM 通过 FlowAPI 创建任务并分配给 FE', time: '2026-03-01 09:00', status: 'done' as const },
+  { action: '开始开发', actor: 'FE', detail: 'Codex Agent 开始编写 Badge 组件代码', time: '2026-03-02 14:30', status: 'done' as const },
+  { action: '代码评审', actor: 'ARCH', detail: '进行多 Agent 代码评审，共识评分 8.6', time: '2026-03-05 10:00', progress: 80, status: 'start' as const },
+  { action: '测试验收', actor: 'QA', detail: '运行 pnpm test 并验证所有组件', time: '2026-03-08', status: 'default' as const },
+  { action: '发布上线', actor: 'OPS', detail: '打包发布到 npm @oneflowui/ui', time: '', status: 'default' as const },
+];
 
 const ctxVisible = ref(false);
 const ctxX = ref(0);
@@ -1913,6 +1959,208 @@ const myStatusMap: ColorMap = {
 
           </div>
         </section>
+      </template>
+
+      <!-- ══════════════════════════════════════════════════════
+           新原子组件（v2.0）
+      ════════════════════════════════════════════════════════ -->
+      <template v-if="activeSection === 'new-atoms'">
+
+        <!-- Badge -->
+        <section class="dev-section">
+          <h2>Badge 徽章</h2>
+          <p class="dev-desc">通用标签/徽章，支持 color 命名色、priority 优先级（P0-P3）、size 尺寸。未匹配 color 时自动降级为默认灰色。</p>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 8px; align-items: center;">
+            <Badge color="blue">进行中</Badge>
+            <Badge color="green">已完成</Badge>
+            <Badge color="orange">已阻塞</Badge>
+            <Badge color="red">失败</Badge>
+            <Badge color="purple">审核中</Badge>
+            <Badge>默认</Badge>
+          </div>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px;">
+            <span style="font-size: 12px; color: #94a3b8;">优先级：</span>
+            <Badge priority="P0">P0</Badge>
+            <Badge priority="P1">P1</Badge>
+            <Badge priority="P2">P2</Badge>
+            <Badge priority="P3">P3</Badge>
+          </div>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px;">
+            <span style="font-size: 12px; color: #94a3b8;">尺寸：</span>
+            <Badge color="blue" size="sm">小</Badge>
+            <Badge color="blue" size="md">中（默认）</Badge>
+          </div>
+        </section>
+
+        <!-- ProgressBar -->
+        <section class="dev-section">
+          <h2>ProgressBar 进度条</h2>
+          <p class="dev-desc">线性进度条，value=100 时自动变绿表示完成，支持自定义颜色、高度、圆角。</p>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">普通进度 60%</div>
+              <ProgressBar :value="60" :show-label="true" />
+            </div>
+            <div>
+              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">完成状态 100%（自动变绿）</div>
+              <ProgressBar :value="100" :show-label="true" />
+            </div>
+            <div>
+              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">自定义颜色 + 高度</div>
+              <ProgressBar :value="75" color="#9333ea" :height="10" />
+            </div>
+            <div>
+              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">动态控制（当前：{{ progressVal }}%）</div>
+              <ProgressBar :value="progressVal" :show-label="true" />
+              <div class="dev-row" style="margin-top: 8px; gap: 8px;">
+                <button class="dev-btn" @click="progressVal = Math.max(0, progressVal - 10)">-10%</button>
+                <button class="dev-btn" @click="progressVal = Math.min(100, progressVal + 10)">+10%</button>
+                <button class="dev-btn" @click="progressVal = 100">完成</button>
+                <button class="dev-btn" style="background:#f1f5f9;color:#64748b" @click="progressVal = 0">重置</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- StatusIndicator -->
+        <section class="dev-section">
+          <h2>StatusIndicator 状态指示灯</h2>
+          <p class="dev-desc">点 + 标签的状态指示，通过 statusColorMap 完全自定义颜色映射，支持自定义 unknown 状态。</p>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 16px; align-items: center;">
+            <StatusIndicator status="in_progress" label="进行中" />
+            <StatusIndicator status="completed" label="已完成" />
+            <StatusIndicator status="blocked" label="已阻塞" />
+            <StatusIndicator status="reviewing" label="审核中" />
+            <StatusIndicator status="idle" label="空闲" />
+            <StatusIndicator status="open" label="待处理" />
+            <StatusIndicator status="unknown-xyz" label="未知状态" />
+          </div>
+        </section>
+
+        <!-- Switch -->
+        <section class="dev-section">
+          <h2>Switch 开关</h2>
+          <p class="dev-desc">无障碍开关，role="switch" + aria-checked，支持键盘空格键切换、加载状态、禁用状态、自定义颜色。</p>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 20px; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <OneSwitch v-model="switchVal" />
+              <span style="font-size: 14px; color: #374151;">{{ switchVal ? '已开启' : '已关闭' }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <OneSwitch :model-value="true" :loading="true" />
+              <span style="font-size: 13px; color: #6b7280;">加载中</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <OneSwitch :model-value="false" :disabled="true" />
+              <span style="font-size: 13px; color: #6b7280;">禁用（关）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <OneSwitch :model-value="true" :disabled="true" />
+              <span style="font-size: 13px; color: #6b7280;">禁用（开）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <OneSwitch :model-value="true" active-color="#9333ea" />
+              <span style="font-size: 13px; color: #6b7280;">自定义颜色</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stepper -->
+        <section class="dev-section">
+          <h2>Stepper 步骤条</h2>
+          <p class="dev-desc">水平/垂直步骤条，当前步骤高亮，已完成步骤显示勾号，支持键盘控制（演示用）。</p>
+          <div style="margin-bottom: 20px;">
+            <Stepper :steps="stepperItems" :current="stepperCurrent" />
+          </div>
+          <div class="dev-row" style="gap: 8px;">
+            <button class="dev-btn" :disabled="stepperCurrent <= 0" @click="stepperCurrent--">← 上一步</button>
+            <button class="dev-btn" :disabled="stepperCurrent >= stepperItems.length - 1" @click="stepperCurrent++">下一步 →</button>
+            <button class="dev-btn" style="background:#f1f5f9;color:#64748b" @click="stepperCurrent = 0">重置</button>
+          </div>
+          <div style="margin-top: 24px;">
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">垂直方向：</div>
+            <Stepper :steps="stepperItems" :current="stepperCurrent" direction="vertical" />
+          </div>
+        </section>
+
+        <!-- Accordion -->
+        <section class="dev-section">
+          <h2>Accordion 手风琴</h2>
+          <p class="dev-desc">默认 v-show 保持内容（keepAlive），lazy=true 时用 v-if 按需渲染。multiple=true 允许多项同时展开。</p>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">单选（默认）：</div>
+            <Accordion v-model="accordionVal" :items="accordionItems">
+              <template #default="{ item }">
+                <div style="padding: 12px 16px; font-size: 14px; color: #374151; line-height: 1.7;">
+                  {{ accordionContents[item.key] }}
+                </div>
+              </template>
+            </Accordion>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">多选（multiple=true）：</div>
+            <Accordion v-model="accordionMultiVal" :items="accordionItems" :multiple="true">
+              <template #default="{ item }">
+                <div style="padding: 12px 16px; font-size: 14px; color: #374151; line-height: 1.7;">
+                  {{ accordionContents[item.key] }}
+                </div>
+              </template>
+            </Accordion>
+          </div>
+        </section>
+
+        <!-- Drawer + SidePanel -->
+        <section class="dev-section">
+          <h2>Drawer 内联抽屉 & SidePanel 侧边面板</h2>
+          <p class="dev-desc">
+            <strong>Drawer</strong>：推挤内容的内联元素，适合布局级侧边栏。
+            <strong>SidePanel</strong>：Teleport 到 body，浮层叠加，适合临时信息面板。
+          </p>
+          <div class="dev-row" style="gap: 12px; margin-bottom: 16px;">
+            <button class="dev-btn" @click="drawerOpen = !drawerOpen">
+              {{ drawerOpen ? '关闭 Drawer' : '打开 Drawer' }}
+            </button>
+            <button class="dev-btn" @click="sidePanelOpen = !sidePanelOpen">
+              {{ sidePanelOpen ? '关闭 SidePanel' : '打开 SidePanel' }}
+            </button>
+          </div>
+
+          <div style="display: flex; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; min-height: 200px; position: relative;">
+            <Drawer v-model="drawerOpen" title="Drawer 抽屉" :width="240">
+              <div style="padding: 16px; font-size: 14px; color: #374151; line-height: 1.8;">
+                <p>内联 Drawer 内容</p>
+                <p style="color: #6b7280; font-size: 13px;">与主内容并排显示，推挤而非覆盖。</p>
+              </div>
+            </Drawer>
+            <div style="flex: 1; padding: 24px; font-size: 14px; color: #6b7280;">
+              主内容区域 — Drawer 打开时会被推挤到右侧
+            </div>
+          </div>
+
+          <!-- SidePanel（Teleport 到 body） -->
+          <SidePanel
+            v-model="sidePanelOpen"
+            title="SidePanel 侧边面板"
+            :width="320"
+          >
+            <div style="padding: 16px; font-size: 14px; color: #374151; line-height: 1.8;">
+              <p>SidePanel 通过 Teleport 挂载到 body。</p>
+              <p style="color: #6b7280; font-size: 13px;">适合临时弹出的详情、设置、过滤器等面板。</p>
+              <p style="margin-top: 16px;">
+                <strong>mode="lazy"</strong>：关闭后销毁 DOM（v-if）<br/>
+                <strong>mode="persistent"</strong>：关闭后保留 DOM（v-show）
+              </p>
+            </div>
+          </SidePanel>
+        </section>
+
+        <!-- ActivityTimeline -->
+        <section class="dev-section">
+          <h2>ActivityTimeline 活动时间线</h2>
+          <p class="dev-desc">垂直时间线组件，支持 done/active/pending/error 四种状态，支持 avatar 头像或 icon 图标。</p>
+          <ActivityTimeline :items="timelineItems" />
+        </section>
+
       </template>
 
     </main>

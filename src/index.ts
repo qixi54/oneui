@@ -3,13 +3,19 @@ export {
   ViewTab,
   ToolbarBtn,
   AddViewBtn,
+  Badge,
   RangeSlider,
+  ProgressBar,
   ButtonGroup,
   EmptyState,
   StatisticCard,
   DropdownMenu,
+  StatusIndicator,
+  Switch,
+  Stepper,
+  Accordion,
 } from "./components/base";
-export type { ButtonOption, EmptyStateAction, MenuItem } from "./components/base";
+export type { ButtonOption, EmptyStateAction, MenuItem, StepItem, StepperProps, StepStatus } from "./components/base";
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
@@ -30,7 +36,12 @@ export {
 export { GalleryView, GalleryCard } from "./components/gallery";
 
 // ─── Timeline ────────────────────────────────────────────────────────────────
-export { GanttTimeline, GanttRow } from "./components/timeline";
+export { ActivityTimeline, GanttTimeline, GanttRow } from "./components/timeline";
+export type {
+  ActivityTimelineProps,
+  ActivityTimelineStatus,
+  TimelineItem,
+} from "./components/timeline";
 
 // ─── Editor ──────────────────────────────────────────────────────────────────
 export { ContentBlock, BlockQuote, CodeBlock, RefLink, RichTextEditor } from "./components/editor";
@@ -61,7 +72,7 @@ export {
 } from "./components/ai";
 
 // ─── Overlay ─────────────────────────────────────────────────────────────────
-export { Modal, Dialog } from "./components/overlay";
+export { Modal, Dialog, Drawer, SidePanel } from "./components/overlay";
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
 export { ToastContainer, ToastItem } from "./components/toast";
@@ -150,18 +161,24 @@ import {
   ViewTab,
   ToolbarBtn,
   AddViewBtn,
+  Badge,
   RangeSlider,
+  ProgressBar,
   ButtonGroup,
   EmptyState,
   StatisticCard,
   DropdownMenu,
+  StatusIndicator,
+  Switch,
+  Stepper,
+  Accordion,
 } from "./components/base";
 import { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
 import { DataTable, TableHeaderRow, TableDataRow, NewRowBtn } from "./components/table";
 import { TableFilterPanel, TableColumnManager, FieldCell } from "./components/table";
 import { KanbanBoard, KanbanColumn, KanbanCard, QuickAddRow } from "./components/kanban";
 import { GalleryView, GalleryCard } from "./components/gallery";
-import { GanttTimeline, GanttRow } from "./components/timeline";
+import { ActivityTimeline, GanttTimeline, GanttRow } from "./components/timeline";
 import { ContentBlock, BlockQuote, CodeBlock, RefLink, RichTextEditor } from "./components/editor";
 import { FormDesigner } from "./components/form";
 import { ColorPanel, PersonPanel, FileUpload } from "./components/auxiliary";
@@ -175,7 +192,7 @@ import {
   AiMessageList,
   AiSender,
 } from "./components/ai";
-import { Modal, Dialog } from "./components/overlay";
+import { Modal, Dialog, Drawer, SidePanel } from "./components/overlay";
 import { ToastContainer, ToastItem } from "./components/toast";
 import { Tabs, TabPanel } from "./components/tabs";
 import { Breadcrumb, BreadcrumbItem } from "./components/breadcrumb";
@@ -187,11 +204,17 @@ const components = [
   ViewTab,
   ToolbarBtn,
   AddViewBtn,
+  Badge,
   RangeSlider,
+  ProgressBar,
   ButtonGroup,
   EmptyState,
   StatisticCard,
   DropdownMenu,
+  StatusIndicator,
+  Switch,
+  Stepper,
+  Accordion,
   AppLayout,
   Navbar,
   Sidebar,
@@ -209,6 +232,7 @@ const components = [
   QuickAddRow,
   GalleryView,
   GalleryCard,
+  ActivityTimeline,
   GanttTimeline,
   GanttRow,
   ContentBlock,
@@ -238,6 +262,8 @@ const components = [
   AiSender,
   Modal,
   Dialog,
+  Drawer,
+  SidePanel,
   ToastContainer,
   ToastItem,
   Tabs,

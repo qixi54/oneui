@@ -1,12 +1,24 @@
 export { default as ViewTab } from "./ViewTab.vue";
 export { default as ToolbarBtn } from "./ToolbarBtn.vue";
 export { default as AddViewBtn } from "./AddViewBtn.vue";
+export { default as Badge } from "./Badge.vue";
 export { default as RangeSlider } from "./RangeSlider.vue";
+export { default as ProgressBar } from "./ProgressBar.vue";
 export { default as ButtonGroup } from "./ButtonGroup.vue";
 export { default as EmptyState } from "./EmptyState.vue";
 export { default as StatisticCard } from "./StatisticCard.vue";
 export { default as DropdownMenu } from "./DropdownMenu.vue";
+export { default as StatusIndicator } from "./StatusIndicator.vue";
+export { default as Switch } from "./Switch.vue";
+export { default as Stepper } from "./Stepper.vue";
+export { default as Accordion } from "./Accordion.vue";
+export { OneSwitch } from "./Switch.vue";
 
 export type { ButtonOption } from "./ButtonGroup.vue";
+export type { AccordionProps, AccordionItem } from "./Accordion.vue";
 export type { EmptyStateAction } from "./EmptyState.vue";
 export type { MenuItem } from "./DropdownMenu.vue";
+export type { StatusIndicatorProps } from "./StatusIndicator.vue";
+export type { SwitchProps } from "./Switch.vue";
+export type { StepItem, StepperProps, StepStatus } from "./Stepper.vue";
+export type { BadgeProps } from "./Badge.vue";
