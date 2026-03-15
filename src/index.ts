@@ -342,4 +342,5 @@ export const OneflowUI = {
 export default OneflowUI;
 
 // Import global styles
+import "./styles/variables.css";
 import "./styles/markdown.css";
