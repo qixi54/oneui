@@ -37,12 +37,25 @@
   --of-color-info: #2563eb;
   --of-color-info-light: #dbeafe;
 
+  /* ─── Extended Colors ─── */
+  --of-color-blue-50: #eff6ff;
+  --of-color-blue-600: #2563eb;
+  --of-color-green-50: #f0fdf4;
+  --of-color-green-600: #16a34a;
+  --of-color-orange-50: #fff7ed;
+  --of-color-orange-600: #ea580c;
+  --of-color-red-50: #fef2f2;
+  --of-color-red-600: #dc2626;
+  --of-color-purple-50: #faf5ff;
+  --of-color-purple-600: #9333ea;
+
   /* ─── Text Colors ─── */
   --of-color-text-primary: var(--of-color-gray-900);
   --of-color-text-secondary: var(--of-color-gray-500);
   --of-color-text-tertiary: var(--of-color-gray-400);
   --of-color-text-inverse: #ffffff;
   --of-color-text-link: var(--of-color-primary-500);
+  --of-color-text: var(--of-color-text-primary);
 
   /* ─── Background ─── */
   --of-color-bg-canvas: #f1f5f9;
@@ -50,6 +63,7 @@
   --of-color-bg-hover: var(--of-color-gray-50);
   --of-color-bg-active: var(--of-color-primary-50);
   --of-color-bg-code: var(--of-color-gray-800);
+  --of-color-primary-foreground: var(--of-color-text-inverse);
 
   /* ─── Priority Badge Colors ─── */
   --of-priority-p0-text: #dc2626;
@@ -84,6 +98,8 @@
   --of-role-arch-bg: #f5f3ff;
   --of-role-pm-text: #db2777;
   --of-role-pm-bg: #fdf2f8;
+  --of-role-default-text: var(--of-color-gray-500);
+  --of-role-default-bg: var(--of-color-gray-100);
 
   /* ─── Badge Color Palette ─── */
   --of-badge-blue-text: #2563eb;
@@ -159,6 +175,7 @@
   /* ─── Borders ─── */
   --of-border-color: var(--of-color-gray-200);
   --of-border: 1px solid var(--of-border-color);
+  --of-color-border-light: var(--of-color-gray-100);
 
   /* ─── Layout ─── */
   --of-navbar-height: 56px;

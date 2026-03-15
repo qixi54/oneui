@@ -17,7 +17,11 @@ import yaml from "highlight.js/lib/languages/yaml";
 import java from "highlight.js/lib/languages/java";
 import go from "highlight.js/lib/languages/go";
 import rust from "highlight.js/lib/languages/rust";
+import plaintext from "highlight.js/lib/languages/plaintext";
 
+hljs.registerLanguage("plaintext", plaintext);
+hljs.registerLanguage("text", plaintext);
+hljs.registerLanguage("txt", plaintext);
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("js", javascript);
 hljs.registerLanguage("typescript", typescript);

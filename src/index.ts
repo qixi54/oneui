@@ -166,6 +166,7 @@ export type {
   UseToastOptions,
 } from "./composables/useToast";
 export type { UseVirtualListOptions } from "./composables/useVirtualList";
+export type { EditingCell } from "./composables/useInlineEdit";
 
 // ─── Composables ─────────────────────────────────────────────────────────────
 export {
@@ -183,6 +184,7 @@ export { useTable } from "./composables/useTable";
 export { useMarkdown } from "./composables/useMarkdown";
 export { useToast } from "./composables/useToast";
 export { useVirtualList } from "./composables/useVirtualList";
+export { useInlineEdit } from "./composables/useInlineEdit";
 
 // ─── Plugin Install ───────────────────────────────────────────────────────────
 import type { App } from "vue";
