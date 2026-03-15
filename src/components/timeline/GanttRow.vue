@@ -54,7 +54,7 @@ const resolvedPriority = computed(() =>
 );
 
 const priorityBarStyle = computed(() => {
-  if (props.item.barColor) return { background: props.item.barColor, color: "#1E293B" };
+  if (props.item.barColor) return { background: props.item.barColor, color: "var(--of-color-gray-800)" };
   return {
     background: resolvedPriority.value.style.background,
     color: resolvedPriority.value.style.color,

@@ -1,4 +1,4 @@
-import { ref, computed, readonly } from "vue";
+import { ref, computed, readonly, shallowRef, triggerRef } from "vue";
 import type { TableColumn } from "../types";
 
 export type FilterOperator =
@@ -90,7 +90,7 @@ function applyCondition(value: unknown, cond: FilterCondition): boolean {
 export function useTableFilter<T extends Record<string, unknown>>(
   options: UseTableFilterOptions = {},
 ) {
-  const conditions = ref<FilterCondition[]>([]);
+  const conditions = shallowRef<FilterCondition[]>([]);
   const logic = ref<FilterLogic>("and");
   const isActive = computed(() => conditions.value.length > 0);
 
@@ -101,19 +101,25 @@ export function useTableFilter<T extends Record<string, unknown>>(
       operator: "contains",
       value: "",
     });
+    triggerRef(conditions);
   }
 
   function removeCondition(id: string) {
     conditions.value = conditions.value.filter((c) => c.id !== id);
+    triggerRef(conditions);
   }
 
   function updateCondition(id: string, update: Partial<FilterCondition>) {
     const idx = conditions.value.findIndex((c) => c.id === id);
-    if (idx !== -1) conditions.value[idx] = { ...conditions.value[idx], ...update };
+    if (idx !== -1) {
+      conditions.value[idx] = { ...conditions.value[idx], ...update };
+      triggerRef(conditions);
+    }
   }
 
   function clearConditions() {
     conditions.value = [];
+    triggerRef(conditions);
   }
 
   function filterData(data: T[]): T[] {

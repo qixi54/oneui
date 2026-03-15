@@ -92,7 +92,7 @@ function fallbackText(name: string) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--of-color-text-inverse);
   font-size: 12px;
   font-weight: 600;
 }

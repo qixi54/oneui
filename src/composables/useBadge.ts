@@ -18,36 +18,36 @@ import type { BadgeConfig, ColorMap } from "../types";
 // ─── 内置默认优先级映射（兼容 P0/P1/P2/P3 风格）───────────────────────────
 
 export const DEFAULT_PRIORITY_MAP: ColorMap = {
-  P0: { text: "#DC2626", bg: "#FEE2E2", label: "P0" },
-  P1: { text: "#D97706", bg: "#FEF3C7", label: "P1" },
-  P2: { text: "#2563EB", bg: "#DBEAFE", label: "P2" },
-  P3: { text: "#64748B", bg: "#F1F5F9", label: "P3" },
+  P0: { text: "var(--of-priority-p0-text)", bg: "var(--of-priority-p0-bg)", label: "P0" },
+  P1: { text: "var(--of-priority-p1-text)", bg: "var(--of-priority-p1-bg)", label: "P1" },
+  P2: { text: "var(--of-priority-p2-text)", bg: "var(--of-priority-p2-bg)", label: "P2" },
+  P3: { text: "var(--of-priority-p3-text)", bg: "var(--of-priority-p3-bg)", label: "P3" },
 };
 
 // ─── 内置默认状态映射（兼容常见英文 key）────────────────────────────────────
 
 export const DEFAULT_STATUS_MAP: ColorMap = {
-  todo: { text: "#64748B", bg: "#F1F5F9", label: "待处理" },
-  in_progress: { text: "#2563EB", bg: "#DBEAFE", label: "进行中" },
-  blocked: { text: "#D97706", bg: "#FEF3C7", label: "已阻塞", dot: "#D97706" },
-  done: { text: "#22C55E", bg: "#DCFCE7", label: "已完成" },
+  todo: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)", label: "待处理" },
+  in_progress: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)", label: "进行中" },
+  blocked: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)", label: "已阻塞", dot: "var(--of-status-blocked-text)" },
+  done: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)", label: "已完成" },
   // 常见英文别名
-  pending: { text: "#64748B", bg: "#F1F5F9", label: "Pending" },
-  open: { text: "#2563EB", bg: "#DBEAFE", label: "Open" },
-  closed: { text: "#22C55E", bg: "#DCFCE7", label: "Closed" },
-  cancelled: { text: "#94A3B8", bg: "#F8FAFC", label: "Cancelled" },
+  pending: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)", label: "Pending" },
+  open: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)", label: "Open" },
+  closed: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)", label: "Closed" },
+  cancelled: { text: "var(--of-status-cancelled-text)", bg: "var(--of-status-cancelled-bg)", label: "Cancelled" },
   // 常见中文 key
-  待处理: { text: "#64748B", bg: "#F1F5F9", label: "待处理" },
-  进行中: { text: "#2563EB", bg: "#DBEAFE", label: "进行中" },
-  已阻塞: { text: "#D97706", bg: "#FEF3C7", label: "已阻塞", dot: "#D97706" },
-  已完成: { text: "#22C55E", bg: "#DCFCE7", label: "已完成" },
+  待处理: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)", label: "待处理" },
+  进行中: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)", label: "进行中" },
+  已阻塞: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)", label: "已阻塞", dot: "var(--of-status-blocked-text)" },
+  已完成: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)", label: "已完成" },
 };
 
 // ─── 兜底样式（value 不在 map 中时使用）─────────────────────────────────────
 
 const FALLBACK: BadgeConfig = {
-  text: "#64748B",
-  bg: "#F1F5F9",
+  text: "var(--of-badge-gray-text)",
+  bg: "var(--of-badge-gray-bg)",
 };
 
 // ─── 解析函数 ────────────────────────────────────────────────────────────────

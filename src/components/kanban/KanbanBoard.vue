@@ -33,7 +33,7 @@ const emit = defineEmits<{
 
 const resolveColumns = () => {
   if (props.columns.length > 0) {
-    return JSON.parse(JSON.stringify(props.columns)) as KanbanColumnData[];
+    return structuredClone(props.columns) as KanbanColumnData[];
   }
   if (props.records.length > 0) {
     return buildKanbanColumns(props.records, {
@@ -63,7 +63,7 @@ function handleColumnUpdate(updated: KanbanColumnData) {
       status: updated.id,
     }));
     localColumns.value[idx] = { ...updated, tasks: normalizedTasks };
-    emit("update:columns", JSON.parse(JSON.stringify(localColumns.value)));
+    emit("update:columns", structuredClone(localColumns.value));
   }
 }
 

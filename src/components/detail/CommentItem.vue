@@ -58,7 +58,7 @@ withDefaults(
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff !important;
+  color: var(--of-color-text-inverse) !important;
   font-family: var(--of-font-sans) !important;
   font-size: 11px !important;
   font-weight: 600 !important;

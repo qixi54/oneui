@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
 }
 
 .of-context-menu__item.is-danger {
-  color: #ff4d4f;
+  color: var(--of-color-error);
 }
 
 .of-context-menu__icon {

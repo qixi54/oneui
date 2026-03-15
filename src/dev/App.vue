@@ -87,6 +87,20 @@ import {
   Drawer,
   SidePanel,
   ActivityTimeline,
+  // v2.1 业务组件
+  RefTag,
+  Avatar,
+  SelectBadge,
+  ChainItem,
+  DescBlock,
+  ViewModeGroup,
+  ViewSwitcher,
+  // v3 信息组件
+  SectionBlock,
+  MonitorItem,
+  StatusSummary,
+  InfoCard,
+  PersonaCard,
 } from "../index";
 import type {
   TabItem,
@@ -107,7 +121,7 @@ import type {
 import type { ButtonOption } from "../components/base";
 import type { ChatMessage } from "../composables/useAiChat";
 import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
-import { DEFAULT_TABLE_SCHEMA } from "../types";
+import { DEFAULT_TABLE_SCHEMA, isSelectField } from "../types";
 
 const toast = useToast();
 
@@ -135,6 +149,8 @@ const sections = [
   { key: "ai", label: "AI 组件" },
   { key: "composables", label: "Composables" },
   { key: "new-atoms", label: "新原子组件" },
+  { key: "biz-components", label: "业务组件" },
+  { key: "v3-components", label: "v3 信息组件" },
 ];
 
 // ── Tabs ──
@@ -387,7 +403,11 @@ const formSchema = ref<TableSchema>({
   ...DEFAULT_TABLE_SCHEMA,
   tableId: "task_form",
   name: "任务创建表单",
-  fields: DEFAULT_TABLE_SCHEMA.fields.map((field) => ({ ...field, options: field.options?.map((opt) => ({ ...opt })) })),
+  fields: DEFAULT_TABLE_SCHEMA.fields.map((field) =>
+    isSelectField(field)
+      ? { ...field, options: field.options.map((opt) => ({ ...opt })) }
+      : { ...field }
+  ),
   views: [],
 });
 
@@ -421,9 +441,9 @@ const detailDescription = ref(
 );
 
 const detailProps: PropItem[] = [
-  { key: "状态", value: "已阻塞", valueColor: "#D97706", valueBg: "#FEF3C7", dotColor: "#D97706" },
-  { key: "优先级", value: "P0", valueColor: "#DC2626", valueBg: "#FEE2E2" },
-  { key: "负责角色", value: "BE", valueColor: "#4F46E5", valueBg: "#EEF2FF" },
+  { key: "状态", value: "已阻塞", valueColor: "var(--of-status-blocked-text)", valueBg: "var(--of-status-blocked-bg)", dotColor: "var(--of-status-blocked-text)" },
+  { key: "优先级", value: "P0", valueColor: "var(--of-priority-p0-text)", valueBg: "var(--of-priority-p0-bg)" },
+  { key: "负责角色", value: "BE", valueColor: "var(--of-role-be-text)", valueBg: "var(--of-role-be-bg)" },
   { key: "创建时间", value: "2026-02-05" },
   { key: "截止日期", value: "2026-02-20" },
 ];
@@ -433,7 +453,7 @@ const detailComments: CommentData[] = [
     id: "c1",
     author: "BE Agent",
     authorInitial: "B",
-    avatarColor: "#6366F1",
+    avatarColor: "var(--of-color-primary-500)",
     action: "完成了代码提交",
     content: "commit: auth-middleware-v2 分支已推送，待 OAuth2 服务就绪后合并。",
     time: "3 小时前",
@@ -442,7 +462,7 @@ const detailComments: CommentData[] = [
     id: "c2",
     author: "ARCH",
     authorInitial: "A",
-    avatarColor: "#D97706",
+    avatarColor: "var(--of-color-warning)",
     action: "更新了状态",
     content: "OAuth2 服务延期，该任务标记为已阻塞，等待解除。",
     time: "1 天前",
@@ -466,6 +486,9 @@ const tableRawData = [
   { id: "6", title: "文档整理", assignee: "李四", priority: "P3", status: "待开始", dueDate: "2026-03-28" },
   { id: "7", title: "安全审计", assignee: "王五", priority: "P0", status: "进行中", dueDate: "2026-03-08" },
 ];
+
+// ── 分组 Demo ──
+const demoGroupBy = ref('');
 
 // useTable 新 API：接收 options 对象
 const {
@@ -526,7 +549,7 @@ const kanbanColumns: KanbanColumnData[] = [
   {
     id: "todo",
     title: "待开始",
-    color: "#6b7280",
+    color: "var(--of-color-gray-500)",
     tasks: [
       { id: "t1", title: "设计新版 Dashboard", priority: "P1", status: "待开始", assignee: "李四", tags: ["设计"] },
       { id: "t2", title: "编写单元测试", priority: "P2", status: "待开始", assignee: "张三", tags: ["测试"] },
@@ -535,7 +558,7 @@ const kanbanColumns: KanbanColumnData[] = [
   {
     id: "doing",
     title: "进行中",
-    color: "#3b82f6",
+    color: "var(--of-color-info)",
     tasks: [
       { id: "t3", title: "重构登录模块", priority: "P0", status: "进行中", assignee: "张三", tags: ["后端"] },
       { id: "t4", title: "接口性能优化", priority: "P1", status: "进行中", assignee: "赵六", tags: ["性能"] },
@@ -544,7 +567,7 @@ const kanbanColumns: KanbanColumnData[] = [
   {
     id: "blocked",
     title: "已阻塞",
-    color: "#f59e0b",
+    color: "var(--of-color-warning)",
     tasks: [
       { id: "t5", title: "认证中间件重构", priority: "P0", status: "已阻塞", assignee: "张三", tags: ["后端"] },
     ],
@@ -552,7 +575,7 @@ const kanbanColumns: KanbanColumnData[] = [
   {
     id: "done",
     title: "已完成",
-    color: "#22c55e",
+    color: "var(--of-color-success)",
     tasks: [
       { id: "t6", title: "修复分页 Bug", priority: "P2", status: "已完成", assignee: "王五", tags: ["修复"] },
     ],
@@ -672,9 +695,9 @@ const selectFieldDefs: FieldDef[] = [
     type: "select",
     label: "状态",
     options: [
-      { label: "活跃", value: "active", color: "#52c41a" },
-      { label: "停用", value: "inactive", color: "#ff4d4f" },
-      { label: "待定", value: "pending", color: "#faad14" },
+      { label: "活跃", value: "active", color: "var(--of-color-success)" },
+      { label: "停用", value: "inactive", color: "var(--of-color-error)" },
+      { label: "待定", value: "pending", color: "var(--of-color-warning)" },
     ],
   },
   {
@@ -701,6 +724,16 @@ function handleInlineEditCommit(
     (row as any)[fieldId] = value as any;
   }
 }
+
+// ── 业务组件 demo 数据 ──
+const viewModeVal = ref('side');
+const viewSwitcherTab = ref('table');
+
+// ── v3 信息组件 demo 数据 ──
+const sectionCollapsed = ref(false);
+const sectionStatus = ref<'pending' | 'updating' | 'done' | 'editing'>('done');
+const personaExpanded = ref(false);
+const persona2Expanded = ref(false);
 
 // ── 新原子组件 demo 数据 ──
 const switchVal = ref(false);
@@ -803,13 +836,13 @@ function onCtxSelect(key: string) {
           <h2>ButtonGroup 按钮组</h2>
           <p class="dev-desc">单选按钮组，常用于视图切换。ButtonOption 使用 value 字段。</p>
           <ButtonGroup v-model="selectedView" :options="viewOptions" />
-          <p style="margin-top: 8px; color: #888; font-size: 13px">当前选中：{{ selectedView }}</p>
+          <p style="margin-top: 8px; color: var(--of-color-text-secondary); font-size: 13px">当前选中：{{ selectedView }}</p>
         </section>
 
         <section class="dev-section">
           <h2>ViewTab + ToolbarBtn 视图标签与工具栏</h2>
           <p class="dev-desc">ViewTab 使用 v-model 绑定当前视图，传入 ViewTabItem[] 数组；ToolbarBtn 用于筛选、排序等操作。</p>
-          <div style="border-bottom: 1px solid #e5e7eb; margin-bottom: 12px;">
+          <div style="border-bottom: 1px solid var(--of-border-color); margin-bottom: 12px;">
             <ViewTab v-model="activeViewTab" :items="viewTabItems" />
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
@@ -838,7 +871,7 @@ function onCtxSelect(key: string) {
           <h2>DropdownMenu 操作菜单</h2>
           <p class="dev-desc">右键/更多操作菜单，支持 variant: 'destructive' 高亮危险操作。</p>
           <div style="display: flex; align-items: center; gap: 16px">
-            <span style="font-size: 14px; color: #666">点击右侧按钮展开菜单：</span>
+            <span style="font-size: 14px; color: var(--of-color-text-secondary)">点击右侧按钮展开菜单：</span>
             <DropdownMenu :items="menuItems" />
           </div>
         </section>
@@ -863,13 +896,13 @@ function onCtxSelect(key: string) {
           <h2>状态徽章 · Status Badge</h2>
           <p class="dev-desc">内置默认状态颜色，可通过 statusColorMap prop 完全覆盖，传给 DataTable、KanbanCard 等组件。</p>
           <div class="dev-row" style="flex-wrap: wrap; gap: 8px;">
-            <span class="of-badge" style="color:#6b7280;background:#f1f5f9;">待处理</span>
-            <span class="of-badge" style="color:#2563eb;background:#dbeafe;">进行中</span>
-            <span class="of-badge" style="display:flex;align-items:center;gap:4px;color:#d97706;background:#fef3c7;">
-              <span style="width:6px;height:6px;border-radius:50%;background:#d97706;display:inline-block;"></span>已阻塞
+            <span class="of-badge" style="color:var(--of-status-todo-text);background:var(--of-status-todo-bg);">待处理</span>
+            <span class="of-badge" style="color:var(--of-status-in-progress-text);background:var(--of-status-in-progress-bg);">进行中</span>
+            <span class="of-badge" style="display:flex;align-items:center;gap:4px;color:var(--of-status-blocked-text);background:var(--of-status-blocked-bg);">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--of-status-blocked-text);display:inline-block;"></span>已阻塞
             </span>
-            <span class="of-badge" style="color:#16a34a;background:#dcfce7;">已完成</span>
-            <span class="of-badge" style="color:#9333ea;background:#f3e8ff;">审核中</span>
+            <span class="of-badge" style="color:var(--of-badge-green-text);background:var(--of-color-success-light);">已完成</span>
+            <span class="of-badge" style="color:var(--of-badge-purple-text);background:var(--of-badge-purple-bg);">审核中</span>
           </div>
         </section>
 
@@ -877,17 +910,17 @@ function onCtxSelect(key: string) {
           <h2>优先级徽章 · Priority Badge</h2>
           <p class="dev-desc">内置 P0-P3，可自定义为 urgent/high/medium/low 等任意值，支持完整的 ColorMap 覆盖。</p>
           <div class="dev-row" style="gap: 8px; flex-wrap: wrap;">
-            <span class="of-badge" style="color:#dc2626;background:#fee2e2;font-weight:600;">P0</span>
-            <span class="of-badge" style="color:#d97706;background:#fef3c7;font-weight:600;">P1</span>
-            <span class="of-badge" style="color:#2563eb;background:#dbeafe;font-weight:600;">P2</span>
-            <span class="of-badge" style="color:#64748b;background:#f1f5f9;font-weight:600;">P3</span>
+            <span class="of-badge" style="color:var(--of-priority-p0-text);background:var(--of-priority-p0-bg);font-weight:600;">P0</span>
+            <span class="of-badge" style="color:var(--of-status-blocked-text);background:var(--of-status-blocked-bg);font-weight:600;">P1</span>
+            <span class="of-badge" style="color:var(--of-status-in-progress-text);background:var(--of-status-in-progress-bg);font-weight:600;">P2</span>
+            <span class="of-badge" style="color:var(--of-color-text-secondary);background:var(--of-status-todo-bg);font-weight:600;">P3</span>
           </div>
           <div class="dev-row" style="gap: 8px; flex-wrap: wrap; margin-top: 12px;">
-            <span style="font-size: 12px; color: #94a3b8;">自定义值：</span>
-            <span class="of-badge" style="color:#dc2626;background:#fee2e2;">紧急</span>
-            <span class="of-badge" style="color:#d97706;background:#fef3c7;">高</span>
-            <span class="of-badge" style="color:#2563eb;background:#dbeafe;">中</span>
-            <span class="of-badge" style="color:#64748b;background:#f1f5f9;">低</span>
+            <span style="font-size: 12px; color: var(--of-color-text-tertiary);">自定义值：</span>
+            <span class="of-badge" style="color:var(--of-priority-p0-text);background:var(--of-priority-p0-bg);">紧急</span>
+            <span class="of-badge" style="color:var(--of-status-blocked-text);background:var(--of-status-blocked-bg);">高</span>
+            <span class="of-badge" style="color:var(--of-status-in-progress-text);background:var(--of-status-in-progress-bg);">中</span>
+            <span class="of-badge" style="color:var(--of-color-text-secondary);background:var(--of-status-todo-bg);">低</span>
           </div>
         </section>
 
@@ -895,13 +928,13 @@ function onCtxSelect(key: string) {
           <h2>角色 / 自定义徽章</h2>
           <p class="dev-desc">ColorMap 支持任意 key，完全由调用方定义枚举值，数据驱动渲染。</p>
           <div class="dev-row" style="gap: 8px; flex-wrap: wrap;">
-            <span class="of-badge" style="color:#4f46e5;background:#eef2ff;">BE</span>
-            <span class="of-badge" style="color:#0891b2;background:#cffafe;">FE</span>
-            <span class="of-badge" style="color:#16a34a;background:#dcfce7;">QA</span>
-            <span class="of-badge" style="color:#d97706;background:#fef3c7;">ARCH</span>
-            <span class="of-badge" style="color:#9333ea;background:#f3e8ff;">PM</span>
-            <span class="of-badge" style="color:#7c3aed;background:#ede9fe;">审核中</span>
-            <span class="of-badge" style="color:#0891b2;background:#cffafe;">部署中</span>
+            <span class="of-badge" style="color:var(--of-role-be-text);background:var(--of-role-be-bg);">BE</span>
+            <span class="of-badge" style="color:var(--of-badge-blue-text);background:var(--of-badge-blue-bg);">FE</span>
+            <span class="of-badge" style="color:var(--of-badge-green-text);background:var(--of-color-success-light);">QA</span>
+            <span class="of-badge" style="color:var(--of-status-blocked-text);background:var(--of-status-blocked-bg);">ARCH</span>
+            <span class="of-badge" style="color:var(--of-badge-purple-text);background:var(--of-badge-purple-bg);">PM</span>
+            <span class="of-badge" style="color:var(--of-badge-purple-text);background:var(--of-badge-purple-bg);">审核中</span>
+            <span class="of-badge" style="color:var(--of-badge-blue-text);background:var(--of-badge-blue-bg);">部署中</span>
           </div>
         </section>
 
@@ -930,7 +963,7 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>AppLayout 应用布局框架</h2>
           <p class="dev-desc">三层布局：#navbar slot（顶部导航）+ #sidebar slot（侧边栏）+ #statusbar slot（底部状态栏），默认 slot 为主内容区。</p>
-          <div style="height: 520px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+          <div style="height: 520px; border: 1px solid var(--of-border-color); border-radius: 10px; overflow: hidden;">
             <AppLayout>
               <template #navbar>
                 <Navbar
@@ -941,7 +974,7 @@ const myStatusMap: ColorMap = {
                   @avatar-click="toast.info('用户设置')"
                 >
                   <template #logo>
-                    <span style="font-size: 15px; font-weight: 700; color: #6366f1;">⚡ OneFlow</span>
+                    <span style="font-size: 15px; font-weight: 700; color: var(--of-color-primary-500);">⚡ OneFlow</span>
                   </template>
                 </Navbar>
               </template>
@@ -978,7 +1011,7 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>Navbar 独立演示</h2>
           <p class="dev-desc">支持 #logo slot、搜索框、通知徽标、头像。</p>
-          <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+          <div style="border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
             <Navbar
               username="张三"
               :notify-count="5"
@@ -991,7 +1024,7 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>Sidebar 侧边栏独立演示</h2>
           <p class="dev-desc">数据驱动导航，支持图标、徽标、子菜单、激活状态。</p>
-          <div style="width: 220px; height: 300px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+          <div style="width: 220px; height: 300px; border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
             <Sidebar :items="sidebarItems" @item-click="handleSidebarClick" />
           </div>
         </section>
@@ -999,10 +1032,10 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>StatusBar 状态栏独立演示</h2>
           <p class="dev-desc">显示同步状态（已同步/同步中）、快捷键提示和版本信息。</p>
-          <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 12px;">
+          <div style="border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden; margin-bottom: 12px;">
             <StatusBar :synced="true" shortcuts="⌘N 新建  ·  ⌘K 搜索" version="v1.0.0" />
           </div>
-          <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+          <div style="border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
             <StatusBar :synced="false" shortcuts="" version="v1.0.0" />
           </div>
         </section>
@@ -1032,43 +1065,43 @@ const myStatusMap: ColorMap = {
           </div>
 
           <Modal v-model="showModal" title="查看详情" width="560px">
-            <p style="color: #666; font-size: 14px; line-height: 1.8">
+            <p style="color: var(--of-color-text-secondary); font-size: 14px; line-height: 1.8">
               这是一个基础 Modal 组件，支持 ESC 关闭、点击遮罩关闭、自定义宽度和底部操作区。
             </p>
             <template #footer>
-              <button class="dev-btn" style="background: #f0f0f0; color: #333" @click="showModal = false">关闭</button>
+              <button class="dev-btn" style="background: var(--of-color-gray-100); color: var(--of-color-text-primary)" @click="showModal = false">关闭</button>
               <button class="dev-btn" @click="() => { showModal = false; toast.success('已确认'); }">确认</button>
             </template>
           </Modal>
 
           <Modal v-model="showFormModal" title="创建任务" width="480px">
             <div style="display: flex; flex-direction: column; gap: 16px; padding: 4px 0">
-              <label style="font-size: 14px; color: #333">
+              <label style="font-size: 14px; color: var(--of-color-text-primary)">
                 <div style="margin-bottom: 6px; font-weight: 500">任务标题</div>
                 <input
-                  style="width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; box-sizing: border-box;"
+                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--of-border-color); border-radius: 6px; font-size: 14px; box-sizing: border-box;"
                   placeholder="请输入任务标题"
                 />
               </label>
-              <label style="font-size: 14px; color: #333">
+              <label style="font-size: 14px; color: var(--of-color-text-primary)">
                 <div style="margin-bottom: 6px; font-weight: 500">优先级</div>
-                <select style="width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px;">
+                <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--of-border-color); border-radius: 6px; font-size: 14px;">
                   <option>P0 - 紧急</option>
                   <option>P1 - 高</option>
                   <option selected>P2 - 中</option>
                   <option>P3 - 低</option>
                 </select>
               </label>
-              <label style="font-size: 14px; color: #333">
+              <label style="font-size: 14px; color: var(--of-color-text-primary)">
                 <div style="margin-bottom: 6px; font-weight: 500">描述</div>
                 <textarea
-                  style="width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; resize: vertical; min-height: 80px; box-sizing: border-box;"
+                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--of-border-color); border-radius: 6px; font-size: 14px; resize: vertical; min-height: 80px; box-sizing: border-box;"
                   placeholder="任务描述（可选）"
                 />
               </label>
             </div>
             <template #footer>
-              <button class="dev-btn" style="background: #f0f0f0; color: #333" @click="showFormModal = false">取消</button>
+              <button class="dev-btn" style="background: var(--of-color-gray-100); color: var(--of-color-text-primary)" @click="showFormModal = false">取消</button>
               <button class="dev-btn" @click="() => { showFormModal = false; toast.success('任务已创建'); }">创建</button>
             </template>
           </Modal>
@@ -1102,17 +1135,17 @@ const myStatusMap: ColorMap = {
           <p class="dev-desc">下划线风格标签页，适合内容区域切换，支持图标和禁用状态。TabPanel 的 name 对应 TabItem 的 key。</p>
           <Tabs v-model="activeTab" :tabs="tabItems" variant="line">
             <TabPanel name="overview">
-              <div style="padding: 16px 0; color: #666; font-size: 14px">
+              <div style="padding: 16px 0; color: var(--of-color-text-secondary); font-size: 14px">
                 📊 这是概览面板内容，展示项目整体情况。
               </div>
             </TabPanel>
             <TabPanel name="members">
-              <div style="padding: 16px 0; color: #666; font-size: 14px">
+              <div style="padding: 16px 0; color: var(--of-color-text-secondary); font-size: 14px">
                 👥 这是成员管理面板，可以添加/移除团队成员。
               </div>
             </TabPanel>
             <TabPanel name="settings">
-              <div style="padding: 16px 0; color: #666; font-size: 14px">
+              <div style="padding: 16px 0; color: var(--of-color-text-secondary); font-size: 14px">
                 ⚙️ 这是设置面板。
               </div>
             </TabPanel>
@@ -1124,17 +1157,17 @@ const myStatusMap: ColorMap = {
           <p class="dev-desc">卡片风格标签页，适合设置面板、分类筛选。</p>
           <Tabs v-model="activeCardTab" :tabs="cardTabItems" variant="card">
             <TabPanel name="all">
-              <div style="padding: 16px 0; color: #666; font-size: 14px">
+              <div style="padding: 16px 0; color: var(--of-color-text-secondary); font-size: 14px">
                 📋 全部任务列表（7 条）
               </div>
             </TabPanel>
             <TabPanel name="active">
-              <div style="padding: 16px 0; color: #666; font-size: 14px">
+              <div style="padding: 16px 0; color: var(--of-color-text-secondary); font-size: 14px">
                 🔄 进行中的任务（3 条）
               </div>
             </TabPanel>
             <TabPanel name="done">
-              <div style="padding: 16px 0; color: #666; font-size: 14px">
+              <div style="padding: 16px 0; color: var(--of-color-text-secondary); font-size: 14px">
                 ✅ 已完成的任务（1 条）
               </div>
             </TabPanel>
@@ -1172,16 +1205,16 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>SplitPane - 水平分栏（支持触摸拖拽）</h2>
           <p class="dev-desc">可拖拽调整两侧宽度，支持 min/max 限制，触摸设备同样可用。</p>
-          <div style="height: 400px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden">
+          <div style="height: 400px; border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden">
             <SplitPane direction="horizontal" :default-size="30" :min-size="15" :max-size="70">
               <template #first>
-                <div style="padding: 16px; height: 100%; box-sizing: border-box; background: #fafafa">
-                  <div style="font-weight: 600; font-size: 13px; color: #333; margin-bottom: 12px">📁 文件树</div>
+                <div style="padding: 16px; height: 100%; box-sizing: border-box; background: var(--of-color-bg-hover)">
+                  <div style="font-weight: 600; font-size: 13px; color: var(--of-color-text-primary); margin-bottom: 12px">📁 文件树</div>
                   <div
                     v-for="f in ['src/', 'components/', 'Tabs.vue', 'Modal.vue', 'index.ts']"
                     :key="f"
-                    style="padding: 4px 8px; font-size: 13px; color: #555; cursor: pointer; border-radius: 4px;"
-                    @mouseenter="($event.target as HTMLElement).style.background = '#e5e7eb'"
+                    style="padding: 4px 8px; font-size: 13px; color: var(--of-color-text-secondary); cursor: pointer; border-radius: 4px;"
+                    @mouseenter="($event.target as HTMLElement).style.background = 'var(--of-color-gray-200)'"
                     @mouseleave="($event.target as HTMLElement).style.background = ''"
                   >
                     {{ f }}
@@ -1190,8 +1223,8 @@ const myStatusMap: ColorMap = {
               </template>
               <template #second>
                 <div style="padding: 16px; height: 100%; box-sizing: border-box; overflow: auto">
-                  <div style="font-weight: 600; font-size: 13px; color: #333; margin-bottom: 12px">📝 代码预览</div>
-                  <pre style="font-size: 12px; color: #555; background: #f5f5f5; padding: 12px; border-radius: 6px; overflow: auto;">{{ `import { Tabs, TabPanel } from 'oneflow-ui'\n\nconst tabs = [\n  { key: 'a', label: '标签A' },\n  { key: 'b', label: '标签B' },\n]` }}</pre>
+                  <div style="font-weight: 600; font-size: 13px; color: var(--of-color-text-primary); margin-bottom: 12px">📝 代码预览</div>
+                  <pre style="font-size: 12px; color: var(--of-color-text-secondary); background: var(--of-color-gray-100); padding: 12px; border-radius: 6px; overflow: auto;">{{ `import { Tabs, TabPanel } from 'oneflow-ui'\n\nconst tabs = [\n  { key: 'a', label: '标签A' },\n  { key: 'b', label: '标签B' },\n]` }}</pre>
                 </div>
               </template>
             </SplitPane>
@@ -1201,18 +1234,18 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>SplitPane - 垂直分栏</h2>
           <p class="dev-desc">上下分栏，适合编辑器+预览布局。</p>
-          <div style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden">
+          <div style="height: 350px; border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden">
             <SplitPane direction="vertical" :default-size="40">
               <template #first>
-                <div style="padding: 16px; height: 100%; box-sizing: border-box; background: #f0f9ff">
-                  <div style="font-weight: 600; font-size: 13px; color: #0369a1">上方面板</div>
-                  <p style="font-size: 13px; color: #666; margin-top: 8px">拖拽中间分隔条调整高度比例</p>
+                <div style="padding: 16px; height: 100%; box-sizing: border-box; background: var(--of-color-info-light)">
+                  <div style="font-weight: 600; font-size: 13px; color: var(--of-color-info)">上方面板</div>
+                  <p style="font-size: 13px; color: var(--of-color-text-secondary); margin-top: 8px">拖拽中间分隔条调整高度比例</p>
                 </div>
               </template>
               <template #second>
-                <div style="padding: 16px; height: 100%; box-sizing: border-box; background: #f0fdf4">
-                  <div style="font-weight: 600; font-size: 13px; color: #166534">下方面板</div>
-                  <p style="font-size: 13px; color: #666; margin-top: 8px">移动端同样支持 touch 拖拽</p>
+                <div style="padding: 16px; height: 100%; box-sizing: border-box; background: var(--of-color-success-light)">
+                  <div style="font-weight: 600; font-size: 13px; color: var(--of-badge-green-text)">下方面板</div>
+                  <p style="font-size: 13px; color: var(--of-color-text-secondary); margin-top: 8px">移动端同样支持 touch 拖拽</p>
                 </div>
               </template>
             </SplitPane>
@@ -1329,20 +1362,20 @@ const myStatusMap: ColorMap = {
           <p class="dev-desc">文本内容展示块，content prop 控制内容，设置 editable 可点击进入编辑模式，用 \n 换行。</p>
           <div style="display: flex; flex-direction: column; gap: 12px; max-width: 700px;">
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 6px;">只读模式（content prop）：</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 6px;">只读模式（content prop）：</p>
               <ContentBlock content="这是一段描述文本，支持多行显示。&#10;第二段内容可以展示更多详情和上下文信息，支持纯文字和行内组件混排。" />
             </div>
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 6px;">可编辑模式（点击进入编辑）：</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 6px;">可编辑模式（点击进入编辑）：</p>
               <ContentBlock
                 v-model:content="editableContent"
                 :editable="true"
               />
             </div>
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 6px;">使用 slot 自定义内容：</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 6px;">使用 slot 自定义内容：</p>
               <ContentBlock>
-                <p style="font-size: 13px; color: #374151; line-height: 1.6; margin: 0;">通过 <strong>slot</strong> 自定义内容，可以包含任意 HTML 结构。</p>
+                <p style="font-size: 13px; color: var(--of-color-text-primary); line-height: 1.6; margin: 0;">通过 <strong>slot</strong> 自定义内容，可以包含任意 HTML 结构。</p>
               </ContentBlock>
             </div>
           </div>
@@ -1368,7 +1401,7 @@ const myStatusMap: ColorMap = {
           <div style="max-width: 700px;">
             <div
               class="of-markdown"
-              style="padding: 16px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;"
+              style="padding: 16px; background: var(--of-color-bg-elevated); border: 1px solid var(--of-border-color); border-radius: 8px;"
               v-html="markdownHtml"
             />
           </div>
@@ -1387,7 +1420,7 @@ const myStatusMap: ColorMap = {
           <h2>RefLink 引用链接</h2>
           <p class="dev-desc">带样式的内联引用标签，refId 是必填的引用 ID，label 可选（不传则显示 refId），点击触发 click 事件。</p>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span style="font-size: 13px; color: #334155;">相关文档：</span>
+            <span style="font-size: 13px; color: var(--of-color-text-primary);">相关文档：</span>
             <RefLink ref-id="wiki:GLOBAL-API-STANDARDS" @click="(id) => toast.info(id)" />
             <RefLink ref-id="task:ZHO-BE-012" label="认证中间件重构" @click="(id) => toast.info(id)" />
             <RefLink ref-id="memo:2026-02-11" @click="(id) => toast.info(id)" />
@@ -1402,7 +1435,7 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>DetailLayout 任务详情布局</h2>
           <p class="dev-desc">左右双栏布局：左侧主内容（标题/描述富文本区/活动记录），右侧属性面板。支持通过 descriptionContent + descriptionEditable 接入可编辑富文本区。</p>
-          <div style="border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+          <div style="border: 1px solid var(--of-border-color); border-radius: 10px; overflow: hidden;">
             <DetailLayout
               :task="detailTask"
               :prop-items="detailProps"
@@ -1416,7 +1449,7 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>PropPanel + PropRow 属性面板</h2>
           <p class="dev-desc">可单独使用的属性面板，PropItem 支持 valueColor/valueBg/dotColor 样式配置。</p>
-          <div style="max-width: 360px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+          <div style="max-width: 360px; border: 1px solid var(--of-border-color); border-radius: 10px; overflow: hidden;">
             <PropPanel title="任务属性" :items="detailProps" />
           </div>
         </section>
@@ -1424,7 +1457,7 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>CommentItem 评论条目</h2>
           <p class="dev-desc">活动记录/评论列表中的单个条目，CommentData 包含 author/authorInitial/avatarColor/action/content/time 字段。</p>
-          <div style="max-width: 600px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px;">
+          <div style="max-width: 600px; border: 1px solid var(--of-border-color); border-radius: 10px; padding: 16px;">
             <CommentItem v-for="c in detailComments" :key="c.id" :comment="c" />
           </div>
         </section>
@@ -1443,7 +1476,7 @@ const myStatusMap: ColorMap = {
             <button class="dev-btn" style="font-size: 13px; padding: 6px 14px;" @click="showFilterPanel = !showFilterPanel">
               {{ showFilterPanel ? '隐藏筛选面板' : '展开筛选面板' }}
             </button>
-            <span v-if="filterActive" style="font-size: 12px; color: #7c3aed; background: #ede9fe; padding: 2px 8px; border-radius: 12px;">筛选已激活</span>
+            <span v-if="filterActive" style="font-size: 12px; color: var(--of-color-primary-500); background: var(--of-color-primary-100); padding: 2px 8px; border-radius: 12px;">筛选已激活</span>
           </div>
           <TableFilterPanel
             v-if="showFilterPanel"
@@ -1487,27 +1520,56 @@ const myStatusMap: ColorMap = {
             DataTable 内置行选择、分页、列排序交互。
           </p>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: #6b7280;" @click="toggleSort('title')">
+            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: var(--of-color-gray-500);" @click="toggleSort('title')">
               按标题排序 ({{ sort.field === 'title' ? sort.order : '无' }})
             </button>
-            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: #6b7280;" @click="toggleSort('priority')">
+            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: var(--of-color-gray-500);" @click="toggleSort('priority')">
               按优先级排序 ({{ sort.field === 'priority' ? sort.order : '无' }})
             </button>
             <div style="flex: 1;" />
-            <span v-if="selectedCount > 0" style="font-size: 13px; color: #7c3aed;">
+            <span v-if="selectedCount > 0" style="font-size: 13px; color: var(--of-color-primary-500);">
               已选 {{ selectedCount }} 条
             </span>
-            <button v-if="selectedCount > 0" class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: #ef4444;" @click="clearSelection">取消选择</button>
+            <button v-if="selectedCount > 0" class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: var(--of-color-error);" @click="clearSelection">取消选择</button>
           </div>
-          <p style="font-size: 12px; color: #888; margin-bottom: 8px;">
+          <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">
             共 {{ pagination.total }} 条 | 第 {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.pageSize) }} 页
           </p>
           <DataTable :tasks="tableData" :columns="tableColumns" />
           <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; justify-content: flex-end;">
             <button class="dev-btn" style="padding: 6px 12px; font-size: 12px;" :disabled="pagination.page <= 1" @click="setPage(pagination.page - 1)">上一页</button>
-            <span style="font-size: 13px; color: #666;">{{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.pageSize) }}</span>
+            <span style="font-size: 13px; color: var(--of-color-text-secondary);">{{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.pageSize) }}</span>
             <button class="dev-btn" style="padding: 6px 12px; font-size: 12px;" :disabled="pagination.page >= Math.ceil(pagination.total / pagination.pageSize)" @click="setPage(pagination.page + 1)">下一页</button>
           </div>
+        </section>
+
+        <!-- 4. 分组视图 -->
+        <section class="dev-section">
+          <h2>DataTable + groupBy 分组视图</h2>
+          <p class="dev-desc">设置 group-by 按字段分组，每组可折叠/展开。传入 group-color-map 时分组标题以 Badge 样式显示。</p>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px;"
+              @click="demoGroupBy = demoGroupBy === 'status' ? '' : 'status'">
+              {{ demoGroupBy === 'status' ? '✓ 按状态分组' : '按状态分组' }}
+            </button>
+            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px;"
+              @click="demoGroupBy = demoGroupBy === 'priority' ? '' : 'priority'">
+              {{ demoGroupBy === 'priority' ? '✓ 按优先级分组' : '按优先级分组' }}
+            </button>
+            <button class="dev-btn" style="font-size: 13px; padding: 6px 14px;"
+              @click="demoGroupBy = demoGroupBy === 'assignee' ? '' : 'assignee'">
+              {{ demoGroupBy === 'assignee' ? '✓ 按负责人分组' : '按负责人分组' }}
+            </button>
+            <button v-if="demoGroupBy" class="dev-btn" style="font-size: 13px; padding: 6px 14px; background: var(--of-color-gray-500);"
+              @click="demoGroupBy = ''">
+              取消分组
+            </button>
+          </div>
+          <DataTable
+            :tasks="tableRawData"
+            :columns="tableColumns"
+            :group-by="demoGroupBy || undefined"
+          />
         </section>
 
       </template>
@@ -1569,7 +1631,7 @@ const myStatusMap: ColorMap = {
           <p class="dev-desc">右键点击下方区域，弹出上下文菜单并响应选择事件。</p>
           <div
             @contextmenu.prevent="showContextMenu"
-            style="padding: 16px; border: 1px dashed #ccc; cursor: context-menu; border-radius: 8px; color: #4b5563;"
+            style="padding: 16px; border: 1px dashed var(--of-color-gray-300); cursor: context-menu; border-radius: 8px; color: var(--of-color-text-secondary);"
           >
             右键点击此区域
           </div>
@@ -1628,24 +1690,24 @@ const myStatusMap: ColorMap = {
           <h2>单图表组件独立使用</h2>
           <p class="dev-desc">BarChart / PieChart / DoughnutChart / NumberCard / TableChart 均可单独引用，无需包在 Dashboard 容器内。</p>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 900px;">
-            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">NumberCard</p>
+            <div style="border: 1px solid var(--of-border-color); border-radius: 8px; padding: 16px;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">NumberCard</p>
               <NumberCard :data="{ value: 128, trend: 'up', compare: '+12%' }" title="总任务" />
             </div>
-            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">BarChart</p>
+            <div style="border: 1px solid var(--of-border-color); border-radius: 8px; padding: 16px;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">BarChart</p>
               <BarChart :data="[12, 17, 14, 20, 23, 16, 19]" title="近7天趋势" />
             </div>
-            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">DoughnutChart</p>
+            <div style="border: 1px solid var(--of-border-color); border-radius: 8px; padding: 16px;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">DoughnutChart</p>
               <DoughnutChart :data="[{ name: 'P0', value: 7 }, { name: 'P1', value: 24 }, { name: 'P2', value: 53 }]" title="优先级分布" />
             </div>
-            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">PieChart</p>
+            <div style="border: 1px solid var(--of-border-color); border-radius: 8px; padding: 16px;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">PieChart</p>
               <PieChart :data="[{ name: 'Todo', value: 34 }, { name: '进行中', value: 52 }, { name: '完成', value: 42 }]" title="状态分布" />
             </div>
-            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">TableChart</p>
+            <div style="border: 1px solid var(--of-border-color); border-radius: 8px; padding: 16px;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">TableChart</p>
               <TableChart :data="[{ label: 'GanttTimeline', value: '已完成' }, { label: 'RichTextEditor', value: '已完成' }, { label: 'FormDesigner', value: '已完成' }]" title="近期完成" />
             </div>
           </div>
@@ -1664,11 +1726,11 @@ const myStatusMap: ColorMap = {
           </p>
           <div style="display: flex; align-items: flex-start; gap: 32px; flex-wrap: wrap;">
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">默认预设色板</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">默认预设色板</p>
               <ColorPanel v-model="auxColor" @change="(c) => toast.info('选色：' + c)" />
             </div>
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">自定义预设 + 无输入框</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">自定义预设 + 无输入框</p>
               <ColorPanel
                 v-model="auxColor"
                 :presets="['#6366f1','#f59e0b','#10b981','#ef4444','#8b5cf6']"
@@ -1676,8 +1738,8 @@ const myStatusMap: ColorMap = {
               />
             </div>
             <div style="display: flex; align-items: center; gap: 12px; margin-top: 24px;">
-              <div :style="{ width: '32px', height: '32px', borderRadius: '50%', background: auxColor, border: '2px solid #e5e7eb' }" />
-              <span style="font-size: 13px; color: #666;">当前颜色：{{ auxColor }}</span>
+              <div :style="{ width: '32px', height: '32px', borderRadius: '50%', background: auxColor, border: '2px solid var(--of-border-color)' }" />
+              <span style="font-size: 13px; color: var(--of-color-text-secondary);">当前颜色：{{ auxColor }}</span>
             </div>
           </div>
         </section>
@@ -1695,7 +1757,7 @@ const myStatusMap: ColorMap = {
               placeholder="请选择负责人"
               @change="(id) => toast.info('选中：' + (auxPeople.find(p => p.id === id)?.name ?? '无'))"
             />
-            <p style="font-size: 13px; color: #888;">当前选中 id：{{ auxPerson ?? '(未选择)' }}</p>
+            <p style="font-size: 13px; color: var(--of-color-text-secondary);">当前选中 id：{{ auxPerson ?? '(未选择)' }}</p>
           </div>
         </section>
 
@@ -1708,7 +1770,7 @@ const myStatusMap: ColorMap = {
           </p>
           <div style="max-width: 500px; display: flex; flex-direction: column; gap: 16px;">
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">单文件上传（accept: .pdf,.docx）</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">单文件上传（accept: .pdf,.docx）</p>
               <FileUpload
                 v-model="auxFiles"
                 accept=".pdf,.docx"
@@ -1717,7 +1779,7 @@ const myStatusMap: ColorMap = {
               />
             </div>
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 8px;">多文件（最多 3 个，限 5MB）</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 8px;">多文件（最多 3 个，限 5MB）</p>
               <FileUpload
                 v-model="auxFiles"
                 :multiple="true"
@@ -1725,7 +1787,7 @@ const myStatusMap: ColorMap = {
                 :max-size-mb="5"
                 @change="(files) => toast.success(`已上传 ${files.length} 个文件`)"
               />
-              <p style="font-size: 12px; color: #888; margin-top: 6px;">已选文件：{{ auxFiles.map(f => f.name).join(', ') || '(无)' }}</p>
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-top: 6px;">已选文件：{{ auxFiles.map(f => f.name).join(', ') || '(无)' }}</p>
             </div>
           </div>
         </section>
@@ -1741,16 +1803,16 @@ const myStatusMap: ColorMap = {
           <div class="dev-row" style="align-items: flex-end; gap: 32px;">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
               <AiThinking size="md" />
-              <span style="font-size: 11px; color: #94a3b8;">size=md（默认）</span>
+              <span style="font-size: 11px; color: var(--of-color-text-tertiary);">size=md（默认）</span>
             </div>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
               <AiThinking size="sm" />
-              <span style="font-size: 11px; color: #94a3b8;">size=sm</span>
+              <span style="font-size: 11px; color: var(--of-color-text-tertiary);">size=sm</span>
             </div>
             <div style="display: flex; align-items: flex-end; gap: 12px;">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: #eef2ff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">🤖</div>
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--of-color-primary-50); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">🤖</div>
               <AiThinking size="md" />
-              <span style="font-size: 11px; color: #94a3b8;">实际对话场景中的位置</span>
+              <span style="font-size: 11px; color: var(--of-color-text-tertiary);">实际对话场景中的位置</span>
             </div>
           </div>
         </section>
@@ -1760,21 +1822,21 @@ const myStatusMap: ColorMap = {
           <p class="dev-desc">闪烁光标，嵌入文本末尾表示正在流式输出。可通过 style 调整颜色适应不同背景。</p>
           <div style="display: flex; flex-direction: column; gap: 16px; max-width: 600px;">
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 6px;">普通文本末尾：</p>
-              <div style="font-size: 14px; color: #1e293b; line-height: 1.8;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 6px;">普通文本末尾：</p>
+              <div style="font-size: 14px; color: var(--of-color-text-primary); line-height: 1.8;">
                 正在为你生成内容，这是一段持续输出的文字流...<AiStreamingCursor />
               </div>
             </div>
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 6px;">标题级别：</p>
-              <div style="font-size: 20px; font-weight: 600; color: #1e293b;">
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 6px;">标题级别：</p>
+              <div style="font-size: 20px; font-weight: 600; color: var(--of-color-text-primary);">
                 深度学习在自然语言处理中的应用<AiStreamingCursor />
               </div>
             </div>
             <div>
-              <p style="font-size: 12px; color: #888; margin-bottom: 6px;">代码块内（白色光标）：</p>
-              <div style="background: #1e293b; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.6;">
-                <span style="color: #7c9dff;">const</span> result = <span style="color: #86efac;">await</span> llm.generate(prompt)<AiStreamingCursor style="background: #e2e8f0;" />
+              <p style="font-size: 12px; color: var(--of-color-text-secondary); margin-bottom: 6px;">代码块内（白色光标）：</p>
+              <div style="background: var(--of-color-bg-code); color: var(--of-color-gray-200); padding: 12px 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.6;">
+                <span style="color: var(--of-color-primary-300);">const</span> result = <span style="color: var(--of-badge-green-border);">await</span> llm.generate(prompt)<AiStreamingCursor style="background: var(--of-color-gray-200);" />
               </div>
             </div>
           </div>
@@ -1802,28 +1864,28 @@ const myStatusMap: ColorMap = {
             AiSender 提供输入框和发送按钮（v-model 绑定输入内容，@send 触发发送）。
           </p>
           <div
-            style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: 520px;"
+            style="border: 1px solid var(--of-border-color); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: 520px;"
           >
             <!-- 头部 -->
-            <div style="padding: 14px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: #fff;">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: #eef2ff; display: flex; align-items: center; justify-content: center; font-size: 16px;">🤖</div>
+            <div style="padding: 14px 20px; border-bottom: 1px solid var(--of-color-gray-200); display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: var(--of-color-bg-elevated);">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--of-color-primary-50); display: flex; align-items: center; justify-content: center; font-size: 16px;">🤖</div>
               <div>
-                <div style="font-size: 13px; font-weight: 600; color: #1e293b;">OneFlow AI 助手</div>
-                <div style="font-size: 11px; color: #22c55e;">● 在线</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--of-color-text-primary);">OneFlow AI 助手</div>
+                <div style="font-size: 11px; color: var(--of-color-success);">● 在线</div>
               </div>
             </div>
 
             <!-- 消息列表 -->
-            <div style="flex: 1; overflow-y: auto; padding: 16px; background: #f8fafc;">
+            <div style="flex: 1; overflow-y: auto; padding: 16px; background: var(--of-color-bg-canvas);">
               <AiMessageList :messages="aiMessages" />
               <div v-if="aiThinking" style="margin-top: 8px; display: flex; align-items: flex-end; gap: 10px;">
-                <div style="width: 28px; height: 28px; border-radius: 50%; background: #eef2ff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">🤖</div>
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--of-color-primary-50); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">🤖</div>
                 <AiThinking size="md" />
               </div>
             </div>
 
             <!-- 发送框 -->
-            <div style="border-top: 1px solid #f0f0f0; flex-shrink: 0;">
+            <div style="border-top: 1px solid var(--of-color-gray-200); flex-shrink: 0;">
               <AiSender v-model="aiInput" placeholder="向 AI 提问..." @send="sendAiMessage" />
             </div>
           </div>
@@ -1979,14 +2041,14 @@ const myStatusMap: ColorMap = {
             <Badge>默认</Badge>
           </div>
           <div class="dev-row" style="flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px;">
-            <span style="font-size: 12px; color: #94a3b8;">优先级：</span>
+            <span style="font-size: 12px; color: var(--of-color-text-tertiary);">优先级：</span>
             <Badge priority="P0">P0</Badge>
             <Badge priority="P1">P1</Badge>
             <Badge priority="P2">P2</Badge>
             <Badge priority="P3">P3</Badge>
           </div>
           <div class="dev-row" style="flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px;">
-            <span style="font-size: 12px; color: #94a3b8;">尺寸：</span>
+            <span style="font-size: 12px; color: var(--of-color-text-tertiary);">尺寸：</span>
             <Badge color="blue" size="sm">小</Badge>
             <Badge color="blue" size="md">中（默认）</Badge>
           </div>
@@ -1998,25 +2060,25 @@ const myStatusMap: ColorMap = {
           <p class="dev-desc">线性进度条，value=100 时自动变绿表示完成，支持自定义颜色、高度、圆角。</p>
           <div style="display: flex; flex-direction: column; gap: 16px;">
             <div>
-              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">普通进度 60%</div>
+              <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 6px;">普通进度 60%</div>
               <ProgressBar :value="60" :show-label="true" />
             </div>
             <div>
-              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">完成状态 100%（自动变绿）</div>
+              <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 6px;">完成状态 100%（自动变绿）</div>
               <ProgressBar :value="100" :show-label="true" />
             </div>
             <div>
-              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">自定义颜色 + 高度</div>
-              <ProgressBar :value="75" color="#9333ea" :height="10" />
+              <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 6px;">自定义颜色 + 高度</div>
+              <ProgressBar :value="75" color="var(--of-badge-purple-text)" :height="10" />
             </div>
             <div>
-              <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">动态控制（当前：{{ progressVal }}%）</div>
+              <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 6px;">动态控制（当前：{{ progressVal }}%）</div>
               <ProgressBar :value="progressVal" :show-label="true" />
               <div class="dev-row" style="margin-top: 8px; gap: 8px;">
                 <button class="dev-btn" @click="progressVal = Math.max(0, progressVal - 10)">-10%</button>
                 <button class="dev-btn" @click="progressVal = Math.min(100, progressVal + 10)">+10%</button>
                 <button class="dev-btn" @click="progressVal = 100">完成</button>
-                <button class="dev-btn" style="background:#f1f5f9;color:#64748b" @click="progressVal = 0">重置</button>
+                <button class="dev-btn" style="background:var(--of-color-gray-100);color:var(--of-color-text-secondary)" @click="progressVal = 0">重置</button>
               </div>
             </div>
           </div>
@@ -2044,23 +2106,23 @@ const myStatusMap: ColorMap = {
           <div class="dev-row" style="flex-wrap: wrap; gap: 20px; align-items: center;">
             <div style="display: flex; align-items: center; gap: 10px;">
               <OneSwitch v-model="switchVal" />
-              <span style="font-size: 14px; color: #374151;">{{ switchVal ? '已开启' : '已关闭' }}</span>
+              <span style="font-size: 14px; color: var(--of-color-text-primary);">{{ switchVal ? '已开启' : '已关闭' }}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <OneSwitch :model-value="true" :loading="true" />
-              <span style="font-size: 13px; color: #6b7280;">加载中</span>
+              <span style="font-size: 13px; color: var(--of-color-text-secondary);">加载中</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <OneSwitch :model-value="false" :disabled="true" />
-              <span style="font-size: 13px; color: #6b7280;">禁用（关）</span>
+              <span style="font-size: 13px; color: var(--of-color-text-secondary);">禁用（关）</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <OneSwitch :model-value="true" :disabled="true" />
-              <span style="font-size: 13px; color: #6b7280;">禁用（开）</span>
+              <span style="font-size: 13px; color: var(--of-color-text-secondary);">禁用（开）</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-              <OneSwitch :model-value="true" active-color="#9333ea" />
-              <span style="font-size: 13px; color: #6b7280;">自定义颜色</span>
+              <OneSwitch :model-value="true" active-color="var(--of-badge-purple-text)" />
+              <span style="font-size: 13px; color: var(--of-color-text-secondary);">自定义颜色</span>
             </div>
           </div>
         </section>
@@ -2075,10 +2137,10 @@ const myStatusMap: ColorMap = {
           <div class="dev-row" style="gap: 8px;">
             <button class="dev-btn" :disabled="stepperCurrent <= 0" @click="stepperCurrent--">← 上一步</button>
             <button class="dev-btn" :disabled="stepperCurrent >= stepperItems.length - 1" @click="stepperCurrent++">下一步 →</button>
-            <button class="dev-btn" style="background:#f1f5f9;color:#64748b" @click="stepperCurrent = 0">重置</button>
+            <button class="dev-btn" style="background:var(--of-color-gray-100);color:var(--of-color-text-secondary)" @click="stepperCurrent = 0">重置</button>
           </div>
           <div style="margin-top: 24px;">
-            <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">垂直方向：</div>
+            <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 12px;">垂直方向：</div>
             <Stepper :steps="stepperItems" :current="stepperCurrent" direction="vertical" />
           </div>
         </section>
@@ -2088,20 +2150,20 @@ const myStatusMap: ColorMap = {
           <h2>Accordion 手风琴</h2>
           <p class="dev-desc">默认 v-show 保持内容（keepAlive），lazy=true 时用 v-if 按需渲染。multiple=true 允许多项同时展开。</p>
           <div style="margin-bottom: 24px;">
-            <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">单选（默认）：</div>
+            <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 8px;">单选（默认）：</div>
             <Accordion v-model="accordionVal" :items="accordionItems">
               <template #default="{ item }">
-                <div style="padding: 12px 16px; font-size: 14px; color: #374151; line-height: 1.7;">
+                <div style="padding: 12px 16px; font-size: 14px; color: var(--of-color-text-primary); line-height: 1.7;">
                   {{ accordionContents[item.key] }}
                 </div>
               </template>
             </Accordion>
           </div>
           <div>
-            <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">多选（multiple=true）：</div>
+            <div style="font-size: 13px; color: var(--of-color-text-secondary); margin-bottom: 8px;">多选（multiple=true）：</div>
             <Accordion v-model="accordionMultiVal" :items="accordionItems" :multiple="true">
               <template #default="{ item }">
-                <div style="padding: 12px 16px; font-size: 14px; color: #374151; line-height: 1.7;">
+                <div style="padding: 12px 16px; font-size: 14px; color: var(--of-color-text-primary); line-height: 1.7;">
                   {{ accordionContents[item.key] }}
                 </div>
               </template>
@@ -2125,14 +2187,14 @@ const myStatusMap: ColorMap = {
             </button>
           </div>
 
-          <div style="display: flex; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; min-height: 200px; position: relative;">
+          <div style="display: flex; border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden; min-height: 200px; position: relative;">
             <Drawer v-model="drawerOpen" title="Drawer 抽屉" :width="240">
-              <div style="padding: 16px; font-size: 14px; color: #374151; line-height: 1.8;">
+              <div style="padding: 16px; font-size: 14px; color: var(--of-color-text-primary); line-height: 1.8;">
                 <p>内联 Drawer 内容</p>
-                <p style="color: #6b7280; font-size: 13px;">与主内容并排显示，推挤而非覆盖。</p>
+                <p style="color: var(--of-color-text-secondary); font-size: 13px;">与主内容并排显示，推挤而非覆盖。</p>
               </div>
             </Drawer>
-            <div style="flex: 1; padding: 24px; font-size: 14px; color: #6b7280;">
+            <div style="flex: 1; padding: 24px; font-size: 14px; color: var(--of-color-text-secondary);">
               主内容区域 — Drawer 打开时会被推挤到右侧
             </div>
           </div>
@@ -2143,9 +2205,9 @@ const myStatusMap: ColorMap = {
             title="SidePanel 侧边面板"
             :width="320"
           >
-            <div style="padding: 16px; font-size: 14px; color: #374151; line-height: 1.8;">
+            <div style="padding: 16px; font-size: 14px; color: var(--of-color-text-primary); line-height: 1.8;">
               <p>SidePanel 通过 Teleport 挂载到 body。</p>
-              <p style="color: #6b7280; font-size: 13px;">适合临时弹出的详情、设置、过滤器等面板。</p>
+              <p style="color: var(--of-color-text-secondary); font-size: 13px;">适合临时弹出的详情、设置、过滤器等面板。</p>
               <p style="margin-top: 16px;">
                 <strong>mode="lazy"</strong>：关闭后销毁 DOM（v-if）<br/>
                 <strong>mode="persistent"</strong>：关闭后保留 DOM（v-show）
@@ -2163,6 +2225,337 @@ const myStatusMap: ColorMap = {
 
       </template>
 
+      <!-- ══════════════════════════════════════════════════════
+           业务组件（v2.1）
+      ════════════════════════════════════════════════════════ -->
+      <template v-if="activeSection === 'biz-components'">
+
+        <!-- RefTag -->
+        <section class="dev-section">
+          <h2>RefTag 引用标签</h2>
+          <p class="dev-desc">用于引用 Spec / Wiki / Task 等资源的彩色标签，支持自定义图标和链接。</p>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 8px;">
+            <RefTag type="spec">spec:arch:ARCH-001</RefTag>
+            <RefTag type="wiki">wiki:ROLE-BE-001</RefTag>
+            <RefTag type="task">task:ZHO-BE-010</RefTag>
+            <RefTag type="spec" href="#">可点击的链接标签</RefTag>
+          </div>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+            <span style="font-size: 12px; color: var(--of-color-text-tertiary);">自定义颜色：</span>
+            <RefTag :color="'var(--of-badge-orange-text)'" bg="var(--of-color-warning-light)" icon="alert-triangle">warning:OPS-003</RefTag>
+            <RefTag :color="'var(--of-badge-red-text)'" bg="var(--of-color-error-light)" icon="bug">bug:FAPI-042</RefTag>
+          </div>
+        </section>
+
+        <!-- Avatar -->
+        <section class="dev-section">
+          <h2>Avatar 角色头像</h2>
+          <p class="dev-desc">根据 role 自动分配颜色的圆形头像，支持自定义大小和颜色。无 role 时根据 name 哈希选色。</p>
+          <div class="dev-row" style="gap: 12px; align-items: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <Avatar name="Backend" role="BE" />
+              <span style="font-size: 11px; color: var(--of-color-text-secondary);">BE</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <Avatar name="Frontend" role="FE" />
+              <span style="font-size: 11px; color: var(--of-color-text-secondary);">FE</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <Avatar name="PM" role="PM" />
+              <span style="font-size: 11px; color: var(--of-color-text-secondary);">PM</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <Avatar name="DBA" role="DBA" />
+              <span style="font-size: 11px; color: var(--of-color-text-secondary);">DBA</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <Avatar name="Architect" role="ARCH" />
+              <span style="font-size: 11px; color: var(--of-color-text-secondary);">ARCH</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <Avatar name="Operations" role="OPM" />
+              <span style="font-size: 11px; color: var(--of-color-text-secondary);">OPM</span>
+            </div>
+          </div>
+          <div class="dev-row" style="gap: 12px; margin-top: 16px; align-items: center;">
+            <span style="font-size: 12px; color: var(--of-color-text-tertiary);">不同尺寸：</span>
+            <Avatar name="Alice" :size="20" />
+            <Avatar name="Bob" :size="28" />
+            <Avatar name="Charlie" :size="36" />
+            <Avatar name="张三" :size="40" />
+          </div>
+        </section>
+
+        <!-- SelectBadge -->
+        <section class="dev-section">
+          <h2>SelectBadge 选择徽章</h2>
+          <p class="dev-desc">带下拉箭头的彩色徽章，适用于状态/优先级选择器的触发按钮。</p>
+          <div class="dev-row" style="flex-wrap: wrap; gap: 8px;">
+            <SelectBadge color="orange" :dot="true" :dot-color="'var(--of-badge-orange-text)'">Blocked</SelectBadge>
+            <SelectBadge color="blue" :dot="true" :dot-color="'var(--of-badge-blue-text)'">In Progress</SelectBadge>
+            <SelectBadge color="green" :dot="true" :dot-color="'var(--of-badge-green-text)'">Done</SelectBadge>
+            <SelectBadge color="red">P0 紧急</SelectBadge>
+            <SelectBadge color="purple">审核中</SelectBadge>
+            <SelectBadge color="gray" :clickable="false">只读标签</SelectBadge>
+          </div>
+        </section>
+
+        <!-- ChainItem -->
+        <section class="dev-section">
+          <h2>ChainItem 链路追踪项</h2>
+          <p class="dev-desc">用于展示 AI 推理链路中的源数据查询和结果返回，支持 source（紫色）和 result（绿色）两种预设。</p>
+          <div style="display: flex; flex-direction: column; gap: 12px; max-width: 600px;">
+            <ChainItem
+              type="source"
+              title="用户查询上下文"
+              description="role: BE-Agent, project: ZHO, scope: full, limit: 20"
+            />
+            <ChainItem
+              type="result"
+              title="内存查询成功"
+              description="获取了 6 条相关任务记录、12 条决策记录"
+              duration="280ms"
+            />
+            <ChainItem
+              type="source"
+              title="检索知识库"
+              description="index: architecture-docs, query: 认证中间件重构方案"
+            />
+            <ChainItem
+              type="result"
+              title="文档匹配完成"
+              description="匹配到 3 篇相关文档，相关性分数: 0.92, 0.87, 0.71"
+              duration="150ms"
+            />
+          </div>
+        </section>
+
+        <!-- DescBlock -->
+        <section class="dev-section">
+          <h2>DescBlock 描述块</h2>
+          <p class="dev-desc">灰底圆角描述容器，用于任务详情、备注等段落文本区域。</p>
+          <div style="max-width: 600px;">
+            <DescBlock>
+              <p style="margin: 0; color: var(--of-color-text-primary);">重构现有认证中间件，支持 JWT + Session 双模式认证。需要兼容现有 API 调用方式，同时为新的 Agent 认证流程提供扩展点。</p>
+              <p style="margin: 0; color: var(--of-color-warning);">当前阻塞原因：等待 /api/auth/token 接口完成，该接口由 ZHO-BE-010 任务负责。</p>
+            </DescBlock>
+          </div>
+        </section>
+
+        <!-- ViewModeGroup -->
+        <section class="dev-section">
+          <h2>ViewModeGroup 视图模式切换</h2>
+          <p class="dev-desc">图标按钮组，用于切换详情的展示模式（侧边面板 / 弹窗 / 全屏）。</p>
+          <div class="dev-row" style="gap: 16px; align-items: center;">
+            <ViewModeGroup v-model="viewModeVal" />
+            <span style="font-size: 13px; color: var(--of-color-text-secondary);">当前模式：<strong>{{ viewModeVal }}</strong></span>
+          </div>
+          <div class="dev-row" style="gap: 16px; align-items: center; margin-top: 16px;">
+            <span style="font-size: 12px; color: var(--of-color-text-tertiary);">自定义选项：</span>
+            <ViewModeGroup
+              v-model="viewModeVal"
+              :options="[
+                { value: 'list', icon: 'list', label: '列表' },
+                { value: 'grid', icon: 'grid-3x3', label: '网格' },
+                { value: 'compact', icon: 'align-justify', label: '紧凑' },
+              ]"
+            />
+          </div>
+        </section>
+
+        <!-- ViewSwitcher -->
+        <section class="dev-section">
+          <h2>ViewSwitcher 视图切换工具栏</h2>
+          <p class="dev-desc">完整的 Notion 风格视图切换工具栏，包含视图标签、筛选/分组/排序按钮和搜索框。</p>
+          <div style="border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
+            <ViewSwitcher
+              v-model="viewSwitcherTab"
+              @filter="toast.info('点击了筛选')"
+              @group="toast.info('点击了分组')"
+              @sort="toast.info('点击了排序')"
+              @search="(q: string) => toast.info(`搜索: ${q}`)"
+            />
+            <div style="padding: 40px; text-align: center; color: var(--of-color-text-tertiary); font-size: 14px;">
+              当前视图：<strong style="color: var(--of-color-text-primary);">{{ viewSwitcherTab }}</strong>
+            </div>
+          </div>
+          <div style="margin-top: 16px; border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
+            <ViewSwitcher
+              v-model="viewSwitcherTab"
+              :tabs="[
+                { value: 'all', label: '全部', icon: 'inbox' },
+                { value: 'mine', label: '我的', icon: 'user' },
+                { value: 'starred', label: '收藏', icon: 'star' },
+              ]"
+              :show-group="false"
+              filter-label="过滤"
+              sort-label="排序"
+              search-placeholder="搜索任务..."
+            />
+            <div style="padding: 40px; text-align: center; color: var(--of-color-text-tertiary); font-size: 14px;">
+              自定义标签 + 隐藏分组按钮
+            </div>
+          </div>
+        </section>
+
+      </template>
+
+      <!-- ══ v3 信息组件 ══ -->
+      <template v-if="activeSection === 'v3-components'">
+
+        <!-- SectionBlock -->
+        <section class="dev-section">
+          <h2>SectionBlock 章节块</h2>
+          <p class="dev-desc">可折叠的内容章节，支持 pending/updating/done/editing 四种状态，适用于文档章节、配置面板。</p>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+            <button v-for="s in ['pending','updating','done','editing']" :key="s"
+              @click="sectionStatus = s as any"
+              :style="{ padding: '4px 12px', borderRadius: '6px', border: sectionStatus === s ? '1px solid var(--of-color-primary-500)' : '1px solid var(--of-border-color)', background: sectionStatus === s ? 'var(--of-color-primary-50)' : 'var(--of-color-bg-elevated)', color: sectionStatus === s ? 'var(--of-color-primary-500)' : 'var(--of-color-text-secondary)', fontSize: '12px', cursor: 'pointer' }">
+              {{ s }}
+            </button>
+          </div>
+          <div style="max-width: 600px;">
+            <SectionBlock
+              title="市场分析"
+              icon="📊"
+              :status="sectionStatus"
+              v-model:collapsed="sectionCollapsed"
+              :editable="true"
+              @edit="sectionStatus = 'editing'"
+              @save="sectionStatus = 'done'"
+            >
+              <p style="margin: 0; font-size: 13px; color: var(--of-color-text-primary); line-height: 1.8;">
+                当前市场规模约 <strong>120亿</strong>，年增长率 15%。核心竞品包括 A（市占率 35%）、B（22%）、C（18%）。
+                目标用户群体以 25-40 岁城市白领为主，对品质和效率有较高需求。
+              </p>
+              <template #editor>
+                <textarea style="width: 100%; border: none; outline: none; background: var(--of-color-warning-light); resize: none; font-size: 12px; line-height: 1.8; padding: 4px; min-height: 80px; font-family: inherit;">当前市场规模约 120亿，年增长率 15%。核心竞品包括 A（市占率 35%）、B（22%）、C（18%）。</textarea>
+              </template>
+            </SectionBlock>
+          </div>
+        </section>
+
+        <!-- MonitorItem -->
+        <section class="dev-section">
+          <h2>MonitorItem 监控进度行</h2>
+          <p class="dev-desc">紧凑的项目监控行，用于仪表盘顶部展示执行中的项目/任务进度。</p>
+          <div style="max-width: 700px; background: var(--of-color-bg-elevated); border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 8px 14px; font-size: 11px; font-weight: 600; color: var(--of-color-text-secondary); border-bottom: 1px solid var(--of-color-gray-200);">
+              ⚡ 执行中 3 个
+            </div>
+            <MonitorItem label="用户认证系统重构" subtitle="flowapi / main" :value="75" count="6/8" :clickable="true" />
+            <MonitorItem label="前端组件库升级" subtitle="oneui / develop" :value="45" count="3/7" :clickable="true" />
+            <MonitorItem label="数据库迁移方案" subtitle="flowapi / main" :value="100" count="5/5" :clickable="true" />
+          </div>
+        </section>
+
+        <!-- StatusSummary -->
+        <section class="dev-section">
+          <h2>StatusSummary 状态摘要条</h2>
+          <p class="dev-desc">水平排列的状态计数条，用于表格/列表上方的快速状态概览。</p>
+          <div style="max-width: 700px; background: var(--of-color-bg-elevated); border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
+            <StatusSummary :items="[
+              { key: 'pending', label: '待处理', count: 5, color: 'var(--of-color-gray-300)' },
+              { key: 'progress', label: '执行中', count: 3, color: 'var(--of-color-info)', highlight: true },
+              { key: 'done', label: '已完成', count: 12, color: 'var(--of-color-success)' },
+              { key: 'blocked', label: '阻塞', count: 1, color: 'var(--of-color-error)', highlight: true },
+            ]">
+              <template #extra>
+                <span style="color: var(--of-color-warning); font-size: 11px;">⚠ 停滞 2</span>
+              </template>
+            </StatusSummary>
+            <div style="padding: 30px; text-align: center; color: var(--of-color-text-tertiary); font-size: 12px;">表格内容区域</div>
+          </div>
+        </section>
+
+        <!-- InfoCard -->
+        <section class="dev-section">
+          <h2>InfoCard 信息卡片</h2>
+          <p class="dev-desc">三合一信息卡，通过 variant 切换 memo（备忘录）、notify（通知）、history（历史记录）三种形态。</p>
+
+          <h3 style="font-size: 13px; color: var(--of-color-text-secondary); margin: 16px 0 8px;">variant="memo"</h3>
+          <div style="max-width: 500px; display: flex; flex-direction: column; gap: 8px;">
+            <InfoCard
+              variant="memo"
+              title="认证中间件重构方案已确认"
+              content="经过评审，决定采用 JWT + refresh token 的双层认证架构。核心改动涉及 auth_middleware.py、token_service.py 和 session_store.py 三个模块。"
+              :tags="['架构决策', '认证']"
+              author="PM-Agent"
+              date="2026-03-14"
+            />
+            <InfoCard
+              variant="memo"
+              title="紧急：生产环境 Token 过期问题"
+              content="发现 refresh token 在高并发场景下存在竞态条件，需要尽快修复。"
+              importance="high"
+              :tags="['紧急', 'Bug']"
+              author="OPS"
+              date="2026-03-15"
+            />
+          </div>
+
+          <h3 style="font-size: 13px; color: var(--of-color-text-secondary); margin: 16px 0 8px;">variant="notify"</h3>
+          <div style="max-width: 500px; background: var(--of-color-bg-elevated); border: 1px solid var(--of-border-color); border-radius: 8px; overflow: hidden;">
+            <InfoCard variant="notify" title="Plan FAPI-042 已进入执行阶段" content="认证系统重构方案已批准，共 8 个任务已创建" :unread="true" meta="system · 3分钟前" />
+            <InfoCard variant="notify" title="Task FAPI-042-003 已完成" content="JWT 签发模块开发完毕，测试通过" :unread="true" meta="BE-Agent · 1小时前" />
+            <InfoCard variant="notify" title="代码评审通过" content="PR #127 已合并到 main 分支" :unread="false" meta="QA · 昨天" />
+          </div>
+
+          <h3 style="font-size: 13px; color: var(--of-color-text-secondary); margin: 16px 0 8px;">variant="history"</h3>
+          <div style="max-width: 500px; display: flex; flex-direction: column; gap: 8px;">
+            <InfoCard variant="history" title="小红书冷启动推广方案" subtitle="5人 · 8章节 · 2轮" type="模板" type-color="var(--of-color-primary-500)" date="2026-03-12">
+              <template #actions>
+                <button style="font-size: 11px; padding: 3px 10px; border-radius: 6px; background: var(--of-color-primary-50); color: var(--of-color-primary-500); border: none; cursor: pointer;">使用</button>
+              </template>
+            </InfoCard>
+            <InfoCard variant="history" title="季度定价策略讨论" subtitle="AI协作 · 6/8 章节完成" type="会话" type-color="var(--of-color-success)" date="2026-03-10">
+              <template #actions>
+                <button style="font-size: 11px; padding: 3px 10px; border-radius: 6px; background: var(--of-color-success-light); color: var(--of-color-success); border: none; cursor: pointer;">恢复</button>
+              </template>
+            </InfoCard>
+          </div>
+        </section>
+
+        <!-- PersonaCard -->
+        <section class="dev-section">
+          <h2>PersonaCard 角色卡片</h2>
+          <p class="dev-desc">角色/人物卡片，支持 emoji 方形头像、标签、展开详情。适用于团队成员、Agent 角色、评审人员展示。</p>
+          <div style="max-width: 500px; display: flex; flex-direction: column; gap: 8px;">
+            <PersonaCard
+              name="策略大师"
+              title="首席策略师"
+              icon="🎯"
+              color="var(--of-color-primary-500)"
+              subtitle="整合全局，把控从洞察到转化的完整链路"
+              :tags="['策略', '全局统筹']"
+              v-model:expanded="personaExpanded"
+            >
+              <div style="font-size: 12px; color: var(--of-color-text-secondary); line-height: 1.8;">
+                <p style="margin: 0 0 8px;">专注方向：统筹全局，确保各模块协同一致</p>
+                <p style="margin: 0;">输出到章节：📋 执行路径</p>
+              </div>
+            </PersonaCard>
+            <PersonaCard
+              name="洞察研究员"
+              title="市场研究专家"
+              icon="🔍"
+              color="var(--of-color-success)"
+              subtitle="挖掘目标受众的情感裂缝和反常识切入视角"
+              :tags="['用户洞察', '竞品分析']"
+              v-model:expanded="persona2Expanded"
+            >
+              <div style="font-size: 12px; color: var(--of-color-text-secondary); line-height: 1.8;">
+                <p style="margin: 0;">负责深度用户画像分析和市场趋势研究</p>
+              </div>
+            </PersonaCard>
+            <PersonaCard name="内容弧线师" title="内容策划" icon="✍️" color="var(--of-color-warning)" :active="true" />
+            <PersonaCard name="账号搭建师" title="运营专家" icon="🏗️" color="#ec4899" :done="true" />
+            <PersonaCard name="离线成员" title="数据分析师" icon="📈" color="var(--of-badge-purple-text)" :disabled="true" />
+          </div>
+        </section>
+
+      </template>
+
     </main>
   </div>
 </template>
@@ -2174,7 +2567,7 @@ const myStatusMap: ColorMap = {
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f8fafc;
+  background: var(--of-color-bg-canvas);
 }
 
 /* CSS 变量 */
@@ -2260,8 +2653,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--of-color-bg-elevated);
+  border-bottom: 1px solid var(--of-border-color);
   padding: 0 24px;
   display: flex;
   align-items: center;
@@ -2272,7 +2665,7 @@ body {
 .dev-header__logo {
   font-weight: 700;
   font-size: 16px;
-  color: #7c3aed;
+  color: var(--of-color-primary-500);
   white-space: nowrap;
 }
 .dev-header__nav {
@@ -2286,17 +2679,17 @@ body {
   background: transparent;
   border-radius: 6px;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--of-color-text-secondary);
   cursor: pointer;
   transition: all 0.15s;
 }
 .dev-nav-btn:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--of-color-bg-hover);
+  color: var(--of-color-text-primary);
 }
 .dev-nav-btn.active {
-  background: #f5f3ff;
-  color: #7c3aed;
+  background: var(--of-color-bg-active);
+  color: var(--of-color-primary-500);
   font-weight: 600;
 }
 
@@ -2309,8 +2702,8 @@ body {
 }
 
 .dev-section {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-border-color);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 20px;
@@ -2318,17 +2711,17 @@ body {
 .dev-section h2 {
   font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: var(--of-color-text-primary);
   margin: 0 0 6px 0;
   padding-bottom: 0;
   border-bottom: none;
 }
 .dev-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--of-color-text-secondary);
   margin: 0 0 16px 0;
   padding-bottom: 12px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--of-color-gray-100);
   line-height: 1.5;
 }
 
@@ -2346,8 +2739,8 @@ body {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  background: #7c3aed;
-  color: #fff;
+  background: var(--of-color-primary-500);
+  color: var(--of-color-text-inverse);
   transition: all 0.15s;
 }
 .dev-btn:disabled {
@@ -2355,31 +2748,31 @@ body {
   cursor: not-allowed;
 }
 .dev-btn:hover:not(:disabled) {
-  background: #6d28d9;
+  background: var(--of-color-primary-700);
 }
 .dev-btn--info {
-  background: #3b82f6;
+  background: var(--of-color-info);
 }
 .dev-btn--info:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--of-color-primary-600);
 }
 .dev-btn--success {
-  background: #22c55e;
+  background: var(--of-color-success);
 }
 .dev-btn--success:hover:not(:disabled) {
-  background: #16a34a;
+  background: var(--of-badge-green-text);
 }
 .dev-btn--warning {
-  background: #f97316;
+  background: var(--of-color-warning);
 }
 .dev-btn--warning:hover:not(:disabled) {
-  background: #ea580c;
+  background: var(--of-badge-orange-text);
 }
 .dev-btn--error {
-  background: #ef4444;
+  background: var(--of-color-error);
 }
 .dev-btn--error:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--of-color-error);
 }
 
 /* ── 徽章样式 ── */
@@ -2395,8 +2788,8 @@ body {
 
 .dev-json-preview {
   margin-top: 12px;
-  background: #0f172a;
-  color: #cbd5e1;
+  background: var(--of-color-bg-code);
+  color: var(--of-color-gray-300);
   border-radius: 8px;
   padding: 12px;
   font-size: 12px;
@@ -2410,11 +2803,11 @@ body {
 }
 .demo-table th,
 .demo-table td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--of-border-color);
 }
 .demo-table th {
-  background: #f8fafc;
-  color: #374151;
+  background: var(--of-color-bg-hover);
+  color: var(--of-color-text-primary);
   font-size: 12px;
   font-weight: 600;
   text-align: left;
@@ -2423,8 +2816,8 @@ body {
 
 /* ── Composables 卡片 ── */
 .composable-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-border-color);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -2433,14 +2826,14 @@ body {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
+  border-bottom: 1px solid var(--of-color-gray-200);
+  background: var(--of-color-bg-hover);
 }
 .composable-badge {
   display: inline-block;
   padding: 2px 10px;
-  background: #ede9fe;
-  color: #7c3aed;
+  background: var(--of-color-primary-100);
+  color: var(--of-color-primary-500);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
@@ -2448,15 +2841,15 @@ body {
 }
 .composable-desc-sm {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--of-color-text-secondary);
 }
 .composable-code {
   margin: 0;
   padding: 14px 16px;
   font-size: 12px;
   line-height: 1.6;
-  color: #1e293b;
-  background: #f8fafc;
+  color: var(--of-color-text-primary);
+  background: var(--of-color-bg-canvas);
   font-family: "JetBrains Mono", "Fira Code", monospace;
   white-space: pre;
   overflow-x: auto;

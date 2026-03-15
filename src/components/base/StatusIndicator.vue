@@ -8,18 +8,18 @@ export interface StatusIndicatorProps {
 }
 
 const STATUS_COLOR_MAP: Record<string, string> = {
-  in_progress: "#1677ff",
-  executing: "#1677ff",
-  analysing: "#1677ff",
-  completed: "#52c41a",
-  resolved: "#52c41a",
-  closed: "#52c41a",
-  reviewing: "#fa8c16",
-  blocked: "#ff4d4f",
-  cancelled: "#ff4d4f",
-  open: "#d9d9d9",
-  idle: "#aaa",
-  draft: "#aaa",
+  in_progress: "var(--of-color-info)",
+  executing: "var(--of-color-info)",
+  analysing: "var(--of-color-info)",
+  completed: "var(--of-color-success)",
+  resolved: "var(--of-color-success)",
+  closed: "var(--of-color-success)",
+  reviewing: "var(--of-color-warning)",
+  blocked: "var(--of-color-error)",
+  cancelled: "var(--of-color-error)",
+  open: "var(--of-color-gray-300)",
+  idle: "var(--of-color-gray-400)",
+  draft: "var(--of-color-gray-400)",
 };
 
 const DOT_SIZE_MAP = {
@@ -34,7 +34,7 @@ const props = withDefaults(defineProps<StatusIndicatorProps>(), {
 
 const normalizedStatus = computed(() => props.status.trim().toLowerCase());
 const displayLabel = computed(() => props.label ?? props.status);
-const dotColor = computed(() => STATUS_COLOR_MAP[normalizedStatus.value] ?? "#d9d9d9");
+const dotColor = computed(() => STATUS_COLOR_MAP[normalizedStatus.value] ?? "var(--of-color-gray-300)");
 const dotSize = computed(() => DOT_SIZE_MAP[props.size]);
 </script>
 

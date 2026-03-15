@@ -54,8 +54,8 @@ function finishEdit() {
 
 <style scoped>
 .block-quote {
-  background: #f8fafc;
-  border-left: 3px solid #000000;
+  background: var(--of-color-gray-50);
+  border-left: 3px solid var(--of-color-text-primary);
   border-radius: 0 var(--of-radius-sm) var(--of-radius-sm) 0;
   padding: 12px 16px;
   margin: 0;

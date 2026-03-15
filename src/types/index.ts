@@ -140,15 +140,83 @@ export interface SelectOption {
   color?: string
 }
 
-export interface FieldDef {
+export interface FieldDefBase {
   id: string
   name: string
-  type: FieldType
   required?: boolean
   hidden?: boolean
   width?: number
-  options?: SelectOption[]
-  formula?: string
+}
+
+export interface TextFieldDef extends FieldDefBase {
+  type: 'text'
+}
+
+export interface NumberFieldDef extends FieldDefBase {
+  type: 'number'
+  min?: number
+  max?: number
+}
+
+export interface SelectFieldDef extends FieldDefBase {
+  type: 'select' | 'multi_select'
+  options: SelectOption[]
+}
+
+export interface DateFieldDef extends FieldDefBase {
+  type: 'date' | 'datetime'
+}
+
+export interface CheckboxFieldDef extends FieldDefBase {
+  type: 'checkbox'
+}
+
+export interface ContactFieldDef extends FieldDefBase {
+  type: 'url' | 'email' | 'phone'
+}
+
+export interface RatingFieldDef extends FieldDefBase {
+  type: 'rating'
+  max?: number
+}
+
+export interface UserFieldDef extends FieldDefBase {
+  type: 'user'
+}
+
+export interface AttachmentFieldDef extends FieldDefBase {
+  type: 'attachment'
+}
+
+export interface RelationFieldDef extends FieldDefBase {
+  type: 'relation'
+  targetTableId?: string
+}
+
+export interface FormulaFieldDef extends FieldDefBase {
+  type: 'formula'
+  formula: string
+}
+
+export type FieldDef =
+  | TextFieldDef
+  | NumberFieldDef
+  | SelectFieldDef
+  | DateFieldDef
+  | CheckboxFieldDef
+  | ContactFieldDef
+  | RatingFieldDef
+  | UserFieldDef
+  | AttachmentFieldDef
+  | RelationFieldDef
+  | FormulaFieldDef
+
+export function isSelectField(field: FieldDef): field is SelectFieldDef {
+  return field.type === 'select' || field.type === 'multi_select'
+}
+
+export function isFormulaField(field: FieldDef): field is FormulaFieldDef {
+  return field.type === 'formula'
 }
 
 // ─── 数据行 ───────────────────────────────────────────────────────────────────
@@ -321,7 +389,7 @@ export const DEFAULT_TABLE_SCHEMA: TableSchema = {
     { id: 'startDate', name: '开始日期', type: 'date' },
     { id: 'endDate', name: '截止日期', type: 'date' },
     { id: 'description', name: '描述', type: 'text' },
-    { id: 'tags', name: '标签', type: 'multi_select' }
+    { id: 'tags', name: '标签', type: 'multi_select', options: [] }
   ],
   views: []
 }

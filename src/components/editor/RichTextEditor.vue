@@ -142,9 +142,9 @@ function saveContent() {
 
 <style scoped>
 .of-rich-editor {
-  border: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border: 1px solid var(--of-border-color);
   border-radius: var(--of-radius-md, 8px);
-  background: #fff;
+  background: var(--of-color-bg-elevated);
 }
 
 .of-rich-editor__toolbar-actions {
@@ -155,10 +155,10 @@ function saveContent() {
 }
 
 .of-rich-editor__btn {
-  border: 1px solid var(--of-color-gray-300, #d1d5db);
+  border: 1px solid var(--of-color-gray-300);
   border-radius: 6px;
-  background: #fff;
-  color: var(--of-color-gray-700, #374151);
+  background: var(--of-color-bg-elevated);
+  color: var(--of-color-gray-700);
   font-size: 12px;
   line-height: 1;
   padding: 8px 12px;
@@ -171,14 +171,14 @@ function saveContent() {
 }
 
 .of-rich-editor__btn--primary {
-  background: #6366f1;
-  color: #fff;
-  border-color: #6366f1;
+  background: var(--of-color-primary-500);
+  color: var(--of-color-text-inverse);
+  border-color: var(--of-color-primary-500);
 }
 
 .of-rich-editor__btn--primary:hover:not(:disabled) {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  background: var(--of-color-primary-600);
+  border-color: var(--of-color-primary-600);
 }
 
 .of-rich-editor__form {
@@ -188,11 +188,11 @@ function saveContent() {
 
 .of-rich-editor__label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--of-color-text-secondary);
 }
 
 .of-rich-editor__input {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--of-border-color);
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 13px;
@@ -200,7 +200,7 @@ function saveContent() {
 
 .of-rich-editor :deep(.ql-toolbar.ql-snow) {
   border: none;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--of-border-color);
   padding: 8px 10px;
 }
 
@@ -211,19 +211,19 @@ function saveContent() {
 .of-rich-editor :deep(.ql-editor) {
   min-height: var(--of-rich-editor-min-height, 220px);
   font-size: 14px;
-  color: #111827;
+  color: var(--of-color-text-primary);
 }
 
 .of-rich-editor :deep(.ql-snow .ql-picker.ql-expanded .ql-picker-options) {
-  border-color: #e5e7eb;
+  border-color: var(--of-border-color);
 }
 
 .of-rich-editor :deep(.ql-snow .ql-stroke) {
-  stroke: #6b7280;
+  stroke: var(--of-color-text-secondary);
 }
 
 .of-rich-editor :deep(.ql-snow .ql-fill) {
-  fill: #6b7280;
+  fill: var(--of-color-text-secondary);
 }
 
 .of-rich-editor :deep(.ql-snow .ql-active .ql-stroke),
@@ -231,7 +231,7 @@ function saveContent() {
 .of-rich-editor :deep(.ql-snow .ql-picker-item.ql-selected .ql-stroke),
 .of-rich-editor :deep(.ql-snow .ql-picker-label:hover .ql-stroke),
 .of-rich-editor :deep(.ql-snow .ql-picker-item:hover .ql-stroke) {
-  stroke: #6366f1;
+  stroke: var(--of-color-primary-500);
 }
 
 .of-rich-editor :deep(.ql-snow .ql-active .ql-fill),
@@ -239,6 +239,6 @@ function saveContent() {
 .of-rich-editor :deep(.ql-snow .ql-picker-item.ql-selected .ql-fill),
 .of-rich-editor :deep(.ql-snow .ql-picker-label:hover .ql-fill),
 .of-rich-editor :deep(.ql-snow .ql-picker-item:hover .ql-fill) {
-  fill: #6366f1;
+  fill: var(--of-color-primary-500);
 }
 </style>

@@ -35,9 +35,9 @@ const normalizedItems = computed(() =>
 );
 
 function getDotColor(status: ActivityTimelineStatus): string {
-  if (status === "done") return "#52c41a";
-  if (status === "start") return "#fa8c16";
-  return "#1677ff";
+  if (status === "done") return "var(--of-color-success)";
+  if (status === "start") return "var(--of-color-warning)";
+  return "var(--of-color-info)";
 }
 
 function getProgressValue(progress?: number): number | null {
@@ -164,7 +164,7 @@ function getProgressValue(progress?: number): number | null {
 }
 
 .of-activity-timeline__dot--skeleton {
-  background: #d9d9d9 !important;
+  background: var(--of-color-gray-300, #d9d9d9) !important;
 }
 
 .of-activity-timeline__line {
@@ -172,7 +172,7 @@ function getProgressValue(progress?: number): number | null {
   flex: 1 !important;
   min-height: 18px !important;
   margin-top: 4px !important;
-  background: #f0f0f0 !important;
+  background: var(--of-color-gray-100, #f0f0f0) !important;
 }
 
 .of-activity-timeline__content {
@@ -194,7 +194,7 @@ function getProgressValue(progress?: number): number | null {
   font-size: 13px !important;
   line-height: 1.5 !important;
   font-weight: 600 !important;
-  color: var(--of-color-text, #262626) !important;
+  color: var(--of-color-text-primary, #262626) !important;
 }
 
 .of-activity-timeline__actor {
@@ -230,7 +230,7 @@ function getProgressValue(progress?: number): number | null {
   height: 4px !important;
   border-radius: 999px !important;
   overflow: hidden !important;
-  background: #f0f0f0 !important;
+  background: var(--of-color-gray-100, #f0f0f0) !important;
 }
 
 .of-activity-timeline__progress-fill {
@@ -250,7 +250,7 @@ function getProgressValue(progress?: number): number | null {
   display: block !important;
   height: 12px !important;
   border-radius: 999px !important;
-  background: linear-gradient(90deg, #f5f5f5 25%, #ebebeb 37%, #f5f5f5 63%) !important;
+  background: linear-gradient(90deg, var(--of-color-gray-100, #f5f5f5) 25%, var(--of-color-gray-200, #ebebeb) 37%, var(--of-color-gray-100, #f5f5f5) 63%) !important;
   background-size: 400% 100% !important;
   animation: of-activity-timeline-skeleton 1.4s ease infinite !important;
 }

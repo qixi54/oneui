@@ -49,7 +49,7 @@ defineProps<{
 
 .of-user-message__bubble {
   background: var(--of-color-primary-600);
-  color: #ffffff;
+  color: var(--of-color-text-inverse);
   border-radius: 12px 0 12px 12px;
   padding: 10px 14px;
   font-size: 14px;

@@ -25,39 +25,39 @@ defineSlots<{
 
 const COLOR_MAP: Record<string, BadgeTone> = {
   default: {
-    background: "#fafafa",
-    text: "#595959",
-    border: "#d9d9d9",
+    background: "var(--of-badge-gray-bg)",
+    text: "var(--of-badge-gray-text)",
+    border: "var(--of-badge-gray-border)",
   },
   blue: {
-    background: "#e6f4ff",
-    text: "#1677ff",
-    border: "#91caff",
+    background: "var(--of-badge-blue-bg)",
+    text: "var(--of-badge-blue-text)",
+    border: "var(--of-badge-blue-border)",
   },
   green: {
-    background: "#f6ffed",
-    text: "#389e0d",
-    border: "#b7eb8f",
+    background: "var(--of-badge-green-bg)",
+    text: "var(--of-badge-green-text)",
+    border: "var(--of-badge-green-border)",
   },
   orange: {
-    background: "#fff7e6",
-    text: "#d46b08",
-    border: "#ffd591",
+    background: "var(--of-badge-orange-bg)",
+    text: "var(--of-badge-orange-text)",
+    border: "var(--of-badge-orange-border)",
   },
   red: {
-    background: "#fff1f0",
-    text: "#cf1322",
-    border: "#ffa39e",
+    background: "var(--of-badge-red-bg)",
+    text: "var(--of-badge-red-text)",
+    border: "var(--of-badge-red-border)",
   },
   purple: {
-    background: "#f9f0ff",
-    text: "#722ed1",
-    border: "#d3adf7",
+    background: "var(--of-badge-purple-bg)",
+    text: "var(--of-badge-purple-text)",
+    border: "var(--of-badge-purple-border)",
   },
   gray: {
-    background: "#f5f5f5",
-    text: "#666666",
-    border: "#e0e0e0",
+    background: "var(--of-badge-gray-bg)",
+    text: "var(--of-badge-gray-text)",
+    border: "var(--of-badge-gray-border)",
   },
 };
 

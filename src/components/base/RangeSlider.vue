@@ -82,7 +82,7 @@ defineEmits<{
   background: var(--of-color-primary-600) !important;
   cursor: pointer !important;
   border: 2px solid var(--of-color-bg-canvas) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: var(--of-shadow-card) !important;
 }
 
 .of-range-slider__input::-moz-range-thumb {
@@ -92,17 +92,17 @@ defineEmits<{
   background: var(--of-color-primary-600) !important;
   cursor: pointer !important;
   border: 2px solid var(--of-color-bg-canvas) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: var(--of-shadow-card) !important;
 }
 
 .of-range-slider__input::-webkit-slider-thumb:hover {
   background: var(--of-color-primary-700) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: var(--of-shadow-card-hover) !important;
 }
 
 .of-range-slider__input::-moz-range-thumb:hover {
   background: var(--of-color-primary-700) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: var(--of-shadow-card-hover) !important;
 }
 
 .of-range-slider__description {

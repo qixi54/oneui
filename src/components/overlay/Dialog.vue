@@ -244,7 +244,7 @@ function handleCancel() {
 .of-dialog__btn--primary {
   background: var(--of-color-primary, #7c3aed) !important;
   border-color: var(--of-color-primary, #7c3aed) !important;
-  color: #ffffff !important;
+  color: var(--of-color-text-inverse) !important;
 }
 
 .of-dialog__btn--primary:hover:not(:disabled) {
@@ -256,7 +256,7 @@ function handleCancel() {
 .of-dialog__btn--danger {
   background: var(--of-color-red-600, #dc2626) !important;
   border-color: var(--of-color-red-600, #dc2626) !important;
-  color: #ffffff !important;
+  color: var(--of-color-text-inverse) !important;
 }
 
 .of-dialog__btn--danger:hover:not(:disabled) {

@@ -101,7 +101,7 @@ function handleAction() {
   box-sizing: border-box;
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-xl);
-  background: #ffffff;
+  background: var(--of-color-bg-elevated);
   transition: border-color 0.15s ease;
   overflow: hidden;
 }
@@ -177,7 +177,7 @@ function handleAction() {
     background 0.15s ease,
     opacity 0.15s ease;
   background: var(--of-color-primary-600);
-  color: #ffffff;
+  color: var(--of-color-text-inverse);
   padding: 0;
   margin-bottom: 2px;
 }

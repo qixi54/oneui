@@ -41,7 +41,7 @@ function handleClick(e: MouseEvent) {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  background: #eef2ff;
+  background: var(--of-color-primary-50);
   border-radius: var(--of-radius-sm);
   padding: 2px 8px;
   font-family: var(--of-font-sans) !important;
@@ -56,7 +56,7 @@ function handleClick(e: MouseEvent) {
 }
 
 .ref-link:hover {
-  background: #e0e7ff;
+  background: var(--of-color-primary-100);
   color: var(--of-color-primary-600) !important;
 }
 

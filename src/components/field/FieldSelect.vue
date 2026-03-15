@@ -207,7 +207,7 @@ const selectedOption = computed(() => {
   padding: 1px 6px;
   border-radius: 3px;
   font-size: 12px;
-  color: #fff;
+  color: var(--of-color-text-inverse);
   line-height: 18px;
 }
 </style>

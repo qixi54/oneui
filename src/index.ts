@@ -14,8 +14,20 @@ export {
   Switch,
   Stepper,
   Accordion,
+  Avatar,
+  RefTag,
+  DescBlock,
+  ViewModeGroup,
+  ViewSwitcher,
+  SelectBadge,
+  ChainItem,
+  SectionBlock,
+  MonitorItem,
+  StatusSummary,
+  InfoCard,
+  PersonaCard,
 } from "./components/base";
-export type { ButtonOption, EmptyStateAction, MenuItem, StepItem, StepperProps, StepStatus } from "./components/base";
+export type { ButtonOption, EmptyStateAction, MenuItem, StepItem, StepperProps, StepStatus, AvatarProps, RefTagProps, ViewModeOption, ViewModeGroupProps, ViewSwitcherTab, ViewSwitcherProps, SelectBadgeProps, ChainItemProps, SectionBlockProps, MonitorItemProps, StatusSummaryProps, StatusSummaryItem, InfoCardProps, PersonaCardProps } from "./components/base";
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
@@ -25,6 +37,7 @@ export {
   DataTable,
   TableHeaderRow,
   TableDataRow,
+  TableGroupRow,
   NewRowBtn,
   TableFilterPanel,
   TableColumnManager,
@@ -100,7 +113,19 @@ export type {
   TaskStatus,
   ViewType,
   FieldType,
+  FieldDefBase,
   FieldDef,
+  TextFieldDef,
+  NumberFieldDef,
+  SelectFieldDef,
+  DateFieldDef,
+  CheckboxFieldDef,
+  ContactFieldDef,
+  RatingFieldDef,
+  UserFieldDef,
+  AttachmentFieldDef,
+  RelationFieldDef,
+  FormulaFieldDef,
   SelectOption,
   CellValue,
   DataRecord,
@@ -121,6 +146,8 @@ export type {
   ColorMap,
 } from "./types";
 export {
+  isSelectField,
+  isFormulaField,
   taskToDataRecord,
   dataRecordToTask,
   buildKanbanColumns,
@@ -128,7 +155,7 @@ export {
 } from "./types";
 
 export type { ChatMessage, UseAiChatOptions } from "./composables/useAiChat";
-export type { UseStreamOptions, StreamMode } from "./composables/useStream";
+export type { UseStreamOptions, StreamMode, RetryOptions } from "./composables/useStream";
 export type { UseTypewriterOptions } from "./composables/useTypewriter";
 export type { FilterCondition, FilterLogic, FilterOperator } from "./composables/useTableFilter";
 export type { SortState, PaginationState, UseTableOptions } from "./composables/useTable";
@@ -138,6 +165,7 @@ export type {
   ToastItem as ToastItemData,
   UseToastOptions,
 } from "./composables/useToast";
+export type { UseVirtualListOptions } from "./composables/useVirtualList";
 
 // ─── Composables ─────────────────────────────────────────────────────────────
 export {
@@ -154,6 +182,7 @@ export { useTableFilter } from "./composables/useTableFilter";
 export { useTable } from "./composables/useTable";
 export { useMarkdown } from "./composables/useMarkdown";
 export { useToast } from "./composables/useToast";
+export { useVirtualList } from "./composables/useVirtualList";
 
 // ─── Plugin Install ───────────────────────────────────────────────────────────
 import type { App } from "vue";
@@ -172,9 +201,21 @@ import {
   Switch,
   Stepper,
   Accordion,
+  Avatar,
+  RefTag,
+  DescBlock,
+  ViewModeGroup,
+  ViewSwitcher,
+  SelectBadge,
+  ChainItem,
+  SectionBlock,
+  MonitorItem,
+  StatusSummary,
+  InfoCard,
+  PersonaCard,
 } from "./components/base";
 import { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
-import { DataTable, TableHeaderRow, TableDataRow, NewRowBtn } from "./components/table";
+import { DataTable, TableHeaderRow, TableDataRow, TableGroupRow, NewRowBtn } from "./components/table";
 import { TableFilterPanel, TableColumnManager, FieldCell } from "./components/table";
 import { KanbanBoard, KanbanColumn, KanbanCard, QuickAddRow } from "./components/kanban";
 import { GalleryView, GalleryCard } from "./components/gallery";
@@ -215,6 +256,7 @@ const components = [
   Switch,
   Stepper,
   Accordion,
+  Avatar,
   AppLayout,
   Navbar,
   Sidebar,
@@ -222,6 +264,7 @@ const components = [
   DataTable,
   TableHeaderRow,
   TableDataRow,
+  TableGroupRow,
   NewRowBtn,
   TableFilterPanel,
   TableColumnManager,
@@ -270,8 +313,20 @@ const components = [
   TabPanel,
   Breadcrumb,
   BreadcrumbItem,
-  MermaidChart,  SplitPane,
+  MermaidChart,
+  SplitPane,
+  RefTag,
+  DescBlock,
+  ViewModeGroup,
+  ViewSwitcher,
   ContextMenu,
+  SelectBadge,
+  ChainItem,
+  SectionBlock,
+  MonitorItem,
+  StatusSummary,
+  InfoCard,
+  PersonaCard,
 ];
 
 export const OneflowUI = {

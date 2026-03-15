@@ -2,7 +2,14 @@
 import { computed, ref, watch } from "vue";
 import { GripVertical, Plus, Trash2 } from "lucide-vue-next";
 import { VueDraggable } from "vue-draggable-plus";
-import type { FieldDef, FieldType, TableSchema } from "../../types";
+import {
+  isSelectField,
+  type FieldDef,
+  type FieldDefBase,
+  type FieldType,
+  type SelectFieldDef,
+  type TableSchema,
+} from "../../types";
 
 const FIELD_TYPE_OPTIONS: Array<{ value: FieldType; label: string }> = [
   { value: "text", label: "文本" },
@@ -54,12 +61,19 @@ const fieldCountLabel = computed(() => `${localSchema.value.fields.length} 个�
 function cloneSchema(schema: TableSchema): TableSchema {
   return {
     ...schema,
-    fields: schema.fields.map((field) => ({
-      ...field,
-      options: field.options?.map((opt) => ({ ...opt })),
-    })),
+    fields: schema.fields.map(cloneField),
     views: schema.views.map((view) => ({ ...view })),
   };
+}
+
+function cloneField(field: FieldDef): FieldDef {
+  if (isSelectField(field)) {
+    return {
+      ...field,
+      options: field.options.map((opt: SelectFieldDef["options"][number]) => ({ ...opt })),
+    };
+  }
+  return { ...field };
 }
 
 function emitSchema() {
@@ -69,14 +83,54 @@ function emitSchema() {
 }
 
 function createField(): FieldDef {
-  const id = `field_${Date.now()}`;
-  return {
-    id,
+  return createFieldOfType("text", {
+    id: `field_${Date.now()}`,
     name: "新字段",
-    type: "text",
     required: false,
     hidden: false,
-  };
+  });
+}
+
+function createFieldOfType(type: FieldType, base: FieldDefBase): FieldDef {
+  switch (type) {
+    case "text":
+      return { ...base, type };
+    case "number":
+      return { ...base, type };
+    case "select":
+    case "multi_select":
+      return {
+        ...base,
+        type,
+        options: defaultSelectOptions(),
+      };
+    case "date":
+    case "datetime":
+      return { ...base, type };
+    case "checkbox":
+      return { ...base, type };
+    case "url":
+    case "email":
+    case "phone":
+      return { ...base, type };
+    case "rating":
+      return { ...base, type };
+    case "user":
+      return { ...base, type };
+    case "attachment":
+      return { ...base, type };
+    case "relation":
+      return { ...base, type };
+    case "formula":
+      return { ...base, type, formula: "" };
+  }
+}
+
+function defaultSelectOptions(): SelectFieldDef["options"] {
+  return [
+    { value: "option_1", label: "选项 1" },
+    { value: "option_2", label: "选项 2" },
+  ];
 }
 
 function addField() {
@@ -92,32 +146,45 @@ function removeField(fieldId: string) {
 }
 
 function onFieldTypeChange(field: FieldDef, nextType: FieldType) {
-  field.type = nextType;
-  if (nextType === "select" || nextType === "multi_select") {
-    field.options = field.options?.length
-      ? field.options
-      : [
-          { value: "option_1", label: "选项 1" },
-          { value: "option_2", label: "选项 2" },
-        ];
-  } else {
-    delete field.options;
-  }
+  const index = localSchema.value.fields.findIndex((item) => item.id === field.id);
+  if (index === -1) return;
+
+  const base: FieldDefBase = {
+    id: field.id,
+    name: field.name,
+    required: field.required,
+    hidden: field.hidden,
+    width: field.width,
+  };
+
+  localSchema.value.fields[index] =
+    isSelectField(field) && (nextType === "select" || nextType === "multi_select")
+      ? {
+          ...base,
+          type: nextType,
+          options: (field as SelectFieldDef).options.map(
+            (opt: SelectFieldDef["options"][number]) => ({ ...opt }),
+          ),
+        }
+      : createFieldOfType(nextType, base);
   emitSchema();
 }
 
 function updateSelectOptions(field: FieldDef, raw: string) {
+  if (!isSelectField(field)) return;
   const items = raw
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
 
-  field.options = items.map((item) => ({ value: item, label: item }));
+  (field as SelectFieldDef).options = items.map((item) => ({ value: item, label: item }));
   emitSchema();
 }
 
 function optionsToString(field: FieldDef): string {
-  return field.options?.map((opt) => opt.label).join(", ") ?? "";
+  return isSelectField(field)
+    ? field.options.map((opt: SelectFieldDef["options"][number]) => opt.label).join(", ")
+    : "";
 }
 
 function handleDragEnd() {
@@ -220,7 +287,7 @@ function handleDragEnd() {
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-xl);
   padding: 14px;
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   font-family: var(--of-font-sans);
 }
 
@@ -302,7 +369,7 @@ function handleDragEnd() {
   font-size: 12px;
   box-sizing: border-box;
   color: var(--of-color-gray-800);
-  background: #fff;
+  background: var(--of-color-bg-elevated);
 }
 
 .of-form-designer__checkbox-label {
@@ -317,7 +384,7 @@ function handleDragEnd() {
   margin-top: 8px;
   border: none;
   background: transparent;
-  color: #ef4444;
+  color: var(--of-color-error);
   cursor: pointer;
   padding: 4px;
   border-radius: var(--of-radius-sm);
@@ -326,7 +393,7 @@ function handleDragEnd() {
 }
 
 .of-form-designer__remove-btn:hover {
-  background: #fee2e2;
+  background: var(--of-color-error-light);
 }
 
 .of-form-designer__options-wrap {

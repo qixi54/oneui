@@ -152,7 +152,7 @@ watch(
   width: 16px !important;
   height: 16px !important;
   border: 2px solid var(--of-color-gray-200, #e8e8e8) !important;
-  border-top-color: var(--of-color-primary, #1677ff) !important;
+  border-top-color: var(--of-color-primary, #6366f1) !important;
   border-radius: 50% !important;
   animation: of-mermaid-spin 0.8s linear infinite !important;
   flex-shrink: 0 !important;
@@ -184,8 +184,8 @@ watch(
   width: 18px !important;
   height: 18px !important;
   border-radius: 50% !important;
-  background: var(--of-color-red-500, #ff4d4f) !important;
-  color: #ffffff !important;
+  background: var(--of-color-red-500, #dc2626) !important;
+  color: var(--of-color-text-inverse) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
   flex-shrink: 0 !important;
@@ -194,7 +194,7 @@ watch(
 
 .of-mermaid__error-text {
   font-size: 13px !important;
-  color: var(--of-color-red-600, #cf1322) !important;
+  color: var(--of-color-red-600, #dc2626) !important;
   line-height: 1.5 !important;
   word-break: break-all !important;
 }

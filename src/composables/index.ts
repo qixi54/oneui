@@ -8,7 +8,7 @@ export {
 export type { ResolvedBadge } from "./useBadge";
 
 export { useStream } from "./useStream";
-export type { UseStreamOptions, StreamMode } from "./useStream";
+export type { UseStreamOptions, StreamMode, RetryOptions } from "./useStream";
 
 export { useTypewriter } from "./useTypewriter";
 export type { UseTypewriterOptions } from "./useTypewriter";
@@ -27,3 +27,6 @@ export type { UseMarkdownOptions } from "./useMarkdown";
 
 export { useInlineEdit } from "./useInlineEdit";
 export type { EditingCell } from "./useInlineEdit";
+
+export { useVirtualList } from "./useVirtualList";
+export type { UseVirtualListOptions, VirtualItem } from "./useVirtualList";

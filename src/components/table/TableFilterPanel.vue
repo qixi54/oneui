@@ -150,7 +150,7 @@ function isNoValue(op: FilterOperator) {
 
 <style scoped>
 .of-filter-panel {
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-xl);
   box-shadow: var(--of-shadow-modal);
@@ -247,7 +247,7 @@ function isNoValue(op: FilterOperator) {
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-md);
   padding: 4px 8px;
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   color: var(--of-color-gray-800);
   outline: none;
 }
@@ -282,8 +282,8 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-condition__remove:hover {
-  color: #dc2626;
-  background: #fee2e2;
+  color: var(--of-color-error);
+  background: var(--of-color-error-light);
 }
 
 .of-filter-panel__footer {
@@ -324,6 +324,6 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-panel__clear:hover {
-  color: #dc2626;
+  color: var(--of-color-error);
 }
 </style>

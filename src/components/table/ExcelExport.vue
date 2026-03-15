@@ -85,7 +85,7 @@ async function handleExport() {
   font-size: 13px !important;
   font-weight: 500 !important;
   color: var(--of-color-gray-700);
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-md);
   padding: 6px 12px;

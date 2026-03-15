@@ -1,4 +1,4 @@
-import { ref, readonly } from "vue";
+import { ref, readonly, shallowRef, triggerRef } from "vue";
 import { useStream } from "./useStream";
 import { useTypewriter } from "./useTypewriter";
 
@@ -35,11 +35,24 @@ function generateId() {
 }
 
 export function useAiChat(options: UseAiChatOptions) {
-  const messages = ref<ChatMessage[]>([]);
+  const messages = shallowRef<ChatMessage[]>([]);
   const isGenerating = ref(false);
   const currentAiMessageId = ref<string | null>(null);
 
-  const tw = options.typewriter ? useTypewriter({ speed: options.typewriterSpeed ?? 15 }) : null;
+  const tw = options.typewriter
+    ? useTypewriter({
+        speed: options.typewriterSpeed ?? 15,
+        onUpdate: (text: string) => {
+          if (currentAiMessageId.value) {
+            const idx = messages.value.findIndex((m) => m.id === currentAiMessageId.value);
+            if (idx !== -1) {
+              messages.value[idx].content = text;
+              triggerRef(messages);
+            }
+          }
+        },
+      })
+    : null;
 
   function addUserMessage(content: string): ChatMessage {
     const msg: ChatMessage = {
@@ -49,6 +62,7 @@ export function useAiChat(options: UseAiChatOptions) {
       timestamp: new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }),
     };
     messages.value.push(msg);
+    triggerRef(messages);
     return msg;
   }
 
@@ -61,6 +75,7 @@ export function useAiChat(options: UseAiChatOptions) {
       timestamp: new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }),
     };
     messages.value.push(msg);
+    triggerRef(messages);
     currentAiMessageId.value = msg.id;
     return msg;
   }
@@ -69,6 +84,7 @@ export function useAiChat(options: UseAiChatOptions) {
     const idx = messages.value.findIndex((m) => m.id === id);
     if (idx !== -1) {
       messages.value[idx] = { ...messages.value[idx], ...update };
+      triggerRef(messages);
     }
   }
 
@@ -76,6 +92,7 @@ export function useAiChat(options: UseAiChatOptions) {
     const idx = messages.value.findIndex((m) => m.id === id);
     if (idx !== -1) {
       messages.value[idx].content += text;
+      triggerRef(messages);
     }
   }
 
@@ -138,19 +155,6 @@ export function useAiChat(options: UseAiChatOptions) {
     isGenerating.value = true;
     if (tw) tw.reset();
 
-    // 如果用打字机，同步 displayText 到 aiMsg.content
-    if (tw) {
-      const stop = setInterval(() => {
-        const idx = messages.value.findIndex((m) => m.id === aiMsg.id);
-        if (idx !== -1) {
-          messages.value[idx].content = tw.displayText.value;
-        }
-        if (!tw.isTyping.value && !isStreaming.value) {
-          clearInterval(stop);
-        }
-      }, 30);
-    }
-
     try {
       const result = await options.sendRequest(content, messages.value.slice(0, -2));
       const stream = result instanceof Response ? result.body! : result;
@@ -179,6 +183,7 @@ export function useAiChat(options: UseAiChatOptions) {
   function clear() {
     cancel();
     messages.value = [];
+    triggerRef(messages);
   }
 
   return {

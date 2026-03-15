@@ -135,7 +135,7 @@ const displayValue = computed(() => {
 }
 
 .of-field-cell--editing {
-  outline: 2px solid var(--of-color-primary, #1677ff);
+  outline: 2px solid var(--of-color-primary-500, #6366f1);
   outline-offset: -1px;
   background: var(--of-color-bg-canvas, #fff);
   cursor: default;

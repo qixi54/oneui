@@ -43,6 +43,6 @@ function select(n: number) {
 }
 
 .of-field-rating__star.filled {
-  color: #faad14;
+  color: var(--of-color-warning);
 }
 </style>

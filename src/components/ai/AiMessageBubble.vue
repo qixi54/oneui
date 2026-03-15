@@ -99,8 +99,8 @@ defineProps<{
 }
 
 .of-ai-message__bubble--error {
-  background: #fef2f2 !important;
-  color: #dc2626 !important;
+  background: var(--of-color-error-light) !important;
+  color: var(--of-color-error) !important;
 }
 
 .of-ai-message__content {

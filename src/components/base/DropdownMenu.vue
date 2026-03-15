@@ -126,7 +126,7 @@ function closeMenu() {
   background: var(--of-color-bg-elevated) !important;
   border: 1px solid var(--of-color-gray-200) !important;
   border-radius: var(--of-radius-md) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: var(--of-shadow-panel) !important;
   margin-top: 4px !important;
   overflow: hidden !important;
 }

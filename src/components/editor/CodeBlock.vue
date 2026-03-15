@@ -55,7 +55,7 @@ async function handleCopy() {
 
 <style scoped>
 .code-block {
-  background: #1e293b;
+  background: var(--of-color-gray-800);
   border-radius: var(--of-radius-md);
   padding: 14px 16px;
   display: flex;
@@ -74,7 +74,7 @@ async function handleCopy() {
 .code-block__lang {
   font-family: var(--of-font-mono) !important;
   font-size: 11px !important;
-  color: #94a3b8 !important;
+  color: var(--of-color-gray-400) !important;
   text-transform: lowercase;
 }
 
@@ -84,19 +84,19 @@ async function handleCopy() {
   align-items: center;
   gap: 4px;
   background: transparent;
-  border: 1px solid #334155;
+  border: 1px solid var(--of-color-gray-700);
   border-radius: var(--of-radius-sm);
   padding: 2px 8px;
   cursor: pointer;
-  color: #94a3b8;
+  color: var(--of-color-gray-400);
   transition: var(--of-transition-fast);
   outline: none;
 }
 
 .code-block__copy-btn:hover {
-  border-color: #475569;
-  color: #cbd5e1;
-  background: #263246;
+  border-color: var(--of-color-gray-600);
+  color: var(--of-color-gray-300);
+  background: var(--of-color-gray-900);
 }
 
 .code-block__copy-btn--copied {
@@ -121,7 +121,7 @@ async function handleCopy() {
 .code-block__code {
   font-family: var(--of-font-mono) !important;
   font-size: 12px !important;
-  color: #e2e8f0 !important;
+  color: var(--of-color-gray-200) !important;
   line-height: 1.6;
 }
 </style>

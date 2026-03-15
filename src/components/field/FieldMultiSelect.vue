@@ -230,9 +230,9 @@ watch(
   padding: 1px 6px;
   border-radius: 3px;
   font-size: 12px;
-  color: #fff;
+  color: var(--of-color-text-inverse);
   line-height: 18px;
-  background: var(--of-color-primary, #1677ff);
+  background: var(--of-color-primary, #6366f1);
 }
 
 .of-field-multiselect__actions {
@@ -245,7 +245,7 @@ watch(
 
 .of-field-multiselect__btn {
   border: 1px solid var(--of-color-gray-200, #e5e5e5);
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   border-radius: 4px;
   font-size: 12px;
   padding: 3px 10px;
@@ -253,8 +253,8 @@ watch(
 }
 
 .of-field-multiselect__btn--primary {
-  border-color: var(--of-color-primary, #1677ff);
-  background: var(--of-color-primary, #1677ff);
-  color: #fff;
+  border-color: var(--of-color-primary, #6366f1);
+  background: var(--of-color-primary, #6366f1);
+  color: var(--of-color-text-inverse);
 }
 </style>

@@ -98,7 +98,7 @@ function onDragEnd() {
 
 <style scoped>
 .of-col-manager {
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-xl);
   box-shadow: var(--of-shadow-modal);

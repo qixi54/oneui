@@ -28,23 +28,23 @@ const emit = defineEmits<{
 // 状态标签颜色
 const statusBadgeStyle = computed(() => {
   const map: Record<string, { text: string; bg: string }> = {
-    todo: { text: "#64748B", bg: "#F1F5F9" },
-    in_progress: { text: "#2563EB", bg: "#DBEAFE" },
-    blocked: { text: "#D97706", bg: "#FEF3C7" },
-    done: { text: "#22C55E", bg: "#DCFCE7" },
+    todo: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)" },
+    in_progress: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)" },
+    blocked: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)" },
+    done: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)" },
   };
-  return map[props.task.status] ?? { text: "#64748B", bg: "#F1F5F9" };
+  return map[props.task.status] ?? { text: "var(--of-color-text-secondary)", bg: "var(--of-color-gray-100)" };
 });
 
 // 优先级标签颜色
 const priorityBadgeStyle = computed(() => {
   const map: Record<string, { text: string; bg: string }> = {
-    P0: { text: "#DC2626", bg: "#FEE2E2" },
-    P1: { text: "#D97706", bg: "#FEF3C7" },
-    P2: { text: "#2563EB", bg: "#DBEAFE" },
-    P3: { text: "#64748B", bg: "#F1F5F9" },
+    P0: { text: "var(--of-priority-p0-text)", bg: "var(--of-priority-p0-bg)" },
+    P1: { text: "var(--of-priority-p1-text)", bg: "var(--of-priority-p1-bg)" },
+    P2: { text: "var(--of-priority-p2-text)", bg: "var(--of-priority-p2-bg)" },
+    P3: { text: "var(--of-priority-p3-text)", bg: "var(--of-priority-p3-bg)" },
   };
-  return map[props.task.priority] ?? { text: "#64748B", bg: "#F1F5F9" };
+  return map[props.task.priority] ?? { text: "var(--of-color-text-secondary)", bg: "var(--of-color-gray-100)" };
 });
 
 // 状态显示文字
@@ -203,8 +203,8 @@ function onDescriptionUpdate(value: string) {
 }
 
 .detail-layout__badge--role {
-  color: #4f46e5 !important;
-  background-color: #eef2ff;
+  color: var(--of-role-default-text) !important;
+  background-color: var(--of-role-default-bg);
 }
 
 .detail-layout__meta-text {

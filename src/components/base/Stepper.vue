@@ -152,21 +152,21 @@ function getLineStatus(index: number): "done" | "pending" {
 }
 
 .of-stepper__indicator--done {
-  background: #52c41a !important;
-  color: #ffffff !important;
-  border: 2px solid #52c41a !important;
+  background: var(--of-color-success) !important;
+  color: var(--of-color-bg-elevated, #ffffff) !important;
+  border: 2px solid var(--of-color-success) !important;
 }
 
 .of-stepper__indicator--active {
-  background: #ffffff !important;
-  color: #1677ff !important;
-  border: 2px solid #1677ff !important;
+  background: var(--of-color-bg-elevated, #ffffff) !important;
+  color: var(--of-color-info) !important;
+  border: 2px solid var(--of-color-info) !important;
 }
 
 .of-stepper__indicator--pending {
-  background: #d9d9d9 !important;
-  color: #595959 !important;
-  border: 2px solid #d9d9d9 !important;
+  background: var(--of-color-gray-300) !important;
+  color: var(--of-color-text-secondary) !important;
+  border: 2px solid var(--of-color-gray-300) !important;
 }
 
 .of-stepper__content {
@@ -211,10 +211,10 @@ function getLineStatus(index: number): "done" | "pending" {
 }
 
 .of-stepper__line--done {
-  background: #52c41a !important;
+  background: var(--of-color-success) !important;
 }
 
 .of-stepper__line--pending {
-  background: #e8e8e8 !important;
+  background: var(--of-color-gray-200) !important;
 }
 </style>

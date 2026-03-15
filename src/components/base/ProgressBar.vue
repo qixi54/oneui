@@ -13,7 +13,7 @@ interface ProgressBarProps {
 
 const props = withDefaults(defineProps<ProgressBarProps>(), {
   height: 4,
-  bgColor: "#f0f0f0",
+  bgColor: "var(--of-color-gray-100)",
   showLabel: false,
   borderRadius: 2,
 });
@@ -25,7 +25,7 @@ defineSlots<{
 const clampedValue = computed(() => Math.min(100, Math.max(0, props.value)));
 
 const computedColor = computed(() =>
-  clampedValue.value === 100 ? "#52c41a" : (props.color ?? "#1677ff"),
+  clampedValue.value === 100 ? "var(--of-color-success)" : (props.color ?? "var(--of-color-primary-500)"),
 );
 
 const trackStyle = computed(() => ({

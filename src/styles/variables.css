@@ -37,9 +37,19 @@
   --of-color-info: #2563eb;
   --of-color-info-light: #dbeafe;
 
+  /* ─── Text Colors ─── */
+  --of-color-text-primary: var(--of-color-gray-900);
+  --of-color-text-secondary: var(--of-color-gray-500);
+  --of-color-text-tertiary: var(--of-color-gray-400);
+  --of-color-text-inverse: #ffffff;
+  --of-color-text-link: var(--of-color-primary-500);
+
   /* ─── Background ─── */
   --of-color-bg-canvas: #f1f5f9;
   --of-color-bg-elevated: #ffffff;
+  --of-color-bg-hover: var(--of-color-gray-50);
+  --of-color-bg-active: var(--of-color-primary-50);
+  --of-color-bg-code: var(--of-color-gray-800);
 
   /* ─── Priority Badge Colors ─── */
   --of-priority-p0-text: #dc2626;
@@ -60,12 +70,70 @@
   --of-status-blocked-bg: #fef3c7;
   --of-status-done-text: #22c55e;
   --of-status-done-bg: #dcfce7;
+  --of-status-cancelled-text: #64748b;
+  --of-status-cancelled-bg: #f1f5f9;
+
+  /* ─── Role Colors ─── */
+  --of-role-be-text: #4f46e5;
+  --of-role-be-bg: #eef2ff;
+  --of-role-fe-text: #059669;
+  --of-role-fe-bg: #ecfdf5;
+  --of-role-dba-text: #c2410c;
+  --of-role-dba-bg: #fff7ed;
+  --of-role-arch-text: #7c3aed;
+  --of-role-arch-bg: #f5f3ff;
+  --of-role-pm-text: #db2777;
+  --of-role-pm-bg: #fdf2f8;
+
+  /* ─── Badge Color Palette ─── */
+  --of-badge-blue-text: #2563eb;
+  --of-badge-blue-bg: #dbeafe;
+  --of-badge-blue-border: #93c5fd;
+  --of-badge-green-text: #16a34a;
+  --of-badge-green-bg: #dcfce7;
+  --of-badge-green-border: #86efac;
+  --of-badge-orange-text: #d97706;
+  --of-badge-orange-bg: #fef3c7;
+  --of-badge-orange-border: #fcd34d;
+  --of-badge-red-text: #dc2626;
+  --of-badge-red-bg: #fee2e2;
+  --of-badge-red-border: #fca5a5;
+  --of-badge-purple-text: #7c3aed;
+  --of-badge-purple-bg: #f5f3ff;
+  --of-badge-purple-border: #c4b5fd;
+  --of-badge-gray-text: #64748b;
+  --of-badge-gray-bg: #f1f5f9;
+  --of-badge-gray-border: #cbd5e1;
 
   /* ─── Typography ─── */
   --of-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --of-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 
+  /* ─── Font Sizes ─── */
+  --of-font-size-xs: 11px;
+  --of-font-size-sm: 12px;
+  --of-font-size-base: 13px;
+  --of-font-size-md: 14px;
+  --of-font-size-lg: 16px;
+  --of-font-size-xl: 18px;
+
+  /* ─── Font Weights ─── */
+  --of-font-weight-normal: 400;
+  --of-font-weight-medium: 500;
+  --of-font-weight-semibold: 600;
+
+  /* ─── Line Heights ─── */
+  --of-line-height-tight: 1.2;
+  --of-line-height-normal: 1.5;
+  --of-line-height-relaxed: 1.6;
+
+  /* ─── Icon Sizes ─── */
+  --of-icon-sm: 14px;
+  --of-icon-md: 16px;
+  --of-icon-lg: 20px;
+
   /* ─── Spacing ─── */
+  --of-spacing-0_5: 2px;
   --of-spacing-1: 4px;
   --of-spacing-2: 8px;
   --of-spacing-3: 12px;

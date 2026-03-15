@@ -129,7 +129,7 @@ function handleAvatarClick() {
 
 .of-navbar__search:focus-within {
   border-color: var(--of-color-primary-300);
-  background: #fff;
+  background: var(--of-color-bg-elevated);
 }
 
 .of-navbar__search-icon {
@@ -190,7 +190,7 @@ function handleAvatarClick() {
   height: 14px;
   padding: 0 3px;
   background: var(--of-color-error);
-  color: #fff;
+  color: var(--of-color-text-inverse);
   font-family: var(--of-font-sans);
   font-size: 9px;
   font-weight: 600;
@@ -213,7 +213,7 @@ function handleAvatarClick() {
   font-family: var(--of-font-sans) !important;
   font-size: 13px !important;
   font-weight: 600 !important;
-  color: #ffffff !important;
+  color: var(--of-color-text-inverse) !important;
   transition: var(--of-transition-fast) !important;
   flex-shrink: 0;
 }

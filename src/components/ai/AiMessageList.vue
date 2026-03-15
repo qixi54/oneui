@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from "vue";
+import { ref, watch, nextTick, computed } from "vue";
+import { useVirtualList } from "@/composables/useVirtualList";
 import AiMessageBubble from "./AiMessageBubble.vue";
 import UserMessageBubble from "./UserMessageBubble.vue";
 import AiThinking from "./AiThinking.vue";
@@ -23,10 +24,29 @@ const props = defineProps<{
 
 const listRef = ref<HTMLElement | null>(null);
 
+const estimateHeight = (index: number): number => {
+  const msg = props.messages[index];
+  if (!msg) return 80;
+  if (msg.role === "user") return 60;
+
+  const contentLines = Math.ceil((msg.content?.length ?? 0) / 60);
+  return Math.max(80, 48 + contentLines * 24);
+};
+
+const {
+  visibleItems: visibleMessages,
+  totalHeight,
+  offsetY,
+  scrollToBottom: virtualScrollToBottom,
+} = useVirtualList({
+  items: computed(() => props.messages),
+  itemHeight: estimateHeight,
+  overscan: 3,
+  containerRef: listRef,
+});
+
 function scrollToBottom() {
-  if (listRef.value) {
-    listRef.value.scrollTop = listRef.value.scrollHeight;
-  }
+  virtualScrollToBottom();
 }
 
 watch(
@@ -41,23 +61,30 @@ watch(
 
 <template>
   <div ref="listRef" class="of-ai-message-list">
-    <template v-for="msg in messages" :key="msg.id">
-      <AiMessageBubble
-        v-if="msg.role === 'ai'"
-        :content="msg.content"
-        :is-streaming="msg.isStreaming"
-        :is-error="msg.isError"
-        :avatar="msg.avatar"
-        :name="msg.name"
-        :timestamp="msg.timestamp"
-      />
-      <UserMessageBubble
-        v-else
-        :content="msg.content"
-        :avatar="msg.avatar"
-        :timestamp="msg.timestamp"
-      />
-    </template>
+    <div :style="{ height: totalHeight + 'px', position: 'relative' }">
+      <div
+        class="of-ai-message-list-inner"
+        :style="{ transform: `translateY(${offsetY}px)` }"
+      >
+        <template v-for="{ data: msg } in visibleMessages" :key="msg.id">
+          <AiMessageBubble
+            v-if="msg.role === 'ai'"
+            :content="msg.content"
+            :is-streaming="msg.isStreaming"
+            :is-error="msg.isError"
+            :avatar="msg.avatar"
+            :name="msg.name"
+            :timestamp="msg.timestamp"
+          />
+          <UserMessageBubble
+            v-else
+            :content="msg.content"
+            :avatar="msg.avatar"
+            :timestamp="msg.timestamp"
+          />
+        </template>
+      </div>
+    </div>
     <AiThinking v-if="isThinking" />
   </div>
 </template>
@@ -66,10 +93,15 @@ watch(
 .of-ai-message-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   padding: 16px;
   overflow-y: auto;
   flex: 1;
   box-sizing: border-box;
+}
+
+.of-ai-message-list-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 </style>

@@ -1,9 +1,4 @@
 <script lang="ts">
-import type { DefineComponent } from "vue";
-
-declare const Switch: DefineComponent;
-
-export { Switch as OneSwitch };
 </script>
 
 <script setup lang="ts">
@@ -82,12 +77,12 @@ function toggle() {
   display: inline-block !important;
   flex-shrink: 0 !important;
   border-radius: 999px !important;
-  background: #d9d9d9 !important;
+  background: var(--of-color-gray-300) !important;
   transition: background 0.2s !important;
 }
 
 .of-switch--checked .of-switch__track {
-  background: #1677ff !important;
+  background: var(--of-color-primary-500) !important;
 }
 
 .of-switch__thumb {

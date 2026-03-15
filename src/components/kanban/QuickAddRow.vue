@@ -84,7 +84,7 @@ function handleBlur() {
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-lg);
   cursor: pointer;
@@ -122,7 +122,7 @@ function handleBlur() {
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  background: #fff;
+  background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-primary-400);
   border-radius: var(--of-radius-lg);
   font-size: 13px;

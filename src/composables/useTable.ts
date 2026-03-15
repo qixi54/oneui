@@ -1,4 +1,4 @@
-import { ref, computed, readonly } from "vue";
+import { ref, computed, readonly, shallowRef, triggerRef } from "vue";
 
 export type SortOrder = "asc" | "desc" | null;
 
@@ -27,7 +27,7 @@ export interface UseTableOptions<T> {
 }
 
 export function useTable<T extends Record<string, unknown>>(options: UseTableOptions<T> = {}) {
-  const rawData = ref<T[]>((options.data ?? []) as T[]);
+  const rawData = shallowRef<T[]>((options.data ?? []) as T[]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const selectedRows = ref<Set<string | number>>(new Set());
@@ -151,6 +151,7 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
         sort: sort.value,
       });
       rawData.value = result.data as T[];
+      triggerRef(rawData);
       pagination.value.total = result.total;
     } catch (e) {
       error.value = e as Error;
@@ -171,6 +172,7 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
   // ── Set data (for external filter results) ──
   function setData(data: T[]) {
     rawData.value = data as T[];
+    triggerRef(rawData);
     pagination.value.page = 1;
     if (!options.serverSide) pagination.value.total = data.length;
   }

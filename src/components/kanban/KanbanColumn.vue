@@ -2,6 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { Plus } from "lucide-vue-next";
 import { VueDraggable } from "vue-draggable-plus";
+import { useVirtualList } from "@/composables/useVirtualList";
 import KanbanCard from "./KanbanCard.vue";
 import type { KanbanColumnData, Task, ColorMap } from "../../types";
 import { DEFAULT_STATUS_MAP, mergeColorMap } from "../../composables/useBadge";
@@ -50,6 +51,19 @@ watch(localTasks, (val) => {
   emit("update:column", { ...props.column, tasks: val });
 });
 
+const useVirtual = computed(() => localTasks.value.length > 50);
+const cardContainerRef = ref<HTMLElement | null>(null);
+const {
+  visibleItems: visibleCards,
+  totalHeight: cardsTotalHeight,
+  offsetY: cardsOffsetY,
+} = useVirtualList({
+  items: localTasks,
+  itemHeight: 120,
+  overscan: 3,
+  containerRef: cardContainerRef,
+});
+
 // 列头圆点颜色：优先用 column.color，否则从 statusColorMap 里按列 id/title 查找 dot 颜色
 const dotColor = computed(() => {
   if (props.column.color) return props.column.color;
@@ -78,6 +92,7 @@ const dotColor = computed(() => {
 
     <!-- 拖拽列表 -->
     <VueDraggable
+      v-if="!useVirtual"
       v-model="localTasks"
       :group="{ name: 'kanban', pull: true, put: true }"
       item-key="id"
@@ -93,6 +108,19 @@ const dotColor = computed(() => {
         @click="emit('card-click', $event)"
       />
     </VueDraggable>
+
+    <div v-else ref="cardContainerRef" class="of-col-cards of-col-cards-virtual">
+      <div :style="{ height: cardsTotalHeight + 'px', position: 'relative' }">
+        <div :style="{ transform: `translateY(${cardsOffsetY}px)` }">
+          <KanbanCard
+            v-for="{ data: task } in visibleCards"
+            :key="task.id"
+            :task="task"
+            @click="emit('card-click', $event)"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -163,6 +191,11 @@ const dotColor = computed(() => {
   flex-direction: column;
   gap: 8px;
   min-height: 40px;
+}
+
+.of-col-cards-virtual {
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 /* 拖拽占位符 */
