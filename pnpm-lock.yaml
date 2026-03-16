@@ -48,6 +48,9 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.0.0
         version: 9.33.0(eslint@9.39.4)
+      eslint-plugin-vuejs-accessibility:
+        specifier: ^2.5.0
+        version: 2.5.0(eslint@9.39.4)(globals@14.0.0)
       jsdom:
         specifier: ^24.1.3
         version: 24.1.3
@@ -1092,6 +1095,10 @@ packages:
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
+  aria-query@5.3.2:
+    resolution: {integrity: sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==}
+    engines: {node: '>= 0.4'}
+
   array-union@2.1.0:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
@@ -1562,6 +1569,13 @@ packages:
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.2.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
+
+  eslint-plugin-vuejs-accessibility@2.5.0:
+    resolution: {integrity: sha512-oZ2fL4tS91Cm/ezH3BueNP+FtpbbeS627OSqqgp9/lsN//glmoPcLBT6D53xwGocLtyBybaT99tX4ThBh8+ytA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      eslint: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+      globals: '>= 13.12.1'
 
   eslint-scope@7.2.2:
     resolution: {integrity: sha512-dOt21O7lTMhDM+X9mB4GX+DZrZtCUJPL/wlcTqxyrx5IvO0IYtILdtrQGQp+8n5S0gwSVmOf9NQrjMOgfQZlIg==}
@@ -3766,6 +3780,8 @@ snapshots:
 
   argparse@2.0.1: {}
 
+  aria-query@5.3.2: {}
+
   array-union@2.1.0: {}
 
   assertion-error@2.0.1: {}
@@ -4279,6 +4295,15 @@ snapshots:
       semver: 7.7.4
       vue-eslint-parser: 9.4.3(eslint@9.39.4)
       xml-name-validator: 4.0.0
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-plugin-vuejs-accessibility@2.5.0(eslint@9.39.4)(globals@14.0.0):
+    dependencies:
+      aria-query: 5.3.2
+      eslint: 9.39.4
+      globals: 14.0.0
+      vue-eslint-parser: 9.4.3(eslint@9.39.4)
     transitivePeerDependencies:
       - supports-color
 
