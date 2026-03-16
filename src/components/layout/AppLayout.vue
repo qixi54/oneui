@@ -67,4 +67,13 @@
   height: var(--of-statusbar-height);
   flex-shrink: 0;
 }
+
+@media (max-width: 768px) {
+  .of-app-layout__sidebar {
+    display: none;
+  }
+  .of-app-layout__main {
+    width: 100%;
+  }
+}
 </style>

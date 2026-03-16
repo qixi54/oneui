@@ -39,3 +39,5 @@ export type { UseTableDataOptions } from "./useTableData";
 
 export { useTableColumns } from "./useTableColumns";
 export type { UseTableColumnsOptions } from "./useTableColumns";
+
+export { useBreakpoint } from "./useBreakpoint";

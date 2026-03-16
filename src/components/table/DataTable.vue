@@ -290,4 +290,12 @@ function handleRowClick(row: T) {
   max-height: 600px;
   overflow-y: auto;
 }
+
+@media (max-width: 768px) {
+  .of-data-table-scroll-container {
+    max-height: 100dvh;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 </style>

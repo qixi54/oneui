@@ -70,4 +70,11 @@ function handleClick(event: MouseEvent) {
 .of-toolbar-btn__label {
   line-height: 1;
 }
+
+@media (max-width: 768px) {
+  .of-toolbar-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
 </style>
