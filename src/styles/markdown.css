@@ -38,7 +38,7 @@
 }
 
 .of-markdown-copy-btn:hover {
-  color: white !important;
+  color: var(--of-color-white, #ffffff) !important;
   background: rgba(255, 255, 255, 0.1) !important;
 }
 

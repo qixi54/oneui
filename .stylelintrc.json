@@ -1,0 +1,18 @@
+{
+  "customSyntax": "postcss-html",
+  "rules": {
+    "declaration-no-important": [true, { "severity": "warning" }],
+    "color-named": ["never", { "severity": "error" }],
+    "color-no-invalid-hex": [true, { "severity": "error" }]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.vue"],
+      "customSyntax": "postcss-html"
+    },
+    {
+      "files": ["**/*.css"],
+      "customSyntax": "postcss"
+    }
+  ]
+}

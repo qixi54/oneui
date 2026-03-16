@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Gate 1: TypeScript 类型检查 ──────────────────────────
+      - name: Type Check
+        run: pnpm type-check
+
+      # ── Gate 2: ESLint 架构规则 ──────────────────────────────
+      # 检查内容：
+      #   - composables 不能 import .vue 组件（层级依赖方向）
+      #   - constants 不能 import 内部模块
+      #   - 必须使用 <script setup>
+      #   - TypeScript 类型规范
+      - name: Lint (ESLint)
+        run: pnpm lint
+
+      # ── Gate 3: Stylelint 样式规则 ──────────────────────────
+      # 检查内容：
+      #   - 禁止 !important（破坏样式可覆盖性）
+      #   - 禁止命名颜色（red/blue等，必须用 CSS 变量）
+      #   - 禁止无效 hex 颜色值
+      - name: Lint (Stylelint)
+        run: pnpm lint:style
+
+      # ── Gate 4: 代码格式 ─────────────────────────────────────
+      - name: Format Check
+        run: pnpm format:check
+
+      # ── Gate 5: 单元测试 ─────────────────────────────────────
+      - name: Test
+        run: pnpm test
