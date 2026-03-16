@@ -1,5 +1,7 @@
 import { ref, computed, readonly, shallowRef, triggerRef } from "vue";
 
+let _warnedMissingId = false
+
 export type SortOrder = "asc" | "desc" | null;
 
 export interface SortState {
@@ -108,8 +110,9 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
 
   // ── Selection ──
   function getRowKey(row: T, index: number): string | number {
-    const id = (row as Record<string, unknown>)["id"] as string | number | undefined
-    if (id === undefined) {
+    const id = (row as Record<string, unknown>)["id"] as string | number | null | undefined
+    if (id == null && !_warnedMissingId) {
+      _warnedMissingId = true
       console.warn(
         "[OneUI] DataTable: row is missing an `id` field. " +
         "Row selection may behave incorrectly after sorting or filtering. " +

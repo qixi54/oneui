@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { ref, type Component } from "vue";
-// NOTE: 全量引入用于 resolveIcon()——图标名由外部 items prop 在运行时传入，
-// 无法静态分析，必须保留 * 引入。ChevronDownIcon/ChevronRightIcon 是固定图标，
-// 已单独按需引入（两种引入共存是正确做法）。
-import * as LucideIcons from "lucide-vue-next";
+import { ref } from "vue";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-vue-next";
 import type { SidebarItem } from "../../types";
+import { resolveIcon } from "../../utils/icon";
 
 defineProps<{
   items: SidebarItem[];
@@ -17,21 +14,6 @@ const emit = defineEmits<{
 
 // 记录展开状态
 const expandedIds = ref<Set<string>>(new Set());
-
-function toPascalCase(name: string): string {
-  return (
-    name
-      .split("-")
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join("") + "Icon"
-  );
-}
-
-function resolveIcon(name?: string): Component | undefined {
-  if (!name) return undefined;
-  const key = toPascalCase(name);
-  return (LucideIcons as unknown as Record<string, Component>)[key];
-}
 
 function toggleExpand(item: SidebarItem) {
   if (expandedIds.value.has(item.id)) {
