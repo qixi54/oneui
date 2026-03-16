@@ -72,9 +72,9 @@ async function handleCopy() {
 }
 
 .code-block__lang {
-  font-family: var(--of-font-mono) !important;
-  font-size: 11px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-mono);
+  font-size: 11px;
+  color: var(--of-color-gray-400);
   text-transform: lowercase;
 }
 
@@ -100,13 +100,13 @@ async function handleCopy() {
 }
 
 .code-block__copy-btn--copied {
-  color: #4ade80;
-  border-color: #166534;
+  color: var(--of-color-success);
+  border-color: var(--of-color-success);
 }
 
 .code-block__copy-label {
-  font-family: var(--of-font-sans) !important;
-  font-size: 11px !important;
+  font-family: var(--of-font-sans);
+  font-size: 11px;
 }
 
 /* Code */
@@ -119,9 +119,9 @@ async function handleCopy() {
 }
 
 .code-block__code {
-  font-family: var(--of-font-mono) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-200) !important;
+  font-family: var(--of-font-mono);
+  font-size: 12px;
+  color: var(--of-color-gray-200);
   line-height: 1.6;
 }
 </style>

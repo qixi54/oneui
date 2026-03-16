@@ -89,14 +89,14 @@ function toggleCollapse() {
 }
 
 .prop-panel__header--collapsible:hover .prop-panel__title {
-  color: var(--of-color-gray-900) !important;
+  color: var(--of-color-gray-900);
 }
 
 .prop-panel__title {
-  font-family: var(--of-font-sans) !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: var(--of-color-gray-700) !important;
+  font-family: var(--of-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--of-color-gray-700);
   transition: var(--of-transition-fast);
 }
 

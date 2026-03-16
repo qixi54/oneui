@@ -83,17 +83,17 @@ const paragraphs = computed(() => {
 }
 
 .content-block__para {
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-700) !important;
-  line-height: 1.6 !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-700);
+  line-height: 1.6;
   margin: 0;
 }
 
 .content-block__placeholder {
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-300) !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-300);
   font-style: italic;
 }
 
@@ -103,9 +103,9 @@ const paragraphs = computed(() => {
   border: 1px solid var(--of-color-primary-300);
   border-radius: var(--of-radius-sm);
   padding: 8px 10px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-700) !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-700);
   line-height: 1.6;
   background: var(--of-color-bg-elevated);
   outline: none;

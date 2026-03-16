@@ -99,9 +99,9 @@ const resolvedItems = computed(() => {
 }
 
 .gallery-view__add-label {
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-400);
   font-weight: 500;
 }
 </style>

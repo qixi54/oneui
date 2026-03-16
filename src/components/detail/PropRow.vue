@@ -114,10 +114,10 @@ const showDot = computed(() => !!dotColor.value);
 }
 
 .prop-row__key {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--of-color-gray-500);
   width: 80px;
   flex-shrink: 0;
   white-space: nowrap;
@@ -139,9 +139,9 @@ const showDot = computed(() => !!dotColor.value);
   gap: 4px;
   padding: 3px 10px;
   border-radius: 8px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;
@@ -157,9 +157,9 @@ const showDot = computed(() => !!dotColor.value);
 }
 
 .prop-row__plain-text {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-700) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-700);
   line-height: 1.5;
 }
 </style>

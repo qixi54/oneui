@@ -44,10 +44,10 @@ function handleClick(e: MouseEvent) {
   background: var(--of-color-primary-50);
   border-radius: var(--of-radius-sm);
   padding: 2px 8px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-primary-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--of-color-primary-500);
   cursor: pointer;
   text-decoration: none;
   line-height: 1.5;
@@ -57,7 +57,7 @@ function handleClick(e: MouseEvent) {
 
 .ref-link:hover {
   background: var(--of-color-primary-100);
-  color: var(--of-color-primary-600) !important;
+  color: var(--of-color-primary-600);
 }
 
 .ref-link__icon {

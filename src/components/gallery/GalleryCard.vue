@@ -134,19 +134,19 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 
 /* Title */
 .gallery-card__title {
-  font-family: var(--of-font-sans) !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: var(--of-color-gray-900) !important;
+  font-family: var(--of-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--of-color-gray-900);
   line-height: 1.4;
   word-break: break-word;
 }
 
 /* Description */
 .gallery-card__desc {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-500);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -181,9 +181,9 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 }
 
 .gallery-card__prop-key {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-500);
   white-space: nowrap;
 }
 
@@ -192,9 +192,9 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 }
 
 .gallery-card__prop-value {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-700) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-700);
   font-weight: 500;
   white-space: nowrap;
   max-width: 100px;
@@ -213,10 +213,10 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
   display: flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-primary-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--of-color-primary-500);
 }
 
 .gallery-card__status-dot {
@@ -231,8 +231,8 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 }
 
 .gallery-card__date {
-  font-family: var(--of-font-sans) !important;
-  font-size: 11px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-sans);
+  font-size: 11px;
+  color: var(--of-color-gray-400);
 }
 </style>

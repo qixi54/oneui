@@ -74,17 +74,17 @@ function finishEdit() {
 }
 
 .block-quote__text {
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-500) !important;
-  line-height: 1.6 !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-500);
+  line-height: 1.6;
   margin: 0;
 }
 
 .block-quote__cite {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-400);
   font-style: italic;
 }
 
@@ -94,9 +94,9 @@ function finishEdit() {
   border: 1px solid var(--of-color-primary-300);
   border-radius: var(--of-radius-sm);
   padding: 6px 8px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-700) !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-700);
   line-height: 1.6;
   background: var(--of-color-bg-elevated);
   outline: none;

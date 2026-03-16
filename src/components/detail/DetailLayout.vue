@@ -172,13 +172,13 @@ function onDescriptionUpdate(value: string) {
 
 /* 任务标题 */
 .detail-layout__title {
-  font-family: var(--of-font-sans) !important;
-  font-size: 22px !important;
-  font-weight: 700 !important;
-  color: var(--of-color-gray-900) !important;
+  font-family: var(--of-font-sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--of-color-gray-900);
   line-height: 1.35;
-  margin: 0 0 12px 0 !important;
-  padding: 0 !important;
+  margin: 0 0 12px 0;
+  padding: 0;
   word-break: break-word;
 }
 
@@ -196,21 +196,21 @@ function onDescriptionUpdate(value: string) {
   align-items: center;
   padding: 3px 10px;
   border-radius: 8px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
 .detail-layout__badge--role {
-  color: var(--of-role-default-text) !important;
+  color: var(--of-role-default-text);
   background-color: var(--of-role-default-bg);
 }
 
 .detail-layout__meta-text {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-500);
 }
 
 /* ─── 区块（描述 / 活动记录）─── */
@@ -223,10 +223,10 @@ function onDescriptionUpdate(value: string) {
 }
 
 .detail-layout__section-title {
-  font-family: var(--of-font-sans) !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: var(--of-color-gray-700) !important;
+  font-family: var(--of-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--of-color-gray-700);
   margin-bottom: 12px;
 }
 
@@ -236,11 +236,11 @@ function onDescriptionUpdate(value: string) {
 }
 
 .detail-layout__desc-placeholder {
-  font-family: var(--of-font-sans) !important;
-  font-size: 14px !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 14px;
+  color: var(--of-color-gray-500);
   line-height: 1.6;
-  margin: 0 !important;
+  margin: 0;
 }
 
 /* 评论列表 */
@@ -251,10 +251,10 @@ function onDescriptionUpdate(value: string) {
 }
 
 .detail-layout__empty-hint {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-400) !important;
-  margin: 0 !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-400);
+  margin: 0;
 }
 
 /* ─── 右栏：属性面板 ─── */

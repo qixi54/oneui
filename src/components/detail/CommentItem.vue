@@ -58,10 +58,10 @@ withDefaults(
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--of-color-text-inverse) !important;
-  font-family: var(--of-font-sans) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
+  color: var(--of-color-text-inverse);
+  font-family: var(--of-font-sans);
+  font-size: 11px;
+  font-weight: 600;
   flex-shrink: 0;
   letter-spacing: 0;
   user-select: none;
@@ -85,32 +85,32 @@ withDefaults(
 }
 
 .comment-item__author {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: var(--of-color-gray-800) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--of-color-gray-800);
   white-space: nowrap;
 }
 
 .comment-item__action {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-500);
 }
 
 .comment-item__time {
-  font-family: var(--of-font-sans) !important;
-  font-size: 11px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-sans);
+  font-size: 11px;
+  color: var(--of-color-gray-400);
   margin-left: auto;
   white-space: nowrap;
 }
 
 /* 内容文字 */
 .comment-item__text {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-600) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-600);
   line-height: 1.5;
   word-break: break-word;
 }

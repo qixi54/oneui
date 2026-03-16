@@ -166,11 +166,11 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 
 @media (max-width: 960px) {
   .of-dashboard__grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 
   .of-dashboard__item {
-    grid-column: span 1 !important;
+    grid-column: span 1;
   }
 }
 </style>
