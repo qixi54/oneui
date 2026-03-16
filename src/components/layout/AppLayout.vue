@@ -1,6 +1,14 @@
 <script setup lang="ts">
 // AppLayout — 整体三层应用布局
 // slots: #navbar, #sidebar, #default (主内容), #statusbar
+import { provide } from "vue"
+import { useBreakpoint } from "@/composables/useBreakpoint"
+
+const { isMobile, isTablet } = useBreakpoint()
+
+// 向子组件注入移动端状态，Sidebar / Navbar 等可通过 inject("isMobile") 感知
+provide("isMobile", isMobile)
+provide("isTablet", isTablet)
 </script>
 
 <template>
@@ -12,7 +20,8 @@
 
     <!-- 中间内容区：侧边栏 + 主内容 -->
     <div class="of-app-layout__body">
-      <aside class="of-app-layout__sidebar">
+      <!-- 移动端用 v-if 替代 CSS display:none，避免不必要的 DOM 渲染 -->
+      <aside v-if="!isMobile" class="of-app-layout__sidebar">
         <slot name="sidebar" />
       </aside>
       <main class="of-app-layout__main">
@@ -66,14 +75,5 @@
 .of-app-layout__statusbar {
   height: var(--of-statusbar-height);
   flex-shrink: 0;
-}
-
-@media (max-width: 768px) {
-  .of-app-layout__sidebar {
-    display: none;
-  }
-  .of-app-layout__main {
-    width: 100%;
-  }
 }
 </style>
