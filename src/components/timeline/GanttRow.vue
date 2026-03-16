@@ -191,10 +191,10 @@ function endDrag() {
 }
 
 .gantt-row__title {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-gray-800) !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--of-color-gray-800);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -202,9 +202,9 @@ function endDrag() {
 }
 
 .gantt-row__priority {
-  font-family: var(--of-font-sans) !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
+  font-family: var(--of-font-sans);
+  font-size: 10px;
+  font-weight: 600;
   padding: 1px 5px;
   border-radius: var(--of-radius-sm);
   flex-shrink: 0;
@@ -249,9 +249,9 @@ function endDrag() {
 }
 
 .gantt-row__bar-label {
-  font-family: var(--of-font-sans) !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
+  font-family: var(--of-font-sans);
+  font-size: 10px;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;

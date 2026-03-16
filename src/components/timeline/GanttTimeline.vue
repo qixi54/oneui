@@ -294,9 +294,9 @@ function handleRowChange(payload: {
   min-width: 240px;
   border-right: 1px solid var(--of-color-gray-200);
   padding: 8px 12px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 11px !important;
-  color: var(--of-color-gray-500) !important;
+  font-family: var(--of-font-sans);
+  font-size: 11px;
+  color: var(--of-color-gray-500);
   display: flex;
   align-items: center;
   position: sticky;
@@ -313,9 +313,9 @@ function handleRowChange(payload: {
 .gantt-timeline__header-cell {
   text-align: center;
   padding: 6px 2px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 10px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-sans);
+  font-size: 10px;
+  color: var(--of-color-gray-400);
   border-right: 1px solid var(--of-color-gray-100);
   white-space: nowrap;
   overflow: hidden;
@@ -323,8 +323,8 @@ function handleRowChange(payload: {
 }
 
 .gantt-timeline__header-cell--today {
-  color: var(--of-color-primary-600) !important;
-  font-weight: 700 !important;
+  color: var(--of-color-primary-600);
+  font-weight: 700;
   background: var(--of-color-primary-50);
 }
 
@@ -350,8 +350,8 @@ function handleRowChange(payload: {
 .gantt-timeline__empty {
   padding: 40px;
   text-align: center;
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  color: var(--of-color-gray-400) !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  color: var(--of-color-gray-400);
 }
 </style>

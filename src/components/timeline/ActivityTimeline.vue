@@ -128,143 +128,143 @@ function getProgressValue(progress?: number): number | null {
 
 <style scoped>
 .of-activity-timeline {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .of-activity-timeline__skeleton {
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .of-activity-timeline__item {
-  display: flex !important;
-  gap: 12px !important;
+  display: flex;
+  gap: 12px;
 }
 
 .of-activity-timeline__item:not(:last-child) {
-  margin-bottom: 12px !important;
+  margin-bottom: 12px;
 }
 
 .of-activity-timeline__rail {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  flex-shrink: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .of-activity-timeline__dot {
-  width: 8px !important;
-  height: 8px !important;
-  border-radius: 999px !important;
-  margin-top: 4px !important;
-  flex-shrink: 0 !important;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+  flex-shrink: 0;
 }
 
 .of-activity-timeline__dot--skeleton {
-  background: var(--of-color-gray-300, #d9d9d9) !important;
+  background: var(--of-color-gray-300, #d9d9d9);
 }
 
 .of-activity-timeline__line {
-  width: 2px !important;
-  flex: 1 !important;
-  min-height: 18px !important;
-  margin-top: 4px !important;
-  background: var(--of-color-gray-100, #f0f0f0) !important;
+  width: 2px;
+  flex: 1;
+  min-height: 18px;
+  margin-top: 4px;
+  background: var(--of-color-gray-100, #f0f0f0);
 }
 
 .of-activity-timeline__content {
-  flex: 1 !important;
-  min-width: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .of-activity-timeline__header {
-  display: flex !important;
-  align-items: baseline !important;
-  gap: 6px !important;
-  flex-wrap: wrap !important;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .of-activity-timeline__action {
-  font-size: 13px !important;
-  line-height: 1.5 !important;
-  font-weight: 600 !important;
-  color: var(--of-color-text-primary, #262626) !important;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--of-color-text-primary, #262626);
 }
 
 .of-activity-timeline__actor {
-  font-size: 12px !important;
-  line-height: 1.5 !important;
-  color: var(--of-color-text-secondary, #8c8c8c) !important;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--of-color-text-secondary, #8c8c8c);
 }
 
 .of-activity-timeline__detail {
-  margin: 0 !important;
-  font-size: 12px !important;
-  line-height: 1.6 !important;
-  color: var(--of-color-text-secondary, #595959) !important;
-  word-break: break-word !important;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--of-color-text-secondary, #595959);
+  word-break: break-word;
 }
 
 .of-activity-timeline__time {
-  margin: 0 !important;
-  font-size: 11px !important;
-  line-height: 1.4 !important;
-  color: var(--of-color-text-tertiary, #bfbfbf) !important;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--of-color-text-tertiary, #bfbfbf);
 }
 
 .of-activity-timeline__progress {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .of-activity-timeline__progress-track {
-  flex: 1 !important;
-  min-width: 0 !important;
-  height: 4px !important;
-  border-radius: 999px !important;
-  overflow: hidden !important;
-  background: var(--of-color-gray-100, #f0f0f0) !important;
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--of-color-gray-100, #f0f0f0);
 }
 
 .of-activity-timeline__progress-fill {
-  height: 100% !important;
-  border-radius: 999px !important;
-  transition: width 0.24s ease !important;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.24s ease;
 }
 
 .of-activity-timeline__progress-value {
-  flex-shrink: 0 !important;
-  font-size: 11px !important;
-  line-height: 1.4 !important;
-  color: var(--of-color-text-secondary, #8c8c8c) !important;
+  flex-shrink: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--of-color-text-secondary, #8c8c8c);
 }
 
 .of-activity-timeline__skeleton-bar {
-  display: block !important;
-  height: 12px !important;
-  border-radius: 999px !important;
-  background: linear-gradient(90deg, var(--of-color-gray-100, #f5f5f5) 25%, var(--of-color-gray-200, #ebebeb) 37%, var(--of-color-gray-100, #f5f5f5) 63%) !important;
-  background-size: 400% 100% !important;
-  animation: of-activity-timeline-skeleton 1.4s ease infinite !important;
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--of-color-gray-100, #f5f5f5) 25%, var(--of-color-gray-200, #ebebeb) 37%, var(--of-color-gray-100, #f5f5f5) 63%);
+  background-size: 400% 100%;
+  animation: of-activity-timeline-skeleton 1.4s ease infinite;
 }
 
 .of-activity-timeline__skeleton-bar--lg {
-  width: 68% !important;
+  width: 68%;
 }
 
 .of-activity-timeline__skeleton-bar--md {
-  width: 52% !important;
+  width: 52%;
 }
 
 .of-activity-timeline__skeleton-bar--sm {
-  width: 36% !important;
+  width: 36%;
 }
 
 @keyframes of-activity-timeline-skeleton {

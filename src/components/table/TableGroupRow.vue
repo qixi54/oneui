@@ -61,79 +61,79 @@ const displayLabel = computed(() => props.groupKey || "(空)");
 
 <style scoped>
 .of-table-group-row {
-  display: flex !important;
-  align-items: center !important;
-  height: 36px !important;
-  padding: 0 12px !important;
-  gap: 8px !important;
-  background: var(--of-color-gray-50) !important;
-  border-bottom: 1px solid var(--of-color-gray-200) !important;
-  cursor: pointer !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-text-primary) !important;
-  box-sizing: border-box !important;
-  user-select: none !important;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  gap: 8px;
+  background: var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-color-gray-200);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--of-color-text-primary);
+  box-sizing: border-box;
+  user-select: none;
 }
 
 .of-table-group-row:hover {
-  background: var(--of-color-gray-100) !important;
+  background: var(--of-color-gray-100);
 }
 
 .of-table-group-row__checkbox-spacer {
-  width: 44px !important;
-  flex-shrink: 0 !important;
+  width: 44px;
+  flex-shrink: 0;
 }
 
 .of-table-group-row__chevron {
-  font-size: var(--of-font-size-xs) !important;
-  color: var(--of-color-text-tertiary) !important;
-  width: 14px !important;
-  text-align: center !important;
-  flex-shrink: 0 !important;
-  display: inline-block !important;
-  transform: rotate(0deg) !important;
-  transition: transform 0.15s !important;
-  line-height: 1 !important;
+  font-size: var(--of-font-size-xs);
+  color: var(--of-color-text-tertiary);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  display: inline-block;
+  transform: rotate(0deg);
+  transition: transform 0.15s;
+  line-height: 1;
 }
 
 .of-table-group-row__chevron--collapsed {
-  transform: rotate(-90deg) !important;
+  transform: rotate(-90deg);
 }
 
 .of-table-group-row__badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: var(--of-spacing-1) !important;
-  padding: 2px 8px !important;
-  border-radius: var(--of-radius-xl) !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  white-space: nowrap !important;
-  line-height: 1.4 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--of-spacing-1);
+  padding: 2px 8px;
+  border-radius: var(--of-radius-xl);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 
 .of-table-group-row__badge-dot {
-  display: inline-block !important;
-  width: 6px !important;
-  height: 6px !important;
-  border-radius: var(--of-radius-full) !important;
-  flex-shrink: 0 !important;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--of-radius-full);
+  flex-shrink: 0;
 }
 
 .of-table-group-row__label {
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-text-primary) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--of-color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .of-table-group-row__count {
-  font-size: 12px !important;
-  color: var(--of-color-text-tertiary) !important;
-  font-weight: 400 !important;
-  white-space: nowrap !important;
+  font-size: 12px;
+  color: var(--of-color-text-tertiary);
+  font-weight: 400;
+  white-space: nowrap;
 }
 </style>
