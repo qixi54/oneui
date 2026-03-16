@@ -1,4 +1,13 @@
-/* Markdown Code Block Styles */
+/*
+ * markdown.css — 第三方 Markdown 渲染样式
+ *
+ * 本文件中的 !important 是有意保留的。
+ * 原因：marked/highlight.js 渲染的 HTML 内容不在 Vue 组件树内，
+ *       无法使用 scoped 机制，需要 !important 确保样式能覆盖
+ *       宿主页面可能存在的同名选择器。
+ *       stylelint 对 .css 文件的 declaration-no-important 规则已通过
+ *       .stylelintrc.json 中的 overrides 豁免。
+ */
 
 .of-code-block-wrapper {
   display: block !important;

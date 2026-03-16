@@ -81,9 +81,9 @@ async function handleExport() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--of-font-sans) !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
+  font-family: var(--of-font-sans);
+  font-size: 13px;
+  font-weight: 500;
   color: var(--of-color-gray-700);
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
@@ -95,7 +95,7 @@ async function handleExport() {
 }
 
 .of-excel-export.sm {
-  font-size: 12px !important;
+  font-size: 12px;
   padding: 4px 10px;
 }
 
