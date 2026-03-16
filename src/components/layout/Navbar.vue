@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed, inject, type ComputedRef } from "vue";
 import { SearchIcon, BellIcon } from "lucide-vue-next";
 
-const density = inject<string>("density", "comfortable");
+const densityRef = inject<ComputedRef<string>>("density");
+const density = computed(() => densityRef?.value ?? "comfortable");
 
 const props = withDefaults(
   defineProps<{

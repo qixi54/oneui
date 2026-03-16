@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, inject } from "vue";
+import { ref, computed, inject, type ComputedRef } from "vue";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-vue-next";
 import type { SidebarItem } from "../../types";
 import { resolveIcon } from "../../utils/icon";
 
-const density = inject<string>("density", "comfortable");
+const densityRef = inject<ComputedRef<string>>("density");
+const density = computed(() => densityRef?.value ?? "comfortable");
 
 defineProps<{
   items: SidebarItem[];
