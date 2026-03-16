@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // AppLayout — 整体三层应用布局
 // slots: #navbar, #sidebar, #default (主内容), #statusbar
-import { ref, computed, provide } from "vue";
+import { ref, computed, provide, nextTick, onBeforeUnmount } from "vue";
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import type { Density } from "@/types";
 
@@ -29,13 +29,77 @@ provide(
 // 移动端 Drawer 展开状态
 const sidebarOpen = ref(false);
 
+// ── Focus Trap（移动端导航抽屉）─────────────────────────────
+const drawerNavRef = ref<HTMLElement | null>(null);
+let navPreviousFocus: HTMLElement | null = null;
+
+function getNavFocusableElements(): HTMLElement[] {
+  if (!drawerNavRef.value) return [];
+  return Array.from(
+    drawerNavRef.value.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), a[href]',
+    ),
+  ).filter((el) => !el.closest('[aria-hidden="true"]'));
+}
+
+function trapNavFocus(e: KeyboardEvent) {
+  if (e.key !== "Tab") return;
+  const focusable = getNavFocusableElements();
+  if (focusable.length === 0) {
+    e.preventDefault();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else {
+    if (document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+// ─────────────────────────────────────────────────────────────
+
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value;
+  const opening = !sidebarOpen.value;
+  sidebarOpen.value = opening;
+  if (opening) {
+    navPreviousFocus = document.activeElement as HTMLElement;
+    nextTick(() => {
+      const focusable = getNavFocusableElements();
+      if (focusable.length) focusable[0].focus();
+      document.addEventListener("keydown", trapNavFocus);
+      document.addEventListener("keydown", onNavEscape);
+    });
+  } else {
+    document.removeEventListener("keydown", trapNavFocus);
+    document.removeEventListener("keydown", onNavEscape);
+    navPreviousFocus?.focus();
+    navPreviousFocus = null;
+  }
 }
 
 function closeSidebar() {
   sidebarOpen.value = false;
+  document.removeEventListener("keydown", trapNavFocus);
+  document.removeEventListener("keydown", onNavEscape);
+  navPreviousFocus?.focus();
+  navPreviousFocus = null;
 }
+
+function onNavEscape(e: KeyboardEvent) {
+  if (e.key === "Escape") closeSidebar();
+}
+
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", trapNavFocus);
+  document.removeEventListener("keydown", onNavEscape);
+});
 </script>
 
 <template>
@@ -73,6 +137,7 @@ function closeSidebar() {
         />
         <!-- Drawer 侧边栏 -->
         <aside
+          ref="drawerNavRef"
           class="of-drawer-sidebar"
           :class="{ 'of-drawer-sidebar--open': sidebarOpen }"
           role="dialog"
