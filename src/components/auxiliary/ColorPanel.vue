@@ -124,7 +124,7 @@ function handlePresetPick(color: string) {
   width: 22px;
   height: 22px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--of-color-black-alpha-08);
   cursor: pointer;
 }
 

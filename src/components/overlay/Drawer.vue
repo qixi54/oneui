@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
   inset: 0;
   display: flex;
   justify-content: flex-end;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--of-color-black-alpha-45);
 }
 
 .of-drawer {
@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
 .of-drawer-enter-from,
 .of-drawer-leave-to {
   opacity: 0;
-  background: rgba(0, 0, 0, 0);
+  background: transparent;
 }
 
 .of-drawer-enter-from .of-drawer,

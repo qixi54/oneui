@@ -197,5 +197,12 @@
   --of-kanban-card-width: 280px;
 
   /* ─── White Alpha ─── */
+  --of-color-white-alpha-10: rgba(255, 255, 255, 0.1);
   --of-color-white-alpha-40: rgba(255, 255, 255, 0.4);
+
+  /* ─── Black Alpha ─── */
+  --of-color-black-alpha-08: rgba(0, 0, 0, 0.08);
+  --of-color-black-alpha-14: rgba(0, 0, 0, 0.14);
+  --of-color-black-alpha-45: rgba(0, 0, 0, 0.45);
+  --of-color-black-alpha-50: rgba(0, 0, 0, 0.5);
 }

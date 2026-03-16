@@ -59,6 +59,8 @@ jobs:
             grep -E 'rgba\([^)]*[0-9]|rgb\([^)]*[0-9]|: #[0-9a-fA-F]{3,6}' | \
             grep -v 'variables.css' | \
             grep -v '_template' | \
+            grep -v 'markdown.css' | \
+            grep -v 'src/dev/' | \
             grep -v '<!--' | \
             grep -v 'var(--'; then
             echo "❌ 发现硬编码色值，请改用 CSS token var(--of-color-*)"

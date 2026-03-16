@@ -189,7 +189,7 @@ onUnmounted(() => {
   align-items: flex-start;
   justify-content: center;
   padding: var(--of-spacing-8, 32px) var(--of-spacing-4, 16px);
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--of-color-black-alpha-50);
   overflow-y: auto;
 }
 

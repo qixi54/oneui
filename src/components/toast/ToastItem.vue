@@ -150,11 +150,11 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
 }
 
 .of-toast__close:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--of-color-black-alpha-08);
   color: var(--of-color-text-primary, #1a1a1a);
 }
 
 .of-toast__close:active {
-  background: rgba(0, 0, 0, 0.14);
+  background: var(--of-color-black-alpha-14);
 }
 </style>
