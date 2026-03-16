@@ -99,11 +99,13 @@ function hashCode(str: string): number {
 
 const accentPalette = computed<PersonaPalette>(() => {
   if (props.color) {
+    // 自定义颜色路径：使用 hex + 透明度后缀（兼容 Chrome 87+）
+    const hex = props.color.replace('#', '')
     return {
       accent: props.color,
-      bg: `color-mix(in srgb, ${props.color} 14%, transparent)`,
-      border: `color-mix(in srgb, ${props.color} 32%, transparent)`,
-      tagBg: `color-mix(in srgb, ${props.color} 10%, transparent)`,
+      bg: `#${hex}24`,
+      border: `#${hex}52`,
+      tagBg: `#${hex}1a`,
     };
   }
   return PALETTES[hashCode(props.name) % PALETTES.length];
