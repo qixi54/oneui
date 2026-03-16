@@ -162,187 +162,187 @@ provide("of-tabs-set", setActiveTab);
   --_spacing-3: var(--of-spacing-3, 12px);
   --_spacing-4: var(--of-spacing-4, 16px);
 
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 /* ============================================================
    导航栏
    ============================================================ */
 .of-tabs__nav {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  align-items: flex-end !important;
-  gap: 0 !important;
-  overflow-x: auto !important;
-  scrollbar-width: none !important;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .of-tabs__nav::-webkit-scrollbar {
-  display: none !important;
+  display: none;
 }
 
 /* ============================================================
    Tab 按钮基础样式
    ============================================================ */
 .of-tabs__tab {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: var(--_spacing-1) !important;
-  border: none !important;
-  background: transparent !important;
-  cursor: pointer !important;
-  font-family: inherit !important;
-  font-weight: 500 !important;
-  color: var(--_color-text-muted) !important;
-  white-space: nowrap !important;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_spacing-1);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--_color-text-muted);
+  white-space: nowrap;
   transition:
     color 200ms ease,
     background-color 200ms ease,
-    border-color 200ms ease !important;
-  outline: none !important;
-  position: relative !important;
-  flex-shrink: 0 !important;
+    border-color 200ms ease;
+  outline: none;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .of-tabs__tab:focus-visible {
-  outline: 2px solid var(--_color-primary) !important;
-  outline-offset: -2px !important;
-  border-radius: var(--_radius-sm) !important;
+  outline: 2px solid var(--_color-primary);
+  outline-offset: -2px;
+  border-radius: var(--_radius-sm);
 }
 
 .of-tabs__tab:hover:not(.of-tabs__tab--disabled):not(.of-tabs__tab--active) {
-  color: var(--_color-text) !important;
+  color: var(--_color-text);
 }
 
 /* ============================================================
    Size 变体
    ============================================================ */
 .of-tabs--sm .of-tabs__tab {
-  padding: 6px 12px !important;
-  font-size: 12px !important;
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 .of-tabs--md .of-tabs__tab {
-  padding: 8px 16px !important;
-  font-size: 14px !important;
+  padding: 8px 16px;
+  font-size: 14px;
 }
 
 .of-tabs--lg .of-tabs__tab {
-  padding: 10px 20px !important;
-  font-size: 16px !important;
+  padding: 10px 20px;
+  font-size: 16px;
 }
 
 /* ============================================================
    LINE 变体（默认，下划线风格）
    ============================================================ */
 .of-tabs--line .of-tabs__nav {
-  border-bottom: 1px solid var(--_color-border) !important;
+  border-bottom: 1px solid var(--_color-border);
 }
 
 .of-tabs--line .of-tabs__tab {
-  border-bottom: 2px solid transparent !important;
-  margin-bottom: -1px !important; /* 覆盖 nav border */
-  border-radius: 0 !important;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; /* 覆盖 nav border */
+  border-radius: 0;
 }
 
 .of-tabs--line .of-tabs__tab:hover:not(.of-tabs__tab--disabled):not(.of-tabs__tab--active) {
-  border-bottom-color: var(--_color-border) !important;
+  border-bottom-color: var(--_color-border);
 }
 
 .of-tabs--line .of-tabs__tab--active {
-  color: var(--_color-primary) !important;
-  border-bottom-color: var(--_color-primary) !important;
+  color: var(--_color-primary);
+  border-bottom-color: var(--_color-primary);
 }
 
 /* ============================================================
    CARD 变体（卡片/方块风格）
    ============================================================ */
 .of-tabs--card .of-tabs__nav {
-  border-bottom: 1px solid var(--_color-border) !important;
-  gap: 4px !important;
-  align-items: stretch !important;
-  padding: 0 var(--_spacing-1) !important;
-  padding-top: var(--_spacing-2) !important;
+  border-bottom: 1px solid var(--_color-border);
+  gap: 4px;
+  align-items: stretch;
+  padding: 0 var(--_spacing-1);
+  padding-top: var(--_spacing-2);
 }
 
 .of-tabs--card .of-tabs__tab {
-  background-color: var(--_color-bg-hover) !important;
-  border: 1px solid transparent !important;
-  border-bottom: none !important;
-  border-radius: var(--_radius-md) var(--_radius-md) 0 0 !important;
-  margin-bottom: -1px !important;
-  color: var(--_color-text-muted) !important;
+  background-color: var(--_color-bg-hover);
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--_radius-md) var(--_radius-md) 0 0;
+  margin-bottom: -1px;
+  color: var(--_color-text-muted);
 }
 
 .of-tabs--card .of-tabs__tab:hover:not(.of-tabs__tab--disabled):not(.of-tabs__tab--active) {
-  background-color: var(--_color-surface) !important;
-  border-color: var(--_color-border) !important;
-  color: var(--_color-text) !important;
+  background-color: var(--_color-surface);
+  border-color: var(--_color-border);
+  color: var(--_color-text);
 }
 
 .of-tabs--card .of-tabs__tab--active {
-  background-color: var(--_color-surface) !important;
-  border-color: var(--_color-border) !important;
-  border-bottom-color: var(--_color-surface) !important;
-  color: var(--_color-text) !important;
-  font-weight: 600 !important;
+  background-color: var(--_color-surface);
+  border-color: var(--_color-border);
+  border-bottom-color: var(--_color-surface);
+  color: var(--_color-text);
+  font-weight: 600;
 }
 
 /* ============================================================
    禁用状态
    ============================================================ */
 .of-tabs__tab--disabled {
-  opacity: 0.45 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ============================================================
    图标
    ============================================================ */
 .of-tabs__tab-icon {
-  width: 16px !important;
-  height: 16px !important;
-  flex-shrink: 0 !important;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .of-tabs--sm .of-tabs__tab-icon {
-  width: 14px !important;
-  height: 14px !important;
+  width: 14px;
+  height: 14px;
 }
 
 .of-tabs--lg .of-tabs__tab-icon {
-  width: 18px !important;
-  height: 18px !important;
+  width: 18px;
+  height: 18px;
 }
 
 /* ============================================================
    角标
    ============================================================ */
 .of-tabs__badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 18px !important;
-  height: 18px !important;
-  padding: 0 5px !important;
-  background-color: var(--_color-badge-bg) !important;
-  color: var(--_color-badge-text) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-  border-radius: 9999px !important;
-  flex-shrink: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background-color: var(--_color-badge-bg);
+  color: var(--_color-badge-text);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 9999px;
+  flex-shrink: 0;
 }
 
 /* ============================================================
    内容区域
    ============================================================ */
 .of-tabs__content {
-  padding-top: var(--_spacing-4) !important;
-  width: 100% !important;
-  flex: 1 !important;
+  padding-top: var(--_spacing-4);
+  width: 100%;
+  flex: 1;
 }
 </style>

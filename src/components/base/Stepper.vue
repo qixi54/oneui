@@ -101,120 +101,120 @@ function getLineStatus(index: number): "done" | "pending" {
 
 <style scoped>
 .of-stepper {
-  display: flex !important;
+  display: flex;
 }
 
 .of-stepper--horizontal {
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  width: 100% !important;
+  flex-direction: row;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
 }
 
 .of-stepper--vertical {
-  flex-direction: column !important;
-  align-items: stretch !important;
-  width: 100% !important;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
 }
 
 .of-stepper__step {
-  display: flex !important;
-  gap: 12px !important;
+  display: flex;
+  gap: 12px;
 }
 
 .of-stepper__step--horizontal {
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  min-width: 120px !important;
-  flex-shrink: 0 !important;
-  text-align: center !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 120px;
+  flex-shrink: 0;
+  text-align: center;
 }
 
 .of-stepper__step--vertical {
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  width: 100% !important;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .of-stepper__indicator {
-  width: 32px !important;
-  height: 32px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 999px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  flex-shrink: 0 !important;
-  box-sizing: border-box !important;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .of-stepper__indicator--done {
-  background: var(--of-color-success) !important;
-  color: var(--of-color-bg-elevated, #ffffff) !important;
-  border: 2px solid var(--of-color-success) !important;
+  background: var(--of-color-success);
+  color: var(--of-color-bg-elevated, #ffffff);
+  border: 2px solid var(--of-color-success);
 }
 
 .of-stepper__indicator--active {
-  background: var(--of-color-bg-elevated, #ffffff) !important;
-  color: var(--of-color-info) !important;
-  border: 2px solid var(--of-color-info) !important;
+  background: var(--of-color-bg-elevated, #ffffff);
+  color: var(--of-color-info);
+  border: 2px solid var(--of-color-info);
 }
 
 .of-stepper__indicator--pending {
-  background: var(--of-color-gray-300) !important;
-  color: var(--of-color-text-secondary) !important;
-  border: 2px solid var(--of-color-gray-300) !important;
+  background: var(--of-color-gray-300);
+  color: var(--of-color-text-secondary);
+  border: 2px solid var(--of-color-gray-300);
 }
 
 .of-stepper__content {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
-  min-width: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .of-stepper__label {
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  line-height: 1.4 !important;
-  color: var(--of-color-text) !important;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--of-color-text);
 }
 
 .of-stepper__description {
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: 12px !important;
-  line-height: 1.5 !important;
-  color: var(--of-color-text-secondary) !important;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--of-color-text-secondary);
 }
 
 .of-stepper__line {
-  flex-shrink: 0 !important;
-  border-radius: 999px !important;
+  flex-shrink: 0;
+  border-radius: 999px;
 }
 
 .of-stepper__line--horizontal {
-  width: 48px !important;
-  height: 2px !important;
-  margin: 15px 12px 0 !important;
+  width: 48px;
+  height: 2px;
+  margin: 15px 12px 0;
 }
 
 .of-stepper__line--vertical {
-  width: 2px !important;
-  height: 24px !important;
-  margin: 8px 0 8px 15px !important;
+  width: 2px;
+  height: 24px;
+  margin: 8px 0 8px 15px;
 }
 
 .of-stepper__line--done {
-  background: var(--of-color-success) !important;
+  background: var(--of-color-success);
 }
 
 .of-stepper__line--pending {
-  background: var(--of-color-gray-200) !important;
+  background: var(--of-color-gray-200);
 }
 </style>
