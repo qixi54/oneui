@@ -10,6 +10,8 @@ export interface SwitchProps {
   label?: string;
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<SwitchProps>(), {
   disabled: false,
   size: "md",
@@ -43,6 +45,7 @@ function toggle() {
     :aria-checked="modelValue"
     :aria-label="label"
     :disabled="disabled"
+    v-bind="$attrs"
     @click="toggle"
     @keydown.space.prevent="toggle"
   >

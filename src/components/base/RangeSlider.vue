@@ -15,6 +15,8 @@
  * />
  */
 
+defineOptions({ inheritAttrs: false });
+
 defineProps<{
   label: string;
   modelValue: number;
@@ -30,7 +32,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="of-range-slider">
+  <div class="of-range-slider" v-bind="$attrs">
     <label class="of-range-slider__label">
       {{ label }}
     </label>

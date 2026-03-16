@@ -15,7 +15,7 @@ export interface StatusSummaryProps {
   separator?: boolean;
 }
 
-defineOptions({ name: "StatusSummary" });
+defineOptions({ name: "StatusSummary", inheritAttrs: false });
 
 defineSlots<{
   extra?: () => VNode[];
@@ -39,7 +39,7 @@ function countColor(item: StatusSummaryItem): string {
 </script>
 
 <template>
-  <div class="of-status-summary" :class="`of-status-summary--${size}`">
+  <div class="of-status-summary" :class="`of-status-summary--${size}`" v-bind="$attrs">
     <template v-for="(item, index) in items" :key="item.key">
       <span v-if="separator && index > 0" class="of-status-summary__sep" aria-hidden="true" />
       <span class="of-status-summary__item">

@@ -14,6 +14,8 @@ function resolveIcon(name: string): Component | undefined {
   return ICON_MAP[name];
 }
 
+defineOptions({ inheritAttrs: false });
+
 defineProps<{
   modelValue: string;
   items: ViewTabItem[];
@@ -29,7 +31,7 @@ function select(key: string) {
 </script>
 
 <template>
-  <div class="of-view-tab">
+  <div class="of-view-tab" v-bind="$attrs">
     <button
       v-for="item in items"
       :key="item.key"

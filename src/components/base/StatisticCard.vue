@@ -17,6 +17,8 @@ import { resolveIcon } from "../../utils/icon";
  * />
  */
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps<{
   icon: string | Component;
   iconColor?: "blue" | "green" | "orange" | "red" | "purple";
@@ -54,7 +56,7 @@ const colorClass = computed(() => {
 </script>
 
 <template>
-  <div class="of-statistic-card">
+  <div class="of-statistic-card" v-bind="$attrs">
     <div class="of-statistic-card__icon-container" :style="{ backgroundColor: colorClass.bg }">
       <component
         :is="resolveIcon(icon)"

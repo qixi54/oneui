@@ -29,6 +29,8 @@ const DOT_SIZE_MAP = {
   md: "8px",
 } as const;
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<StatusIndicatorProps>(), {
   label: undefined,
   size: "md",
@@ -44,7 +46,7 @@ const dotSize = computed(() => DOT_SIZE_MAP[props.size]);
 </script>
 
 <template>
-  <span class="of-status-indicator" :style="{ '--of-status-dot-color': dotColor }">
+  <span class="of-status-indicator" :style="{ '--of-status-dot-color': dotColor }" v-bind="$attrs">
     <span
       class="of-status-indicator__dot"
       :style="{

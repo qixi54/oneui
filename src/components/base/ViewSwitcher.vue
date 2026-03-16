@@ -27,6 +27,8 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
   { value: "timeline", label: "时间线", icon: "calendar" },
 ];
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<ViewSwitcherProps>(), {
   tabs: undefined,
   modelValue: "table",
@@ -52,7 +54,7 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
 </script>
 
 <template>
-  <div class="one-view-switcher">
+  <div class="one-view-switcher" v-bind="$attrs">
     <!-- 视图标签组 -->
     <div class="one-view-switcher__tabs">
       <button

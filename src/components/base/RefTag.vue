@@ -2,7 +2,7 @@
 import { computed, type CSSProperties, type VNode } from "vue";
 import { resolveIcon } from "../../utils/icon";
 
-defineOptions({ name: "RefTag" });
+defineOptions({ name: "RefTag", inheritAttrs: false });
 
 export interface RefTagProps {
   type?: "spec" | "wiki" | "task" | string;
@@ -59,6 +59,7 @@ const tagStyle = computed<CSSProperties>(() => {
     :href="href ?? undefined"
     :target="href ? '_blank' : undefined"
     :rel="href ? 'noopener noreferrer' : undefined"
+    v-bind="$attrs"
   >
     <component v-if="iconComponent" :is="iconComponent" class="one-ref-tag__icon" />
     <span class="one-ref-tag__text">

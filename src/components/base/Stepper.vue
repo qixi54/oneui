@@ -15,6 +15,8 @@ export interface StepperProps {
 
 export type StepStatus = "done" | "active" | "pending";
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<StepperProps>(), {
   direction: "horizontal",
 });
@@ -43,7 +45,10 @@ function getLineStatus(index: number): "done" | "pending" {
 </script>
 
 <template>
-  <div :class="['of-stepper', isHorizontal ? 'of-stepper--horizontal' : 'of-stepper--vertical']">
+  <div
+    :class="['of-stepper', isHorizontal ? 'of-stepper--horizontal' : 'of-stepper--vertical']"
+    v-bind="$attrs"
+  >
     <template v-for="(item, index) in steps" :key="`${item.label}-${index}`">
       <div
         :class="[

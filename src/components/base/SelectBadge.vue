@@ -12,6 +12,8 @@ export interface SelectBadgeProps {
   clickable?: boolean;
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<SelectBadgeProps>(), {
   dot: false,
   clickable: true,
@@ -101,6 +103,7 @@ function handleClick(e: MouseEvent) {
     class="one-select-badge"
     :class="{ 'one-select-badge--clickable': clickable }"
     :style="containerStyle"
+    v-bind="$attrs"
     @click="handleClick"
   >
     <span v-if="dot" class="one-select-badge__dot" :style="dotStyle" />

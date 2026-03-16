@@ -13,7 +13,7 @@ export interface SectionBlockProps {
   statusLabels?: Record<string, string>;
 }
 
-defineOptions({ name: "SectionBlock" });
+defineOptions({ name: "SectionBlock", inheritAttrs: false });
 
 const props = withDefaults(defineProps<SectionBlockProps>(), {
   icon: undefined,
@@ -111,6 +111,7 @@ function onSave() {
       'of-section-block--done': status === 'done',
     }"
     :style="blockStyle"
+    v-bind="$attrs"
   >
     <!-- Header -->
     <div class="of-section-block__header" @click="toggleCollapse">

@@ -2,6 +2,8 @@
 import { computed } from "vue";
 import { resolveIcon } from "../../utils/icon";
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps<{
   icon: string;
   label: string;
@@ -22,7 +24,12 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-  <button class="of-toolbar-btn" :class="{ 'of-toolbar-btn--active': active }" @click="handleClick">
+  <button
+    class="of-toolbar-btn"
+    :class="{ 'of-toolbar-btn--active': active }"
+    v-bind="$attrs"
+    @click="handleClick"
+  >
     <component :is="iconComponent" class="of-toolbar-btn__icon" :size="13" />
     <span class="of-toolbar-btn__label">{{ label }}</span>
   </button>

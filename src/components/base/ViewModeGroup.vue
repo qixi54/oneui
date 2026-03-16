@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { resolveIcon } from "../../utils/icon";
 
-defineOptions({ name: "ViewModeGroup" });
+defineOptions({ name: "ViewModeGroup", inheritAttrs: false });
 
 export interface ViewModeOption {
   value: string;
@@ -33,7 +33,7 @@ const resolvedOptions = computed(() => props.options ?? DEFAULT_OPTIONS);
 </script>
 
 <template>
-  <div class="one-view-mode-group">
+  <div class="one-view-mode-group" v-bind="$attrs">
     <button
       v-for="opt in resolvedOptions"
       :key="opt.value"
