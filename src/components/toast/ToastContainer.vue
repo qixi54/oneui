@@ -35,43 +35,43 @@ const { toasts, remove } = useToast();
 <style>
 /* 注意：不使用 scoped，因为 Teleport 后 scoped 属性不会跟随 */
 .of-toast-container {
-  position: fixed !important;
-  top: 16px !important;
-  right: 16px !important;
-  z-index: 9999 !important;
-  pointer-events: none !important;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  pointer-events: none;
 }
 
 .of-toast-list {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  align-items: flex-end !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
 }
 
 /* 进入动画 */
 .of-toast-enter-active {
-  transition: all 0.3s ease !important;
+  transition: all 0.3s ease;
 }
 
 /* 离开动画 */
 .of-toast-leave-active {
-  transition: all 0.25s ease !important;
-  position: absolute !important;
+  transition: all 0.25s ease;
+  position: absolute;
 }
 
 .of-toast-enter-from {
-  opacity: 0 !important;
-  transform: translateX(100%) !important;
+  opacity: 0;
+  transform: translateX(100%);
 }
 
 .of-toast-leave-to {
-  opacity: 0 !important;
-  transform: translateX(100%) !important;
+  opacity: 0;
+  transform: translateX(100%);
 }
 
 /* 列表移动动画 */
 .of-toast-move {
-  transition: transform 0.3s ease !important;
+  transition: transform 0.3s ease;
 }
 </style>
