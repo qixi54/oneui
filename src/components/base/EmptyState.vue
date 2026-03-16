@@ -48,66 +48,66 @@ defineProps<{
 
 <style scoped>
 .of-empty-state {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-height: 300px !important;
-  padding: var(--of-spacing-8) var(--of-spacing-4) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: var(--of-spacing-8) var(--of-spacing-4);
 }
 
 .of-empty-state__content {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: var(--of-spacing-4) !important;
-  text-align: center !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--of-spacing-4);
+  text-align: center;
 }
 
 .of-empty-state__icon {
-  width: 48px !important;
-  height: 48px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: var(--of-color-gray-300) !important;
-  opacity: 0.6 !important;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--of-color-gray-300);
+  opacity: 0.6;
 }
 
 .of-empty-state__icon svg {
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
 }
 
 .of-empty-state__title {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: var(--of-color-text) !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--of-color-text);
+  margin: 0;
+  padding: 0;
 }
 
 .of-empty-state__description {
-  font-size: 14px !important;
-  color: var(--of-color-text-secondary) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 300px !important;
+  font-size: 14px;
+  color: var(--of-color-text-secondary);
+  margin: 0;
+  padding: 0;
+  max-width: 300px;
 }
 
 .of-empty-state__action {
-  margin-top: var(--of-spacing-2) !important;
-  padding: 8px 16px !important;
-  background: var(--of-color-primary-600) !important;
-  color: var(--of-color-primary-foreground) !important;
-  border: none !important;
-  border-radius: var(--of-radius-md) !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: var(--of-transition-fast) !important;
+  margin-top: var(--of-spacing-2);
+  padding: 8px 16px;
+  background: var(--of-color-primary-600);
+  color: var(--of-color-primary-foreground);
+  border: none;
+  border-radius: var(--of-radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--of-transition-fast);
 }
 
 .of-empty-state__action:hover {
-  background: var(--of-color-primary-700) !important;
+  background: var(--of-color-primary-700);
 }
 </style>

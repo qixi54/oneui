@@ -51,64 +51,64 @@ defineEmits<{
 
 <style scoped>
 .of-range-slider {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: var(--of-spacing-2) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--of-spacing-2);
 }
 
 .of-range-slider__label {
-  display: block !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  color: var(--of-color-text) !important;
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--of-color-text);
 }
 
 .of-range-slider__input {
-  width: 100% !important;
-  height: 6px !important;
-  border-radius: var(--of-radius-full) !important;
-  background: var(--of-color-gray-200) !important;
-  outline: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--of-radius-full);
+  background: var(--of-color-gray-200);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .of-range-slider__input::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 18px !important;
-  height: 18px !important;
-  border-radius: var(--of-radius-full) !important;
-  background: var(--of-color-primary-600) !important;
-  cursor: pointer !important;
-  border: 2px solid var(--of-color-bg-canvas) !important;
-  box-shadow: var(--of-shadow-card) !important;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--of-radius-full);
+  background: var(--of-color-primary-600);
+  cursor: pointer;
+  border: 2px solid var(--of-color-bg-canvas);
+  box-shadow: var(--of-shadow-card);
 }
 
 .of-range-slider__input::-moz-range-thumb {
-  width: 18px !important;
-  height: 18px !important;
-  border-radius: var(--of-radius-full) !important;
-  background: var(--of-color-primary-600) !important;
-  cursor: pointer !important;
-  border: 2px solid var(--of-color-bg-canvas) !important;
-  box-shadow: var(--of-shadow-card) !important;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--of-radius-full);
+  background: var(--of-color-primary-600);
+  cursor: pointer;
+  border: 2px solid var(--of-color-bg-canvas);
+  box-shadow: var(--of-shadow-card);
 }
 
 .of-range-slider__input::-webkit-slider-thumb:hover {
-  background: var(--of-color-primary-700) !important;
-  box-shadow: var(--of-shadow-card-hover) !important;
+  background: var(--of-color-primary-700);
+  box-shadow: var(--of-shadow-card-hover);
 }
 
 .of-range-slider__input::-moz-range-thumb:hover {
-  background: var(--of-color-primary-700) !important;
-  box-shadow: var(--of-shadow-card-hover) !important;
+  background: var(--of-color-primary-700);
+  box-shadow: var(--of-shadow-card-hover);
 }
 
 .of-range-slider__description {
-  font-size: 12px !important;
-  color: var(--of-color-gray-500) !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  font-size: 12px;
+  color: var(--of-color-gray-500);
+  margin: 0;
+  padding: 0;
 }
 </style>

@@ -75,56 +75,56 @@ function countColor(item: StatusSummaryItem): string {
 
 <style scoped>
 .of-status-summary {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  flex-wrap: nowrap !important;
-  gap: 14px !important;
-  padding: 5px 13px !important;
-  background: var(--of-color-gray-50) !important;
-  border-bottom: 1px solid var(--of-border-color) !important;
-  box-sizing: border-box !important;
-  min-height: 0 !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 14px;
+  padding: 5px 13px;
+  background: var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-border-color);
+  box-sizing: border-box;
+  min-height: 0;
 }
 
 .of-status-summary__item {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .of-status-summary__dot {
-  display: inline-block !important;
-  border-radius: var(--of-radius-full) !important;
-  flex-shrink: 0 !important;
+  display: inline-block;
+  border-radius: var(--of-radius-full);
+  flex-shrink: 0;
 }
 
 .of-status-summary__label {
-  color: var(--of-color-text-tertiary) !important;
-  line-height: 1.4 !important;
-  font-family: var(--of-font-sans, sans-serif) !important;
+  color: var(--of-color-text-tertiary);
+  line-height: 1.4;
+  font-family: var(--of-font-sans, sans-serif);
 }
 
 .of-status-summary__count {
-  line-height: 1.4 !important;
-  font-family: var(--of-font-sans, sans-serif) !important;
+  line-height: 1.4;
+  font-family: var(--of-font-sans, sans-serif);
 }
 
 .of-status-summary__sep {
-  display: inline-block !important;
-  width: 1px !important;
-  height: 12px !important;
-  background: var(--of-border-color) !important;
-  flex-shrink: 0 !important;
-  align-self: center !important;
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: var(--of-border-color);
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .of-status-summary__extra {
-  display: inline-flex !important;
-  align-items: center !important;
-  margin-left: auto !important;
-  flex-shrink: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 </style>

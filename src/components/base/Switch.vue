@@ -58,72 +58,72 @@ function toggle() {
 
 <style scoped>
 .of-switch {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  cursor: pointer !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .of-switch--disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .of-switch__track {
-  position: relative !important;
-  display: inline-block !important;
-  flex-shrink: 0 !important;
-  border-radius: 999px !important;
-  background: var(--of-color-gray-300) !important;
-  transition: background 0.2s !important;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--of-color-gray-300);
+  transition: background 0.2s;
 }
 
 .of-switch--checked .of-switch__track {
-  background: var(--of-color-primary-500) !important;
+  background: var(--of-color-primary-500);
 }
 
 .of-switch__thumb {
-  position: absolute !important;
-  top: 2px !important;
-  left: 2px !important;
-  border-radius: 50% !important;
-  background: #ffffff !important;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  border-radius: 50%;
+  background: var(--of-color-bg-elevated);
   transition:
     left 0.2s,
-    transform 0.2s !important;
+    transform 0.2s;
 }
 
 .of-switch--checked .of-switch__thumb {
-  left: calc(100% - 2px) !important;
-  transform: translateX(-100%) !important;
+  left: calc(100% - 2px);
+  transform: translateX(-100%);
 }
 
 .of-switch--sm .of-switch__track {
-  width: 32px !important;
-  height: 18px !important;
+  width: 32px;
+  height: 18px;
 }
 
 .of-switch--sm .of-switch__thumb {
-  width: 14px !important;
-  height: 14px !important;
+  width: 14px;
+  height: 14px;
 }
 
 .of-switch--md .of-switch__track {
-  width: 44px !important;
-  height: 24px !important;
+  width: 44px;
+  height: 24px;
 }
 
 .of-switch--md .of-switch__thumb {
-  width: 20px !important;
-  height: 20px !important;
+  width: 20px;
+  height: 20px;
 }
 
 .of-switch__label {
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  color: var(--of-color-text, #262626) !important;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--of-color-text-primary);
 }
 </style>

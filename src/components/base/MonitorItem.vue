@@ -80,72 +80,72 @@ function handleClick() {
 
 <style scoped>
 .of-monitor-item {
-  display: grid !important;
-  grid-template-columns: 120px 1fr 90px 48px 60px !important;
-  align-items: center !important;
-  gap: 0 8px !important;
-  padding: 8px 14px !important;
-  border-bottom: 1px solid var(--of-color-gray-200) !important;
-  box-sizing: border-box !important;
-  min-width: 0 !important;
+  display: grid;
+  grid-template-columns: 120px 1fr 90px 48px 60px;
+  align-items: center;
+  gap: 0 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--of-color-gray-200);
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .of-monitor-item--clickable {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .of-monitor-item--clickable:hover {
-  background: var(--of-color-gray-50) !important;
+  background: var(--of-color-gray-50);
 }
 
 .of-monitor-item__subtitle {
-  font-size: 10px !important;
-  color: var(--of-color-text-tertiary, #aaa) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  min-width: 0 !important;
+  font-size: 10px;
+  color: var(--of-color-text-tertiary, #aaa);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .of-monitor-item__label {
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  min-width: 0 !important;
-  color: var(--of-color-text-primary, #262626) !important;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  color: var(--of-color-text-primary, #262626);
 }
 
 .of-monitor-item__progress {
-  min-width: 0 !important;
-  width: 100% !important;
+  min-width: 0;
+  width: 100%;
 }
 
 .of-monitor-item__track {
-  width: 100% !important;
-  height: 4px !important;
-  border-radius: 2px !important;
-  overflow: hidden !important;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
 }
 
 .of-monitor-item__fill {
-  height: 100% !important;
-  border-radius: 2px !important;
-  transition: width 0.3s ease !important;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
 }
 
 .of-monitor-item__percentage {
-  font-size: 11px !important;
-  color: var(--of-color-text-secondary, #888) !important;
-  text-align: right !important;
-  white-space: nowrap !important;
+  font-size: 11px;
+  color: var(--of-color-text-secondary, #888);
+  text-align: right;
+  white-space: nowrap;
 }
 
 .of-monitor-item__count {
-  font-size: 10px !important;
-  color: var(--of-color-text-tertiary, #bbb) !important;
-  text-align: right !important;
-  white-space: nowrap !important;
+  font-size: 10px;
+  color: var(--of-color-text-tertiary, #bbb);
+  text-align: right;
+  white-space: nowrap;
 }
 </style>

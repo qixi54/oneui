@@ -55,52 +55,52 @@ const avatarStyle = computed<CSSProperties>(() => ({
 
 <style scoped>
 .one-chain-item {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  border-radius: 8px !important;
-  padding: 12px !important;
-  border: 1px solid !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .one-chain-item__header {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 8px !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 .one-chain-item__avatar {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 50% !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  flex-shrink: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 
 .one-chain-item__title {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  line-height: 1.2 !important;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .one-chain-item__duration {
-  margin-left: auto !important;
-  font-size: 11px !important;
-  color: var(--of-color-text-secondary, #6B7280) !important;
-  white-space: nowrap !important;
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--of-color-text-secondary, #6B7280);
+  white-space: nowrap;
 }
 
 .one-chain-item__desc {
-  font-size: 11px !important;
-  font-family: var(--of-font-mono, 'Roboto Mono', monospace) !important;
-  line-height: 1.4 !important;
-  word-break: break-all !important;
+  font-size: 11px;
+  font-family: var(--of-font-mono, 'Roboto Mono', monospace);
+  line-height: 1.4;
+  word-break: break-all;
 }
 </style>

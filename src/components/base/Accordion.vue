@@ -113,69 +113,69 @@ function toggleItem(item: AccordionItem) {
 
 <style scoped>
 .of-accordion {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
 .of-accordion__item {
-  border: 1px solid var(--of-color-gray-200, #e5e7eb) !important;
-  border-radius: 12px !important;
-  background: var(--of-color-bg-elevated, #ffffff) !important;
-  overflow: hidden !important;
+  border: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border-radius: 12px;
+  background: var(--of-color-bg-elevated, #ffffff);
+  overflow: hidden;
 }
 
 .of-accordion__item--disabled {
-  opacity: 0.6 !important;
+  opacity: 0.6;
 }
 
 .of-accordion__trigger {
-  width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  padding: 16px 18px !important;
-  border: none !important;
-  background: transparent !important;
-  text-align: left !important;
-  cursor: pointer !important;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
 .of-accordion__trigger:disabled {
-  cursor: not-allowed !important;
+  cursor: not-allowed;
 }
 
 .of-accordion__trigger-text {
-  display: flex !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  flex-direction: column !important;
-  gap: 4px !important;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .of-accordion__title {
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  font-weight: 600 !important;
-  color: var(--of-color-text, #111827) !important;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--of-color-text, #111827);
 }
 
 .of-accordion__subtitle {
-  font-size: 12px !important;
-  line-height: 1.5 !important;
-  color: var(--of-color-text-secondary, #6b7280) !important;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--of-color-text-secondary, #6b7280);
 }
 
 .of-accordion__icon {
-  flex-shrink: 0 !important;
-  font-size: 12px !important;
-  line-height: 1 !important;
-  color: var(--of-color-text-secondary, #6b7280) !important;
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--of-color-text-secondary, #6b7280);
 }
 
 .of-accordion__panel {
-  padding: 0 18px 18px !important;
+  padding: 0 18px 18px;
 }
 </style>
