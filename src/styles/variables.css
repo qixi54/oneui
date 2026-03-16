@@ -126,12 +126,12 @@
   --of-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 
   /* ─── Font Sizes ─── */
-  --of-font-size-xs: 11px;
-  --of-font-size-sm: 12px;
-  --of-font-size-base: 13px;
-  --of-font-size-md: 14px;
-  --of-font-size-lg: 16px;
-  --of-font-size-xl: 18px;
+  --of-font-size-xs: 0.6875rem;
+  --of-font-size-sm: 0.75rem;
+  --of-font-size-base: 0.8125rem;
+  --of-font-size-md: 0.875rem;
+  --of-font-size-lg: 1rem;
+  --of-font-size-xl: 1.125rem;
 
   /* ─── Font Weights ─── */
   --of-font-weight-normal: 400;
@@ -149,21 +149,21 @@
   --of-icon-lg: 20px;
 
   /* ─── Spacing ─── */
-  --of-spacing-0_5: 2px;
-  --of-spacing-1: 4px;
-  --of-spacing-2: 8px;
-  --of-spacing-3: 12px;
-  --of-spacing-4: 16px;
-  --of-spacing-5: 20px;
-  --of-spacing-6: 24px;
-  --of-spacing-8: 32px;
-  --of-spacing-10: 40px;
+  --of-spacing-0_5: 0.125rem;
+  --of-spacing-1: 0.25rem;
+  --of-spacing-2: 0.5rem;
+  --of-spacing-3: 0.75rem;
+  --of-spacing-4: 1rem;
+  --of-spacing-5: 1.25rem;
+  --of-spacing-6: 1.5rem;
+  --of-spacing-8: 2rem;
+  --of-spacing-10: 2.5rem;
 
   /* ─── Border Radius ─── */
-  --of-radius-sm: 4px;
-  --of-radius-md: 6px;
-  --of-radius-lg: 8px;
-  --of-radius-xl: 10px;
+  --of-radius-sm: 0.25rem;
+  --of-radius-md: 0.375rem;
+  --of-radius-lg: 0.5rem;
+  --of-radius-xl: 0.625rem;
   --of-radius-full: 9999px;
 
   /* ─── Shadows ─── */
