@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { MoreHorizontal } from "lucide-vue-next";
 import type { Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
@@ -30,29 +30,59 @@ defineProps<{
 }>();
 
 const isOpen = ref(false);
+const triggerRef = ref<HTMLButtonElement | null>(null);
+const menuRef = ref<HTMLDivElement | null>(null);
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === "Escape" && isOpen.value) {
+    isOpen.value = false;
+    triggerRef.value?.focus();
+  }
+}
+
+onMounted(() => {
+  if (typeof document === "undefined") return;
+  document.addEventListener("keydown", onKeydown);
+});
+
+onBeforeUnmount(() => {
+  if (typeof document === "undefined") return;
+  document.removeEventListener("keydown", onKeydown);
+});
 
 function handleItemClick(item: MenuItem) {
   item.onClick();
   isOpen.value = false;
+  triggerRef.value?.focus();
 }
 
 function toggleMenu() {
   isOpen.value = !isOpen.value;
+  if (isOpen.value) {
+    nextTick(() => {
+      const firstItem = menuRef.value?.querySelector<HTMLButtonElement>('[role="menuitem"]');
+      firstItem?.focus();
+    });
+  } else {
+    triggerRef.value?.focus();
+  }
 }
 
 function closeMenu() {
   isOpen.value = false;
+  triggerRef.value?.focus();
 }
 </script>
 
 <template>
   <div class="of-dropdown-menu">
     <button
+      ref="triggerRef"
       class="of-dropdown-menu__trigger"
-      @click="toggleMenu"
       aria-haspopup="true"
       :aria-expanded="isOpen"
       aria-label="更多操作"
+      @click="toggleMenu"
     >
       <MoreHorizontal :size="18" />
     </button>
@@ -62,7 +92,7 @@ function closeMenu() {
     </transition>
 
     <transition name="of-dropdown-slide">
-      <div v-if="isOpen" class="of-dropdown-menu__content" role="menu">
+      <div v-if="isOpen" ref="menuRef" class="of-dropdown-menu__content" role="menu">
         <button
           v-for="(item, index) in items"
           :key="index"
