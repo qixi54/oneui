@@ -11,11 +11,15 @@
       "customSyntax": "postcss-html"
     },
     {
-      "files": ["**/*.css"],
+      "files": ["**/styles/markdown.css"],
       "customSyntax": "postcss",
       "rules": {
         "declaration-no-important": null
       }
+    },
+    {
+      "files": ["**/styles/variables.css"],
+      "customSyntax": "postcss"
     }
   ]
 }
