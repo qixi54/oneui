@@ -9,7 +9,8 @@ import { useInlineEdit } from "@/composables/useInlineEdit";
 import { useVirtualList } from "@/composables/useVirtualList";
 import { useTable } from "@/composables/useTable";
 import { useTableGroup } from "@/composables/useTableGroup";
-import { DEFAULT_TABLE_COLUMNS } from "../../constants/table";
+import { useTableData } from "@/composables/useTableData";
+import { useTableColumns } from "@/composables/useTableColumns";
 import type {
   Task,
   TableColumn,
@@ -17,7 +18,6 @@ import type {
   DataRecord,
   TableSchema,
   ViewConfig,
-  FieldDef as SchemaFieldDef,
 } from "../../types";
 
 const props = withDefaults(
@@ -64,44 +64,16 @@ const emit = defineEmits<{
 const { commit: commitInlineEdit } = useInlineEdit();
 
 // ── Normalize Data ──
-const normalizedData = computed<T[]>(() => {
-  if (props.records?.length) {
-    return props.records.map((record) => ({
-      id: record.id,
-      ...record.fields,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
-      __record: record,
-    })) as unknown as T[];
-  }
-  return (props.tasks ?? []) as unknown as T[];
+const { rows: normalizedData } = useTableData<T>({
+  tasks: toRef(props, "tasks"),
+  records: toRef(props, "records"),
 });
 
 // ── Column Logic ──
-function fieldTypeToColumnType(field: SchemaFieldDef): TableColumn["type"] {
-  if (field.type === "number" || field.type === "date") return field.type;
-  if (field.type === "select") return "status";
-  return "string";
-}
-
-function fieldToColumn(field: SchemaFieldDef): TableColumn {
-  return {
-    key: field.id,
-    label: field.name,
-    width: field.width,
-    type: fieldTypeToColumnType(field),
-  };
-}
-
-const resolvedColumns = computed<TableColumn[]>(() => {
-  if (props.columns?.length) return props.columns;
-  if (props.schema?.fields?.length) {
-    const visibleFields = props.view?.visibleFields?.length
-      ? props.schema.fields.filter((f) => props.view?.visibleFields.includes(f.id))
-      : props.schema.fields;
-    return visibleFields.filter((f) => !f.hidden).map(fieldToColumn);
-  }
-  return DEFAULT_TABLE_COLUMNS;
+const { columns: resolvedColumns } = useTableColumns({
+  columns: toRef(props, "columns"),
+  schema: toRef(props, "schema"),
+  view: toRef(props, "view"),
 });
 
 // ── Brain 1: Table Management (Sort/Select/Pagination) ──

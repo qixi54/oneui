@@ -33,3 +33,9 @@ export type { UseVirtualListOptions, VirtualItem } from "./useVirtualList";
 
 export { useToast } from "./useToast";
 export type { UseToastOptions, ToastType, ToastItem } from "./useToast";
+
+export { useTableData } from "./useTableData";
+export type { UseTableDataOptions } from "./useTableData";
+
+export { useTableColumns } from "./useTableColumns";
+export type { UseTableColumnsOptions } from "./useTableColumns";
