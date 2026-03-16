@@ -1,5 +1,4 @@
-<script lang="ts">
-</script>
+<script lang="ts"></script>
 
 <script setup lang="ts">
 import { computed } from "vue";

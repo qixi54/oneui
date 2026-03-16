@@ -45,12 +45,8 @@ withDefaults(defineProps<Props>(), {
         </thead>
         <tbody>
           <tr v-for="(row, idx) in rows" :key="row.id ?? idx">
-            <td
-              v-for="col in columns"
-              :key="col.key"
-              :style="{ textAlign: col.align ?? 'left' }"
-            >
-              {{ row[col.key] ?? '-' }}
+            <td v-for="col in columns" :key="col.key" :style="{ textAlign: col.align ?? 'left' }">
+              {{ row[col.key] ?? "-" }}
             </td>
           </tr>
         </tbody>

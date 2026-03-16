@@ -27,7 +27,28 @@ export {
   InfoCard,
   PersonaCard,
 } from "./components/base";
-export type { ButtonOption, EmptyStateAction, MenuItem, StepItem, StepperProps, StepStatus, AvatarProps, RefTagProps, ViewModeOption, ViewModeGroupProps, ViewSwitcherTab, ViewSwitcherProps, SelectBadgeProps, ChainItemProps, SectionBlockProps, MonitorItemProps, StatusSummaryProps, StatusSummaryItem, InfoCardProps, PersonaCardProps } from "./components/base";
+export type {
+  ButtonOption,
+  EmptyStateAction,
+  MenuItem,
+  StepItem,
+  StepperProps,
+  StepStatus,
+  AvatarProps,
+  RefTagProps,
+  ViewModeOption,
+  ViewModeGroupProps,
+  ViewSwitcherTab,
+  ViewSwitcherProps,
+  SelectBadgeProps,
+  ChainItemProps,
+  SectionBlockProps,
+  MonitorItemProps,
+  StatusSummaryProps,
+  StatusSummaryItem,
+  InfoCardProps,
+  PersonaCardProps,
+} from "./components/base";
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
@@ -69,7 +90,14 @@ export { ColorPanel, PersonPanel, FileUpload } from "./components/auxiliary";
 export { DetailLayout, PropPanel, PropRow, CommentItem } from "./components/detail";
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
-export { Dashboard, BarChart, PieChart, DoughnutChart, NumberCard, TableChart } from "./components/Dashboard";
+export {
+  Dashboard,
+  BarChart,
+  PieChart,
+  DoughnutChart,
+  NumberCard,
+  TableChart,
+} from "./components/Dashboard";
 
 // ─── Kanban ──────────────────────────────────────────────────────────────────
 export { KanbanBoard, KanbanColumn, KanbanCard, QuickAddRow } from "./components/kanban";
@@ -217,7 +245,13 @@ import {
   PersonaCard,
 } from "./components/base";
 import { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
-import { DataTable, TableHeaderRow, TableDataRow, TableGroupRow, NewRowBtn } from "./components/table";
+import {
+  DataTable,
+  TableHeaderRow,
+  TableDataRow,
+  TableGroupRow,
+  NewRowBtn,
+} from "./components/table";
 import { TableFilterPanel, TableColumnManager, FieldCell } from "./components/table";
 import { KanbanBoard, KanbanColumn, KanbanCard, QuickAddRow } from "./components/kanban";
 import { GalleryView, GalleryCard } from "./components/gallery";
@@ -226,7 +260,14 @@ import { ContentBlock, BlockQuote, CodeBlock, RefLink, RichTextEditor } from "./
 import { FormDesigner } from "./components/form";
 import { ColorPanel, PersonPanel, FileUpload } from "./components/auxiliary";
 import { DetailLayout, PropPanel, PropRow, CommentItem } from "./components/detail";
-import { Dashboard, BarChart, PieChart, DoughnutChart, NumberCard, TableChart } from "./components/Dashboard";
+import {
+  Dashboard,
+  BarChart,
+  PieChart,
+  DoughnutChart,
+  NumberCard,
+  TableChart,
+} from "./components/Dashboard";
 import {
   AiThinking,
   AiStreamingCursor,

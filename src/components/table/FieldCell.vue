@@ -1,90 +1,98 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue'
-import { useInlineEdit } from '@/composables/useInlineEdit'
+import { computed, defineAsyncComponent } from "vue";
+import { useInlineEdit } from "@/composables/useInlineEdit";
 
 export type FieldType =
-  | 'text' | 'number' | 'checkbox' | 'select' | 'multiselect'
-  | 'date' | 'datetime' | 'rating' | 'url' | 'email'
+  | "text"
+  | "number"
+  | "checkbox"
+  | "select"
+  | "multiselect"
+  | "date"
+  | "datetime"
+  | "rating"
+  | "url"
+  | "email";
 
 export interface FieldOption {
-  label: string
-  value: string
-  color?: string
+  label: string;
+  value: string;
+  color?: string;
 }
 
 export interface FieldDef {
-  id: string
-  type: FieldType
-  label: string
-  options?: FieldOption[]
-  max?: number
-  readonly?: boolean
+  id: string;
+  type: FieldType;
+  label: string;
+  options?: FieldOption[];
+  max?: number;
+  readonly?: boolean;
 }
 
-export type CellValue = string | number | boolean | string[] | null | undefined
+export type CellValue = string | number | boolean | string[] | null | undefined;
 
 const props = withDefaults(
   defineProps<{
-    rowId: string
-    field: FieldDef
-    value?: CellValue
-    readonly?: boolean
+    rowId: string;
+    field: FieldDef;
+    value?: CellValue;
+    readonly?: boolean;
   }>(),
-  { readonly: false }
-)
+  { readonly: false },
+);
 
 const emit = defineEmits<{
-  commit: [rowId: string, fieldId: string, value: CellValue]
-  cancel: []
-  tabNext: []
-}>()
+  commit: [rowId: string, fieldId: string, value: CellValue];
+  cancel: [];
+  tabNext: [];
+}>();
 
-const { isEditing, activate, commit: commitEdit, cancel } = useInlineEdit()
+const { isEditing, activate, commit: commitEdit, cancel } = useInlineEdit();
 
-const editing = computed(() => isEditing(props.rowId, props.field.id))
-const isReadonly = computed(() => props.readonly || props.field.readonly)
+const editing = computed(() => isEditing(props.rowId, props.field.id));
+const isReadonly = computed(() => props.readonly || props.field.readonly);
 
 function handleClick() {
-  if (isReadonly.value) return
-  activate(props.rowId, props.field.id)
+  if (isReadonly.value) return;
+  activate(props.rowId, props.field.id);
 }
 
 function handleCommit(value: CellValue) {
-  commitEdit(props.rowId, props.field.id, value)
-  emit('commit', props.rowId, props.field.id, value)
+  commitEdit(props.rowId, props.field.id, value);
+  emit("commit", props.rowId, props.field.id, value);
 }
 
 function handleCancel() {
-  cancel()
-  emit('cancel')
+  cancel();
+  emit("cancel");
 }
 
 function handleTabNext() {
-  emit('tabNext')
+  emit("tabNext");
 }
 
 const editorMap: Record<FieldType, ReturnType<typeof defineAsyncComponent>> = {
-  text: defineAsyncComponent(() => import('@/components/field/FieldText.vue')),
-  number: defineAsyncComponent(() => import('@/components/field/FieldNumber.vue')),
-  checkbox: defineAsyncComponent(() => import('@/components/field/FieldCheckbox.vue')),
-  select: defineAsyncComponent(() => import('@/components/field/FieldSelect.vue')),
-  multiselect: defineAsyncComponent(() => import('@/components/field/FieldMultiSelect.vue')),
-  date: defineAsyncComponent(() => import('@/components/field/FieldDate.vue')),
-  datetime: defineAsyncComponent(() => import('@/components/field/FieldDatetime.vue')),
-  rating: defineAsyncComponent(() => import('@/components/field/FieldRating.vue')),
-  url: defineAsyncComponent(() => import('@/components/field/FieldUrl.vue')),
-  email: defineAsyncComponent(() => import('@/components/field/FieldEmail.vue')),
-}
+  text: defineAsyncComponent(() => import("@/components/field/FieldText.vue")),
+  number: defineAsyncComponent(() => import("@/components/field/FieldNumber.vue")),
+  checkbox: defineAsyncComponent(() => import("@/components/field/FieldCheckbox.vue")),
+  select: defineAsyncComponent(() => import("@/components/field/FieldSelect.vue")),
+  multiselect: defineAsyncComponent(() => import("@/components/field/FieldMultiSelect.vue")),
+  date: defineAsyncComponent(() => import("@/components/field/FieldDate.vue")),
+  datetime: defineAsyncComponent(() => import("@/components/field/FieldDatetime.vue")),
+  rating: defineAsyncComponent(() => import("@/components/field/FieldRating.vue")),
+  url: defineAsyncComponent(() => import("@/components/field/FieldUrl.vue")),
+  email: defineAsyncComponent(() => import("@/components/field/FieldEmail.vue")),
+};
 
-const currentEditor = computed(() => editorMap[props.field.type])
+const currentEditor = computed(() => editorMap[props.field.type]);
 
 const displayValue = computed(() => {
-  const v = props.value
-  if (v === null || v === undefined || v === '') return '—'
-  if (Array.isArray(v)) return v.join(', ')
-  if (typeof v === 'boolean') return v ? '✓' : '—'
-  return String(v)
-})
+  const v = props.value;
+  if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) return v.join(", ");
+  if (typeof v === "boolean") return v ? "✓" : "—";
+  return String(v);
+});
 </script>
 
 <template>

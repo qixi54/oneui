@@ -36,7 +36,15 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   click: [item: GanttRowItem];
-  change: [payload: { id: string; offsetDays: number; durationDays: number; startDate: string; endDate: string }];
+  change: [
+    payload: {
+      id: string;
+      offsetDays: number;
+      durationDays: number;
+      startDate: string;
+      endDate: string;
+    },
+  ];
 }>();
 
 const dragging = ref(false);
@@ -50,11 +58,15 @@ const leftPx = computed(() => props.offsetDays * props.dayWidth);
 const barWidthPx = computed(() => Math.max(props.durationDays, 1) * props.dayWidth);
 
 const resolvedPriority = computed(() =>
-  resolveBadge(props.item.priority || "", mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap)),
+  resolveBadge(
+    props.item.priority || "",
+    mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap),
+  ),
 );
 
 const priorityBarStyle = computed(() => {
-  if (props.item.barColor) return { background: props.item.barColor, color: "var(--of-color-gray-800)" };
+  if (props.item.barColor)
+    return { background: props.item.barColor, color: "var(--of-color-gray-800)" };
   return {
     background: resolvedPriority.value.style.background,
     color: resolvedPriority.value.style.color,
@@ -64,7 +76,10 @@ const priorityBarStyle = computed(() => {
 const priorityBadgeStyle = computed(() => resolvedPriority.value.style);
 
 const dotColor = computed(() => {
-  const badge = resolveBadge(props.item.status || "", mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap));
+  const badge = resolveBadge(
+    props.item.status || "",
+    mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap),
+  );
   return badge.dot ?? badge.style.color;
 });
 

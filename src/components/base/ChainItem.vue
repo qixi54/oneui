@@ -2,7 +2,7 @@
 import { computed, type CSSProperties } from "vue";
 
 export interface ChainItemProps {
-  type?: 'source' | 'result';
+  type?: "source" | "result";
   title: string;
   description?: string;
   avatar?: string;
@@ -13,15 +13,29 @@ export interface ChainItemProps {
 }
 
 const props = withDefaults(defineProps<ChainItemProps>(), {
-  type: 'source',
+  type: "source",
 });
 
 const PRESETS = {
-  source: { color: 'var(--of-badge-purple-text, #7C3AED)', bg: 'var(--of-badge-purple-bg, #F9F0FF)', border: 'var(--of-badge-purple-border, #E9D5FF)', avatarBg: 'var(--of-badge-purple-border, #E9D5FF)', descColor: 'var(--of-badge-purple-text, #6B21A8)', defaultAvatar: 'A' },
-  result: { color: 'var(--of-color-success, #22C55E)', bg: 'var(--of-color-success-light, #F6FFED)', border: 'var(--of-color-success-border, #B7EB8F)', avatarBg: 'var(--of-color-success-border, #B7EB8F)', descColor: 'var(--of-color-success-dark, #165E26)', defaultAvatar: '✓' },
+  source: {
+    color: "var(--of-badge-purple-text, #7C3AED)",
+    bg: "var(--of-badge-purple-bg, #F9F0FF)",
+    border: "var(--of-badge-purple-border, #E9D5FF)",
+    avatarBg: "var(--of-badge-purple-border, #E9D5FF)",
+    descColor: "var(--of-badge-purple-text, #6B21A8)",
+    defaultAvatar: "A",
+  },
+  result: {
+    color: "var(--of-color-success, #22C55E)",
+    bg: "var(--of-color-success-light, #F6FFED)",
+    border: "var(--of-color-success-border, #B7EB8F)",
+    avatarBg: "var(--of-color-success-border, #B7EB8F)",
+    descColor: "var(--of-color-success-dark, #165E26)",
+    defaultAvatar: "✓",
+  },
 };
 
-const preset = computed(() => PRESETS[props.type || 'source']);
+const preset = computed(() => PRESETS[props.type || "source"]);
 
 const resolvedColor = computed(() => props.color || preset.value.color);
 const resolvedBg = computed(() => props.bg || preset.value.bg);
@@ -93,13 +107,13 @@ const avatarStyle = computed<CSSProperties>(() => ({
 .one-chain-item__duration {
   margin-left: auto;
   font-size: 11px;
-  color: var(--of-color-text-secondary, #6B7280);
+  color: var(--of-color-text-secondary, #6b7280);
   white-space: nowrap;
 }
 
 .one-chain-item__desc {
   font-size: 11px;
-  font-family: var(--of-font-mono, 'Roboto Mono', monospace);
+  font-family: var(--of-font-mono, "Roboto Mono", monospace);
   line-height: 1.4;
   word-break: break-all;
 }

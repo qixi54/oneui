@@ -56,10 +56,7 @@ function getProgressValue(progress?: number): number | null {
       >
         <div class="of-activity-timeline__rail">
           <span class="of-activity-timeline__dot of-activity-timeline__dot--skeleton" />
-          <span
-            v-if="row < skeletonRows.length - 1"
-            class="of-activity-timeline__line"
-          />
+          <span v-if="row < skeletonRows.length - 1" class="of-activity-timeline__line" />
         </div>
         <div class="of-activity-timeline__content">
           <span class="of-activity-timeline__skeleton-bar of-activity-timeline__skeleton-bar--lg" />
@@ -80,10 +77,7 @@ function getProgressValue(progress?: number): number | null {
           class="of-activity-timeline__dot"
           :style="{ backgroundColor: getDotColor(item.status) }"
         />
-        <span
-          v-if="index < normalizedItems.length - 1"
-          class="of-activity-timeline__line"
-        />
+        <span v-if="index < normalizedItems.length - 1" class="of-activity-timeline__line" />
       </div>
 
       <div class="of-activity-timeline__content">
@@ -250,7 +244,12 @@ function getProgressValue(progress?: number): number | null {
   display: block;
   height: 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--of-color-gray-100, #f5f5f5) 25%, var(--of-color-gray-200, #ebebeb) 37%, var(--of-color-gray-100, #f5f5f5) 63%);
+  background: linear-gradient(
+    90deg,
+    var(--of-color-gray-100, #f5f5f5) 25%,
+    var(--of-color-gray-200, #ebebeb) 37%,
+    var(--of-color-gray-100, #f5f5f5) 63%
+  );
   background-size: 400% 100%;
   animation: of-activity-timeline-skeleton 1.4s ease infinite;
 }

@@ -41,11 +41,7 @@ function countColor(item: StatusSummaryItem): string {
 <template>
   <div class="of-status-summary" :class="`of-status-summary--${size}`">
     <template v-for="(item, index) in items" :key="item.key">
-      <span
-        v-if="separator && index > 0"
-        class="of-status-summary__sep"
-        aria-hidden="true"
-      />
+      <span v-if="separator && index > 0" class="of-status-summary__sep" aria-hidden="true" />
       <span class="of-status-summary__item">
         <span
           class="of-status-summary__dot"
@@ -63,7 +59,8 @@ function countColor(item: StatusSummaryItem): string {
             color: countColor(item),
             fontWeight: item.highlight ? '700' : '600',
           }"
-        >{{ item.count }}</span>
+          >{{ item.count }}</span
+        >
       </span>
     </template>
 

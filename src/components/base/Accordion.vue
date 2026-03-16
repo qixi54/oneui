@@ -56,9 +56,7 @@ function toggleItem(item: AccordionItem) {
   if (props.multiple) {
     emit(
       "update:modelValue",
-      opened
-        ? openKeys.value.filter((key) => key !== item.key)
-        : [...openKeys.value, item.key],
+      opened ? openKeys.value.filter((key) => key !== item.key) : [...openKeys.value, item.key],
     );
     return;
   }

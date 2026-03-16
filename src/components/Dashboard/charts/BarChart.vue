@@ -28,7 +28,9 @@ const render = () => {
 
   chart.setOption({
     color: props.colors,
-    title: props.title ? { text: props.title, left: "center", textStyle: { fontSize: 14, fontWeight: 600 } } : undefined,
+    title: props.title
+      ? { text: props.title, left: "center", textStyle: { fontSize: 14, fontWeight: 600 } }
+      : undefined,
     tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
     grid: { left: 12, right: 12, top: props.title ? 42 : 16, bottom: 8, containLabel: true },
     xAxis: { type: "category", data: props.xAxisData },

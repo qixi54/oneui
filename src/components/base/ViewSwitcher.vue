@@ -62,7 +62,11 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
         :class="{ 'one-view-switcher__tab--active': modelValue === tab.value }"
         @click="$emit('update:modelValue', tab.value)"
       >
-        <component v-if="tab.icon" :is="resolveIcon(tab.icon)" class="one-view-switcher__tab-icon" />
+        <component
+          v-if="tab.icon"
+          :is="resolveIcon(tab.icon)"
+          class="one-view-switcher__tab-icon"
+        />
         <span>{{ tab.label }}</span>
       </button>
     </div>

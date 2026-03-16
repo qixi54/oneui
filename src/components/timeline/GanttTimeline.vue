@@ -118,7 +118,9 @@ const timelineRows = computed<TimelineRow[]>(() => {
 
 const minStartDate = computed(() => {
   if (!timelineRows.value.length) return props.startDate || getDefaultStart();
-  const minTs = Math.min(...timelineRows.value.map((row) => parseDateOnly(row.startDate).getTime()));
+  const minTs = Math.min(
+    ...timelineRows.value.map((row) => parseDateOnly(row.startDate).getTime()),
+  );
   const d = new Date(minTs);
   d.setDate(d.getDate() - 1);
   return formatDateOnly(d);

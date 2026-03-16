@@ -223,14 +223,19 @@ function handleDragEnd() {
             class="of-form-designer__input"
             placeholder="字段名称"
             :disabled="readonly"
-            @input="field.name = String(($event.target as HTMLInputElement).value); emitSchema()"
+            @input="
+              field.name = String(($event.target as HTMLInputElement).value);
+              emitSchema();
+            "
           />
 
           <select
             class="of-form-designer__select"
             :value="field.type"
             :disabled="readonly"
-            @change="onFieldTypeChange(field, ($event.target as HTMLSelectElement).value as FieldType)"
+            @change="
+              onFieldTypeChange(field, ($event.target as HTMLSelectElement).value as FieldType)
+            "
           >
             <option v-for="option in FIELD_TYPE_OPTIONS" :key="option.value" :value="option.value">
               {{ option.label }}
@@ -242,7 +247,10 @@ function handleDragEnd() {
               type="checkbox"
               :checked="Boolean(field.required)"
               :disabled="readonly"
-              @change="field.required = ($event.target as HTMLInputElement).checked; emitSchema()"
+              @change="
+                field.required = ($event.target as HTMLInputElement).checked;
+                emitSchema();
+              "
             />
             必填
           </label>
@@ -252,7 +260,10 @@ function handleDragEnd() {
               type="checkbox"
               :checked="Boolean(field.hidden)"
               :disabled="readonly"
-              @change="field.hidden = ($event.target as HTMLInputElement).checked; emitSchema()"
+              @change="
+                field.hidden = ($event.target as HTMLInputElement).checked;
+                emitSchema();
+              "
             />
             隐藏
           </label>
@@ -266,7 +277,10 @@ function handleDragEnd() {
           <Trash2 :size="14" />
         </button>
 
-        <div v-if="field.type === 'select' || field.type === 'multi_select'" class="of-form-designer__options-wrap">
+        <div
+          v-if="field.type === 'select' || field.type === 'multi_select'"
+          class="of-form-designer__options-wrap"
+        >
           <label class="of-form-designer__options-label">选项（逗号分隔）</label>
           <input
             :value="optionsToString(field)"

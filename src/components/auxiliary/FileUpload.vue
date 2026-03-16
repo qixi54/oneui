@@ -93,10 +93,19 @@ function triggerPick() {
     </button>
 
     <ul v-if="modelValue && modelValue.length" class="of-file-upload__list">
-      <li v-for="(file, index) in modelValue" :key="`${file.name}-${index}`" class="of-file-upload__item">
+      <li
+        v-for="(file, index) in modelValue"
+        :key="`${file.name}-${index}`"
+        class="of-file-upload__item"
+      >
         <span class="of-file-upload__name">{{ file.name }}</span>
         <span class="of-file-upload__size">{{ (file.size / 1024).toFixed(1) }} KB</span>
-        <button type="button" class="of-file-upload__remove" :disabled="disabled" @click="removeAt(index)">
+        <button
+          type="button"
+          class="of-file-upload__remove"
+          :disabled="disabled"
+          @click="removeAt(index)"
+        >
           <X :size="14" />
         </button>
       </li>

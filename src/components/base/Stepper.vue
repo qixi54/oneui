@@ -20,11 +20,7 @@ const props = withDefaults(defineProps<StepperProps>(), {
 });
 
 defineSlots<{
-  "step-content"?: (props: {
-    item: StepItem;
-    index: number;
-    status: StepStatus;
-  }) => unknown;
+  "step-content"?: (props: { item: StepItem; index: number; status: StepStatus }) => unknown;
 }>();
 
 const isHorizontal = computed(() => props.direction === "horizontal");
@@ -47,12 +43,7 @@ function getLineStatus(index: number): "done" | "pending" {
 </script>
 
 <template>
-  <div
-    :class="[
-      'of-stepper',
-      isHorizontal ? 'of-stepper--horizontal' : 'of-stepper--vertical',
-    ]"
-  >
+  <div :class="['of-stepper', isHorizontal ? 'of-stepper--horizontal' : 'of-stepper--vertical']">
     <template v-for="(item, index) in steps" :key="`${item.label}-${index}`">
       <div
         :class="[
@@ -62,10 +53,7 @@ function getLineStatus(index: number): "done" | "pending" {
         ]"
       >
         <div
-          :class="[
-            'of-stepper__indicator',
-            `of-stepper__indicator--${getStepStatus(index)}`,
-          ]"
+          :class="['of-stepper__indicator', `of-stepper__indicator--${getStepStatus(index)}`]"
           :aria-current="getStepStatus(index) === 'active' ? 'step' : undefined"
         >
           <Check v-if="getStepStatus(index) === 'done'" :size="14" :stroke-width="3" />
@@ -73,12 +61,7 @@ function getLineStatus(index: number): "done" | "pending" {
         </div>
 
         <div class="of-stepper__content">
-          <slot
-            name="step-content"
-            :item="item"
-            :index="index"
-            :status="getStepStatus(index)"
-          >
+          <slot name="step-content" :item="item" :index="index" :status="getStepStatus(index)">
             <p class="of-stepper__label">{{ item.label }}</p>
             <p v-if="item.description" class="of-stepper__description">
               {{ item.description }}

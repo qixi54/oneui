@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { CellValue, FieldDef } from '@/components/table/FieldCell.vue'
+import { ref } from "vue";
+import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
 
-const props = defineProps<{ value?: CellValue; field: FieldDef }>()
-const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>()
+const props = defineProps<{ value?: CellValue; field: FieldDef }>();
+const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
 
-const hoverIndex = ref(0)
-const maxStars = props.field.max ?? 5
-const currentValue = Number(props.value ?? 0)
+const hoverIndex = ref(0);
+const maxStars = props.field.max ?? 5;
+const currentValue = Number(props.value ?? 0);
 
 function select(n: number) {
-  emit('commit', n)
+  emit("commit", n);
 }
 </script>
 
@@ -24,7 +24,8 @@ function select(n: number) {
       @mouseenter="hoverIndex = n"
       @mouseleave="hoverIndex = 0"
       @click.stop="select(n)"
-    >★</span>
+      >★</span
+    >
   </div>
 </template>
 

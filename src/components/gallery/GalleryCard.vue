@@ -15,7 +15,9 @@ const emit = defineEmits<{
 }>();
 
 const bannerColor = computed(() => props.item.bannerColor ?? "#BFDBFE");
-const hasImageCover = computed(() => typeof props.item.cover === "string" && /^https?:\/\//.test(props.item.cover));
+const hasImageCover = computed(
+  () => typeof props.item.cover === "string" && /^https?:\/\//.test(props.item.cover),
+);
 
 const visibleProps = computed(() => (props.item.extraProps ?? []).slice(0, 2));
 

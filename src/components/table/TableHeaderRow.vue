@@ -25,7 +25,6 @@ const emit = defineEmits<{
   "select-all": [];
 }>();
 
-
 function colStyle(col: TableColumn) {
   if (col.width === "fill") {
     const minWidth = `${col.minWidth ?? 220}px`;

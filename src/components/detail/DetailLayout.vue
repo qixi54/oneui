@@ -29,11 +29,19 @@ const emit = defineEmits<{
 const statusBadgeStyle = computed(() => {
   const map: Record<string, { text: string; bg: string }> = {
     todo: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)" },
-    in_progress: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)" },
+    in_progress: {
+      text: "var(--of-status-in-progress-text)",
+      bg: "var(--of-status-in-progress-bg)",
+    },
     blocked: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)" },
     done: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)" },
   };
-  return map[props.task.status] ?? { text: "var(--of-color-text-secondary)", bg: "var(--of-color-gray-100)" };
+  return (
+    map[props.task.status] ?? {
+      text: "var(--of-color-text-secondary)",
+      bg: "var(--of-color-gray-100)",
+    }
+  );
 });
 
 // 优先级标签颜色
@@ -44,7 +52,12 @@ const priorityBadgeStyle = computed(() => {
     P2: { text: "var(--of-priority-p2-text)", bg: "var(--of-priority-p2-bg)" },
     P3: { text: "var(--of-priority-p3-text)", bg: "var(--of-priority-p3-bg)" },
   };
-  return map[props.task.priority] ?? { text: "var(--of-color-text-secondary)", bg: "var(--of-color-gray-100)" };
+  return (
+    map[props.task.priority] ?? {
+      text: "var(--of-color-text-secondary)",
+      bg: "var(--of-color-gray-100)",
+    }
+  );
 });
 
 // 状态显示文字
@@ -117,9 +130,7 @@ function onDescriptionUpdate(value: string) {
               :editable="descriptionEditable"
               @update:content="onDescriptionUpdate"
             />
-            <p v-if="!descriptionText" class="detail-layout__desc-placeholder">
-              暂无描述
-            </p>
+            <p v-if="!descriptionText" class="detail-layout__desc-placeholder">暂无描述</p>
           </slot>
         </div>
       </div>

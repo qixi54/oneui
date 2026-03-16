@@ -126,13 +126,29 @@ function saveContent() {
     <Modal v-model="showLinkModal" title="插入链接" width="480px">
       <div class="of-rich-editor__form">
         <label class="of-rich-editor__label" for="link-text">链接文本</label>
-        <input id="link-text" v-model="linkText" class="of-rich-editor__input" placeholder="请输入链接文本" />
+        <input
+          id="link-text"
+          v-model="linkText"
+          class="of-rich-editor__input"
+          placeholder="请输入链接文本"
+        />
         <label class="of-rich-editor__label" for="link-url">链接地址</label>
-        <input id="link-url" v-model="linkUrl" class="of-rich-editor__input" placeholder="https://example.com" />
+        <input
+          id="link-url"
+          v-model="linkUrl"
+          class="of-rich-editor__input"
+          placeholder="https://example.com"
+        />
       </div>
       <template #footer>
-        <button type="button" class="of-rich-editor__btn" @click="showLinkModal = false">取消</button>
-        <button type="button" class="of-rich-editor__btn of-rich-editor__btn--primary" @click="insertLink">
+        <button type="button" class="of-rich-editor__btn" @click="showLinkModal = false">
+          取消
+        </button>
+        <button
+          type="button"
+          class="of-rich-editor__btn of-rich-editor__btn--primary"
+          @click="insertLink"
+        >
           确认
         </button>
       </template>

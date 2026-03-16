@@ -53,7 +53,7 @@ const resolvedOptions = computed(() => props.options ?? DEFAULT_OPTIONS);
   gap: 2px;
   padding: 2px;
   border-radius: 6px;
-  border: 1px solid var(--of-color-gray-200, #E5E7EB);
+  border: 1px solid var(--of-color-gray-200, #e5e7eb);
 }
 
 .one-view-mode-group__btn {
@@ -67,17 +67,17 @@ const resolvedOptions = computed(() => props.options ?? DEFAULT_OPTIONS);
   background: transparent;
   cursor: pointer;
   padding: 0;
-  color: var(--of-color-gray-400, #9CA3AF);
+  color: var(--of-color-gray-400, #9ca3af);
   transition: all 0.15s ease;
 }
 
 .one-view-mode-group__btn:hover:not(.one-view-mode-group__btn--active) {
-  background: var(--of-color-gray-50, #F9FAFB);
+  background: var(--of-color-gray-50, #f9fafb);
 }
 
 .one-view-mode-group__btn--active {
-  background: var(--of-color-primary-50, #EEF2FF);
-  color: var(--of-color-primary-600, #4F46E5);
+  background: var(--of-color-primary-50, #eef2ff);
+  color: var(--of-color-primary-600, #4f46e5);
 }
 
 .one-view-mode-group__icon {

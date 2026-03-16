@@ -11,14 +11,7 @@ import { useTable } from "@/composables/useTable";
 import { useTableGroup } from "@/composables/useTableGroup";
 import { useTableData } from "@/composables/useTableData";
 import { useTableColumns } from "@/composables/useTableColumns";
-import type {
-  Task,
-  TableColumn,
-  ColorMap,
-  DataRecord,
-  TableSchema,
-  ViewConfig,
-} from "../../types";
+import type { Task, TableColumn, ColorMap, DataRecord, TableSchema, ViewConfig } from "../../types";
 
 const props = withDefaults(
   defineProps<{
@@ -105,17 +98,16 @@ const {
 });
 
 // Sync input data with useTable — watch only fires on change, not on setup
-watch(normalizedData, (newRows) => {
-  setData(newRows);
-}, { deep: false });
+watch(
+  normalizedData,
+  (newRows) => {
+    setData(newRows);
+  },
+  { deep: false },
+);
 
 // ── Brain 2: Grouping ──
-const {
-  groupedItems,
-  collapsedGroups,
-  toggleGroup,
-  isGroupHeader,
-} = useTableGroup<T>({
+const { groupedItems, collapsedGroups, toggleGroup, isGroupHeader } = useTableGroup<T>({
   data: sortedData, // Consumes sorted data from Brain 1
   groupBy: toRef(props, "groupBy"),
 });
@@ -146,8 +138,8 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 });
 
 // ── Readonly Overrides ──
-const effectiveSelectable = computed(() => props.readonly ? false : props.selectable);
-const effectiveAddable = computed(() => props.readonly ? false : props.addable);
+const effectiveSelectable = computed(() => (props.readonly ? false : props.selectable));
+const effectiveAddable = computed(() => (props.readonly ? false : props.addable));
 
 // ── Selection Proxies ──
 const selectedIdsArray = computed(() => Array.from(selectedRows.value));
@@ -158,13 +150,17 @@ function handleSelectAll() {
 }
 
 function handleSelect(id: string | number) {
-  const row = sortedData.value.find(r => r[props.rowKey] === id);
+  const row = sortedData.value.find((r) => r[props.rowKey] === id);
   if (row) toggleRowSelection(row, 0); // index doesn't matter for id-based selection
 }
 
-watch(selectedIdsArray, (ids) => {
-  emit("selection-change", ids);
-}, { immediate: false });
+watch(
+  selectedIdsArray,
+  (ids) => {
+    emit("selection-change", ids);
+  },
+  { immediate: false },
+);
 
 // ── Event Handlers ──
 function getRowId(row: T): string {
@@ -173,11 +169,13 @@ function getRowId(row: T): string {
 }
 
 function getFieldDef(colKey: string): CellFieldDef {
-  return props.fieldDefs?.find((f) => f.id === colKey) ?? {
-    id: colKey,
-    type: "text",
-    label: colKey,
-  };
+  return (
+    props.fieldDefs?.find((f) => f.id === colKey) ?? {
+      id: colKey,
+      type: "text",
+      label: colKey,
+    }
+  );
 }
 
 function onCellCommit(rowId: string, fieldId: string, value: unknown) {
@@ -253,7 +251,7 @@ function dataRowProps(item: T) {
                   <FieldCell
                     :row-id="getRowId(slotRow as T)"
                     :field="getFieldDef(col.key)"
-                    :value="(slotRow[col.key] as CellValue)"
+                    :value="slotRow[col.key] as CellValue"
                     @commit="onCellCommit"
                   />
                 </template>
@@ -281,7 +279,7 @@ function dataRowProps(item: T) {
               <FieldCell
                 :row-id="getRowId(slotRow as T)"
                 :field="getFieldDef(col.key)"
-                :value="(slotRow[col.key] as CellValue)"
+                :value="slotRow[col.key] as CellValue"
                 @commit="onCellCommit"
               />
             </template>

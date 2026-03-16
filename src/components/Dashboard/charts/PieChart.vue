@@ -37,7 +37,9 @@ const render = () => {
 
   chart.setOption({
     color: props.colors,
-    title: props.title ? { text: props.title, left: "center", textStyle: { fontSize: 14, fontWeight: 600 } } : undefined,
+    title: props.title
+      ? { text: props.title, left: "center", textStyle: { fontSize: 14, fontWeight: 600 } }
+      : undefined,
     tooltip: { trigger: "item" },
     legend: props.showLegend ? { bottom: 0 } : undefined,
     series: [

@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
-import type { CellValue, FieldDef } from '@/components/table/FieldCell.vue'
+import { ref, onMounted, nextTick } from "vue";
+import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
 
-const props = defineProps<{ value?: CellValue; field: FieldDef }>()
-const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>()
+const props = defineProps<{ value?: CellValue; field: FieldDef }>();
+const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
 
-const inputRef = ref<HTMLInputElement | null>(null)
-const local = ref(String(props.value ?? ''))
+const inputRef = ref<HTMLInputElement | null>(null);
+const local = ref(String(props.value ?? ""));
 
-onMounted(() => nextTick(() => inputRef.value?.focus()))
+onMounted(() => nextTick(() => inputRef.value?.focus()));
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    emit('commit', local.value || null)
+  if (e.key === "Enter") {
+    e.preventDefault();
+    emit("commit", local.value || null);
   }
-  if (e.key === 'Escape') {
-    e.preventDefault()
-    emit('cancel')
+  if (e.key === "Escape") {
+    e.preventDefault();
+    emit("cancel");
   }
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    emit('commit', local.value || null)
-    emit('tabNext')
+  if (e.key === "Tab") {
+    e.preventDefault();
+    emit("commit", local.value || null);
+    emit("tabNext");
   }
 }
 </script>

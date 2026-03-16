@@ -37,14 +37,11 @@ const displayLabel = computed(() => props.groupKey || "(空)");
     <span
       class="of-table-group-row__chevron"
       :class="{ 'of-table-group-row__chevron--collapsed': collapsed }"
-    >▼</span>
+      >▼</span
+    >
 
     <!-- Group label: badge if colorMap has a matching entry, plain text otherwise -->
-    <span
-      v-if="badge"
-      class="of-table-group-row__badge"
-      :style="badge.style"
-    >
+    <span v-if="badge" class="of-table-group-row__badge" :style="badge.style">
       <span
         v-if="badge.dot"
         class="of-table-group-row__badge-dot"

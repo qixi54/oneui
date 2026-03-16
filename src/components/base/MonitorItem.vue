@@ -1,5 +1,4 @@
-<script lang="ts">
-</script>
+<script lang="ts"></script>
 
 <script setup lang="ts">
 import { computed } from "vue";
@@ -29,7 +28,9 @@ const emit = defineEmits<{
 const clampedValue = computed(() => Math.min(100, Math.max(0, props.value)));
 
 const computedColor = computed(() =>
-  clampedValue.value === 100 ? "var(--of-color-success)" : (props.color ?? "var(--of-color-primary-500)"),
+  clampedValue.value === 100
+    ? "var(--of-color-success)"
+    : (props.color ?? "var(--of-color-primary-500)"),
 );
 
 const trackStyle = computed(() => ({
@@ -68,9 +69,7 @@ function handleClick() {
       </div>
     </div>
 
-    <div class="of-monitor-item__percentage">
-      {{ clampedValue }}%
-    </div>
+    <div class="of-monitor-item__percentage">{{ clampedValue }}%</div>
 
     <div v-if="count !== undefined" class="of-monitor-item__count">
       {{ count }}

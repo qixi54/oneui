@@ -123,11 +123,9 @@ function onSave() {
           aria-hidden="true"
         />
         <span class="of-section-block__title">{{ title }}</span>
-        <span
-          v-if="status"
-          class="of-section-block__status-badge"
-          :style="statusBadgeStyle"
-        >{{ statusLabel }}</span>
+        <span v-if="status" class="of-section-block__status-badge" :style="statusBadgeStyle">{{
+          statusLabel
+        }}</span>
       </div>
 
       <div class="of-section-block__header-right" @click.stop>
@@ -162,13 +160,17 @@ function onSave() {
             class="of-section-block__collapse-icon"
             :class="{ 'of-section-block__collapse-icon--collapsed': collapsed }"
             aria-hidden="true"
-          >▾</span>
+            >▾</span
+          >
         </button>
       </div>
     </div>
 
     <!-- Body -->
-    <div class="of-section-block__body-wrapper" :class="{ 'of-section-block__body-wrapper--collapsed': collapsed }">
+    <div
+      class="of-section-block__body-wrapper"
+      :class="{ 'of-section-block__body-wrapper--collapsed': collapsed }"
+    >
       <div class="of-section-block__body">
         <template v-if="isEditing">
           <slot name="editor" />
@@ -186,7 +188,9 @@ function onSave() {
   border: 1px solid var(--of-border-color);
   border-radius: 8px;
   overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   background: var(--of-color-bg-elevated);
   box-sizing: border-box;
   width: 100%;
@@ -264,7 +268,10 @@ function onSave() {
   font-weight: 500;
   line-height: 1.5;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   white-space: nowrap;
 }
 

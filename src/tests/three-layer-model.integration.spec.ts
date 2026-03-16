@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DEFAULT_TABLE_SCHEMA,
-  taskToDataRecord,
-  type DataRecord,
-  type ViewConfig,
-} from "../types";
+import { DEFAULT_TABLE_SCHEMA, taskToDataRecord, type DataRecord, type ViewConfig } from "../types";
 
 describe("三层模型集成", () => {
   it("task 可以转换为 DataRecord 且关键字段保留", () => {

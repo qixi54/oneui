@@ -26,12 +26,36 @@ const emit = defineEmits<{
 }>();
 
 const COLOR_MAP: Record<string, { text: string; bg: string; border: string }> = {
-  red:    { text: 'var(--of-badge-red-text)',    bg: 'var(--of-badge-red-bg)',    border: 'var(--of-badge-red-border)' },
-  orange: { text: 'var(--of-badge-orange-text)', bg: 'var(--of-badge-orange-bg)', border: 'var(--of-badge-orange-border)' },
-  green:  { text: 'var(--of-badge-green-text)',  bg: 'var(--of-badge-green-bg)',  border: 'var(--of-badge-green-border)' },
-  blue:   { text: 'var(--of-badge-blue-text)',   bg: 'var(--of-badge-blue-bg)',   border: 'var(--of-badge-blue-border)' },
-  purple: { text: 'var(--of-badge-purple-text)', bg: 'var(--of-badge-purple-bg)', border: 'var(--of-badge-purple-border)' },
-  gray:   { text: 'var(--of-badge-gray-text)',   bg: 'var(--of-badge-gray-bg)',   border: 'var(--of-badge-gray-border)' },
+  red: {
+    text: "var(--of-badge-red-text)",
+    bg: "var(--of-badge-red-bg)",
+    border: "var(--of-badge-red-border)",
+  },
+  orange: {
+    text: "var(--of-badge-orange-text)",
+    bg: "var(--of-badge-orange-bg)",
+    border: "var(--of-badge-orange-border)",
+  },
+  green: {
+    text: "var(--of-badge-green-text)",
+    bg: "var(--of-badge-green-bg)",
+    border: "var(--of-badge-green-border)",
+  },
+  blue: {
+    text: "var(--of-badge-blue-text)",
+    bg: "var(--of-badge-blue-bg)",
+    border: "var(--of-badge-blue-border)",
+  },
+  purple: {
+    text: "var(--of-badge-purple-text)",
+    bg: "var(--of-badge-purple-bg)",
+    border: "var(--of-badge-purple-border)",
+  },
+  gray: {
+    text: "var(--of-badge-gray-text)",
+    bg: "var(--of-badge-gray-bg)",
+    border: "var(--of-badge-gray-border)",
+  },
 };
 
 const resolvedTextColor = computed(() => {
@@ -52,20 +76,23 @@ const resolvedBorderColor = computed(() => {
   return COLOR_MAP.gray.border;
 });
 
-const containerStyle = computed<CSSProperties>(() => ({
-  '--one-sb-text': resolvedTextColor.value,
-  '--one-sb-bg': resolvedBgColor.value,
-  '--one-sb-border': resolvedBorderColor.value,
-} as CSSProperties));
+const containerStyle = computed<CSSProperties>(
+  () =>
+    ({
+      "--one-sb-text": resolvedTextColor.value,
+      "--one-sb-bg": resolvedBgColor.value,
+      "--one-sb-border": resolvedBorderColor.value,
+    }) as CSSProperties,
+);
 
 const dotStyle = computed<CSSProperties>(() => ({
   backgroundColor: props.dotColor || resolvedTextColor.value,
 }));
 
-const ChevronDown = resolveIcon('chevron-down');
+const ChevronDown = resolveIcon("chevron-down");
 
 function handleClick(e: MouseEvent) {
-  emit('click', e);
+  emit("click", e);
 }
 </script>
 
@@ -80,11 +107,7 @@ function handleClick(e: MouseEvent) {
     <span class="one-select-badge__text">
       <slot />
     </span>
-    <component
-      v-if="clickable && ChevronDown"
-      :is="ChevronDown"
-      class="one-select-badge__arrow"
-    />
+    <component v-if="clickable && ChevronDown" :is="ChevronDown" class="one-select-badge__arrow" />
   </span>
 </template>
 

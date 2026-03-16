@@ -1,34 +1,37 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
-const props = defineProps<{ value?: unknown; field: import('@/components/table/FieldCell.vue').FieldDef }>()
-const emit = defineEmits<{ commit: [value: boolean]; cancel: []; tabNext: [] }>()
+const props = defineProps<{
+  value?: unknown;
+  field: import("@/components/table/FieldCell.vue").FieldDef;
+}>();
+const emit = defineEmits<{ commit: [value: boolean]; cancel: []; tabNext: [] }>();
 
-const checked = computed(() => Boolean(props.value))
+const checked = computed(() => Boolean(props.value));
 
 function toggle() {
-  emit('commit', !checked.value)
+  emit("commit", !checked.value);
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    toggle()
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    toggle();
   }
-  if (e.key === 'Escape') {
-    e.preventDefault()
-    emit('cancel')
+  if (e.key === "Escape") {
+    e.preventDefault();
+    emit("cancel");
   }
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    emit('tabNext')
+  if (e.key === "Tab") {
+    e.preventDefault();
+    emit("tabNext");
   }
 }
 </script>
 
 <template>
   <div class="of-field-checkbox" tabindex="0" @click.stop="toggle" @keydown="onKeydown">
-    <span class="of-field-checkbox__icon">{{ checked ? '☑' : '☐' }}</span>
+    <span class="of-field-checkbox__icon">{{ checked ? "☑" : "☐" }}</span>
   </div>
 </template>
 

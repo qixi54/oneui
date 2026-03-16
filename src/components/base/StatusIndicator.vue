@@ -37,7 +37,9 @@ const props = withDefaults(defineProps<StatusIndicatorProps>(), {
 
 const normalizedStatus = computed(() => props.status.trim().toLowerCase());
 const displayLabel = computed(() => props.label ?? props.status);
-const dotColor = computed(() => props.color ?? STATUS_COLOR_MAP[normalizedStatus.value] ?? "var(--of-color-gray-300)");
+const dotColor = computed(
+  () => props.color ?? STATUS_COLOR_MAP[normalizedStatus.value] ?? "var(--of-color-gray-300)",
+);
 const dotSize = computed(() => DOT_SIZE_MAP[props.size]);
 </script>
 

@@ -35,7 +35,9 @@ const selectedId = computed({
   },
 });
 
-const selectedPerson = computed(() => props.people.find((item) => item.id === selectedId.value) ?? null);
+const selectedPerson = computed(
+  () => props.people.find((item) => item.id === selectedId.value) ?? null,
+);
 
 function fallbackText(name: string) {
   return (name || "?").trim().slice(0, 1).toUpperCase();

@@ -19,7 +19,11 @@ interface Preset {
 }
 
 const PRESETS: Record<string, Preset> = {
-  spec: { icon: "file-text", color: "var(--of-color-primary-700)", bg: "var(--of-color-primary-50)" },
+  spec: {
+    icon: "file-text",
+    color: "var(--of-color-primary-700)",
+    bg: "var(--of-color-primary-50)",
+  },
   wiki: { icon: "book-open", color: "var(--of-color-green-600)", bg: "var(--of-color-green-50)" },
   task: { icon: "link", color: "var(--of-color-orange-600)", bg: "var(--of-color-orange-50)" },
 };
@@ -56,11 +60,7 @@ const tagStyle = computed<CSSProperties>(() => {
     :target="href ? '_blank' : undefined"
     :rel="href ? 'noopener noreferrer' : undefined"
   >
-    <component
-      v-if="iconComponent"
-      :is="iconComponent"
-      class="one-ref-tag__icon"
-    />
+    <component v-if="iconComponent" :is="iconComponent" class="one-ref-tag__icon" />
     <span class="one-ref-tag__text">
       <slot />
     </span>

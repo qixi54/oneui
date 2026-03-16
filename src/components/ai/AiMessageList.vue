@@ -62,10 +62,7 @@ watch(
 <template>
   <div ref="listRef" class="of-ai-message-list">
     <div :style="{ height: totalHeight + 'px', position: 'relative' }">
-      <div
-        class="of-ai-message-list-inner"
-        :style="{ transform: `translateY(${offsetY}px)` }"
-      >
+      <div class="of-ai-message-list-inner" :style="{ transform: `translateY(${offsetY}px)` }">
         <template v-for="{ data: msg } in visibleMessages" :key="msg.id">
           <AiMessageBubble
             v-if="msg.role === 'ai'"

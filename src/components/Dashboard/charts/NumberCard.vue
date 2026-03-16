@@ -32,7 +32,11 @@ const displayValue = computed(() => {
     <div class="of-number-card__value-row">
       <p class="of-number-card__value" :style="{ color }">{{ displayValue }}</p>
       <TrendingUpIcon v-if="trend === 'up'" class="of-number-card__trend up" :size="16" />
-      <TrendingDownIcon v-else-if="trend === 'down'" class="of-number-card__trend down" :size="16" />
+      <TrendingDownIcon
+        v-else-if="trend === 'down'"
+        class="of-number-card__trend down"
+        :size="16"
+      />
     </div>
     <p v-if="compare" class="of-number-card__compare">环比 {{ compare }}</p>
   </div>

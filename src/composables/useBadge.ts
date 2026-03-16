@@ -28,18 +28,44 @@ export const DEFAULT_PRIORITY_MAP: ColorMap = {
 
 export const DEFAULT_STATUS_MAP: ColorMap = {
   todo: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)", label: "待处理" },
-  in_progress: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)", label: "进行中" },
-  blocked: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)", label: "已阻塞", dot: "var(--of-status-blocked-text)" },
+  in_progress: {
+    text: "var(--of-status-in-progress-text)",
+    bg: "var(--of-status-in-progress-bg)",
+    label: "进行中",
+  },
+  blocked: {
+    text: "var(--of-status-blocked-text)",
+    bg: "var(--of-status-blocked-bg)",
+    label: "已阻塞",
+    dot: "var(--of-status-blocked-text)",
+  },
   done: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)", label: "已完成" },
   // 常见英文别名
   pending: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)", label: "Pending" },
-  open: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)", label: "Open" },
+  open: {
+    text: "var(--of-status-in-progress-text)",
+    bg: "var(--of-status-in-progress-bg)",
+    label: "Open",
+  },
   closed: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)", label: "Closed" },
-  cancelled: { text: "var(--of-status-cancelled-text)", bg: "var(--of-status-cancelled-bg)", label: "Cancelled" },
+  cancelled: {
+    text: "var(--of-status-cancelled-text)",
+    bg: "var(--of-status-cancelled-bg)",
+    label: "Cancelled",
+  },
   // 常见中文 key
   待处理: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)", label: "待处理" },
-  进行中: { text: "var(--of-status-in-progress-text)", bg: "var(--of-status-in-progress-bg)", label: "进行中" },
-  已阻塞: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)", label: "已阻塞", dot: "var(--of-status-blocked-text)" },
+  进行中: {
+    text: "var(--of-status-in-progress-text)",
+    bg: "var(--of-status-in-progress-bg)",
+    label: "进行中",
+  },
+  已阻塞: {
+    text: "var(--of-status-blocked-text)",
+    bg: "var(--of-status-blocked-bg)",
+    label: "已阻塞",
+    dot: "var(--of-status-blocked-text)",
+  },
   已完成: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)", label: "已完成" },
 };
 

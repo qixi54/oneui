@@ -6,15 +6,13 @@ export interface UseTableGroupOptions<T> {
 }
 
 export type GroupHeaderItem = {
-  __type: 'group-header';
+  __type: "group-header";
   __groupKey: string;
   __groupCount: number;
   id: string;
 };
 
-export type GroupedListItem<T> =
-  | (T & { __type: 'data-row' })
-  | GroupHeaderItem;
+export type GroupedListItem<T> = (T & { __type: "data-row" }) | GroupHeaderItem;
 
 export function useTableGroup<T extends Record<string, any>>(options: UseTableGroupOptions<T>) {
   const collapsedGroups = ref(new Set<string>());
@@ -36,7 +34,7 @@ export function useTableGroup<T extends Record<string, any>>(options: UseTableGr
     const field = options.groupBy.value;
 
     if (!field) {
-      return rows.map((r) => ({ ...r, __type: 'data-row' as const }));
+      return rows.map((r) => ({ ...r, __type: "data-row" as const }));
     }
 
     const groupOrder: string[] = [];
@@ -44,7 +42,7 @@ export function useTableGroup<T extends Record<string, any>>(options: UseTableGr
 
     for (const row of rows) {
       const raw = row[field];
-      const key = raw != null ? String(raw) : '';
+      const key = raw != null ? String(raw) : "";
       if (!groups.has(key)) {
         groupOrder.push(key);
         groups.set(key, []);
@@ -58,14 +56,14 @@ export function useTableGroup<T extends Record<string, any>>(options: UseTableGr
     for (const key of groupOrder) {
       const groupRows = groups.get(key)!;
       result.push({
-        __type: 'group-header',
+        __type: "group-header",
         __groupKey: key,
         __groupCount: groupRows.length,
         id: `__group__${key}`,
       });
       if (!collapsed.has(key)) {
         for (const row of groupRows) {
-          result.push({ ...row, __type: 'data-row' });
+          result.push({ ...row, __type: "data-row" });
         }
       }
     }
@@ -74,7 +72,7 @@ export function useTableGroup<T extends Record<string, any>>(options: UseTableGr
   });
 
   function isGroupHeader(item: any): item is GroupHeaderItem {
-    return item && item.__type === 'group-header';
+    return item && item.__type === "group-header";
   }
 
   return {

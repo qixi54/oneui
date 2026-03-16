@@ -1,129 +1,124 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import type { CellValue, FieldDef } from '@/components/table/FieldCell.vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
 
-const props = defineProps<{ value?: CellValue; field: FieldDef }>()
-const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>()
+const props = defineProps<{ value?: CellValue; field: FieldDef }>();
+const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
 
-const triggerRef = ref<HTMLElement | null>(null)
-const dropdownRef = ref<HTMLElement | null>(null)
-const dropdownStyle = ref({ top: '0px', left: '0px', width: '0px' })
-const isOpen = ref(true)
+const triggerRef = ref<HTMLElement | null>(null);
+const dropdownRef = ref<HTMLElement | null>(null);
+const dropdownStyle = ref({ top: "0px", left: "0px", width: "0px" });
+const isOpen = ref(true);
 
-const options = computed(() => props.field.options ?? [])
-const draftValues = ref<string[]>([])
-const activeIndex = ref(0)
+const options = computed(() => props.field.options ?? []);
+const draftValues = ref<string[]>([]);
+const activeIndex = ref(0);
 
 const selectedOptions = computed(() => {
-  const set = new Set(draftValues.value)
-  return options.value.filter((opt) => set.has(opt.value))
-})
+  const set = new Set(draftValues.value);
+  return options.value.filter((opt) => set.has(opt.value));
+});
 
 function initDraft() {
   draftValues.value = Array.isArray(props.value)
-    ? props.value.filter((v): v is string => typeof v === 'string')
-    : []
+    ? props.value.filter((v): v is string => typeof v === "string")
+    : [];
 }
 
 function updateDropdownPosition() {
-  if (!triggerRef.value) return
-  const rect = triggerRef.value.getBoundingClientRect()
+  if (!triggerRef.value) return;
+  const rect = triggerRef.value.getBoundingClientRect();
   dropdownStyle.value = {
     top: `${rect.bottom}px`,
     left: `${rect.left}px`,
     width: `${Math.max(rect.width, 220)}px`,
-  }
+  };
 }
 
 function toggleValue(optValue: string) {
-  const idx = draftValues.value.indexOf(optValue)
+  const idx = draftValues.value.indexOf(optValue);
   if (idx >= 0) {
-    draftValues.value = draftValues.value.filter((v) => v !== optValue)
-    return
+    draftValues.value = draftValues.value.filter((v) => v !== optValue);
+    return;
   }
-  draftValues.value = [...draftValues.value, optValue]
+  draftValues.value = [...draftValues.value, optValue];
 }
 
 function commitAndClose() {
-  isOpen.value = false
-  emit('commit', [...draftValues.value])
+  isOpen.value = false;
+  emit("commit", [...draftValues.value]);
 }
 
 function cancelAndClose() {
-  if (!isOpen.value) return
-  isOpen.value = false
-  emit('cancel')
+  if (!isOpen.value) return;
+  isOpen.value = false;
+  emit("cancel");
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'ArrowDown') {
-    e.preventDefault()
-    activeIndex.value = Math.min(activeIndex.value + 1, Math.max(options.value.length - 1, 0))
-    return
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    activeIndex.value = Math.min(activeIndex.value + 1, Math.max(options.value.length - 1, 0));
+    return;
   }
-  if (e.key === 'ArrowUp') {
-    e.preventDefault()
-    activeIndex.value = Math.max(activeIndex.value - 1, 0)
-    return
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+    activeIndex.value = Math.max(activeIndex.value - 1, 0);
+    return;
   }
-  if (e.key === ' ' || e.key === 'Enter') {
-    e.preventDefault()
-    const current = options.value[activeIndex.value]
-    if (current) toggleValue(current.value)
-    return
+  if (e.key === " " || e.key === "Enter") {
+    e.preventDefault();
+    const current = options.value[activeIndex.value];
+    if (current) toggleValue(current.value);
+    return;
   }
-  if (e.key === 'Escape') {
-    e.preventDefault()
-    cancelAndClose()
-    return
+  if (e.key === "Escape") {
+    e.preventDefault();
+    cancelAndClose();
+    return;
   }
-  if (e.key === 'Tab') {
-    e.preventDefault()
-    commitAndClose()
-    emit('tabNext')
+  if (e.key === "Tab") {
+    e.preventDefault();
+    commitAndClose();
+    emit("tabNext");
   }
 }
 
 function onWindowPointerDown(e: MouseEvent) {
-  const target = e.target as Node | null
-  if (!target) return
-  if (triggerRef.value?.contains(target)) return
-  if (dropdownRef.value?.contains(target)) return
-  commitAndClose()
+  const target = e.target as Node | null;
+  if (!target) return;
+  if (triggerRef.value?.contains(target)) return;
+  if (dropdownRef.value?.contains(target)) return;
+  commitAndClose();
 }
 
 onMounted(() => {
-  initDraft()
+  initDraft();
   nextTick(() => {
-    updateDropdownPosition()
-    triggerRef.value?.focus()
-  })
-  window.addEventListener('resize', updateDropdownPosition)
-  window.addEventListener('scroll', updateDropdownPosition, true)
-  window.addEventListener('mousedown', onWindowPointerDown, true)
-})
+    updateDropdownPosition();
+    triggerRef.value?.focus();
+  });
+  window.addEventListener("resize", updateDropdownPosition);
+  window.addEventListener("scroll", updateDropdownPosition, true);
+  window.addEventListener("mousedown", onWindowPointerDown, true);
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateDropdownPosition)
-  window.removeEventListener('scroll', updateDropdownPosition, true)
-  window.removeEventListener('mousedown', onWindowPointerDown, true)
-})
+  window.removeEventListener("resize", updateDropdownPosition);
+  window.removeEventListener("scroll", updateDropdownPosition, true);
+  window.removeEventListener("mousedown", onWindowPointerDown, true);
+});
 
 watch(
   () => props.value,
   () => {
-    initDraft()
-  }
-)
+    initDraft();
+  },
+);
 </script>
 
 <template>
-  <div
-    ref="triggerRef"
-    class="of-field-multiselect"
-    tabindex="0"
-    @keydown="onKeydown"
-  >
+  <div ref="triggerRef" class="of-field-multiselect" tabindex="0" @keydown="onKeydown">
     <div v-if="selectedOptions.length" class="of-field-multiselect__chips">
       <span
         v-for="opt in selectedOptions"
@@ -157,13 +152,26 @@ watch(
             tabindex="-1"
             :checked="draftValues.includes(opt.value)"
             @change.prevent
+          />
+          <span
+            v-if="opt.color"
+            class="of-field-multiselect__badge"
+            :style="{ background: opt.color }"
+            >{{ opt.label }}</span
           >
-          <span v-if="opt.color" class="of-field-multiselect__badge" :style="{ background: opt.color }">{{ opt.label }}</span>
           <span v-else>{{ opt.label }}</span>
         </div>
         <div class="of-field-multiselect__actions">
-          <button class="of-field-multiselect__btn" type="button" @click.stop="cancelAndClose">取消</button>
-          <button class="of-field-multiselect__btn of-field-multiselect__btn--primary" type="button" @click.stop="commitAndClose">完成</button>
+          <button class="of-field-multiselect__btn" type="button" @click.stop="cancelAndClose">
+            取消
+          </button>
+          <button
+            class="of-field-multiselect__btn of-field-multiselect__btn--primary"
+            type="button"
+            @click.stop="commitAndClose"
+          >
+            完成
+          </button>
         </div>
       </div>
     </Teleport>

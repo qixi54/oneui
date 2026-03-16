@@ -1,37 +1,37 @@
 <script setup lang="ts">
 // AppLayout — 整体三层应用布局
 // slots: #navbar, #sidebar, #default (主内容), #statusbar
-import { ref, provide } from "vue"
-import { useBreakpoint } from "@/composables/useBreakpoint"
-import type { Density } from "@/types"
+import { ref, provide } from "vue";
+import { useBreakpoint } from "@/composables/useBreakpoint";
+import type { Density } from "@/types";
 
 const props = withDefaults(
   defineProps<{
     /** 布局密度：comfortable（默认）| compact（紧凑） */
-    density?: Density
+    density?: Density;
   }>(),
   {
     density: "comfortable",
   },
-)
+);
 
-const { isMobile, isTablet } = useBreakpoint()
+const { isMobile, isTablet } = useBreakpoint();
 
 // 向子组件注入移动端状态，Sidebar / Navbar 等可通过 inject("isMobile") 感知
-provide("isMobile", isMobile)
-provide("isTablet", isTablet)
+provide("isMobile", isMobile);
+provide("isTablet", isTablet);
 // 向子组件注入 density，Navbar / Sidebar 可通过 inject("density") 感知
-provide("density", props.density)
+provide("density", props.density);
 
 // 移动端 Drawer 展开状态
-const sidebarOpen = ref(false)
+const sidebarOpen = ref(false);
 
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value
+  sidebarOpen.value = !sidebarOpen.value;
 }
 
 function closeSidebar() {
-  sidebarOpen.value = false
+  sidebarOpen.value = false;
 }
 </script>
 
@@ -61,16 +61,9 @@ function closeSidebar() {
       <!-- 移动端：Drawer 模式 -->
       <template v-if="isMobile">
         <!-- 遮罩层 -->
-        <div
-          v-if="sidebarOpen"
-          class="of-drawer-overlay"
-          @click="closeSidebar"
-        />
+        <div v-if="sidebarOpen" class="of-drawer-overlay" @click="closeSidebar" />
         <!-- Drawer 侧边栏 -->
-        <aside
-          class="of-drawer-sidebar"
-          :class="{ 'of-drawer-sidebar--open': sidebarOpen }"
-        >
+        <aside class="of-drawer-sidebar" :class="{ 'of-drawer-sidebar--open': sidebarOpen }">
           <slot name="sidebar" />
         </aside>
       </template>

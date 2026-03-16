@@ -42,7 +42,12 @@ function handlePresetPick(color: string) {
       <span class="of-color-panel__value">{{ colorValue }}</span>
     </div>
     <div class="of-color-panel__picker-row">
-      <input v-model="colorValue" class="of-color-panel__picker" type="color" :disabled="disabled" />
+      <input
+        v-model="colorValue"
+        class="of-color-panel__picker"
+        type="color"
+        :disabled="disabled"
+      />
       <input
         v-if="showInput"
         v-model="colorValue"

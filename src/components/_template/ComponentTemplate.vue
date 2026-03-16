@@ -11,11 +11,11 @@
 <script setup lang="ts">
 // @ts-ignore -- 模板文件，Component 类型供复制后使用
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Component } from "vue"
+import type { Component } from "vue";
 // import { resolveIcon } from "../../utils/icon"  // 如需渲染图标取消注释
 
 // ① 禁止 Vue 自动合并 attrs，由组件显式控制落点
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 // ② 所有 optional prop 必须用 withDefaults —— 不允许裸 defineProps
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,7 +30,7 @@ const props = withDefaults(
     // visible: true,           // ← 对应上方每个 optional prop
     // size: "md",
   },
-)
+);
 
 // const emit = defineEmits<{
 //   (e: "change", value: string): void
@@ -43,12 +43,7 @@ const props = withDefaults(
     ① 根元素必须 v-bind="$attrs"（透传 class/style/data-*/aria-*）
     ⑤ 根元素或关键子元素添加语义 ARIA：role / aria-label / aria-expanded 等
   -->
-  <div
-    class="of-component-name"
-    v-bind="$attrs"
-    role="region"
-    aria-label="组件名称"
-  >
+  <div class="of-component-name" v-bind="$attrs" role="region" aria-label="组件名称">
     <!-- 组件内容 -->
   </div>
 </template>

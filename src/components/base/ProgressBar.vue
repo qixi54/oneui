@@ -25,7 +25,9 @@ defineSlots<{
 const clampedValue = computed(() => Math.min(100, Math.max(0, props.value)));
 
 const computedColor = computed(() =>
-  clampedValue.value === 100 ? "var(--of-color-success)" : (props.color ?? "var(--of-color-primary-500)"),
+  clampedValue.value === 100
+    ? "var(--of-color-success)"
+    : (props.color ?? "var(--of-color-primary-500)"),
 );
 
 const trackStyle = computed(() => ({
@@ -44,7 +46,11 @@ const fillStyle = computed(() => ({
 <template>
   <div class="of-progress-bar">
     <div class="of-progress-bar__track pb" :style="trackStyle">
-      <div class="of-progress-bar__fill pf" :class="{ dn: clampedValue === 100 }" :style="fillStyle" />
+      <div
+        class="of-progress-bar__fill pf"
+        :class="{ dn: clampedValue === 100 }"
+        :style="fillStyle"
+      />
     </div>
 
     <div v-if="showLabel" class="of-progress-bar__label">

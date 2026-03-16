@@ -69,26 +69,51 @@ const cardStyle = computed<CSSProperties>(() => {
     "--of-ic-border": resolvedBorderColor.value,
   } as CSSProperties;
   if (props.variant === "notify") {
-    (base as Record<string, string>)["--of-ic-unread-dot"] = props.unread ? "var(--of-color-info)" : "var(--of-color-text-tertiary)";
+    (base as Record<string, string>)["--of-ic-unread-dot"] = props.unread
+      ? "var(--of-color-info)"
+      : "var(--of-color-text-tertiary)";
   }
   return base;
 });
 
 // ── Content clamp style ──────────────────────────────────────────────────────
 
-const contentStyle = computed<CSSProperties>(() => ({
-  "--of-ic-clamp": String(props.contentLines ?? 3),
-} as CSSProperties));
+const contentStyle = computed<CSSProperties>(
+  () =>
+    ({
+      "--of-ic-clamp": String(props.contentLines ?? 3),
+    }) as CSSProperties,
+);
 
 // ── Tag badge style ──────────────────────────────────────────────────────────
 
 function tagStyle(index: number): CSSProperties {
   const PALETTES = [
-    { bg: "var(--of-badge-blue-bg)", color: "var(--of-badge-blue-text)", border: "var(--of-badge-blue-border)" },
-    { bg: "var(--of-badge-green-bg)", color: "var(--of-badge-green-text)", border: "var(--of-badge-green-border)" },
-    { bg: "var(--of-badge-orange-bg)", color: "var(--of-badge-orange-text)", border: "var(--of-badge-orange-border)" },
-    { bg: "var(--of-badge-purple-bg)", color: "var(--of-badge-purple-text)", border: "var(--of-badge-purple-border)" },
-    { bg: "var(--of-badge-gray-bg)", color: "var(--of-badge-gray-text)", border: "var(--of-badge-gray-border)" },
+    {
+      bg: "var(--of-badge-blue-bg)",
+      color: "var(--of-badge-blue-text)",
+      border: "var(--of-badge-blue-border)",
+    },
+    {
+      bg: "var(--of-badge-green-bg)",
+      color: "var(--of-badge-green-text)",
+      border: "var(--of-badge-green-border)",
+    },
+    {
+      bg: "var(--of-badge-orange-bg)",
+      color: "var(--of-badge-orange-text)",
+      border: "var(--of-badge-orange-border)",
+    },
+    {
+      bg: "var(--of-badge-purple-bg)",
+      color: "var(--of-badge-purple-text)",
+      border: "var(--of-badge-purple-border)",
+    },
+    {
+      bg: "var(--of-badge-gray-bg)",
+      color: "var(--of-badge-gray-text)",
+      border: "var(--of-badge-gray-border)",
+    },
   ];
   const t = PALETTES[index % PALETTES.length];
   return {
@@ -131,7 +156,8 @@ function handleClick(e: MouseEvent) {
               :key="tag"
               class="of-info-card__tag"
               :style="tagStyle(i)"
-            >{{ tag }}</span>
+              >{{ tag }}</span
+            >
           </template>
           <span v-if="author" class="of-info-card__meta-text">{{ author }}</span>
           <span v-if="date" class="of-info-card__meta-text">{{ date }}</span>

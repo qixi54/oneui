@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DEFAULT_TABLE_SCHEMA,
-  isFormulaField,
-  isSelectField,
-  type FieldDef,
-} from "../types";
+import { DEFAULT_TABLE_SCHEMA, isFormulaField, isSelectField, type FieldDef } from "../types";
 
 function isValidFieldDef(field: FieldDef): boolean {
   switch (field.type) {

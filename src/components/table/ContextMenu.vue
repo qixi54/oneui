@@ -1,91 +1,91 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 export interface ContextMenuItem {
-  key: string
-  label: string
-  icon?: string
-  disabled?: boolean
-  danger?: boolean
-  separator?: boolean
-  children?: ContextMenuItem[]
+  key: string;
+  label: string;
+  icon?: string;
+  disabled?: boolean;
+  danger?: boolean;
+  separator?: boolean;
+  children?: ContextMenuItem[];
 }
 
 defineOptions({
-  name: 'ContextMenu',
-})
+  name: "ContextMenu",
+});
 
 const props = withDefaults(
   defineProps<{
-    x: number
-    y: number
-    items: ContextMenuItem[]
-    visible?: boolean
+    x: number;
+    y: number;
+    items: ContextMenuItem[];
+    visible?: boolean;
   }>(),
-  { visible: true }
-)
+  { visible: true },
+);
 
 const emit = defineEmits<{
-  select: [key: string]
-  close: []
-}>()
+  select: [key: string];
+  close: [];
+}>();
 
-const menuRef = ref<HTMLElement | null>(null)
+const menuRef = ref<HTMLElement | null>(null);
 
 const menuStyle = computed(() => ({
-  position: 'fixed' as const,
+  position: "fixed" as const,
   left: `${props.x}px`,
   top: `${props.y}px`,
-}))
+}));
 
 function handleSelect(item: ContextMenuItem) {
   if (item.disabled || item.separator) {
-    return
+    return;
   }
 
-  emit('select', item.key)
-  emit('close')
+  emit("select", item.key);
+  emit("close");
 }
 
 function handleDocumentMouseDown(event: MouseEvent) {
-  const target = event.target as Node | null
+  const target = event.target as Node | null;
   if (menuRef.value && target && !menuRef.value.contains(target)) {
-    emit('close')
+    emit("close");
   }
 }
 
 function handleDocumentKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    emit('close')
+  if (event.key === "Escape") {
+    emit("close");
   }
 }
 
 function addListeners() {
-  document.addEventListener('mousedown', handleDocumentMouseDown)
-  document.addEventListener('keydown', handleDocumentKeydown)
+  document.addEventListener("mousedown", handleDocumentMouseDown);
+  document.addEventListener("keydown", handleDocumentKeydown);
 }
 
 function removeListeners() {
-  document.removeEventListener('mousedown', handleDocumentMouseDown)
-  document.removeEventListener('keydown', handleDocumentKeydown)
+  document.removeEventListener("mousedown", handleDocumentMouseDown);
+  document.removeEventListener("keydown", handleDocumentKeydown);
 }
 
 watch(
   () => props.visible,
   (visible) => {
     if (visible) {
-      addListeners()
-      return
+      addListeners();
+      return;
     }
 
-    removeListeners()
+    removeListeners();
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 onBeforeUnmount(() => {
-  removeListeners()
-})
+  removeListeners();
+});
 </script>
 
 <template>

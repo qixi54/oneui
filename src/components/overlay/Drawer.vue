@@ -187,7 +187,9 @@ onBeforeUnmount(() => {
 
 .of-drawer-enter-active,
 .of-drawer-leave-active {
-  transition: background 0.22s ease, opacity 0.22s ease;
+  transition:
+    background 0.22s ease,
+    opacity 0.22s ease;
 }
 
 .of-drawer-enter-active .of-drawer,

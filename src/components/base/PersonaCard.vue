@@ -100,7 +100,7 @@ function hashCode(str: string): number {
 const accentPalette = computed<PersonaPalette>(() => {
   if (props.color) {
     // 自定义颜色路径：使用 hex + 透明度后缀（兼容 Chrome 87+）
-    const hex = props.color.replace('#', '')
+    const hex = props.color.replace("#", "");
     return {
       accent: props.color,
       bg: `#${hex}24`,
@@ -166,10 +166,9 @@ function handleHeaderClick() {
       <!-- Main content -->
       <div class="of-persona-card__body">
         <div class="of-persona-card__name-row">
-          <span
-            class="of-persona-card__name"
-            :style="{ fontSize: `${nameFontSize}px` }"
-          >{{ name }}</span>
+          <span class="of-persona-card__name" :style="{ fontSize: `${nameFontSize}px` }">{{
+            name
+          }}</span>
           <!-- badge slot -->
           <slot name="badge" />
           <span v-if="title" class="of-persona-card__title-badge">
@@ -181,14 +180,11 @@ function handleHeaderClick() {
           v-if="subtitle"
           class="of-persona-card__subtitle"
           :style="{ fontSize: `${subtitleFontSize}px` }"
-        >{{ subtitle }}</span>
+          >{{ subtitle }}</span
+        >
 
         <div v-if="tags && tags.length > 0" class="of-persona-card__tags">
-          <span
-            v-for="tag in tags"
-            :key="tag"
-            class="of-persona-card__tag"
-          >{{ tag }}</span>
+          <span v-for="tag in tags" :key="tag" class="of-persona-card__tag">{{ tag }}</span>
         </div>
       </div>
 
