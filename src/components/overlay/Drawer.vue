@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, useSlots, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, useSlots, watch, type Slots } from "vue";
 import { X } from "lucide-vue-next";
 
 const props = withDefaults(
@@ -23,7 +23,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
 
-const slots = useSlots();
+const slots: Slots = useSlots();
 
 const drawerStyle = computed(() => ({
   width: `${props.width}px`,

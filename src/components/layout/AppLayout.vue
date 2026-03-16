@@ -29,42 +29,42 @@
 
 <style scoped>
 .of-app-layout {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100vh !important;
-  overflow: hidden !important;
-  background: var(--of-color-bg-canvas) !important;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--of-color-bg-canvas);
 }
 
 .of-app-layout__navbar {
-  height: var(--of-navbar-height) !important;
-  flex-shrink: 0 !important;
+  height: var(--of-navbar-height);
+  flex-shrink: 0;
 }
 
 .of-app-layout__body {
-  display: flex !important;
-  flex-direction: row !important;
-  flex: 1 !important;
-  min-height: 0 !important;
-  height: calc(100vh - var(--of-navbar-height) - var(--of-statusbar-height)) !important;
-  overflow: hidden !important;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  height: calc(100vh - var(--of-navbar-height) - var(--of-statusbar-height));
+  overflow: hidden;
 }
 
 .of-app-layout__sidebar {
-  flex-shrink: 0 !important;
-  height: 100% !important;
-  overflow: hidden !important;
+  flex-shrink: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .of-app-layout__main {
-  flex: 1 !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  overflow: auto !important;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: auto;
 }
 
 .of-app-layout__statusbar {
-  height: var(--of-statusbar-height) !important;
-  flex-shrink: 0 !important;
+  height: var(--of-statusbar-height);
+  flex-shrink: 0;
 }
 </style>

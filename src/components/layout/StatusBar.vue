@@ -47,15 +47,15 @@ withDefaults(
 
 <style scoped>
 .of-statusbar {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  height: var(--of-statusbar-height) !important;
-  padding: 0 var(--of-spacing-4) !important;
-  gap: var(--of-spacing-4) !important;
-  background: var(--of-color-bg-elevated) !important;
-  border-top: var(--of-border) !important;
-  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: var(--of-statusbar-height);
+  padding: 0 var(--of-spacing-4);
+  gap: var(--of-spacing-4);
+  background: var(--of-color-bg-elevated);
+  border-top: var(--of-border);
+  box-sizing: border-box;
 }
 
 .of-statusbar__left {
@@ -66,18 +66,18 @@ withDefaults(
 }
 
 .of-statusbar__sync-icon--ok {
-  color: var(--of-color-success) !important;
+  color: var(--of-color-success);
 }
 
 .of-statusbar__sync-icon--warn {
-  color: var(--of-color-warning) !important;
+  color: var(--of-color-warning);
 }
 
 .of-statusbar__sync-text {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-400) !important;
-  line-height: 1 !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-400);
+  line-height: 1;
 }
 
 .of-statusbar__spacer {
@@ -92,16 +92,16 @@ withDefaults(
 }
 
 .of-statusbar__shortcuts {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-400) !important;
-  line-height: 1 !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-400);
+  line-height: 1;
 }
 
 .of-statusbar__version {
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  color: var(--of-color-gray-300) !important;
-  line-height: 1 !important;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  color: var(--of-color-gray-300);
+  line-height: 1;
 }
 </style>

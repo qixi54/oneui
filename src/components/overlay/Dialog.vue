@@ -148,125 +148,125 @@ function handleCancel() {
 <style scoped>
 /* ── Dialog body layout ───────────────────────────────────── */
 .of-dialog {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: var(--of-spacing-4, 16px) !important;
-  padding: var(--of-spacing-2, 8px) 0 !important;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--of-spacing-4, 16px);
+  padding: var(--of-spacing-2, 8px) 0;
 }
 
 /* ── Icon ─────────────────────────────────────────────────── */
 .of-dialog__icon-wrap {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 50% !important;
-  flex-shrink: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .of-dialog__icon--info {
-  background: var(--of-color-blue-50, #eff6ff) !important;
-  color: var(--of-color-blue-500, #3b82f6) !important;
+  background: var(--of-color-blue-50, #eff6ff);
+  color: var(--of-color-blue-500, #3b82f6);
 }
 
 .of-dialog__icon--warning {
-  background: var(--of-color-yellow-50, #fffbeb) !important;
-  color: var(--of-color-yellow-500, #f59e0b) !important;
+  background: var(--of-color-yellow-50, #fffbeb);
+  color: var(--of-color-yellow-500, #f59e0b);
 }
 
 .of-dialog__icon--danger {
-  background: var(--of-color-red-50, #fef2f2) !important;
-  color: var(--of-color-red-500, #ef4444) !important;
+  background: var(--of-color-red-50, #fef2f2);
+  color: var(--of-color-red-500, #ef4444);
 }
 
 .of-dialog__icon--success {
-  background: var(--of-color-green-50, #f0fdf4) !important;
-  color: var(--of-color-green-500, #22c55e) !important;
+  background: var(--of-color-green-50, #f0fdf4);
+  color: var(--of-color-green-500, #22c55e);
 }
 
 /* ── Content ──────────────────────────────────────────────── */
 .of-dialog__content {
-  flex: 1 !important;
-  min-width: 0 !important;
+  flex: 1;
+  min-width: 0;
 }
 
 .of-dialog__title {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: var(--of-color-text, #111827) !important;
-  margin: 0 0 var(--of-spacing-2, 8px) 0 !important;
-  line-height: 1.4 !important;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--of-color-text, #111827);
+  margin: 0 0 var(--of-spacing-2, 8px) 0;
+  line-height: 1.4;
 }
 
 .of-dialog__text {
-  font-size: 14px !important;
-  color: var(--of-color-text-secondary, #6b7280) !important;
-  margin: 0 !important;
-  line-height: 1.6 !important;
+  font-size: 14px;
+  color: var(--of-color-text-secondary, #6b7280);
+  margin: 0;
+  line-height: 1.6;
 }
 
 /* ── Buttons ──────────────────────────────────────────────── */
 .of-dialog__btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: var(--of-spacing-2, 8px) !important;
-  padding: 8px 20px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  border-radius: var(--of-radius-md, 6px) !important;
-  border: 1px solid transparent !important;
-  cursor: pointer !important;
-  transition: var(--of-transition-fast, all 0.15s ease) !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--of-spacing-2, 8px);
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--of-radius-md, 6px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--of-transition-fast, all 0.15s ease);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .of-dialog__btn:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed !important;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* 取消按钮 */
 .of-dialog__btn--cancel {
-  background: transparent !important;
-  border-color: var(--of-color-gray-300, #d1d5db) !important;
-  color: var(--of-color-text-secondary, #6b7280) !important;
+  background: transparent;
+  border-color: var(--of-color-gray-300, #d1d5db);
+  color: var(--of-color-text-secondary, #6b7280);
 }
 
 .of-dialog__btn--cancel:hover:not(:disabled) {
-  background: var(--of-color-gray-50, #f9fafb) !important;
-  border-color: var(--of-color-gray-400, #9ca3af) !important;
-  color: var(--of-color-text, #111827) !important;
+  background: var(--of-color-gray-50, #f9fafb);
+  border-color: var(--of-color-gray-400, #9ca3af);
+  color: var(--of-color-text, #111827);
 }
 
 /* 确认按钮 - 主色 */
 .of-dialog__btn--primary {
-  background: var(--of-color-primary, #7c3aed) !important;
-  border-color: var(--of-color-primary, #7c3aed) !important;
-  color: var(--of-color-text-inverse) !important;
+  background: var(--of-color-primary, #7c3aed);
+  border-color: var(--of-color-primary, #7c3aed);
+  color: var(--of-color-text-inverse);
 }
 
 .of-dialog__btn--primary:hover:not(:disabled) {
-  background: var(--of-color-primary-hover, #6d28d9) !important;
-  border-color: var(--of-color-primary-hover, #6d28d9) !important;
+  background: var(--of-color-primary-hover, #6d28d9);
+  border-color: var(--of-color-primary-hover, #6d28d9);
 }
 
 /* 确认按钮 - 危险红色 */
 .of-dialog__btn--danger {
-  background: var(--of-color-red-600, #dc2626) !important;
-  border-color: var(--of-color-red-600, #dc2626) !important;
-  color: var(--of-color-text-inverse) !important;
+  background: var(--of-color-red-600, #dc2626);
+  border-color: var(--of-color-red-600, #dc2626);
+  color: var(--of-color-text-inverse);
 }
 
 .of-dialog__btn--danger:hover:not(:disabled) {
-  background: var(--of-color-red-700, #b91c1c) !important;
-  border-color: var(--of-color-red-700, #b91c1c) !important;
+  background: var(--of-color-red-700, #b91c1c);
+  border-color: var(--of-color-red-700, #b91c1c);
 }
 
 /* ── Spinner ──────────────────────────────────────────────── */
 .of-dialog__spinner {
-  animation: of-dialog-spin 0.8s linear infinite !important;
+  animation: of-dialog-spin 0.8s linear infinite;
 }
 
 @keyframes of-dialog-spin {
