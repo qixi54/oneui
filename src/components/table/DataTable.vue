@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends { id: string } & Record<string, any>">
-import { ref, computed, toRef, watchEffect } from "vue";
+import { ref, computed, toRef, watch } from "vue";
 import TableHeaderRow from "./TableHeaderRow.vue";
 import TableDataRow from "./TableDataRow.vue";
 import TableGroupRow from "./TableGroupRow.vue";
@@ -56,6 +56,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   "row-click": [row: any];
+  "row-click-record": [record: DataRecord];
   "add-row": [];
   "selection-change": [ids: (string | number)[]];
   "cell-edit": [payload: { rowId: string; fieldId: string; value: unknown }];
@@ -91,10 +92,10 @@ const {
   pageSize: 999999, // Disable pagination inside DataTable for now or manage it externally
 });
 
-// Sync input data with useTable
-watchEffect(() => {
-  setData(normalizedData.value);
-});
+// Sync input data with useTable — watch only fires on change, not on setup
+watch(normalizedData, (newRows) => {
+  setData(newRows);
+}, { deep: false });
 
 // ── Brain 2: Grouping ──
 const {
@@ -146,9 +147,9 @@ function handleSelect(id: string | number) {
   if (row) toggleRowSelection(row, 0); // index doesn't matter for id-based selection
 }
 
-watchEffect(() => {
-  emit("selection-change", selectedIdsArray.value);
-});
+watch(selectedIdsArray, (ids) => {
+  emit("selection-change", ids);
+}, { immediate: false });
 
 // ── Event Handlers ──
 function getRowId(row: T): string {
@@ -172,6 +173,7 @@ function onCellCommit(rowId: string, fieldId: string, value: unknown) {
 function handleRowClick(row: T) {
   const anyRow = row as any;
   if (anyRow.__record) {
+    emit("row-click-record", anyRow.__record);
     emit("row-click", anyRow.__record);
     return;
   }

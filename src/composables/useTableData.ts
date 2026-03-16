@@ -1,7 +1,7 @@
 import { computed, type Ref } from "vue";
 import type { Task, DataRecord } from "../types";
 
-export interface UseTableDataOptions<T extends { id: string } & Record<string, any>> {
+export interface UseTableDataOptions {
   tasks?: Ref<Task[] | undefined>;
   records?: Ref<DataRecord[] | undefined>;
 }
@@ -13,7 +13,7 @@ export interface UseTableDataOptions<T extends { id: string } & Record<string, a
  * - 否则使用 tasks（原样透传，不做额外转换）
  */
 export function useTableData<T extends { id: string } & Record<string, any>>(
-  options: UseTableDataOptions<T>,
+  options: UseTableDataOptions,
 ) {
   const rows = computed<T[]>(() => {
     if (options.records?.value?.length) {
