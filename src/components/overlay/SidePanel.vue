@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { computed, type CSSProperties, type VNode } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  type CSSProperties,
+  type VNode,
+} from "vue";
 import { X } from "lucide-vue-next";
 
 export interface SidePanelProps {
@@ -29,6 +38,78 @@ const panelStyle = computed<CSSProperties>(() => ({
   width: `${props.width}px`,
 }));
 
+// ── Focus Trap ────────────────────────────────────────────────
+const sidePanelRef = ref<HTMLElement | null>(null);
+let previousFocus: HTMLElement | null = null;
+
+function getFocusableElements(): HTMLElement[] {
+  if (!sidePanelRef.value) return [];
+  return Array.from(
+    sidePanelRef.value.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), a[href]',
+    ),
+  ).filter((el) => !el.closest('[aria-hidden="true"]'));
+}
+
+function trapFocus(e: KeyboardEvent) {
+  if (e.key !== "Tab") return;
+  const focusable = getFocusableElements();
+  if (focusable.length === 0) {
+    e.preventDefault();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else {
+    if (document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+// ─────────────────────────────────────────────────────────────
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === "Escape" && props.modelValue) close();
+}
+
+onMounted(() => {
+  if (typeof document === "undefined") return;
+  document.addEventListener("keydown", onKeydown);
+});
+
+watch(
+  () => props.modelValue,
+  (open) => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = open ? "hidden" : "";
+    if (open) {
+      previousFocus = document.activeElement as HTMLElement;
+      nextTick(() => {
+        const focusable = getFocusableElements();
+        if (focusable.length) focusable[0].focus();
+        document.addEventListener("keydown", trapFocus);
+      });
+    } else {
+      document.removeEventListener("keydown", trapFocus);
+      previousFocus?.focus();
+      previousFocus = null;
+    }
+  },
+);
+
+onBeforeUnmount(() => {
+  if (typeof document === "undefined") return;
+  document.removeEventListener("keydown", onKeydown);
+  document.removeEventListener("keydown", trapFocus);
+  document.body.style.overflow = "";
+});
+
 function close() {
   emit("update:modelValue", false);
 }
@@ -39,6 +120,7 @@ function close() {
     <template v-if="mode === 'lazy'">
       <aside
         v-if="modelValue"
+        ref="sidePanelRef"
         class="of-side-panel"
         :style="panelStyle"
         role="dialog"
@@ -69,6 +151,7 @@ function close() {
     <aside
       v-else
       v-show="modelValue"
+      ref="sidePanelRef"
       class="of-side-panel"
       :style="panelStyle"
       role="dialog"
