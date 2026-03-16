@@ -19,6 +19,8 @@ function toPascalCase(name: string): string {
   );
 }
 
+const iconCache = new Map<string, Component | undefined>();
+
 /**
  * 解析图标：支持 lucide 图标名字符串或直接传入 Vue 组件
  * @param icon lucide icon name (kebab-case) 或 Component
@@ -27,6 +29,11 @@ function toPascalCase(name: string): string {
 export function resolveIcon(icon: string | Component | undefined): Component | undefined {
   if (!icon) return undefined;
   if (typeof icon !== "string") return icon as Component;
+
+  if (iconCache.has(icon)) return iconCache.get(icon);
+
   const key = toPascalCase(icon);
-  return (LucideIcons as unknown as Record<string, Component>)[key];
+  const resolved = (LucideIcons as unknown as Record<string, Component>)[key];
+  iconCache.set(icon, resolved);
+  return resolved;
 }
