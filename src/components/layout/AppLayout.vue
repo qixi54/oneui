@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // AppLayout — 整体三层应用布局
 // slots: #navbar, #sidebar, #default (主内容), #statusbar
-import { ref, provide } from "vue";
+import { ref, computed, provide } from "vue";
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import type { Density } from "@/types";
 
@@ -21,7 +21,10 @@ const { isMobile, isTablet } = useBreakpoint();
 provide("isMobile", isMobile);
 provide("isTablet", isTablet);
 // 向子组件注入 density，Navbar / Sidebar 可通过 inject("density") 感知
-provide("density", props.density);
+provide(
+  "density",
+  computed(() => props.density),
+);
 
 // 移动端 Drawer 展开状态
 const sidebarOpen = ref(false);
@@ -44,6 +47,7 @@ function closeSidebar() {
         v-if="isMobile"
         class="of-app-layout__hamburger"
         aria-label="Toggle sidebar"
+        :aria-expanded="sidebarOpen"
         @click="toggleSidebar"
       >
         &#9776;
@@ -61,9 +65,20 @@ function closeSidebar() {
       <!-- 移动端：Drawer 模式 -->
       <template v-if="isMobile">
         <!-- 遮罩层 -->
-        <div v-if="sidebarOpen" class="of-drawer-overlay" @click="closeSidebar" />
+        <div
+          v-if="sidebarOpen"
+          class="of-drawer-overlay"
+          aria-hidden="true"
+          @click="closeSidebar"
+        />
         <!-- Drawer 侧边栏 -->
-        <aside class="of-drawer-sidebar" :class="{ 'of-drawer-sidebar--open': sidebarOpen }">
+        <aside
+          class="of-drawer-sidebar"
+          :class="{ 'of-drawer-sidebar--open': sidebarOpen }"
+          role="dialog"
+          aria-modal="true"
+          aria-label="导航菜单"
+        >
           <slot name="sidebar" />
         </aside>
       </template>
