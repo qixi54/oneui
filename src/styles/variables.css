@@ -56,6 +56,7 @@
   --of-color-text-inverse: #ffffff;
   --of-color-text-link: var(--of-color-primary-500);
   --of-color-text: var(--of-color-text-primary);
+  --of-color-text-muted: var(--of-color-gray-300);
 
   /* ─── Background ─── */
   --of-color-bg-canvas: #f1f5f9;
@@ -205,4 +206,9 @@
   --of-color-black-alpha-14: rgba(0, 0, 0, 0.14);
   --of-color-black-alpha-45: rgba(0, 0, 0, 0.45);
   --of-color-black-alpha-50: rgba(0, 0, 0, 0.5);
+
+  /* ─── InfoCard ─── */
+  --of-ic-tag-bg: var(--of-color-primary-50);
+  --of-ic-tag-border: var(--of-color-primary-200);
+  --of-ic-tag-color: var(--of-color-primary-600);
 }
