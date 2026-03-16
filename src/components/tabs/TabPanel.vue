@@ -51,7 +51,7 @@ const isActive = computed<boolean>(() => activeTab?.value === props.name);
 
 <style scoped>
 .of-tab-panel {
-  width: 100% !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 </style>

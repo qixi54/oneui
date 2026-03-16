@@ -58,39 +58,39 @@ const fillStyle = computed(() => ({
 
 <style scoped>
 .of-progress-bar {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 6px !important;
-  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
 }
 
 .of-progress-bar__track {
-  width: 100% !important;
-  overflow: hidden !important;
+  width: 100%;
+  overflow: hidden;
 }
 
 .of-progress-bar__fill {
-  height: 100% !important;
-  transition: width 0.3s ease !important;
+  height: 100%;
+  transition: width 0.3s ease;
 }
 
 .of-progress-bar__label {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 8px !important;
-  font-size: 12px !important;
-  line-height: 1.4 !important;
-  color: var(--of-color-text-secondary, #8c8c8c) !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--of-color-text-secondary, #8c8c8c);
 }
 
 .of-progress-bar__slot {
-  min-width: 0 !important;
-  flex: 1 !important;
+  min-width: 0;
+  flex: 1;
 }
 
 .of-progress-bar__value {
-  flex-shrink: 0 !important;
-  color: var(--of-color-text-secondary, #8c8c8c) !important;
+  flex-shrink: 0;
+  color: var(--of-color-text-secondary, #8c8c8c);
 }
 </style>

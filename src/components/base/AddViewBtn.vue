@@ -19,36 +19,36 @@ function handleClick(event: MouseEvent) {
 
 <style scoped>
 .of-add-view-btn {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 4px !important;
-  padding: 6px 10px !important;
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer !important;
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 400 !important;
-  color: var(--of-color-gray-400) !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  transition: var(--of-transition-fast) !important;
-  border-radius: var(--of-radius-md) !important;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--of-color-gray-400);
+  line-height: 1;
+  white-space: nowrap;
+  transition: var(--of-transition-fast);
+  border-radius: var(--of-radius-md);
 }
 
 .of-add-view-btn .of-add-view-btn__icon {
-  color: var(--of-color-gray-400) !important;
+  color: var(--of-color-gray-400);
   flex-shrink: 0;
-  transition: var(--of-transition-fast) !important;
+  transition: var(--of-transition-fast);
 }
 
 .of-add-view-btn:hover {
-  color: var(--of-color-gray-600) !important;
+  color: var(--of-color-gray-600);
 }
 
 .of-add-view-btn:hover .of-add-view-btn__icon {
-  color: var(--of-color-gray-600) !important;
+  color: var(--of-color-gray-600);
 }
 
 .of-add-view-btn__label {

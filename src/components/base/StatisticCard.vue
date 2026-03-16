@@ -71,48 +71,48 @@ const colorClass = computed(() => {
 
 <style scoped>
 .of-statistic-card {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--of-spacing-4) !important;
-  padding: var(--of-spacing-4) !important;
-  background: var(--of-color-bg-canvas) !important;
-  border: 1px solid var(--of-color-gray-100) !important;
-  border-radius: var(--of-radius-lg) !important;
+  display: flex;
+  align-items: center;
+  gap: var(--of-spacing-4);
+  padding: var(--of-spacing-4);
+  background: var(--of-color-bg-canvas);
+  border: 1px solid var(--of-color-gray-100);
+  border-radius: var(--of-radius-lg);
 }
 
 .of-statistic-card__icon-container {
-  width: 48px !important;
-  height: 48px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: var(--of-radius-md) !important;
-  flex-shrink: 0 !important;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--of-radius-md);
+  flex-shrink: 0;
 }
 
 .of-statistic-card__icon {
-  width: 24px !important;
-  height: 24px !important;
+  width: 24px;
+  height: 24px;
 }
 
 .of-statistic-card__content {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 2px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .of-statistic-card__value {
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  color: var(--of-color-text) !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--of-color-text);
+  margin: 0;
+  padding: 0;
 }
 
 .of-statistic-card__label {
-  font-size: 12px !important;
-  color: var(--of-color-text-secondary) !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  font-size: 12px;
+  color: var(--of-color-text-secondary);
+  margin: 0;
+  padding: 0;
 }
 </style>

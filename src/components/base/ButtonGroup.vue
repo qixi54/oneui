@@ -65,58 +65,58 @@ const columnClass = computed(() => {
 
 <style scoped>
 .of-button-group {
-  display: grid !important;
-  gap: var(--of-spacing-2) !important;
+  display: grid;
+  gap: var(--of-spacing-2);
 }
 
 .of-button-group--cols-2 {
-  grid-template-columns: repeat(2, 1fr) !important;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .of-button-group--cols-3 {
-  grid-template-columns: repeat(3, 1fr) !important;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .of-button-group--cols-4 {
-  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .of-button-group__item {
-  padding: var(--of-spacing-3) !important;
-  border-radius: var(--of-radius-lg) !important;
-  border: 1px solid var(--of-color-gray-200) !important;
-  background: var(--of-color-bg-canvas) !important;
-  color: var(--of-color-text-secondary) !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  transition: var(--of-transition-fast) !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  padding: var(--of-spacing-3);
+  border-radius: var(--of-radius-lg);
+  border: 1px solid var(--of-color-gray-200);
+  background: var(--of-color-bg-canvas);
+  color: var(--of-color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--of-transition-fast);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .of-button-group__item:hover:not(.of-button-group__item--active) {
-  background: var(--of-color-gray-50) !important;
-  border-color: var(--of-color-gray-300) !important;
+  background: var(--of-color-gray-50);
+  border-color: var(--of-color-gray-300);
 }
 
 .of-button-group__item--active {
-  background: var(--of-color-primary-600) !important;
-  border-color: var(--of-color-primary-600) !important;
-  color: var(--of-color-primary-foreground) !important;
+  background: var(--of-color-primary-600);
+  border-color: var(--of-color-primary-600);
+  color: var(--of-color-primary-foreground);
 }
 
 .of-button-group__item-content {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--of-spacing-2) !important;
-  justify-content: center !important;
+  display: flex;
+  align-items: center;
+  gap: var(--of-spacing-2);
+  justify-content: center;
 }
 
 .of-button-group__item-icon {
-  width: 16px !important;
-  height: 16px !important;
-  flex-shrink: 0 !important;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 </style>

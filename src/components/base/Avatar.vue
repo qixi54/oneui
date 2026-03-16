@@ -100,21 +100,21 @@ const avatarStyle = computed<CSSProperties>(() => {
 
 <style scoped>
 .one-avatar {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: var(--one-avatar-size) !important;
-  height: var(--one-avatar-size) !important;
-  border-radius: 50% !important;
-  background: var(--one-avatar-bg) !important;
-  color: var(--one-avatar-color) !important;
-  font-size: var(--one-avatar-font-size) !important;
-  font-weight: 600 !important;
-  font-family: var(--of-font-sans) !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  box-sizing: border-box !important;
-  user-select: none !important;
-  flex-shrink: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--one-avatar-size);
+  height: var(--one-avatar-size);
+  border-radius: 50%;
+  background: var(--one-avatar-bg);
+  color: var(--one-avatar-color);
+  font-size: var(--one-avatar-font-size);
+  font-weight: 600;
+  font-family: var(--of-font-sans);
+  line-height: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+  user-select: none;
+  flex-shrink: 0;
 }
 </style>

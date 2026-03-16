@@ -98,28 +98,28 @@ const badgeStyle = computed<CSSProperties>(() => {
 
 <style scoped>
 .one-badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: fit-content !important;
-  border: 1px solid var(--one-badge-border) !important;
-  border-radius: 3px !important;
-  background: var(--one-badge-bg) !important;
-  color: var(--one-badge-color) !important;
-  font-family: var(--of-font-sans) !important;
-  font-weight: 500 !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-  box-sizing: border-box !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border: 1px solid var(--one-badge-border);
+  border-radius: 3px;
+  background: var(--one-badge-bg);
+  color: var(--one-badge-color);
+  font-family: var(--of-font-sans);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .one-badge--sm {
-  font-size: 11px !important;
-  padding: 1px 6px !important;
+  font-size: 11px;
+  padding: 1px 6px;
 }
 
 .one-badge--md {
-  font-size: 12px !important;
-  padding: 2px 8px !important;
+  font-size: 12px;
+  padding: 2px 8px;
 }
 </style>

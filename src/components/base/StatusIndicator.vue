@@ -5,6 +5,8 @@ export interface StatusIndicatorProps {
   status: string;
   label?: string;
   size?: "sm" | "md";
+  /** 可选的圆点颜色覆盖 */
+  color?: string;
 }
 
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -30,22 +32,22 @@ const DOT_SIZE_MAP = {
 const props = withDefaults(defineProps<StatusIndicatorProps>(), {
   label: undefined,
   size: "md",
+  color: undefined,
 });
 
 const normalizedStatus = computed(() => props.status.trim().toLowerCase());
 const displayLabel = computed(() => props.label ?? props.status);
-const dotColor = computed(() => STATUS_COLOR_MAP[normalizedStatus.value] ?? "var(--of-color-gray-300)");
+const dotColor = computed(() => props.color ?? STATUS_COLOR_MAP[normalizedStatus.value] ?? "var(--of-color-gray-300)");
 const dotSize = computed(() => DOT_SIZE_MAP[props.size]);
 </script>
 
 <template>
-  <span class="of-status-indicator">
+  <span class="of-status-indicator" :style="{ '--of-status-dot-color': dotColor }">
     <span
       class="of-status-indicator__dot"
       :style="{
         width: dotSize,
         height: dotSize,
-        backgroundColor: dotColor,
       }"
     />
     <slot :status="status" :label="displayLabel" :color="dotColor">
@@ -56,19 +58,20 @@ const dotSize = computed(() => DOT_SIZE_MAP[props.size]);
 
 <style scoped>
 .of-status-indicator {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .of-status-indicator__dot {
-  display: inline-block !important;
-  border-radius: 50% !important;
-  flex-shrink: 0 !important;
+  display: inline-block;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: var(--of-status-dot-color, var(--of-color-gray-300));
 }
 
 .of-status-indicator__label {
-  color: var(--of-color-text-secondary, #595959) !important;
-  line-height: 1.4 !important;
+  color: var(--of-color-text-secondary, #595959);
+  line-height: 1.4;
 }
 </style>

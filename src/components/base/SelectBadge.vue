@@ -90,44 +90,44 @@ function handleClick(e: MouseEvent) {
 
 <style scoped>
 .one-select-badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  border-radius: 8px !important;
-  padding: 3px 10px !important;
-  border: 1px solid var(--one-sb-border) !important;
-  background: var(--one-sb-bg) !important;
-  color: var(--one-sb-text) !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-  box-sizing: border-box !important;
-  user-select: none !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 8px;
+  padding: 3px 10px;
+  border: 1px solid var(--one-sb-border);
+  background: var(--one-sb-bg);
+  color: var(--one-sb-text);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-sizing: border-box;
+  user-select: none;
 }
 
 .one-select-badge--clickable {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .one-select-badge__dot {
-  display: inline-block !important;
-  width: 6px !important;
-  height: 6px !important;
-  border-radius: 50% !important;
-  flex-shrink: 0 !important;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .one-select-badge__text {
-  color: inherit !important;
-  font-size: inherit !important;
-  font-weight: inherit !important;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .one-select-badge__arrow {
-  width: 10px !important;
-  height: 10px !important;
-  flex-shrink: 0 !important;
-  color: inherit !important;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  color: inherit;
 }
 </style>

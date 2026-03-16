@@ -69,39 +69,39 @@ const tagStyle = computed<CSSProperties>(() => {
 
 <style scoped>
 .one-ref-tag {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  padding: 4px 10px !important;
-  border-radius: 6px !important;
-  background: var(--one-ref-tag-bg) !important;
-  color: var(--one-ref-tag-color) !important;
-  text-decoration: none !important;
-  cursor: default !important;
-  box-sizing: border-box !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--one-ref-tag-bg);
+  color: var(--one-ref-tag-color);
+  text-decoration: none;
+  cursor: default;
+  box-sizing: border-box;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 a.one-ref-tag {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 a.one-ref-tag:hover {
-  opacity: 0.85 !important;
+  opacity: 0.85;
 }
 
 .one-ref-tag__icon {
-  width: 12px !important;
-  height: 12px !important;
-  flex-shrink: 0 !important;
-  color: var(--one-ref-tag-color) !important;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--one-ref-tag-color);
 }
 
 .one-ref-tag__text {
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  font-family: "Inter", var(--of-font-sans), sans-serif !important;
-  color: var(--one-ref-tag-color) !important;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: "Inter", var(--of-font-sans), sans-serif;
+  color: var(--one-ref-tag-color);
 }
 </style>

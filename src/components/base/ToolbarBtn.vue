@@ -40,41 +40,41 @@ function handleClick(event: MouseEvent) {
 
 <style scoped>
 .of-toolbar-btn {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 6px !important;
-  padding: 5px 10px !important;
-  background: transparent !important;
-  border: 1px solid var(--of-color-gray-200) !important;
-  border-radius: var(--of-radius-md) !important;
-  cursor: pointer !important;
-  font-family: var(--of-font-sans) !important;
-  font-size: 12px !important;
-  font-weight: 400 !important;
-  color: var(--of-color-gray-600) !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  transition: var(--of-transition-fast) !important;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--of-color-gray-200);
+  border-radius: var(--of-radius-md);
+  cursor: pointer;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--of-color-gray-600);
+  line-height: 1;
+  white-space: nowrap;
+  transition: var(--of-transition-fast);
 }
 
 .of-toolbar-btn .of-toolbar-btn__icon {
-  color: var(--of-color-gray-500) !important;
+  color: var(--of-color-gray-500);
   flex-shrink: 0;
 }
 
 .of-toolbar-btn:hover:not(.of-toolbar-btn--active) {
-  background: var(--of-color-gray-50) !important;
+  background: var(--of-color-gray-50);
 }
 
 .of-toolbar-btn--active {
-  background: var(--of-color-primary-50) !important;
-  color: var(--of-color-primary-600) !important;
-  border-color: var(--of-color-primary-200) !important;
+  background: var(--of-color-primary-50);
+  color: var(--of-color-primary-600);
+  border-color: var(--of-color-primary-200);
 }
 
 .of-toolbar-btn--active .of-toolbar-btn__icon {
-  color: var(--of-color-primary-600) !important;
+  color: var(--of-color-primary-600);
 }
 
 .of-toolbar-btn__label {
