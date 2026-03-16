@@ -4,10 +4,13 @@ import { GripVertical, Eye, EyeOff, X } from "lucide-vue-next";
 import { VueDraggable } from "vue-draggable-plus";
 import type { TableColumn } from "../../types";
 
-const props = defineProps<{
-  columns: TableColumn[];
-  visible?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    columns: TableColumn[];
+    visible?: boolean;
+  }>(),
+  { visible: true },
+);
 
 const emit = defineEmits<{
   "update:columns": [columns: TableColumn[]];
@@ -57,7 +60,7 @@ function onDragEnd() {
 </script>
 
 <template>
-  <div v-if="visible !== false" class="of-col-manager">
+  <div v-if="visible" class="of-col-manager">
     <div class="of-col-manager__header">
       <span class="of-col-manager__title">管理列</span>
       <button class="of-col-manager__close" @click="emit('close')">

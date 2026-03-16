@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onBeforeUnmount } from "vue";
+import { ref, watch, nextTick, onUnmounted } from "vue";
 import { X } from "lucide-vue-next";
 
 // Teleport 根节点无法自动继承 attrs（如 class），关闭自动继承
@@ -51,6 +51,42 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
 
+// ── Focus Trap ────────────────────────────────────────────────
+const modalRef = ref<HTMLElement | null>(null);
+let previousFocus: HTMLElement | null = null;
+
+function getFocusableElements(): HTMLElement[] {
+  if (!modalRef.value) return [];
+  return Array.from(
+    modalRef.value.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), a[href]'
+    )
+  ).filter((el) => !el.closest('[aria-hidden="true"]'));
+}
+
+function trapFocus(e: KeyboardEvent) {
+  if (e.key !== "Tab") return;
+  const focusable = getFocusableElements();
+  if (focusable.length === 0) {
+    e.preventDefault();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else {
+    if (document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+// ─────────────────────────────────────────────────────────────
+
 function close() {
   emit("update:modelValue", false);
 }
@@ -69,18 +105,28 @@ watch(
     if (typeof document === "undefined") return; // SSR 守卫
     if (val) {
       document.body.style.overflow = "hidden";
+      previousFocus = document.activeElement as HTMLElement;
       document.addEventListener("keydown", onKeydown);
+      nextTick(() => {
+        const focusable = getFocusableElements();
+        if (focusable.length) focusable[0].focus();
+        document.addEventListener("keydown", trapFocus);
+      });
     } else {
       document.body.style.overflow = "";
       document.removeEventListener("keydown", onKeydown);
+      document.removeEventListener("keydown", trapFocus);
+      previousFocus?.focus();
+      previousFocus = null;
     }
   },
 );
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   if (typeof document === "undefined") return; // SSR 守卫
   document.body.style.overflow = "";
   document.removeEventListener("keydown", onKeydown);
+  document.removeEventListener("keydown", trapFocus);
 });
 </script>
 
@@ -94,6 +140,7 @@ onBeforeUnmount(() => {
         @click.self="onMaskClick"
       >
         <div
+          ref="modalRef"
           class="of-modal"
           :class="{ 'of-modal--centered': centered }"
           :style="{ width: width, maxWidth: '90vw' }"

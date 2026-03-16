@@ -24,6 +24,8 @@ export interface ButtonOption {
   icon?: string | Component; // lucide icon name (kebab-case) or component
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps<{
   options: ButtonOption[];
   modelValue: string | number;
@@ -42,7 +44,7 @@ const columnClass = computed(() => {
 </script>
 
 <template>
-  <div class="of-button-group" :class="columnClass">
+  <div class="of-button-group" :class="columnClass" v-bind="$attrs">
     <button
       v-for="opt in options"
       :key="opt.value"

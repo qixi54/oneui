@@ -69,6 +69,31 @@ export interface TableColumn {
   hidden?: boolean;
 }
 
+/**
+ * DataTable 组件的 Props 类型定义（与 DataTable.vue 中 defineProps 保持同步）
+ */
+export interface DataTableProps {
+  tasks?: Task[];
+  records?: DataRecord[];
+  schema?: TableSchema;
+  view?: ViewConfig;
+  columns?: TableColumn[];
+  rowKey?: string;
+  selectable?: boolean;
+  addable?: boolean;
+  priorityColorMap?: ColorMap;
+  statusColorMap?: ColorMap;
+  groupBy?: string;
+  groupColorMap?: ColorMap;
+  /** 手动强制开关虚拟滚动；undefined 表示自动判断 */
+  virtual?: boolean;
+  /**
+   * 自动启用虚拟滚动的行数阈值（默认 100）。
+   * 仅在 `virtual` prop 未传时生效。
+   */
+  virtualThreshold?: number;
+}
+
 // ─── Kanban ──────────────────────────────────────────────────────────────────
 
 export interface KanbanColumnData {

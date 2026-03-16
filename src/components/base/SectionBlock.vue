@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, type CSSProperties } from "vue";
+import type { Component } from "vue";
+import { resolveIcon } from "../../utils/icon";
 
 export interface SectionBlockProps {
   title: string;
-  icon?: string;
+  /** 图标：lucide icon name（kebab-case，如 "file-text"）或 Vue 组件对象。传入无法解析的字符串时不渲染。 */
+  icon?: string | Component;
   status?: "pending" | "updating" | "done" | "editing";
   collapsed?: boolean;
   editable?: boolean;
@@ -84,6 +87,7 @@ const blockStyle = computed<CSSProperties>(() => {
 
 const isEditing = computed(() => props.status === "editing");
 const showEditBtn = computed(() => props.editable && props.status === "done");
+const iconComponent = computed(() => resolveIcon(props.icon));
 
 function toggleCollapse() {
   emit("update:collapsed", !props.collapsed);
@@ -111,7 +115,13 @@ function onSave() {
     <!-- Header -->
     <div class="of-section-block__header" @click="toggleCollapse">
       <div class="of-section-block__header-left">
-        <span v-if="icon" class="of-section-block__icon" aria-hidden="true">{{ icon }}</span>
+        <component
+          v-if="iconComponent"
+          :is="iconComponent"
+          class="of-section-block__icon"
+          :size="14"
+          aria-hidden="true"
+        />
         <span class="of-section-block__title">{{ title }}</span>
         <span
           v-if="status"

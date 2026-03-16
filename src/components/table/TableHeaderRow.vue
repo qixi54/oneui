@@ -56,9 +56,11 @@ function handleSort(key: string) {
     <div
       v-for="col in columns"
       :key="col.key"
+      role="columnheader"
       class="of-th"
       :style="colStyle(col)"
       :class="{ 'of-th--sortable': true, 'of-th--active': sortKey === col.key }"
+      :aria-sort="sortKey === col.key ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'"
       @click="handleSort(col.key)"
     >
       <span class="of-th-label">{{ col.label }}</span>

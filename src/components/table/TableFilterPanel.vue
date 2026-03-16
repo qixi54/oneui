@@ -7,12 +7,15 @@ import type {
   FilterOperator,
 } from "../../composables/useTableFilter";
 
-const props = defineProps<{
-  columns: TableColumn[];
-  conditions: readonly FilterCondition[];
-  logic: FilterLogic;
-  visible?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    columns: TableColumn[];
+    conditions: readonly FilterCondition[];
+    logic: FilterLogic;
+    visible?: boolean;
+  }>(),
+  { visible: true },
+);
 
 const emit = defineEmits<{
   "add-condition": [];
@@ -63,7 +66,7 @@ function isNoValue(op: FilterOperator) {
 </script>
 
 <template>
-  <div v-if="visible !== false" class="of-filter-panel">
+  <div v-if="visible" class="of-filter-panel">
     <div class="of-filter-panel__header">
       <span class="of-filter-panel__title">筛选</span>
       <button class="of-filter-panel__close" @click="emit('close')">

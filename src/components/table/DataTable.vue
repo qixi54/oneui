@@ -43,14 +43,26 @@ const props = withDefaults(
      * 手动控制虚拟滚动开关。
      * - `true`：强制启用虚拟滚动
      * - `false`：强制关闭虚拟滚动
-     * - `undefined`（默认）：自动判断，行数 > VIRTUAL_SCROLL_THRESHOLD 时启用
+     * - `undefined`（默认）：自动判断，行数 >= virtualThreshold 时启用
      */
     virtual?: boolean;
+    /**
+     * 自动启用虚拟滚动的行数阈值（默认 100）。
+     * 仅在 `virtual` prop 未传时生效。
+     */
+    virtualThreshold?: number;
+    /**
+     * 只读模式。为 true 时，selectable 和 addable 自动降为 false，
+     * 即使调用方显式传了 true 也会被覆盖。
+     */
+    readonly?: boolean;
   }>(),
   {
     selectable: true,
     addable: true,
     rowKey: "id",
+    virtualThreshold: 100,
+    readonly: false,
   },
 );
 
@@ -109,7 +121,6 @@ const {
 });
 
 // ── Virtual List ──
-const VIRTUAL_SCROLL_THRESHOLD = 100;
 const GROUP_HEADER_HEIGHT = 36;
 const DATA_ROW_HEIGHT = 44;
 const scrollContainerRef = ref<HTMLElement | null>(null);
@@ -117,11 +128,11 @@ const scrollContainerRef = ref<HTMLElement | null>(null);
 /**
  * 是否启用虚拟滚动：
  * - props.virtual 明确传 true/false 时，以 prop 为准（手动覆盖）
- * - 未传 prop 时自动判断：行数 > VIRTUAL_SCROLL_THRESHOLD 则启用
+ * - 未传 prop 时自动判断：行数 >= props.virtualThreshold 则启用
  */
 const useVirtual = computed(() => {
   if (props.virtual !== undefined) return props.virtual;
-  return groupedItems.value.length > VIRTUAL_SCROLL_THRESHOLD;
+  return groupedItems.value.length >= props.virtualThreshold;
 });
 
 const { visibleItems, totalHeight, offsetY } = useVirtualList({
@@ -133,6 +144,10 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
   overscan: 5,
   containerRef: scrollContainerRef,
 });
+
+// ── Readonly Overrides ──
+const effectiveSelectable = computed(() => props.readonly ? false : props.selectable);
+const effectiveAddable = computed(() => props.readonly ? false : props.addable);
 
 // ── Selection Proxies ──
 const selectedIdsArray = computed(() => Array.from(selectedRows.value));
@@ -179,13 +194,36 @@ function handleRowClick(row: T) {
   }
   emit("row-click", row);
 }
+
+// ── Shared Row Prop Builders (FE-00056 去重) ──
+function groupRowProps(item: any) {
+  return {
+    groupKey: item.__groupKey,
+    count: item.__groupCount,
+    collapsed: collapsedGroups.value.has(item.__groupKey),
+    colorMap: props.groupColorMap,
+    selectable: effectiveSelectable.value,
+  };
+}
+
+function dataRowProps(item: T) {
+  return {
+    row: item,
+    rowKey: props.rowKey,
+    selected: selectedRows.value.has(getRowId(item)),
+    selectable: effectiveSelectable.value,
+    columns: resolvedColumns.value,
+    priorityColorMap: props.priorityColorMap,
+    statusColorMap: props.statusColorMap,
+  };
+}
 </script>
 
 <template>
-  <div class="of-data-table">
+  <div class="of-data-table" role="grid">
     <TableHeaderRow
       :columns="resolvedColumns"
-      :selectable="selectable"
+      :selectable="effectiveSelectable"
       :sort-key="sort.field ?? ''"
       :sort-order="sort.order ?? 'asc'"
       :all-selected="isAllSelected"
@@ -195,29 +233,19 @@ function handleRowClick(row: T) {
     />
 
     <div ref="scrollContainerRef" class="of-data-table-scroll-container">
-      <!-- 虚拟滚动模式：行数 > 100 或手动 virtual=true -->
+      <!-- 虚拟滚动模式：行数 >= virtualThreshold 或手动 virtual=true -->
       <template v-if="useVirtual">
         <div :style="{ height: totalHeight + 'px', position: 'relative' }">
           <div :style="{ transform: `translateY(${offsetY}px)` }">
             <template v-for="{ data: item } in visibleItems" :key="item.id">
               <TableGroupRow
                 v-if="isGroupHeader(item)"
-                :group-key="item.__groupKey"
-                :count="item.__groupCount"
-                :collapsed="collapsedGroups.has(item.__groupKey)"
-                :color-map="groupColorMap"
-                :selectable="selectable"
+                v-bind="groupRowProps(item)"
                 @toggle="toggleGroup(item.__groupKey)"
               />
               <TableDataRow
                 v-else
-                :row="(item as T)"
-                :row-key="rowKey"
-                :selected="selectedRows.has(getRowId(item as T))"
-                :selectable="selectable"
-                :columns="resolvedColumns"
-                :priority-color-map="priorityColorMap"
-                :status-color-map="statusColorMap"
+                v-bind="dataRowProps(item as T)"
                 @select="handleSelect"
                 @click="handleRowClick(item as T)"
               >
@@ -235,27 +263,17 @@ function handleRowClick(row: T) {
         </div>
       </template>
 
-      <!-- 普通渲染模式：行数 ≤ 100，支持 Ctrl+F 全文搜索 -->
+      <!-- 普通渲染模式：行数 < virtualThreshold，支持 Ctrl+F 全文搜索 -->
       <template v-else>
         <template v-for="item in groupedItems" :key="item.id">
           <TableGroupRow
             v-if="isGroupHeader(item)"
-            :group-key="item.__groupKey"
-            :count="item.__groupCount"
-            :collapsed="collapsedGroups.has(item.__groupKey)"
-            :color-map="groupColorMap"
-            :selectable="selectable"
+            v-bind="groupRowProps(item)"
             @toggle="toggleGroup(item.__groupKey)"
           />
           <TableDataRow
             v-else
-            :row="(item as T)"
-            :row-key="rowKey"
-            :selected="selectedRows.has(getRowId(item as T))"
-            :selectable="selectable"
-            :columns="resolvedColumns"
-            :priority-color-map="priorityColorMap"
-            :status-color-map="statusColorMap"
+            v-bind="dataRowProps(item as T)"
             @select="handleSelect"
             @click="handleRowClick(item as T)"
           >
@@ -272,7 +290,7 @@ function handleRowClick(row: T) {
       </template>
     </div>
 
-    <NewRowBtn v-if="addable" @click="emit('add-row')" />
+    <NewRowBtn v-if="effectiveAddable" @click="emit('add-row')" />
   </div>
 </template>
 

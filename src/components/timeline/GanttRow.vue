@@ -263,6 +263,6 @@ function endDrag() {
   margin-left: auto;
   flex-shrink: 0;
   cursor: ew-resize;
-  border-left: 1px solid rgba(255, 255, 255, 0.4);
+  border-left: 1px solid var(--of-color-white-alpha-40);
 }
 </style>

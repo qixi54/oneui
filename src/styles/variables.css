@@ -190,4 +190,7 @@
   /* ─── Kanban ─── */
   --of-kanban-column-width: 280px;
   --of-kanban-card-width: 280px;
+
+  /* ─── White Alpha ─── */
+  --of-color-white-alpha-40: rgba(255, 255, 255, 0.4);
 }
