@@ -23,9 +23,9 @@ export function useTableData<T extends { id: string } & Record<string, any>>(
         createdAt: record.createdAt,
         updatedAt: record.updatedAt,
         __record: record,
-      })) as unknown as T[];
+      })) as ({ id: string } & Record<string, any>)[] as T[];
     }
-    return (options.tasks?.value ?? []) as unknown as T[];
+    return (options.tasks?.value ?? []) as ({ id: string } & Record<string, any>)[] as T[];
   });
 
   return { rows };
