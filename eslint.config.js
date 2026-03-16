@@ -1,10 +1,11 @@
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import pluginVue from 'eslint-plugin-vue'
+import pluginA11y from 'eslint-plugin-vuejs-accessibility'
 
 export default tseslint.config(
   // 忽略目录
-  { ignores: ['dist', 'node_modules', 'src/dev'] },
+  { ignores: ['dist', 'node_modules', 'src/dev', 'src/components/_template'] },
 
   // 基础规则
   js.configs.recommended,
@@ -43,6 +44,36 @@ export default tseslint.config(
       // ── TypeScript 规范 ────────────────────────────────────────
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
+  },
+
+  // ── a11y 无障碍规则（warn 级别，逐步修复）────────────────────
+  // flat/recommended 是数组，整体 spread 进来以注册插件和默认规则
+  ...pluginA11y.configs['flat/recommended'],
+  // 覆盖降级为 warn（避免现有组件大量 error 阻断 CI）
+  {
+    files: ['src/**/*.vue'],
+    rules: {
+      'vuejs-accessibility/alt-text': 'warn',
+      'vuejs-accessibility/anchor-has-content': 'warn',
+      'vuejs-accessibility/aria-props': 'warn',
+      'vuejs-accessibility/aria-role': 'warn',
+      'vuejs-accessibility/aria-unsupported-elements': 'warn',
+      'vuejs-accessibility/click-events-have-key-events': 'warn',
+      'vuejs-accessibility/form-control-has-label': 'warn',
+      'vuejs-accessibility/heading-has-content': 'warn',
+      'vuejs-accessibility/iframe-has-title': 'warn',
+      'vuejs-accessibility/interactive-supports-focus': 'warn',
+      'vuejs-accessibility/label-has-for': 'warn',
+      'vuejs-accessibility/media-has-caption': 'warn',
+      'vuejs-accessibility/mouse-events-have-key-events': 'warn',
+      'vuejs-accessibility/no-access-key': 'warn',
+      'vuejs-accessibility/no-autofocus': 'off',  // Modal focus trap 需要 autofocus
+      'vuejs-accessibility/no-distracting-elements': 'warn',
+      'vuejs-accessibility/no-redundant-roles': 'warn',
+      'vuejs-accessibility/no-static-element-interactions': 'warn',
+      'vuejs-accessibility/role-has-required-aria-props': 'warn',
+      'vuejs-accessibility/tabindex-no-positive': 'warn',
     },
   },
 

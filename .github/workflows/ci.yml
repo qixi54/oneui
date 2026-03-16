@@ -50,6 +50,22 @@ jobs:
       - name: Lint (Stylelint)
         run: pnpm lint:style
 
+      # ── Gate 3b: 禁止硬编码 rgba/rgb/hex 色值 ───────────────
+      # 组件样式必须使用 CSS token var(--of-color-*)，不允许字面量色值
+      - name: Check no hardcoded rgba/rgb colors
+        run: |
+          if grep -rn --include="*.vue" --include="*.css" \
+            -E 'color|background|border|fill|stroke' src/ | \
+            grep -E 'rgba\([^)]*[0-9]|rgb\([^)]*[0-9]|: #[0-9a-fA-F]{3,6}' | \
+            grep -v 'variables.css' | \
+            grep -v '_template' | \
+            grep -v '<!--' | \
+            grep -v 'var(--'; then
+            echo "❌ 发现硬编码色值，请改用 CSS token var(--of-color-*)"
+            exit 1
+          fi
+          echo "✅ 无硬编码色值"
+
       # ── Gate 4: 代码格式 ─────────────────────────────────────
       - name: Format Check
         run: pnpm format:check
