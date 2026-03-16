@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { SearchIcon, BellIcon } from "lucide-vue-next";
+
+const density = inject<string>("density", "comfortable");
 
 const props = withDefaults(
   defineProps<{
@@ -39,7 +41,7 @@ function handleAvatarClick() {
 </script>
 
 <template>
-  <nav class="of-navbar">
+  <nav class="of-navbar" :class="{ 'of-navbar--compact': density === 'compact' }">
     <!-- 左侧 Logo 区域 -->
     <div class="of-navbar__left">
       <slot name="logo">
@@ -220,5 +222,10 @@ function handleAvatarClick() {
 
 .of-navbar__avatar:hover {
   background: var(--of-color-primary-600);
+}
+
+/* ── Density: compact ── */
+.of-navbar--compact {
+  padding: var(--of-navbar-padding-compact);
 }
 </style>

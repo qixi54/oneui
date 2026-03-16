@@ -1,3 +1,7 @@
+// ─── Layout Density ─────────────────────────────────────────────────────────
+
+export type Density = 'comfortable' | 'compact'
+
 // ─── Common Types ───────────────────────────────────────────────────────────
 
 // Priority 和 TaskStatus 是开放字符串，不限定固定枚举值

@@ -3,12 +3,25 @@
 // slots: #navbar, #sidebar, #default (主内容), #statusbar
 import { ref, provide } from "vue"
 import { useBreakpoint } from "@/composables/useBreakpoint"
+import type { Density } from "@/types"
+
+const props = withDefaults(
+  defineProps<{
+    /** 布局密度：comfortable（默认）| compact（紧凑） */
+    density?: Density
+  }>(),
+  {
+    density: "comfortable",
+  },
+)
 
 const { isMobile, isTablet } = useBreakpoint()
 
 // 向子组件注入移动端状态，Sidebar / Navbar 等可通过 inject("isMobile") 感知
 provide("isMobile", isMobile)
 provide("isTablet", isTablet)
+// 向子组件注入 density，Navbar / Sidebar 可通过 inject("density") 感知
+provide("density", props.density)
 
 // 移动端 Drawer 展开状态
 const sidebarOpen = ref(false)
@@ -23,7 +36,7 @@ function closeSidebar() {
 </script>
 
 <template>
-  <div class="of-app-layout">
+  <div class="of-app-layout" :class="{ 'of-density-compact': density === 'compact' }">
     <!-- 顶部导航栏 -->
     <header class="of-app-layout__navbar">
       <!-- 移动端 hamburger 按钮 -->
@@ -155,5 +168,11 @@ function closeSidebar() {
   inset: 0;
   background: var(--of-color-black-alpha-50, rgba(0, 0, 0, 0.5));
   z-index: 199;
+}
+
+/* ── Density: compact ── */
+.of-density-compact {
+  --of-navbar-height: var(--of-navbar-height-compact);
+  --of-sidebar-width: var(--of-sidebar-width-compact);
 }
 </style>

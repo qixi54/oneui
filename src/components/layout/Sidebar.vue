@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-vue-next";
 import type { SidebarItem } from "../../types";
 import { resolveIcon } from "../../utils/icon";
+
+const density = inject<string>("density", "comfortable");
 
 defineProps<{
   items: SidebarItem[];
@@ -36,7 +38,7 @@ function isExpanded(item: SidebarItem): boolean {
 </script>
 
 <template>
-  <div class="of-sidebar">
+  <div class="of-sidebar" :class="{ 'of-sidebar--compact': density === 'compact' }">
     <!-- 头部插槽 -->
     <div v-if="$slots.header" class="of-sidebar__header">
       <slot name="header" />
@@ -222,5 +224,11 @@ function isExpanded(item: SidebarItem): boolean {
   flex-shrink: 0;
   padding-top: var(--of-spacing-2);
   border-top: var(--of-border);
+}
+
+/* ── Density: compact ── */
+.of-sidebar--compact .of-sidebar__item {
+  padding-top: var(--of-sidebar-item-py-compact);
+  padding-bottom: var(--of-sidebar-item-py-compact);
 }
 </style>

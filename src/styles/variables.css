@@ -179,7 +179,12 @@
 
   /* ─── Layout ─── */
   --of-navbar-height: 56px;
+  --of-navbar-height-compact: 44px;
   --of-sidebar-width: 240px;
+  --of-sidebar-width-compact: 200px;
+  --of-navbar-padding-compact: 0 0.75rem;
+  --of-sidebar-item-py: 0.625rem;
+  --of-sidebar-item-py-compact: 0.375rem;
   --of-statusbar-height: 32px;
 
   /* ─── Transitions ─── */
