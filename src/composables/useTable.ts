@@ -50,12 +50,14 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
       sort.value.order = "asc";
     }
     pagination.value.page = 1;
+    selectedRows.value.clear(); // 排序后清空选中，避免 index-based key 错乱
     if (options.serverSide) fetchData();
   }
 
   function setSort(field: string, order: SortOrder) {
     sort.value = { field, order };
     pagination.value.page = 1;
+    selectedRows.value.clear(); // 排序后清空选中，避免 index-based key 错乱
     if (options.serverSide) fetchData();
   }
 
@@ -106,7 +108,15 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
 
   // ── Selection ──
   function getRowKey(row: T, index: number): string | number {
-    return (row["id"] as string | number | undefined) ?? index;
+    const id = (row as Record<string, unknown>)["id"] as string | number | undefined
+    if (id === undefined) {
+      console.warn(
+        "[OneUI] DataTable: row is missing an `id` field. " +
+        "Row selection may behave incorrectly after sorting or filtering. " +
+        "Please ensure each row has a unique `id` property."
+      )
+    }
+    return id ?? index
   }
 
   function toggleRowSelection(row: T, index: number) {
