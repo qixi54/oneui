@@ -1,3 +1,8 @@
+// NOTE: 此处必须使用全量引入（* as LucideIcons），因为 resolveIcon 接受任意
+// 字符串作为图标名，在运行时动态查找对应组件（LucideIcons[key]）。
+// 静态分析无法提前知道用户会传入哪些图标名，故无法改为按需引入。
+// lucide-vue-next 在 vite.config.ts 中已配置为 external，不会打包进库产物，
+// 消费方按需引入由其自身 bundler 的 tree-shaking 决定。
 import * as LucideIcons from "lucide-vue-next";
 import type { Component } from "vue";
 

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, type Component } from "vue";
+// NOTE: 全量引入用于 resolveIcon()——图标名由外部 items prop 在运行时传入，
+// 无法静态分析，必须保留 * 引入。ChevronDownIcon/ChevronRightIcon 是固定图标，
+// 已单独按需引入（两种引入共存是正确做法）。
 import * as LucideIcons from "lucide-vue-next";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-vue-next";
 import type { SidebarItem } from "../../types";

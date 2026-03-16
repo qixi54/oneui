@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, type Component } from "vue";
-import * as LucideIcons from "lucide-vue-next";
+import { computed } from "vue";
+import { resolveIcon } from "../../utils/icon";
 
 const props = defineProps<{
   icon: string;
@@ -12,19 +12,9 @@ const emit = defineEmits<{
   (e: "click", event: MouseEvent): void;
 }>();
 
-function toPascalCase(name: string): string {
-  return (
-    name
-      .split("-")
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join("") + "Icon"
-  );
-}
-
-const iconComponent = computed<Component | undefined>(() => {
-  const key = toPascalCase(props.icon);
-  return (LucideIcons as unknown as Record<string, Component>)[key];
-});
+// icon prop 为运行时字符串，通过 resolveIcon 动态查找 Lucide 组件。
+// 全量引入由 icon.ts 统一处理，此处无需重复引入 lucide-vue-next。
+const iconComponent = computed(() => resolveIcon(props.icon));
 
 function handleClick(event: MouseEvent) {
   emit("click", event);
