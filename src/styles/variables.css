@@ -30,6 +30,8 @@
   /* ─── Status Colors ─── */
   --of-color-success: #22c55e;
   --of-color-success-light: #dcfce7;
+  --of-color-success-border: #b7eb8f;
+  --of-color-success-dark: #165e26;
   --of-color-warning: #d97706;
   --of-color-warning-light: #fef3c7;
   --of-color-error: #dc2626;
@@ -39,13 +41,24 @@
 
   /* ─── Extended Colors ─── */
   --of-color-blue-50: #eff6ff;
+  --of-color-blue-200: #bfdbfe;
+  --of-color-blue-500: #3b82f6;
   --of-color-blue-600: #2563eb;
   --of-color-green-50: #f0fdf4;
+  --of-color-green-200: #bbf7d0;
+  --of-color-green-500: #22c55e;
   --of-color-green-600: #16a34a;
   --of-color-orange-50: #fff7ed;
+  --of-color-orange-200: #fed7aa;
+  --of-color-orange-500: #f97316;
   --of-color-orange-600: #ea580c;
   --of-color-red-50: #fef2f2;
+  --of-color-red-200: #fecaca;
+  --of-color-red-500: #ef4444;
   --of-color-red-600: #dc2626;
+  --of-color-red-700: #b91c1c;
+  --of-color-yellow-50: #fffbeb;
+  --of-color-yellow-500: #f59e0b;
   --of-color-purple-50: #faf5ff;
   --of-color-purple-600: #9333ea;
 
@@ -150,6 +163,7 @@
   --of-icon-lg: 20px;
 
   /* ─── Spacing ─── */
+  --of-spacing-xs: 0.125rem;
   --of-spacing-0_5: 0.125rem;
   --of-spacing-1: 0.25rem;
   --of-spacing-2: 0.5rem;
