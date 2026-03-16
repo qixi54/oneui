@@ -30,15 +30,62 @@ const emit = defineEmits<{
   click: [];
 }>();
 
-const COLORS = [
-  "#f59e0b",
-  "#6366f1",
-  "#ec4899",
-  "#10b981",
-  "#3b82f6",
-  "#8b5cf6",
-  "#ef4444",
-  "#14b8a6",
+type PersonaPalette = {
+  accent: string;
+  bg: string;
+  border: string;
+  tagBg: string;
+};
+
+const PALETTES: PersonaPalette[] = [
+  {
+    accent: "var(--of-color-warning)",
+    bg: "var(--of-color-warning-light)",
+    border: "var(--of-badge-orange-border)",
+    tagBg: "var(--of-badge-orange-bg)",
+  },
+  {
+    accent: "var(--of-color-primary-500)",
+    bg: "var(--of-color-primary-50)",
+    border: "var(--of-color-primary-200)",
+    tagBg: "var(--of-color-primary-100)",
+  },
+  {
+    accent: "var(--of-role-pm-text)",
+    bg: "var(--of-role-pm-bg)",
+    border: "var(--of-badge-red-border)",
+    tagBg: "var(--of-badge-red-bg)",
+  },
+  {
+    accent: "var(--of-color-success)",
+    bg: "var(--of-color-success-light)",
+    border: "var(--of-badge-green-border)",
+    tagBg: "var(--of-badge-green-bg)",
+  },
+  {
+    accent: "var(--of-color-info)",
+    bg: "var(--of-color-info-light)",
+    border: "var(--of-badge-blue-border)",
+    tagBg: "var(--of-badge-blue-bg)",
+  },
+  {
+    accent: "var(--of-role-arch-text)",
+    bg: "var(--of-role-arch-bg)",
+    border: "var(--of-badge-purple-border)",
+    tagBg: "var(--of-badge-purple-bg)",
+  },
+  {
+    accent: "var(--of-color-error)",
+    bg: "var(--of-color-error-light)",
+    border: "var(--of-badge-red-border)",
+    tagBg: "var(--of-badge-red-bg)",
+  },
+  {
+    accent: "var(--of-role-fe-text)",
+    bg: "var(--of-role-fe-bg)",
+    border: "var(--of-badge-green-border)",
+    tagBg: "var(--of-badge-green-bg)",
+  },
 ];
 
 function hashCode(str: string): number {
@@ -50,9 +97,16 @@ function hashCode(str: string): number {
   return Math.abs(hash);
 }
 
-const accentColor = computed(() => {
-  if (props.color) return props.color;
-  return COLORS[hashCode(props.name) % COLORS.length];
+const accentPalette = computed<PersonaPalette>(() => {
+  if (props.color) {
+    return {
+      accent: props.color,
+      bg: `color-mix(in srgb, ${props.color} 14%, transparent)`,
+      border: `color-mix(in srgb, ${props.color} 32%, transparent)`,
+      tagBg: `color-mix(in srgb, ${props.color} 10%, transparent)`,
+    };
+  }
+  return PALETTES[hashCode(props.name) % PALETTES.length];
 });
 
 const avatarSize = computed(() => (props.size === "sm" ? 24 : 32));
@@ -79,10 +133,10 @@ const containerClass = computed(() => [
 ]);
 
 const containerStyle = computed<CSSProperties>(() => ({
-  "--pc-accent": accentColor.value,
-  "--pc-accent-bg": accentColor.value + "22",
-  "--pc-accent-border": accentColor.value + "55",
-  "--pc-accent-tag-bg": accentColor.value + "15",
+  "--pc-accent": accentPalette.value.accent,
+  "--pc-accent-bg": accentPalette.value.bg,
+  "--pc-accent-border": accentPalette.value.border,
+  "--pc-accent-tag-bg": accentPalette.value.tagBg,
 }));
 
 const avatarStyle = computed<CSSProperties>(() => ({
@@ -161,201 +215,201 @@ function handleHeaderClick() {
 <style scoped>
 /* ── Container ───────────────────────────────────────────── */
 .of-persona-card {
-  display: flex !important;
-  flex-direction: column !important;
-  background: var(--of-color-bg-primary, #fff) !important;
-  border: 1px solid var(--of-color-border, #e5e7eb) !important;
-  border-radius: 10px !important;
-  padding: 12px 14px !important;
-  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-sizing: border-box;
   transition:
     border-color 0.2s,
-    box-shadow 0.2s !important;
-  cursor: pointer !important;
-  user-select: none !important;
-  position: relative !important;
+    box-shadow 0.2s;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
 }
 
 .of-persona-card:hover:not(.of-persona-card--disabled) {
-  border-color: var(--of-color-border-hover, #d1d5db) !important;
-  box-shadow: var(--of-shadow-card) !important;
+  border-color: var(--of-color-gray-300);
+  box-shadow: var(--of-shadow-card);
 }
 
 /* ── Size modifier ───────────────────────────────────────── */
 .of-persona-card--sm {
-  padding: 8px 10px !important;
-  border-radius: 8px !important;
+  padding: 8px 10px;
+  border-radius: 8px;
 }
 
 /* ── Active state ────────────────────────────────────────── */
 .of-persona-card--active {
-  border-color: var(--pc-accent) !important;
-  animation: of-persona-pulse 2s ease-in-out infinite !important;
+  border-color: var(--pc-accent);
+  animation: of-persona-pulse 2s ease-in-out infinite;
 }
 
 @keyframes of-persona-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 transparent !important;
+    box-shadow: 0 0 0 0 transparent;
   }
   50% {
-    box-shadow: 0 0 0 3px var(--pc-accent-border) !important;
+    box-shadow: 0 0 0 3px var(--pc-accent-border);
   }
 }
 
 /* ── Done state ──────────────────────────────────────────── */
 .of-persona-card--done {
-  border-color: var(--of-badge-green-border) !important;
+  border-color: var(--of-badge-green-border);
 }
 
 /* ── Disabled state ──────────────────────────────────────── */
 .of-persona-card--disabled {
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ── Expanded state ──────────────────────────────────────── */
 .of-persona-card--expanded {
-  border-color: var(--pc-accent) !important;
+  border-color: var(--pc-accent);
 }
 
 /* ── Header row ──────────────────────────────────────────── */
 .of-persona-card__header {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  gap: 10px !important;
-  width: 100% !important;
-  min-width: 0 !important;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
 }
 
 /* ── Avatar ──────────────────────────────────────────────── */
 .of-persona-card__avatar {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  border-radius: 8px !important;
-  background: var(--pc-accent-bg) !important;
-  border: 1.5px solid var(--pc-accent-border) !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-  box-sizing: border-box !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--pc-accent-bg);
+  border: 1.5px solid var(--pc-accent-border);
+  font-weight: 600;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 /* ── Body ────────────────────────────────────────────────── */
 .of-persona-card__body {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 3px !important;
-  flex: 1 !important;
-  min-width: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
 }
 
 .of-persona-card__name-row {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 5px !important;
-  min-width: 0 !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
 }
 
 .of-persona-card__name {
-  font-weight: 600 !important;
-  color: var(--of-color-text-primary) !important;
-  line-height: 1.3 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  flex-shrink: 1 !important;
-  min-width: 0 !important;
+  font-weight: 600;
+  color: var(--of-color-text-primary);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .of-persona-card__title-badge {
-  display: inline-block !important;
-  flex-shrink: 0 !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  color: var(--pc-accent) !important;
-  background: var(--pc-accent-bg) !important;
-  border: 1px solid var(--pc-accent-border) !important;
-  border-radius: 999px !important;
-  padding: 1px 6px !important;
-  line-height: 1.4 !important;
-  white-space: nowrap !important;
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--pc-accent);
+  background: var(--pc-accent-bg);
+  border: 1px solid var(--pc-accent-border);
+  border-radius: 999px;
+  padding: 1px 6px;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 .of-persona-card__subtitle {
-  color: var(--pc-accent) !important;
-  line-height: 1.3 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  color: var(--pc-accent);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Tags ────────────────────────────────────────────────── */
 .of-persona-card__tags {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  gap: 3px !important;
-  margin-top: 1px !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 1px;
 }
 
 .of-persona-card__tag {
-  display: inline-block !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  color: var(--pc-accent) !important;
-  background: var(--pc-accent-tag-bg) !important;
-  border-radius: 999px !important;
-  padding: 1px 6px !important;
-  line-height: 1.4 !important;
-  white-space: nowrap !important;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--pc-accent);
+  background: var(--pc-accent-tag-bg);
+  border-radius: 999px;
+  padding: 1px 6px;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 /* ── Right side ──────────────────────────────────────────── */
 .of-persona-card__right {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 4px !important;
-  flex-shrink: 0 !important;
-  margin-left: auto !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .of-persona-card__done-mark {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 18px !important;
-  height: 18px !important;
-  border-radius: 50% !important;
-  background: var(--of-color-success-light, #dcfce7) !important;
-  color: var(--of-badge-green-text) !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  flex-shrink: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--of-color-success-light);
+  color: var(--of-badge-green-text);
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .of-persona-card__chevron {
-  font-size: 9px !important;
-  color: var(--of-color-text-tertiary) !important;
-  flex-shrink: 0 !important;
-  line-height: 1 !important;
-  transition: color 0.2s !important;
+  font-size: 9px;
+  color: var(--of-color-text-tertiary);
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.2s;
 }
 
 .of-persona-card--active .of-persona-card__chevron,
 .of-persona-card--expanded .of-persona-card__chevron {
-  color: var(--pc-accent) !important;
+  color: var(--pc-accent);
 }
 
 /* ── Expanded detail ─────────────────────────────────────── */
 .of-persona-card__detail {
-  border-top: 1px solid var(--of-color-border-light) !important;
-  margin-top: 10px !important;
-  padding-top: 10px !important;
+  border-top: 1px solid var(--of-color-border-light);
+  margin-top: 10px;
+  padding-top: 10px;
 }
 </style>
