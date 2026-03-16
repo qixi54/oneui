@@ -1,7 +1,7 @@
 {
   "customSyntax": "postcss-html",
   "rules": {
-    "declaration-no-important": [true, { "severity": "warning" }],
+    "declaration-no-important": [true, { "severity": "error" }],
     "color-named": ["never", { "severity": "error" }],
     "color-no-invalid-hex": [true, { "severity": "error" }]
   },
@@ -12,7 +12,10 @@
     },
     {
       "files": ["**/*.css"],
-      "customSyntax": "postcss"
+      "customSyntax": "postcss",
+      "rules": {
+        "declaration-no-important": null
+      }
     }
   ]
 }
