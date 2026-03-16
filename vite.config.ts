@@ -13,8 +13,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'OneflowUI',
-      fileName: 'oneflow-ui',
+      formats: ['es'],
     },
     target: ['es2020', 'chrome87', 'firefox78', 'safari14'],
     sourcemap: false,
@@ -33,18 +32,9 @@ export default defineConfig({
         'vue-draggable-plus',
       ],
       output: {
-        globals: {
-          vue: 'Vue',
-          'lucide-vue-next': 'LucideVueNext',
-          echarts: 'echarts',
-          mermaid: 'mermaid',
-          katex: 'katex',
-          'highlight.js': 'hljs',
-          marked: 'marked',
-          quill: 'Quill',
-          '@vueup/vue-quill': 'VueQuill',
-          'vue-draggable-plus': 'VueDraggablePlus',
-        },
+        preserveModules: true,
+        preserveModulesRoot: 'src',
+        entryFileNames: '[name].js',
         exports: 'named',
       },
     },

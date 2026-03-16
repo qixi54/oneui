@@ -3,17 +3,24 @@
   "version": "0.4.2",
   "description": "OneFlow UI Component Library - Vue3 components for task management views",
   "type": "module",
-  "main": "./dist/oneflow-ui.umd.cjs",
-  "module": "./dist/oneflow-ui.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/oneflow-ui.js",
-      "require": "./dist/oneflow-ui.umd.cjs"
+      "import": "./dist/index.js"
     },
-    "./styles": "./dist/style.css"
+    "./styles": "./dist/style.css",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
   },
+  "sideEffects": [
+    "*.css",
+    "*.vue"
+  ],
   "files": [
     "dist"
   ],
