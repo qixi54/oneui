@@ -103,59 +103,59 @@ watch(
 <style scoped>
 /* 根容器 */
 .of-mermaid {
-  box-sizing: border-box !important;
-  display: block !important;
-  font-family: inherit !important;
+  box-sizing: border-box;
+  display: block;
+  font-family: inherit;
 }
 
 /* 图表内容区域 */
 .of-mermaid__container {
-  width: 100% !important;
-  overflow-x: auto !important;
-  padding: var(--of-spacing-4, 16px) !important;
-  background: var(--of-color-bg-canvas, #ffffff) !important;
-  border: 1px solid var(--of-color-gray-100, #f0f0f0) !important;
-  border-radius: var(--of-radius-lg, 8px) !important;
-  box-sizing: border-box !important;
-  min-height: 60px !important;
-  text-align: center !important;
+  width: 100%;
+  overflow-x: auto;
+  padding: var(--of-spacing-4, 16px);
+  background: var(--of-color-bg-canvas, #ffffff);
+  border: 1px solid var(--of-color-gray-100, #f0f0f0);
+  border-radius: var(--of-radius-lg, 8px);
+  box-sizing: border-box;
+  min-height: 60px;
+  text-align: center;
 }
 
 /* 让 mermaid 生成的 svg 自适应宽度 */
 .of-mermaid__container :deep(svg) {
-  max-width: 100% !important;
-  height: auto !important;
+  max-width: 100%;
+  height: auto;
 }
 
 /* 加载状态 */
 .of-mermaid__loading {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: var(--of-spacing-2, 8px) !important;
-  padding: var(--of-spacing-4, 16px) !important;
-  background: var(--of-color-bg-canvas, #ffffff) !important;
-  border: 1px solid var(--of-color-gray-100, #f0f0f0) !important;
-  border-radius: var(--of-radius-lg, 8px) !important;
-  min-height: 60px !important;
-  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--of-spacing-2, 8px);
+  padding: var(--of-spacing-4, 16px);
+  background: var(--of-color-bg-canvas, #ffffff);
+  border: 1px solid var(--of-color-gray-100, #f0f0f0);
+  border-radius: var(--of-radius-lg, 8px);
+  min-height: 60px;
+  box-sizing: border-box;
 }
 
 .of-mermaid__loading-text {
-  font-size: 13px !important;
-  color: var(--of-color-text-secondary, #8c8c8c) !important;
+  font-size: 13px;
+  color: var(--of-color-text-secondary, #8c8c8c);
 }
 
 /* Spinner 动画 */
 .of-mermaid__spinner {
-  display: inline-block !important;
-  width: 16px !important;
-  height: 16px !important;
-  border: 2px solid var(--of-color-gray-200, #e8e8e8) !important;
-  border-top-color: var(--of-color-primary, #6366f1) !important;
-  border-radius: 50% !important;
-  animation: of-mermaid-spin 0.8s linear infinite !important;
-  flex-shrink: 0 !important;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--of-color-gray-200, #e8e8e8);
+  border-top-color: var(--of-color-primary, #6366f1);
+  border-radius: 50%;
+  animation: of-mermaid-spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes of-mermaid-spin {
@@ -166,36 +166,36 @@ watch(
 
 /* 错误状态 */
 .of-mermaid__error {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: var(--of-spacing-2, 8px) !important;
-  padding: var(--of-spacing-3, 12px) var(--of-spacing-4, 16px) !important;
-  background: var(--of-color-red-50, #fff2f0) !important;
-  border: 1px solid var(--of-color-red-200, #ffccc7) !important;
-  border-radius: var(--of-radius-lg, 8px) !important;
-  box-sizing: border-box !important;
-  min-height: 60px !important;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--of-spacing-2, 8px);
+  padding: var(--of-spacing-3, 12px) var(--of-spacing-4, 16px);
+  background: var(--of-color-red-50, #fff2f0);
+  border: 1px solid var(--of-color-red-200, #ffccc7);
+  border-radius: var(--of-radius-lg, 8px);
+  box-sizing: border-box;
+  min-height: 60px;
 }
 
 .of-mermaid__error-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 18px !important;
-  height: 18px !important;
-  border-radius: 50% !important;
-  background: var(--of-color-red-500, #dc2626) !important;
-  color: var(--of-color-text-inverse) !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  flex-shrink: 0 !important;
-  margin-top: 1px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--of-color-red-500, #dc2626);
+  color: var(--of-color-text-inverse);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .of-mermaid__error-text {
-  font-size: 13px !important;
-  color: var(--of-color-red-600, #dc2626) !important;
-  line-height: 1.5 !important;
-  word-break: break-all !important;
+  font-size: 13px;
+  color: var(--of-color-red-600, #dc2626);
+  line-height: 1.5;
+  word-break: break-all;
 }
 </style>

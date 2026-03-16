@@ -47,42 +47,42 @@ const emit = defineEmits<{
 
 <style scoped>
 .of-breadcrumb__item {
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .of-breadcrumb__link {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  color: var(--of-color-text-secondary, #6b7280) !important;
-  font-size: 14px !important;
-  text-decoration: none !important;
-  transition: color 0.15s ease !important;
-  cursor: default !important;
-  line-height: 1.5 !important;
-  padding: var(--of-spacing-xs, 2px) 0 !important;
-  border-radius: var(--of-radius-sm, 4px) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--of-color-text-secondary, #6b7280);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  cursor: default;
+  line-height: 1.5;
+  padding: var(--of-spacing-xs, 2px) 0;
+  border-radius: var(--of-radius-sm, 4px);
 }
 
 .of-breadcrumb__link[href]:hover {
-  color: var(--of-color-primary, #7c3aed) !important;
-  cursor: pointer !important;
+  color: var(--of-color-primary, #7c3aed);
+  cursor: pointer;
 }
 
 .of-breadcrumb__link--active {
-  color: var(--of-color-text, #111827) !important;
-  font-weight: 500 !important;
-  pointer-events: none !important;
-  cursor: default !important;
+  color: var(--of-color-text, #111827);
+  font-weight: 500;
+  pointer-events: none;
+  cursor: default;
 }
 
 .of-breadcrumb__icon {
-  width: 14px !important;
-  height: 14px !important;
-  display: inline !important;
-  vertical-align: middle !important;
-  flex-shrink: 0 !important;
+  width: 14px;
+  height: 14px;
+  display: inline;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 </style>
