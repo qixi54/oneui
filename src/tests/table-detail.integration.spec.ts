@@ -46,6 +46,49 @@ describe("Table + Detail 集成", () => {
     expect(onRowClick.mock.calls[0][0]).toMatchObject({ id: "T-1", title: "完善集成测试" });
   });
 
+  it("selectable=false 时表头和数据行都不渲染 checkbox", async () => {
+    const wrapper = mount(DataTable, {
+      props: {
+        tasks,
+        selectable: false,
+        columns: [
+          { key: "title", label: "标题" },
+          { key: "status", label: "状态" },
+        ],
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find(".of-th-checkbox").exists()).toBe(false);
+    expect(wrapper.find(".of-td-checkbox").exists()).toBe(false);
+    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(false);
+  });
+
+  it("fill 列会应用最小宽度，避免窄容器下被压扁", async () => {
+    const wrapper = mount(DataTable, {
+      props: {
+        tasks,
+        columns: [
+          { key: "title", label: "标题", width: "fill", minWidth: 260 },
+          { key: "status", label: "状态", width: 90 },
+        ],
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    const titleHeader = wrapper.findAll(".of-th").find((cell) => cell.text().includes("标题"));
+    const titleCell = wrapper.find(".of-td-title").element.parentElement as HTMLElement | null;
+
+    expect(titleHeader).toBeTruthy();
+    expect(titleCell).not.toBeNull();
+    expect((titleHeader!.element as HTMLElement).style.minWidth).toBe("260px");
+    expect((titleHeader!.element as HTMLElement).style.flex).toBe("1 1 260px");
+    expect(titleCell!.style.minWidth).toBe("260px");
+    expect(titleCell!.style.flex).toBe("1 1 260px");
+  });
+
   it("DetailLayout 能渲染来自 task 的关键字段", () => {
     const wrapper = mount(DetailLayout, {
       props: {

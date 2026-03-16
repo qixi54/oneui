@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { ChevronUp, ChevronDown } from "lucide-vue-next";
 import type { TableColumn } from "../../types";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    columns?: TableColumn[];
+    columns: TableColumn[];
     selectable?: boolean;
     sortKey?: string;
     sortOrder?: "asc" | "desc";
@@ -26,19 +25,12 @@ const emit = defineEmits<{
   "select-all": [];
 }>();
 
-const defaultColumns: TableColumn[] = [
-  { key: "id", label: "任务ID", width: 100, align: "left" },
-  { key: "title", label: "标题", width: "fill", align: "left" },
-  { key: "status", label: "状态", width: 90, align: "left" },
-  { key: "role", label: "负责角色", width: 90, align: "left" },
-  { key: "priority", label: "优先级", width: 70, align: "left" },
-  { key: "updatedAt", label: "更新时间", width: 100, align: "left" },
-];
-
-const resolvedColumns = computed(() => props.columns ?? defaultColumns);
 
 function colStyle(col: TableColumn) {
-  if (col.width === "fill") return { flex: "1 1 0" };
+  if (col.width === "fill") {
+    const minWidth = `${col.minWidth ?? 220}px`;
+    return { flex: `1 1 ${minWidth}`, minWidth };
+  }
   return { width: `${col.width}px`, flexShrink: "0", flexGrow: "0" };
 }
 
@@ -62,7 +54,7 @@ function handleSort(key: string) {
 
     <!-- 数据列 -->
     <div
-      v-for="col in resolvedColumns"
+      v-for="col in columns"
       :key="col.key"
       class="of-th"
       :style="colStyle(col)"

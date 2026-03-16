@@ -165,14 +165,14 @@ const selectedOption = computed(() => {
 
 .of-field-select__display {
   font-size: 13px;
-  color: var(--of-color-text, #1a1a1a);
+  color: var(--of-color-text-primary);
 }
 
 .of-field-select__dropdown {
   position: fixed;
   z-index: 9999;
-  background: var(--of-color-bg-canvas, #fff);
-  border: 1px solid var(--of-color-gray-200, #e5e5e5);
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-border-color);
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   overflow: hidden;
@@ -191,7 +191,7 @@ const selectedOption = computed(() => {
 
 .of-field-select__option:hover,
 .of-field-select__option.active {
-  background: var(--of-color-gray-50, #f5f5f5);
+  background: var(--of-color-bg-hover);
 }
 
 .of-field-select__option.selected {
@@ -199,7 +199,7 @@ const selectedOption = computed(() => {
 }
 
 .of-field-select__option--clear {
-  border-bottom: 1px solid var(--of-color-gray-100, #f0f0f0);
+  border-bottom: 1px solid var(--of-color-border-light);
 }
 
 .of-field-select__badge {

@@ -123,8 +123,8 @@ onBeforeUnmount(() => {
 .of-context-menu {
   min-width: 160px;
   padding: 4px 0;
-  background: var(--of-color-bg-canvas, #fff);
-  border: 1px solid var(--of-color-gray-200, #e5e7eb);
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-border-color);
   border-radius: 8px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
   z-index: 9999;
@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
 .of-context-menu__sep {
   margin: 4px 0;
   border: 0;
-  border-top: 1px solid var(--of-color-gray-100, #f0f0f0);
+  border-top: 1px solid var(--of-color-border-light);
 }
 
 .of-context-menu__item {
@@ -148,16 +148,16 @@ onBeforeUnmount(() => {
   text-align: left;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--of-color-text, #1a1a1a);
+  color: var(--of-color-text-primary);
   cursor: pointer;
 }
 
 .of-context-menu__item:hover:not(.is-disabled) {
-  background: var(--of-color-gray-50, #f5f5f5);
+  background: var(--of-color-bg-hover);
 }
 
 .of-context-menu__item.is-disabled {
-  color: var(--of-color-gray-400, #a8a8a8);
+  color: var(--of-color-text-tertiary);
   cursor: default;
 }
 
@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
 
 .of-context-menu__submenu-indicator {
   margin-left: auto;
-  color: var(--of-color-gray-400, #a8a8a8);
+  color: var(--of-color-text-tertiary);
   font-size: 12px;
 }
 </style>

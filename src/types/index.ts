@@ -61,6 +61,7 @@ export interface TableColumn {
   key: string;
   label: string;
   width?: number | "fill";
+  minWidth?: number;
   align?: "left" | "center" | "right";
   /** 列数据类型，用于筛选面板选择对应的操作符 */
   type?: "string" | "number" | "date" | "status" | "priority";

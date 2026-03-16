@@ -188,14 +188,14 @@ watch(
 
 .of-field-multiselect__placeholder {
   font-size: 13px;
-  color: var(--of-color-gray-400, #a0a0a0);
+  color: var(--of-color-text-tertiary);
 }
 
 .of-field-multiselect__dropdown {
   position: fixed;
   z-index: 9999;
-  background: var(--of-color-bg-canvas, #fff);
-  border: 1px solid var(--of-color-gray-200, #e5e5e5);
+  background: var(--of-color-bg-elevated);
+  border: 1px solid var(--of-border-color);
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   overflow: hidden;
@@ -213,7 +213,7 @@ watch(
 
 .of-field-multiselect__option:hover,
 .of-field-multiselect__option.active {
-  background: var(--of-color-gray-50, #f5f5f5);
+  background: var(--of-color-bg-hover);
 }
 
 .of-field-multiselect__option.selected {
@@ -232,19 +232,19 @@ watch(
   font-size: 12px;
   color: var(--of-color-text-inverse);
   line-height: 18px;
-  background: var(--of-color-primary, #6366f1);
+  background: var(--of-color-primary-500);
 }
 
 .of-field-multiselect__actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  border-top: 1px solid var(--of-color-gray-100, #f0f0f0);
+  border-top: 1px solid var(--of-color-border-light);
   padding: 8px;
 }
 
 .of-field-multiselect__btn {
-  border: 1px solid var(--of-color-gray-200, #e5e5e5);
+  border: 1px solid var(--of-border-color);
   background: var(--of-color-bg-elevated);
   border-radius: 4px;
   font-size: 12px;
@@ -253,8 +253,8 @@ watch(
 }
 
 .of-field-multiselect__btn--primary {
-  border-color: var(--of-color-primary, #6366f1);
-  background: var(--of-color-primary, #6366f1);
+  border-color: var(--of-color-primary-500);
+  background: var(--of-color-primary-500);
   color: var(--of-color-text-inverse);
 }
 </style>

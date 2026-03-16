@@ -131,13 +131,13 @@ const displayValue = computed(() => {
 }
 
 .of-field-cell:hover:not(.of-field-cell--readonly):not(.of-field-cell--editing) {
-  background: var(--of-color-gray-50, #f9f9f9);
+  background: var(--of-color-bg-hover);
 }
 
 .of-field-cell--editing {
-  outline: 2px solid var(--of-color-primary-500, #6366f1);
+  outline: 2px solid var(--of-color-primary-500);
   outline-offset: -1px;
-  background: var(--of-color-bg-canvas, #fff);
+  background: var(--of-color-bg-elevated);
   cursor: default;
   padding: 0;
 }
@@ -148,7 +148,7 @@ const displayValue = computed(() => {
 
 .of-field-cell__display {
   font-size: 13px;
-  color: var(--of-color-text, #1a1a1a);
+  color: var(--of-color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -157,6 +157,6 @@ const displayValue = computed(() => {
 
 .of-field-cell__loading {
   font-size: 13px;
-  color: var(--of-color-gray-400, #aaa);
+  color: var(--of-color-text-tertiary);
 }
 </style>
