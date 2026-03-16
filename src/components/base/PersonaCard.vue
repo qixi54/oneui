@@ -15,7 +15,7 @@ export interface PersonaCardProps {
   size?: "sm" | "md";
 }
 
-defineOptions({ name: "PersonaCard" });
+defineOptions({ name: "PersonaCard", inheritAttrs: false });
 
 const props = withDefaults(defineProps<PersonaCardProps>(), {
   size: "md",
@@ -155,7 +155,7 @@ function handleHeaderClick() {
 </script>
 
 <template>
-  <div :class="containerClass" :style="containerStyle">
+  <div :class="containerClass" :style="containerStyle" v-bind="$attrs">
     <!-- Header row -->
     <div class="of-persona-card__header" @click="handleHeaderClick">
       <!-- Avatar -->

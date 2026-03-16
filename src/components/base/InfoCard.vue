@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, type CSSProperties, type VNode } from "vue";
 
-defineOptions({ name: "InfoCard" });
+defineOptions({ name: "InfoCard", inheritAttrs: false });
 
 export interface InfoCardProps {
   variant?: "memo" | "notify" | "history";
@@ -133,6 +133,7 @@ function handleClick(e: MouseEvent) {
     class="of-info-card"
     :class="`of-info-card--${variant}`"
     :style="cardStyle"
+    v-bind="$attrs"
     @click="handleClick"
   >
     <!-- ── MEMO variant ─────────────────────────────────────────────────── -->

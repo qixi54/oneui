@@ -12,7 +12,7 @@ export interface MonitorItemProps {
   clickable?: boolean;
 }
 
-defineOptions({ name: "MonitorItem" });
+defineOptions({ name: "MonitorItem", inheritAttrs: false });
 
 const props = withDefaults(defineProps<MonitorItemProps>(), {
   subtitle: undefined,
@@ -53,6 +53,7 @@ function handleClick() {
   <div
     class="of-monitor-item"
     :class="{ 'of-monitor-item--clickable': clickable }"
+    v-bind="$attrs"
     @click="handleClick"
   >
     <div v-if="subtitle !== undefined" class="of-monitor-item__subtitle">

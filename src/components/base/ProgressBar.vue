@@ -11,6 +11,8 @@ interface ProgressBarProps {
   borderRadius?: number;
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<ProgressBarProps>(), {
   height: 4,
   bgColor: "var(--of-color-gray-100)",
@@ -44,7 +46,7 @@ const fillStyle = computed(() => ({
 </script>
 
 <template>
-  <div class="of-progress-bar">
+  <div class="of-progress-bar" v-bind="$attrs">
     <div class="of-progress-bar__track pb" :style="trackStyle">
       <div
         class="of-progress-bar__fill pf"

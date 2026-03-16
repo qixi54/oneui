@@ -12,6 +12,8 @@ export interface ChainItemProps {
   borderColor?: string;
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<ChainItemProps>(), {
   type: "source",
 });
@@ -55,7 +57,7 @@ const avatarStyle = computed<CSSProperties>(() => ({
 </script>
 
 <template>
-  <div class="one-chain-item" :style="containerStyle">
+  <div class="one-chain-item" :style="containerStyle" v-bind="$attrs">
     <div class="one-chain-item__header">
       <span class="one-chain-item__avatar" :style="avatarStyle">{{ displayAvatar }}</span>
       <span class="one-chain-item__title" :style="{ color: resolvedColor }">{{ title }}</span>

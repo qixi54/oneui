@@ -21,6 +21,8 @@ export interface EmptyStateAction {
   onClick: () => void;
 }
 
+defineOptions({ inheritAttrs: false });
+
 defineProps<{
   icon?: string | Component; // lucide icon name or component
   title: string;
@@ -30,7 +32,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="of-empty-state">
+  <div class="of-empty-state" v-bind="$attrs">
     <div class="of-empty-state__content">
       <div v-if="icon" class="of-empty-state__icon">
         <component :is="resolveIcon(icon)" />

@@ -25,6 +25,8 @@ export interface MenuItem {
   variant?: "default" | "destructive";
 }
 
+defineOptions({ inheritAttrs: false });
+
 defineProps<{
   items: MenuItem[];
 }>();
@@ -75,7 +77,7 @@ function closeMenu() {
 </script>
 
 <template>
-  <div class="of-dropdown-menu">
+  <div class="of-dropdown-menu" v-bind="$attrs">
     <button
       ref="triggerRef"
       class="of-dropdown-menu__trigger"

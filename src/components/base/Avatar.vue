@@ -9,7 +9,7 @@ export interface AvatarProps {
   role?: string;
 }
 
-defineOptions({ name: "Avatar" });
+defineOptions({ name: "Avatar", inheritAttrs: false });
 
 const props = withDefaults(defineProps<AvatarProps>(), {
   size: 28,
@@ -93,7 +93,7 @@ const avatarStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <span class="one-avatar" :style="avatarStyle">
+  <span class="one-avatar" :style="avatarStyle" v-bind="$attrs">
     {{ displayText }}
   </span>
 </template>

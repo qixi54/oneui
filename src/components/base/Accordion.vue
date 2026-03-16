@@ -15,6 +15,8 @@ export interface AccordionProps {
   lazy?: boolean;
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<AccordionProps>(), {
   modelValue: undefined,
   multiple: false,
@@ -66,7 +68,7 @@ function toggleItem(item: AccordionItem) {
 </script>
 
 <template>
-  <div class="of-accordion">
+  <div class="of-accordion" v-bind="$attrs">
     <section
       v-for="item in items"
       :key="item.key"

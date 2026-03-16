@@ -15,6 +15,8 @@ interface BadgeTone {
   border: string;
 }
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<BadgeProps>(), {
   size: "md",
 });
@@ -91,7 +93,7 @@ const badgeStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <span class="one-badge" :class="`one-badge--${size}`" :style="badgeStyle">
+  <span class="one-badge" :class="`one-badge--${size}`" :style="badgeStyle" v-bind="$attrs">
     <slot />
   </span>
 </template>
