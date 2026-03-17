@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { nextTick, onBeforeUnmount, ref } from "vue";
 import { MoreHorizontal } from "lucide-vue-next";
 import type { Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
@@ -42,11 +42,6 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
-  if (typeof document === "undefined") return;
-  document.addEventListener("keydown", onKeydown);
-});
-
 onBeforeUnmount(() => {
   if (typeof document === "undefined") return;
   document.removeEventListener("keydown", onKeydown);
@@ -55,6 +50,7 @@ onBeforeUnmount(() => {
 function handleItemClick(item: MenuItem) {
   item.onClick();
   isOpen.value = false;
+  document.removeEventListener("keydown", onKeydown);
   triggerRef.value?.focus();
 }
 
@@ -62,16 +58,19 @@ function toggleMenu() {
   isOpen.value = !isOpen.value;
   if (isOpen.value) {
     nextTick(() => {
+      document.addEventListener("keydown", onKeydown);
       const firstItem = menuRef.value?.querySelector<HTMLButtonElement>('[role="menuitem"]');
       firstItem?.focus();
     });
   } else {
+    document.removeEventListener("keydown", onKeydown);
     triggerRef.value?.focus();
   }
 }
 
 function closeMenu() {
   isOpen.value = false;
+  document.removeEventListener("keydown", onKeydown);
   triggerRef.value?.focus();
 }
 </script>
