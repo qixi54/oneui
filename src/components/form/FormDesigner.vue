@@ -123,6 +123,16 @@ function createFieldOfType(type: FieldType, base: FieldDefBase): FieldDef {
       return { ...base, type };
     case "formula":
       return { ...base, type, formula: "" };
+    case "currency":
+      return { ...base, type };
+    case "richtext":
+      return { ...base, type };
+    case "auto_number":
+      return { ...base, type };
+    case "creator":
+      return { ...base, type };
+    case "progress":
+      return { ...base, type };
   }
 }
 

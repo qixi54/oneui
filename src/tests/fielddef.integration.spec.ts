@@ -25,6 +25,13 @@ function isValidFieldDef(field: FieldDef): boolean {
       return field.targetTableId === undefined || typeof field.targetTableId === "string";
     case "formula":
       return typeof field.formula === "string";
+    case "currency":
+      return true;
+    case "richtext":
+    case "auto_number":
+    case "creator":
+    case "progress":
+      return true;
     default: {
       const exhaustive: never = field;
       return exhaustive;
