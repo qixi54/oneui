@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useBreakpoint } from "@/composables/useBreakpoint";
 import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
+
+const { isMobile } = useBreakpoint();
 
 const props = defineProps<{ value?: CellValue; field: FieldDef }>();
 const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
@@ -122,7 +125,13 @@ const selectedOption = computed(() => {
     </span>
 
     <Teleport to="body">
-      <div v-if="isOpen" ref="dropdownRef" class="of-field-select__dropdown" :style="dropdownStyle">
+      <div
+        v-if="isOpen"
+        ref="dropdownRef"
+        class="of-field-select__dropdown"
+        :class="{ 'of-field-select__dropdown--sheet': isMobile }"
+        :style="isMobile ? {} : dropdownStyle"
+      >
         <div
           class="of-field-select__option of-field-select__option--clear"
           :class="{ active: activeIndex === -1, selected: selectedIndex === -1 }"
@@ -173,7 +182,7 @@ const selectedOption = computed(() => {
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-border-color);
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--of-shadow-dropdown);
   overflow: hidden;
   max-height: 260px;
   overflow-y: auto;
@@ -208,5 +217,32 @@ const selectedOption = computed(() => {
   font-size: 12px;
   color: var(--of-color-text-inverse);
   line-height: 18px;
+}
+
+/* Mobile bottom-sheet mode — higher specificity to override base dropdown */
+.of-field-select .of-field-select__dropdown--sheet {
+  position: fixed;
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-height: 50dvh;
+  border-radius: 16px 16px 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.of-field-select__dropdown--sheet .of-field-select__option {
+  min-height: 44px;
+  font-size: 16px;
+  padding: 12px 16px;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .of-field-select {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
 }
 </style>
