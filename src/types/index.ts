@@ -173,7 +173,12 @@ export type FieldType =
   | "user"
   | "attachment"
   | "relation"
-  | "formula";
+  | "formula"
+  | "currency"
+  | "richtext"
+  | "auto_number"
+  | "creator"
+  | "progress";
 
 export interface SelectOption {
   value: string;
@@ -232,11 +237,51 @@ export interface AttachmentFieldDef extends FieldDefBase {
 export interface RelationFieldDef extends FieldDefBase {
   type: "relation";
   targetTableId?: string;
+  /** Field ID to display from the target table (e.g. "title") */
+  displayFieldId?: string;
+  /** Filter conditions applied when selecting related records */
+  filterConfig?: FilterCondition[];
+  /** Relation cardinality */
+  relationMode?: "one_to_many" | "many_to_many";
+  /** Schema of the target table for inline rendering */
+  targetSchema?: TableSchema;
 }
 
 export interface FormulaFieldDef extends FieldDefBase {
   type: "formula";
   formula: string;
+  /** Type of the computed result */
+  resultType?: "string" | "number" | "date" | "boolean";
+  /** Field IDs this formula depends on (for recalculation) */
+  dependencies?: string[];
+}
+
+export interface CurrencyFieldDef extends FieldDefBase {
+  type: "currency";
+  /** ISO 4217 currency code, e.g. 'USD', 'CNY' */
+  currencyCode?: string;
+  /** Decimal precision, default 2 */
+  precision?: number;
+}
+
+export interface RichTextFieldDef extends FieldDefBase {
+  type: "richtext";
+}
+
+export interface AutoNumberFieldDef extends FieldDefBase {
+  type: "auto_number";
+  /** Prefix for the auto number, e.g. 'TASK-' */
+  prefix?: string;
+}
+
+export interface CreatorFieldDef extends FieldDefBase {
+  type: "creator";
+}
+
+export interface ProgressFieldDef extends FieldDefBase {
+  type: "progress";
+  min?: number;
+  max?: number;
 }
 
 export type FieldDef =
@@ -250,7 +295,12 @@ export type FieldDef =
   | UserFieldDef
   | AttachmentFieldDef
   | RelationFieldDef
-  | FormulaFieldDef;
+  | FormulaFieldDef
+  | CurrencyFieldDef
+  | RichTextFieldDef
+  | AutoNumberFieldDef
+  | CreatorFieldDef
+  | ProgressFieldDef;
 
 export function isSelectField(field: FieldDef): field is SelectFieldDef {
   return field.type === "select" || field.type === "multi_select";
@@ -263,6 +313,32 @@ export function isFormulaField(field: FieldDef): field is FormulaFieldDef {
 // ─── 数据行 ───────────────────────────────────────────────────────────────────
 
 export type CellValue = string | number | boolean | string[] | null;
+
+// ─── Active Cell (Keyboard Navigation) ──────────────────────────────────────
+
+export interface ActiveCell {
+  rowId: string;
+  colKey: string;
+}
+
+// ─── Aggregation ────────────────────────────────────────────────────────────
+
+export type AggregationFn = "sum" | "avg" | "count" | "min" | "max";
+
+export interface AggregationConfig {
+  fieldId: string;
+  fn: AggregationFn;
+}
+
+// ─── Draft Row State ────────────────────────────────────────────────────────
+
+export interface DraftRowState {
+  draftId: string;
+  fields: Record<string, CellValue>;
+  dirtyFields: Set<string>;
+  validationErrors: Map<string, string>;
+  groupFieldValue?: CellValue;
+}
 
 export interface DataRecord {
   id: string;
@@ -299,6 +375,10 @@ export interface ViewConfig {
   kanbanFieldId?: string;
   galleryCoverFieldId?: string;
   galleryCardFields?: string[];
+  /** Aggregation configs shown in group headers/footers */
+  aggregations?: AggregationConfig[];
+  /** Column keys to pin on the left side */
+  fixedColumns?: string[];
 }
 
 // ─── 表结构 ───────────────────────────────────────────────────────────────────
@@ -410,6 +490,43 @@ export function buildGalleryItems(
       extraProps: extraProps.length > 0 ? extraProps : undefined,
     };
   });
+}
+
+export function buildGanttItems(
+  records: DataRecord[],
+  options: {
+    startFieldId?: string;
+    endFieldId?: string;
+    labelFieldId?: string;
+    barColorFieldId?: string;
+  } = {},
+): GanttItem[] {
+  const startFid = options.startFieldId ?? "startDate";
+  const endFid = options.endFieldId ?? "endDate";
+  const labelFid = options.labelFieldId ?? "title";
+
+  const result: GanttItem[] = [];
+  for (const record of records) {
+    const task = dataRecordToTask(record);
+    const startDate = record.fields[startFid];
+    const endDate = record.fields[endFid];
+
+    // 跳过没有日期的记录
+    if (!startDate || !endDate) continue;
+
+    const label = record.fields[labelFid];
+
+    result.push({
+      ...task,
+      title: typeof label === "string" && label ? label : task.title,
+      startDate: String(startDate),
+      endDate: String(endDate),
+      barColor: options.barColorFieldId
+        ? String(record.fields[options.barColorFieldId] ?? "")
+        : undefined,
+    });
+  }
+  return result;
 }
 
 export const DEFAULT_TABLE_SCHEMA: TableSchema = {
