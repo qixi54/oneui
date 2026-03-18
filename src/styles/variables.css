@@ -34,10 +34,20 @@
   --of-color-success-dark: #165e26;
   --of-color-warning: #d97706;
   --of-color-warning-light: #fef3c7;
+  --of-color-warning-50: #fffbeb;
+  --of-color-warning-100: #fef3c7;
+  --of-color-warning-200: #fde68a;
+  --of-color-warning-700: #b45309;
+  --of-color-warning-800: #92400e;
   --of-color-error: #dc2626;
   --of-color-error-light: #fee2e2;
   --of-color-info: #2563eb;
   --of-color-info-light: #dbeafe;
+  --of-color-error-50: #fef2f2;
+
+  /* ─── Utility Colors ─── */
+  --of-color-white: #ffffff;
+  --of-color-overlay: rgba(0, 0, 0, 0.4);
 
   /* ─── Extended Colors ─── */
   --of-color-blue-50: #eff6ff;
@@ -182,10 +192,17 @@
   --of-radius-full: 9999px;
 
   /* ─── Shadows ─── */
-  --of-shadow-card: 0 1px 8px 0 rgba(0, 0, 0, 0.04);
+  --of-shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
   --of-shadow-card-hover: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
-  --of-shadow-panel: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
-  --of-shadow-modal: 0 8px 32px 0 rgba(0, 0, 0, 0.12);
+  --of-shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --of-shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --of-shadow-drawer: -12px 0 32px rgba(0, 0, 0, 0.12), -2px 0 8px rgba(0, 0, 0, 0.08);
+  --of-shadow-panel: -2px 0 20px rgba(0, 0, 0, 0.13);
+  --of-shadow-toast: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --of-shadow-context-menu: 0 10px 28px rgba(0, 0, 0, 0.16);
+  --of-shadow-popover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --of-shadow-fixed-col: 4px 0 8px -2px rgba(0, 0, 0, 0.1);
+  --of-shadow-overlay-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
 
   /* ─── Borders ─── */
   --of-border-color: var(--of-color-gray-200);
