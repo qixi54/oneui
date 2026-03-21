@@ -1,11 +1,13 @@
+<script lang="ts">
+export type { BulkActionItem, BulkActionContext } from "../../types/data-table";
+</script>
+
 <script setup lang="ts" generic="T extends { id: string } & Record<string, unknown>">
 import {
   ref,
   computed,
   toRef,
   watch,
-  onMounted,
-  onBeforeUnmount,
   defineAsyncComponent,
   type ComponentPublicInstance,
   type CSSProperties,
@@ -14,11 +16,28 @@ import TableHeaderRow from "./TableHeaderRow.vue";
 import TableDataRow from "./TableDataRow.vue";
 import TableGroupRow from "./TableGroupRow.vue";
 import NewRowBtn from "./NewRowBtn.vue";
-import MobileListView from "./MobileListView.vue";
+import DataTableSelectionBar from "./DataTableSelectionBar.vue";
+import DataTableDraftToolbar from "./DataTableDraftToolbar.vue";
+import DataTableMobilePanel from "./DataTableMobilePanel.vue";
 import FieldCell, {
   type FieldDef as CellFieldDef,
   type CellValue,
 } from "./FieldCell.vue";
+import type {
+  BulkActionItem,
+  BulkActionContext,
+  ResolvedBulkActionItem,
+} from "../../types/data-table";
+import {
+  normalizeFieldType,
+  resolveRowId,
+  resolveFieldDef,
+  resolveFirstEditableFieldKey,
+  buildResolvedBulkActionItems,
+  buildDataRowStyle,
+  buildBodyCellStyle,
+  buildGroupSpacerStyle,
+} from "./dataTableUtils";
 import type { RowActionItem } from "./TableDataRow.vue";
 import { useInlineEdit } from "@/composables/useInlineEdit";
 import { useVirtualList } from "@/composables/useVirtualList";
@@ -32,6 +51,7 @@ import { useBreakpoint } from "@/composables/useBreakpoint";
 import { useFixedColumns } from "@/composables/useFixedColumns";
 import { useRowDrag } from "@/composables/useRowDrag";
 import { useDraftRows } from "@/composables/useDraftRows";
+import { useDataTableLayout } from "@/composables/useDataTableLayout";
 import type {
   Density,
   Task,
@@ -45,21 +65,6 @@ import type {
   GroupConfig,
   FieldType,
 } from "../../types";
-
-export interface BulkActionItem {
-  key: string;
-  label: string | ((context: BulkActionContext<unknown>) => string);
-  variant?: "default" | "danger";
-  disabled?: boolean | ((context: BulkActionContext<unknown>) => boolean);
-  visible?: boolean | ((context: BulkActionContext<unknown>) => boolean);
-  clearSelectionAfter?: boolean;
-}
-
-export interface BulkActionContext<TRecord = DataRecord> {
-  selectionCount: number;
-  rowIds: string[];
-  rows: TRecord[];
-}
 
 // ── Props ──────────────────────────────────────────────────────────────────
 
@@ -171,104 +176,27 @@ const emit = defineEmits<{
 }>();
 const ColumnHeaderMenu = defineAsyncComponent(() => import("./ColumnHeaderMenu.vue"));
 const FieldTypePicker = defineAsyncComponent(() => import("./FieldTypePicker.vue"));
-const DetailSheet = defineAsyncComponent(() => import("./DetailSheet.vue"));
-
-const TABLE_DENSITY_METRICS: Record<
-  Density,
-  {
-    headerHeight: number;
-    rowHeight: number;
-    groupRowHeight: number;
-    mobileCardPaddingX: number;
-    mobileCardPaddingY: number;
-    fillMinWidth: number;
-  }
-> = {
-  compact: {
-    headerHeight: 32,
-    rowHeight: 36,
-    groupRowHeight: 32,
-    mobileCardPaddingX: 12,
-    mobileCardPaddingY: 10,
-    fillMinWidth: 180,
-  },
-  standard: {
-    headerHeight: 36,
-    rowHeight: 44,
-    groupRowHeight: 36,
-    mobileCardPaddingX: 16,
-    mobileCardPaddingY: 12,
-    fillMinWidth: 220,
-  },
-  comfortable: {
-    headerHeight: 40,
-    rowHeight: 52,
-    groupRowHeight: 40,
-    mobileCardPaddingX: 18,
-    mobileCardPaddingY: 14,
-    fillMinWidth: 240,
-  },
-};
 
 const density = computed<Density>(() => props.density ?? "standard");
-const tableContainerWidth = ref(0);
-let tableResizeObserver: ResizeObserver | null = null;
-
-function syncTableContainerWidth() {
-  tableContainerWidth.value = tableContainerRef.value?.clientWidth ?? 0;
-}
-
-onMounted(() => {
-  syncTableContainerWidth();
-  if (typeof ResizeObserver === "undefined" || !tableContainerRef.value) return;
-  tableResizeObserver = new ResizeObserver((entries) => {
-    const entry = entries[0];
-    if (!entry) return;
-    tableContainerWidth.value = entry.contentRect.width;
-  });
-  tableResizeObserver.observe(tableContainerRef.value);
-});
-
-onBeforeUnmount(() => {
-  tableResizeObserver?.disconnect();
-  tableResizeObserver = null;
-});
-
-const containerDensity = computed<Density>(() => {
-  if (!props.containerResponsive || isMobile.value) {
-    return density.value;
-  }
-  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 860) {
-    return "compact";
-  }
-  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 1080 && density.value === "comfortable") {
-    return "standard";
-  }
-  return density.value;
-});
-const densityMetrics = computed(() => TABLE_DENSITY_METRICS[containerDensity.value]);
-const densityClass = computed(() => `of-data-table--${containerDensity.value}`);
-const containerWidthClass = computed(() => {
-  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 860) {
-    return "of-data-table--container-tight";
-  }
-  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 1080) {
-    return "of-data-table--container-medium";
-  }
-  return "of-data-table--container-wide";
-});
-const densityStyle = computed(() => ({
-  "--of-data-table-group-row-height": `${densityMetrics.value.groupRowHeight}px`,
-  "--of-data-table-mobile-card-padding-x": `${densityMetrics.value.mobileCardPaddingX}px`,
-  "--of-data-table-mobile-card-padding-y": `${densityMetrics.value.mobileCardPaddingY}px`,
-  "--of-data-table-new-row-padding-x": `${densityMetrics.value.mobileCardPaddingX}px`,
-  "--of-data-table-new-row-padding-y": `${densityMetrics.value.mobileCardPaddingY}px`,
-  "--of-data-table-fill-min-width": `${densityMetrics.value.fillMinWidth}px`,
-}));
 
 // ── Breakpoint ─────────────────────────────────────────────────────────────
 
 const { isMobile } = useBreakpoint();
+const scrollContainerRef = ref<HTMLElement | null>(null);
+const tableContainerRef = ref<HTMLElement | null>(null);
+const fixedContainerRef = ref<HTMLElement | null>(null);
+const {
+  containerDensity,
+  densityMetrics,
+  densityClass,
+  containerWidthClass,
+  densityStyle,
+} = useDataTableLayout({
+  tableContainerRef,
+  density,
+  containerResponsive: computed(() => props.containerResponsive ?? true),
+  isMobile,
+});
 const detailSheetVisible = ref(false);
 type RowWithRecord = T & { __record?: DataRecord };
 const detailSheetRow = ref<RowWithRecord | null>(null);
@@ -284,14 +212,12 @@ const editableFieldKeys = computed(() =>
 );
 
 function getFirstEditableFieldKey(row: T): string | null {
-  if (props.readonly) return null;
-  for (const col of effectiveColumns.value) {
-    if (col.hidden) continue;
-    if (!editableFieldKeys.value.includes(col.key)) continue;
-    if (row[col.key] === undefined && !(col.key in row)) continue;
-    return col.key;
-  }
-  return null;
+  return resolveFirstEditableFieldKey({
+    row,
+    readonly: props.readonly,
+    columns: effectiveColumns.value,
+    editableFieldKeys: editableFieldKeys.value,
+  });
 }
 
 function buildRowActionItems(row: T): RowActionItem[] {
@@ -422,10 +348,6 @@ const { groupedItems, collapsedGroups, toggleGroup, isGroupHeader } = useTableGr
 });
 
 // ── Virtual List ───────────────────────────────────────────────────────────
-
-const scrollContainerRef = ref<HTMLElement | null>(null);
-const tableContainerRef = ref<HTMLElement | null>(null);
-const fixedContainerRef = ref<HTMLElement | null>(null);
 
 const hasFixedColumns = computed(() => (props.fixedColumns?.length ?? 0) > 0);
 const scrollLeft = ref(0);
@@ -572,11 +494,6 @@ const headerMenuState = ref<{
 
 const showAddFieldPicker = ref(false);
 
-function normalizeFieldType(type?: CellFieldDef["type"]): FieldType | undefined {
-  if (type === "multiselect") return "multi_select";
-  return type;
-}
-
 function onHeaderContextMenu(event: MouseEvent, colKey: string) {
   const col = effectiveColumns.value.find((c) => c.key === colKey);
   const fieldDef = props.fieldDefs?.find((f) => f.id === colKey);
@@ -651,33 +568,9 @@ const bulkActionContext = computed<BulkActionContext<T | DataRecord>>(() => ({
 const hasSelectionBar = computed(
   () => props.showSelectionBar && effectiveSelectable.value && selectedRows.value.size > 0,
 );
-const resolvedBulkActionItems = computed<
-  Array<BulkActionItem & { resolvedLabel: string; resolvedDisabled: boolean }>
->(() => {
-  const defaults: BulkActionItem[] = [
-    {
-      key: "clear-selection",
-      label: "清空选择",
-      clearSelectionAfter: true,
-    },
-  ];
-  return [...defaults, ...(props.bulkActionItems ?? [])]
-    .filter((action) => {
-      if (typeof action.visible === "function") {
-        return action.visible(bulkActionContext.value);
-      }
-      return action.visible ?? true;
-    })
-    .map((action) => ({
-      ...action,
-      resolvedLabel:
-        typeof action.label === "function" ? action.label(bulkActionContext.value) : action.label,
-      resolvedDisabled:
-        typeof action.disabled === "function"
-          ? action.disabled(bulkActionContext.value)
-          : (action.disabled ?? false),
-    }));
-});
+const resolvedBulkActionItems = computed<ResolvedBulkActionItem[]>(() =>
+  buildResolvedBulkActionItems(props.bulkActionItems, bulkActionContext.value),
+);
 
 function handleSelectAll() {
   toggleSelectAll(sortedData.value);
@@ -688,7 +581,7 @@ function handleSelect(id: string | number) {
   if (row) toggleRowSelection(row, 0);
 }
 
-function handleBulkAction(action: BulkActionItem) {
+function handleBulkAction(action: BulkActionItem | ResolvedBulkActionItem) {
   emit("bulk-action", {
     actionKey: action.key,
     rowIds: bulkActionContext.value.rowIds,
@@ -704,18 +597,11 @@ watch(selectedIdsArray, (ids) => emit("selection-change", ids), { immediate: fal
 // ── Event Handlers ─────────────────────────────────────────────────────────
 
 function getRowId(row: T): string {
-  const value = row[props.rowKey];
-  return value != null ? String(value) : "";
+  return resolveRowId(row, props.rowKey);
 }
 
 function getFieldDef(colKey: string): CellFieldDef {
-  return (
-    props.fieldDefs?.find((f) => f.id === colKey) ?? {
-      id: colKey,
-      type: "text",
-      label: colKey,
-    }
-  );
+  return resolveFieldDef(props.fieldDefs, colKey);
 }
 
 function onCellCommit(rowId: string, fieldId: string, value: unknown) {
@@ -768,42 +654,21 @@ function onAutoFitColumn(colKey: string) {
   autoFitColumn(colKey, tableContainerRef.value);
 }
 
-function densityCellPadding(): { x: number; y: number } {
-  if (density.value === "compact") return { x: 10, y: 6 };
-  if (density.value === "comfortable") return { x: 14, y: 10 };
-  return { x: 12, y: 8 };
-}
-
 function dataRowStyle(): CSSProperties {
-  return {
-    minHeight: `${densityMetrics.value.rowHeight}px`,
-  };
+  return buildDataRowStyle(densityMetrics.value.rowHeight);
 }
 
 function bodyCellStyle(col: TableColumn): CSSProperties {
-  const { x, y } = densityCellPadding();
-  const padding = {
-    padding: `${y}px ${x}px`,
-  };
-  if (col.width === "fill") {
-    const minWidth = `${col.minWidth ?? densityMetrics.value.fillMinWidth}px`;
-    return { ...padding, flex: `1 1 ${minWidth}`, minWidth };
-  }
-  if (typeof col.width === "number") {
-    return { ...padding, width: `${col.width}px`, flexShrink: "0", flexGrow: "0" };
-  }
-  return {
-    ...padding,
-    width: `${resolvedWidth(col.key)}px`,
-    flexShrink: "0",
-    flexGrow: "0",
-  };
+  return buildBodyCellStyle({
+    density: containerDensity.value,
+    col,
+    resolvedWidth: resolvedWidth(col.key),
+    fillMinWidth: densityMetrics.value.fillMinWidth,
+  });
 }
 
 function groupSpacerStyle(): CSSProperties {
-  return {
-    height: `${densityMetrics.value.groupRowHeight}px`,
-  };
+  return buildGroupSpacerStyle(densityMetrics.value.groupRowHeight);
 }
 
 function onScrollRegionScroll(e: Event) {
@@ -880,33 +745,29 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 <template>
   <!-- Mobile mode -->
   <template v-if="isMobile">
-    <MobileListView
+    <DataTableMobilePanel
       :rows="sortedData as TableRowRecord[]"
       :columns="effectiveColumns"
+      :field-defs="fieldDefs"
       :selectable="effectiveSelectable"
       :addable="effectiveAddable"
       :status-color-map="statusColorMap"
       :readonly="readonly"
-      :class="densityClass"
-      :style="densityStyle"
+      :density-class="densityClass"
+      :density-style="densityStyle"
+      :detail-visible="detailSheetVisible"
+      :detail-row="detailSheetTableRow"
       @row-click="(row) => handleMobileRowClick(row as T)"
       @add-row="emit('add-row')"
+      @close-detail="detailSheetVisible = false"
+      @detail-save="handleDetailSave"
+      @row-delete="(id: string) => emit('row-delete', id)"
+      @cell-edit="(payload) => emit('cell-edit', payload)"
     >
       <template v-if="$slots.cell" #cell="cellProps">
         <slot name="cell" v-bind="cellProps" />
       </template>
-    </MobileListView>
-    <DetailSheet
-      v-if="detailSheetTableRow"
-      :row="detailSheetTableRow"
-      :columns="effectiveColumns"
-      :field-defs="fieldDefs"
-      :visible="detailSheetVisible"
-      @close="detailSheetVisible = false"
-      @save="handleDetailSave"
-      @delete="(id) => emit('row-delete', id)"
-      @cell-edit="(p) => emit('cell-edit', p)"
-    />
+    </DataTableMobilePanel>
   </template>
 
   <!-- Desktop/Tablet mode -->
@@ -920,25 +781,12 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
     tabindex="0"
     @keydown="enableKeyboard ? handleKeyDown($event) : undefined"
   >
-    <div v-if="hasSelectionBar" class="of-data-table-selection-bar" data-role="selection-bar">
-      <div class="of-data-table-selection-bar__summary">
-        <span class="of-data-table-selection-bar__count">{{ selectedRows.size }}</span>
-        <span class="of-data-table-selection-bar__text">条记录已选中</span>
-      </div>
-      <div class="of-data-table-selection-bar__actions">
-        <button
-          v-for="action in resolvedBulkActionItems"
-          :key="action.key"
-          type="button"
-          class="of-data-table-selection-bar__btn"
-          :class="{ 'of-data-table-selection-bar__btn--danger': action.variant === 'danger' }"
-          :disabled="action.resolvedDisabled"
-          @click="handleBulkAction(action)"
-        >
-          {{ action.resolvedLabel }}
-        </button>
-      </div>
-    </div>
+    <DataTableSelectionBar
+      v-if="hasSelectionBar"
+      :selection-count="selectedRows.size"
+      :items="resolvedBulkActionItems"
+      @action="handleBulkAction"
+    />
 
     <!-- Fixed columns mode -->
     <template v-if="hasFixedColumns">
@@ -1394,21 +1242,12 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
     />
 
     <!-- Draft rows batch toolbar -->
-    <div v-if="hasDrafts" class="of-data-table-draft-toolbar">
-      <span class="of-data-table-draft-count">{{ drafts.size }} 条草稿</span>
-      <button
-        class="of-data-table-draft-btn of-data-table-draft-btn--commit"
-        @click="handleCommitAll"
-      >
-        全部提交
-      </button>
-      <button
-        class="of-data-table-draft-btn of-data-table-draft-btn--discard"
-        @click="handleDiscardAll"
-      >
-        全部放弃
-      </button>
-    </div>
+    <DataTableDraftToolbar
+      v-if="hasDrafts"
+      :draft-count="drafts.size"
+      @commit-all="handleCommitAll"
+      @discard-all="handleDiscardAll"
+    />
 
     <NewRowBtn v-if="effectiveAddable" @click="handleAddRow" />
 
@@ -1469,85 +1308,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   overflow-y: auto;
 }
 
-.of-data-table-selection-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  border-bottom: 1px solid
-    var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
-  background: var(
-    --of-surface-workspace-strong,
-    var(--of-surface-selected, var(--of-color-gray-100))
-  );
-}
-
-.of-data-table-selection-bar__summary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.of-data-table-selection-bar__count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: var(--of-status-active-bg, var(--of-surface-elevated, #fff));
-  color: var(--of-status-active, var(--of-row-action-text, var(--of-text-primary, #111827)));
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.of-data-table-selection-bar__text {
-  color: var(--of-text-secondary, var(--of-color-gray-600));
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.of-data-table-selection-bar__actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.of-data-table-selection-bar__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  padding: 6px 12px;
-  border: 1px solid var(--of-row-action-border, var(--of-border-subtle, var(--of-color-gray-200)));
-  border-radius: 999px;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  color: var(--of-row-action-text, var(--of-text-primary, var(--of-color-gray-800)));
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--of-transition-fast);
-}
-
-.of-data-table-selection-bar__btn:hover:not(:disabled),
-.of-data-table-selection-bar__btn:focus-visible:not(:disabled) {
-  background: var(--of-row-action-hover, var(--of-surface-selected, var(--of-color-gray-100)));
-}
-
-.of-data-table-selection-bar__btn--danger {
-  color: var(--of-error-text, var(--of-color-error-600));
-}
-
-.of-data-table-selection-bar__btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
 .of-data-table--compact :deep(.of-table-group-row) {
   height: var(--of-data-table-group-row-height);
 }
@@ -1602,19 +1362,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 }
 
 @media (max-width: 768px) {
-  .of-data-table-selection-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .of-data-table-selection-bar__actions {
-    justify-content: stretch;
-  }
-
-  .of-data-table-selection-bar__btn {
-    width: 100%;
-  }
-
   .of-data-table-scroll-container {
     max-height: 100dvh;
     overflow-x: auto;
@@ -1777,42 +1524,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 
 .of-data-table--container-tight .of-table-row__action-btn {
   padding: 4px 8px;
-}
-
-/* Draft toolbar */
-.of-data-table-draft-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
-  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  font-size: 13px;
-}
-
-.of-data-table-draft-count {
-  color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
-  font-weight: 500;
-  flex: 1;
-}
-
-.of-data-table-draft-btn {
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-}
-
-.of-data-table-draft-btn--commit {
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
-}
-
-.of-data-table-draft-btn--discard {
-  background: var(--of-surface-muted, var(--of-color-gray-200, #e5e7eb));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
 }
 
 /* Drag state */
