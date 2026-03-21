@@ -1,5 +1,5 @@
 ---
-生成时间: 2026-03-22 10:03:18
+生成时间: 2026-03-22 02:12:23
 参考文档: /opt/Oneflow/flowlab/项目/oneui/code/develop/docs/plans/2026-03-22-oneui-modularization-phase3-plan.md
 角色定义: ARCH（架构师）
 文档生成目的: 记录 OneUI DataTable 模块化第三阶段的实际改动、验证命令与 FlowAPI plan/task 收口证据，确保本轮改造可追溯
@@ -10,9 +10,9 @@
 
 ## 1. 基本信息
 
-- Plan ID: `c47ed516-5676-40a5-a12e-e43d460423f9`
-- Task ID: `ONEUI-ARCH-00039`
-- Git 目标提交：待本轮验证文档写入后提交
+- Plan ID: `5890c4c1-2f1c-4ccf-9a6e-5bda7049d761`
+- Task ID: `ONEUI-ARCH-00040`
+- Git 实现提交：`a9d6126` (`refactor: modularize datatable layout and renderers`)
 
 ## 2. 实际改动
 
@@ -63,8 +63,10 @@
 3. 测试服务器代码：未同步
 4. 生产服务器代码：未同步
 
-## 6. 后续收口项
+## 6. FlowAPI 收口结果
 
-1. 将本验证文档回填到 `ONEUI-ARCH-00039` 输出物。
-2. 写入 plan verification report 并完成 closeout。
-3. 在工作区无新增失败后提交 git。
+1. 已将本验证文档及相关改动文件回填到 `ONEUI-ARCH-00040` 输出物，并将任务状态关闭为 `completed`。
+2. 已写入 `verification-report/upsert`，Plan `5890c4c1-2f1c-4ccf-9a6e-5bda7049d761` 已完成 `completed` closeout。
+3. 已登记 Plan artifact：
+   - `bad7ee65-ed0c-40ba-a248-0013cebb846e`（phase3 plan）
+   - `b67755ba-a3a4-4692-b9f2-1788dd567bc5`（phase3 verification）
