@@ -12,6 +12,9 @@ const props = withDefaults(
     maskClosable?: boolean;
     zIndex?: number;
     fullscreen?: boolean;
+    resizable?: boolean;
+    minWidth?: number;
+    maxWidth?: number;
   }>(),
   {
     width: 390,
@@ -20,11 +23,15 @@ const props = withDefaults(
     maskClosable: true,
     zIndex: 1000,
     fullscreen: false,
+    resizable: false,
+    minWidth: 360,
+    maxWidth: 1320,
   },
 );
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  "update:width": [value: number];
 }>();
 
 const slots: Slots = useSlots();
@@ -43,6 +50,10 @@ const {
 
 function handleClose() {
   emit("update:modelValue", false);
+}
+
+function clampWidth(width: number): number {
+  return Math.max(props.minWidth, Math.min(props.maxWidth, width));
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -73,6 +84,21 @@ onBeforeUnmount(() => {
   document.removeEventListener("keydown", onKeydown);
   document.body.style.overflow = "";
 });
+
+function handleResizeStart(event: PointerEvent) {
+  if (!props.resizable || props.fullscreen || typeof window === "undefined") return;
+  event.preventDefault();
+  const onPointerMove = (moveEvent: PointerEvent) => {
+    const nextWidth = clampWidth(window.innerWidth - moveEvent.clientX);
+    emit("update:width", nextWidth);
+  };
+  const onPointerUp = () => {
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
+  };
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp, { once: true });
+}
 </script>
 
 <template>
@@ -100,6 +126,13 @@ onBeforeUnmount(() => {
         :style="drawerStyle"
           @click.stop
         >
+          <button
+            v-if="resizable && !fullscreen"
+            type="button"
+            class="of-drawer__resize-handle"
+            aria-label="调整抽屉宽度"
+            @pointerdown="handleResizeStart"
+          />
           <div class="of-drawer__inner">
             <div v-if="slots.title || title || showClose" class="of-drawer__header">
               <div class="of-drawer__title">
@@ -156,6 +189,18 @@ onBeforeUnmount(() => {
   border-left: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   box-shadow: var(--of-shadow-drawer);
   overflow: hidden;
+}
+
+.of-drawer__resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: ew-resize;
 }
 
 .of-drawer--fullscreen {

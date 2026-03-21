@@ -118,9 +118,19 @@ function flushPromises() {
 
 const TableToolbarStub = defineComponent({
   name: "TableToolbar",
+  props: {
+    currentView: {
+      type: String,
+      default: "",
+    },
+    searchKeyword: {
+      type: String,
+      default: "",
+    },
+  },
   emits: ["update:current-view"],
   template: `
-    <div data-role="toolbar">
+    <div data-role="toolbar" :data-current-view="currentView" :data-search-keyword="searchKeyword">
       <button data-role="switch-table" @click="$emit('update:current-view', 'v-table')">table</button>
       <button data-role="switch-kanban" @click="$emit('update:current-view', 'v-kanban')">kanban</button>
       <button data-role="switch-gallery" @click="$emit('update:current-view', 'v-gallery')">gallery</button>
@@ -196,9 +206,45 @@ const SidePanelStub = defineComponent({
       type: String,
       default: "persistent",
     },
+    width: {
+      type: Number,
+      default: 500,
+    },
   },
+  emits: ["update:width"],
   template: `
-    <aside v-if="modelValue" data-role="side-panel" :data-mode="mode">
+    <aside v-if="modelValue" data-role="side-panel" :data-mode="mode" :data-width="String(width)">
+      <button data-role="resize-side-panel" @click="$emit('update:width', 840)">resize</button>
+      <slot />
+    </aside>
+  `,
+});
+
+const DrawerStub = defineComponent({
+  name: "Drawer",
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    width: {
+      type: Number,
+      default: 390,
+    },
+    fullscreen: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ["update:width"],
+  template: `
+    <aside
+      v-if="modelValue"
+      data-role="drawer"
+      :data-width="String(width)"
+      :data-fullscreen="fullscreen ? 'true' : 'false'"
+    >
+      <button data-role="resize-drawer" @click="$emit('update:width', 980)">resize</button>
       <slot />
     </aside>
   `,
@@ -222,6 +268,7 @@ const EmptyStateStub = defineComponent({
 describe("DatabaseView 页面级集成", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    window.localStorage.clear();
     vi.restoreAllMocks();
   });
 
@@ -612,5 +659,66 @@ describe("DatabaseView 页面级集成", () => {
       detailPresentation: "side-panel",
       density: "compact",
     });
+  });
+
+  it("DatabaseView 应该记住当前视图、搜索词和 workspace 宽度偏好", async () => {
+    const stubs = {
+      Teleport: true,
+      TableToolbar: TableToolbarStub,
+      DataTable: DataTableStub,
+      KanbanBoard: KanbanBoardStub,
+      GalleryView: GalleryViewStub,
+      GanttTimeline: GanttTimelineStub,
+      EmptyState: EmptyStateStub,
+      SidePanel: SidePanelStub,
+      Drawer: DrawerStub,
+    };
+
+    const firstWrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-persist",
+        schema: buildSchema(),
+        records: buildRecords(),
+        views: buildViews(),
+        selectedRecordId: "R-1",
+      },
+      global: { stubs },
+    });
+
+    await nextTick();
+    await firstWrapper.get('[data-role="switch-gallery"]').trigger("click");
+    await nextTick();
+    await firstWrapper.setProps({ searchKeyword: "第二条" });
+    await nextTick();
+    await firstWrapper.get('[data-role="resize-side-panel"]').trigger("click");
+    await nextTick();
+    await firstWrapper.get('[data-role="workspace-mode-switch"] [data-mode="full-page"]').trigger("click");
+    await nextTick();
+    firstWrapper.unmount();
+
+    const persisted = JSON.parse(window.localStorage.getItem("oneui-database-workspace:tbl-persist") || "{}");
+    expect(persisted).toMatchObject({
+      activeViewId: "v-gallery",
+      searchKeyword: "第二条",
+      detailPresentation: "full-page",
+      sidePanelWidth: 840,
+    });
+
+    const secondWrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-persist",
+        schema: buildSchema(),
+        records: buildRecords(),
+        views: buildViews(),
+        selectedRecordId: "R-1",
+      },
+      global: { stubs },
+    });
+
+    await nextTick();
+    expect(secondWrapper.get('[data-role="toolbar"]').attributes("data-current-view")).toBe("v-gallery");
+    expect(secondWrapper.get('[data-role="toolbar"]').attributes("data-search-keyword")).toBe("第二条");
+    expect(secondWrapper.find('[data-role="drawer"]').exists()).toBe(true);
+    expect(secondWrapper.get('[data-role="drawer"]').attributes("data-fullscreen")).toBe("true");
   });
 });

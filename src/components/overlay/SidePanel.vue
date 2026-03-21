@@ -9,6 +9,9 @@ export interface SidePanelProps {
   title?: string;
   showClose?: boolean;
   mode?: "lazy" | "persistent";
+  resizable?: boolean;
+  minWidth?: number;
+  maxWidth?: number;
 }
 
 const props = withDefaults(defineProps<SidePanelProps>(), {
@@ -16,10 +19,14 @@ const props = withDefaults(defineProps<SidePanelProps>(), {
   title: undefined,
   showClose: true,
   mode: "persistent",
+  resizable: false,
+  minWidth: 360,
+  maxWidth: 1320,
 });
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  "update:width": [value: number];
 }>();
 
 defineSlots<{
@@ -71,6 +78,25 @@ onBeforeUnmount(() => {
 function close() {
   emit("update:modelValue", false);
 }
+
+function clampWidth(width: number): number {
+  return Math.max(props.minWidth, Math.min(props.maxWidth, width));
+}
+
+function handleResizeStart(event: PointerEvent) {
+  if (!props.resizable || typeof window === "undefined") return;
+  event.preventDefault();
+  const onPointerMove = (moveEvent: PointerEvent) => {
+    const nextWidth = clampWidth(window.innerWidth - moveEvent.clientX);
+    emit("update:width", nextWidth);
+  };
+  const onPointerUp = () => {
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
+  };
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp, { once: true });
+}
 </script>
 
 <template>
@@ -85,6 +111,13 @@ function close() {
         aria-modal="true"
         :aria-label="title"
       >
+        <button
+          v-if="resizable"
+          type="button"
+          class="of-side-panel__resize-handle"
+          aria-label="调整面板宽度"
+          @pointerdown="handleResizeStart"
+        />
         <div v-if="$slots.header || title || showClose" class="of-side-panel__header">
           <slot name="header">
             <h3 v-if="title" class="of-side-panel__title">{{ title }}</h3>
@@ -116,6 +149,13 @@ function close() {
       aria-modal="true"
       :aria-label="title"
     >
+      <button
+        v-if="resizable"
+        type="button"
+        class="of-side-panel__resize-handle"
+        aria-label="调整面板宽度"
+        @pointerdown="handleResizeStart"
+      />
       <div v-if="$slots.header || title || showClose" class="of-side-panel__header">
         <slot name="header">
           <h3 v-if="title" class="of-side-panel__title">{{ title }}</h3>
@@ -152,6 +192,18 @@ function close() {
   overflow: hidden;
   width: min(var(--of-side-panel-width, 500px), 100vw);
   max-width: 100vw;
+}
+
+.of-side-panel__resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: ew-resize;
 }
 
 .of-side-panel__header {

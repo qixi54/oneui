@@ -48,10 +48,17 @@ import type {
 
 export interface BulkActionItem {
   key: string;
-  label: string;
+  label: string | ((context: BulkActionContext<unknown>) => string);
   variant?: "default" | "danger";
-  disabled?: boolean;
+  disabled?: boolean | ((context: BulkActionContext<unknown>) => boolean);
+  visible?: boolean | ((context: BulkActionContext<unknown>) => boolean);
   clearSelectionAfter?: boolean;
+}
+
+export interface BulkActionContext<TRecord = DataRecord> {
+  selectionCount: number;
+  rowIds: string[];
+  rows: TRecord[];
 }
 
 // ── Props ──────────────────────────────────────────────────────────────────
@@ -636,10 +643,17 @@ const indeterminate = computed(() => selectedRows.value.size > 0 && !isAllSelect
 const selectedDataRows = computed(() =>
   sortedData.value.filter((row) => selectedRows.value.has(getRowId(row))),
 );
+const bulkActionContext = computed<BulkActionContext<T | DataRecord>>(() => ({
+  selectionCount: selectedDataRows.value.length,
+  rowIds: selectedDataRows.value.map((row) => getRowId(row)),
+  rows: [...selectedDataRows.value],
+}));
 const hasSelectionBar = computed(
   () => props.showSelectionBar && effectiveSelectable.value && selectedRows.value.size > 0,
 );
-const resolvedBulkActionItems = computed<BulkActionItem[]>(() => {
+const resolvedBulkActionItems = computed<
+  Array<BulkActionItem & { resolvedLabel: string; resolvedDisabled: boolean }>
+>(() => {
   const defaults: BulkActionItem[] = [
     {
       key: "clear-selection",
@@ -647,7 +661,22 @@ const resolvedBulkActionItems = computed<BulkActionItem[]>(() => {
       clearSelectionAfter: true,
     },
   ];
-  return [...defaults, ...(props.bulkActionItems ?? [])];
+  return [...defaults, ...(props.bulkActionItems ?? [])]
+    .filter((action) => {
+      if (typeof action.visible === "function") {
+        return action.visible(bulkActionContext.value);
+      }
+      return action.visible ?? true;
+    })
+    .map((action) => ({
+      ...action,
+      resolvedLabel:
+        typeof action.label === "function" ? action.label(bulkActionContext.value) : action.label,
+      resolvedDisabled:
+        typeof action.disabled === "function"
+          ? action.disabled(bulkActionContext.value)
+          : (action.disabled ?? false),
+    }));
 });
 
 function handleSelectAll() {
@@ -660,11 +689,10 @@ function handleSelect(id: string | number) {
 }
 
 function handleBulkAction(action: BulkActionItem) {
-  const rowIds = selectedDataRows.value.map((row) => getRowId(row));
   emit("bulk-action", {
     actionKey: action.key,
-    rowIds,
-    rows: [...selectedDataRows.value],
+    rowIds: bulkActionContext.value.rowIds,
+    rows: bulkActionContext.value.rows,
   });
   if (action.clearSelectionAfter || action.key === "clear-selection") {
     clearSelection();
@@ -904,10 +932,10 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
           type="button"
           class="of-data-table-selection-bar__btn"
           :class="{ 'of-data-table-selection-bar__btn--danger': action.variant === 'danger' }"
-          :disabled="action.disabled"
+          :disabled="action.resolvedDisabled"
           @click="handleBulkAction(action)"
         >
-          {{ action.label }}
+          {{ action.resolvedLabel }}
         </button>
       </div>
     </div>

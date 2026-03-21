@@ -57,6 +57,15 @@ export interface DatabaseViewUiOptions {
 }
 
 export type DatabaseViewDetailPresentation = "auto" | "side-panel" | "sheet" | "full-page";
+type DatabaseViewResolvedDetailPresentation = Exclude<DatabaseViewDetailPresentation, "auto">;
+
+interface DatabaseViewWorkspacePreferences {
+  activeViewId?: string;
+  detailPresentation?: DatabaseViewResolvedDetailPresentation;
+  sidePanelWidth?: number;
+  drawerWidth?: number;
+  searchKeyword?: string;
+}
 
 export interface DatabaseViewProps {
   tableId?: string;
@@ -104,7 +113,7 @@ const props = withDefaults(defineProps<DatabaseViewProps>(), {
   initialViewId: "",
   selectedRecordId: undefined,
   initialSelectedRecordId: undefined,
-  searchKeyword: "",
+  searchKeyword: undefined,
   loading: undefined,
   error: undefined,
   viewTabs: undefined,
@@ -151,6 +160,11 @@ const emit = defineEmits<{
 
 const DETAIL_VIEW_ID = "detail";
 const MOBILE_BREAKPOINT = "(max-width: 768px)";
+const WORKSPACE_STORAGE_PREFIX = "oneui-database-workspace:";
+const DEFAULT_SIDE_PANEL_WIDTH = 720;
+const DEFAULT_DRAWER_WIDTH = 900;
+const MIN_DETAIL_PANEL_WIDTH = 420;
+const MAX_DETAIL_PANEL_WIDTH = 1320;
 
 defineOptions({ name: "DatabaseView", inheritAttrs: false });
 
@@ -184,6 +198,38 @@ function cloneView(view: ViewConfig): ViewConfig {
     fixedColumns: view.fixedColumns ? [...view.fixedColumns] : undefined,
     galleryCardFields: view.galleryCardFields ? [...view.galleryCardFields] : undefined,
   };
+}
+
+function clampWorkspaceWidth(width: number, fallback: number): number {
+  if (!Number.isFinite(width)) return fallback;
+  return Math.max(MIN_DETAIL_PANEL_WIDTH, Math.min(MAX_DETAIL_PANEL_WIDTH, width));
+}
+
+function getWorkspaceStorageKey(tableId?: string): string | null {
+  const normalized = (tableId ?? "").trim();
+  return normalized ? `${WORKSPACE_STORAGE_PREFIX}${normalized}` : null;
+}
+
+function readWorkspacePreferences(tableId?: string): DatabaseViewWorkspacePreferences {
+  const storageKey = getWorkspaceStorageKey(tableId);
+  if (!storageKey || typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return {};
+    return JSON.parse(raw) as DatabaseViewWorkspacePreferences;
+  } catch {
+    return {};
+  }
+}
+
+function writeWorkspacePreferences(tableId: string | undefined, prefs: DatabaseViewWorkspacePreferences) {
+  const storageKey = getWorkspaceStorageKey(tableId);
+  if (!storageKey || typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(prefs));
+  } catch {
+    // ignore storage failures
+  }
 }
 
 function inferFieldIdsFromRecords(records: DataRecord[]): string[] {
@@ -517,6 +563,7 @@ function buildDetailEmptyAction(fallbackViewId: string | null): EmptyStateAction
   return undefined;
 }
 
+const initialWorkspacePreferences = readWorkspacePreferences(props.tableId);
 const schemaSource = computed(() => props.schema ?? null);
 const recordSource = computed(() => props.records ?? []);
 const viewSource = computed(() => {
@@ -547,6 +594,7 @@ const databaseView = useDatabaseView<DataRecord>({
   initialViewId:
     props.currentViewId ||
     props.initialViewId ||
+    initialWorkspacePreferences.activeViewId ||
     props.defaultView?.viewId ||
     viewSource.value[0]?.viewId ||
     "",
@@ -603,8 +651,16 @@ const resolvedSchema = computed(() => databaseView.schema.value ?? schemaSource.
 const resolvedRecords = computed<DataRecord[]>(() => [...databaseView.records.value]);
 const activeViewType = computed(() => activeView.value.viewType || "table");
 const detailDraftFields = ref<Record<string, unknown>>({});
-
-const searchKeyword = ref(props.searchKeyword ?? "");
+const preferredDetailPresentation = ref<DatabaseViewResolvedDetailPresentation | null>(
+  initialWorkspacePreferences.detailPresentation ?? null,
+);
+const sidePanelWidth = ref(
+  clampWorkspaceWidth(initialWorkspacePreferences.sidePanelWidth ?? DEFAULT_SIDE_PANEL_WIDTH, DEFAULT_SIDE_PANEL_WIDTH),
+);
+const drawerWidth = ref(
+  clampWorkspaceWidth(initialWorkspacePreferences.drawerWidth ?? DEFAULT_DRAWER_WIDTH, DEFAULT_DRAWER_WIDTH),
+);
+const searchKeyword = ref(props.searchKeyword || initialWorkspacePreferences.searchKeyword || "");
 const filterLogic = ref<FilterLogic>("and");
 const toolbarFilters = ref<ToolbarFilterCondition[]>([]);
 const detailWorkspaceActive = ref(
@@ -617,7 +673,8 @@ const detailWorkspaceActive = ref(
 watch(
   () => props.searchKeyword,
   (next) => {
-    searchKeyword.value = next ?? "";
+    if (next === undefined) return;
+    searchKeyword.value = next;
   },
   { immediate: true },
 );
@@ -625,6 +682,20 @@ watch(
 watch(searchKeyword, (keyword) => {
   emit("update:searchKeyword", keyword);
 });
+
+watch(
+  [activeViewId, searchKeyword, preferredDetailPresentation, sidePanelWidth, drawerWidth],
+  ([nextViewId, nextSearchKeyword, nextDetailPresentation, nextSidePanelWidth, nextDrawerWidth]) => {
+    writeWorkspacePreferences(props.tableId, {
+      activeViewId: nextViewId,
+      searchKeyword: nextSearchKeyword,
+      detailPresentation: nextDetailPresentation ?? undefined,
+      sidePanelWidth: nextSidePanelWidth,
+      drawerWidth: nextDrawerWidth,
+    });
+  },
+  { immediate: true },
+);
 
 watch(
   activeView,
@@ -780,12 +851,28 @@ const showGroup = computed(() => props.showGroup !== false);
 const showColumns = computed(() => props.showColumns !== false);
 const showSearch = computed(() => props.showSearch !== false);
 const showDetailWorkspace = computed(() => detailWorkspaceActive.value && Boolean(selectedRecord.value));
-const resolvedDetailPresentation = computed<Exclude<DatabaseViewDetailPresentation, "auto">>(() => {
+const resolvedDetailPresentation = computed<DatabaseViewResolvedDetailPresentation>(() => {
   if (props.detailPresentation !== "auto") {
     return props.detailPresentation;
   }
+  if (preferredDetailPresentation.value) {
+    if (preferredDetailPresentation.value === "side-panel" && isMobileViewport.value) {
+      return "sheet";
+    }
+    return preferredDetailPresentation.value;
+  }
   return isMobileViewport.value ? "sheet" : "side-panel";
 });
+const workspaceModes = computed<Array<{ value: DatabaseViewResolvedDetailPresentation; label: string }>>(() => {
+  const modes: Array<{ value: DatabaseViewResolvedDetailPresentation; label: string }> = [];
+  if (!isMobileViewport.value) {
+    modes.push({ value: "side-panel", label: "侧栏" });
+  }
+  modes.push({ value: "sheet", label: "抽屉" });
+  modes.push({ value: "full-page", label: "全屏" });
+  return modes;
+});
+const canSwitchDetailPresentation = computed(() => props.detailPresentation === "auto");
 
 const effectiveLoading = computed(() => props.loading ?? databaseView.loading.value);
 const effectiveError = computed(() => props.error ?? databaseView.error.value);
@@ -874,6 +961,11 @@ function openRecord(record: DataRecord | null) {
   detailWorkspaceActive.value = true;
   detailDraftFields.value = {};
   databaseView.setSelectedRecord(record);
+}
+
+function setPreferredDetailPresentation(mode: DatabaseViewResolvedDetailPresentation) {
+  if (!canSwitchDetailPresentation.value) return;
+  preferredDetailPresentation.value = mode;
 }
 
 function findRecordById(recordId: string | undefined | null) {
@@ -1079,6 +1171,14 @@ function handleDetailWorkspaceSave() {
     fields: { ...detailDraftFields.value },
   });
 }
+
+function handleSidePanelWidthUpdate(width: number) {
+  sidePanelWidth.value = clampWorkspaceWidth(width, DEFAULT_SIDE_PANEL_WIDTH);
+}
+
+function handleDrawerWidthUpdate(width: number) {
+  drawerWidth.value = clampWorkspaceWidth(width, DEFAULT_DRAWER_WIDTH);
+}
 </script>
 
 <template>
@@ -1217,8 +1317,10 @@ function handleDetailWorkspaceSave() {
       v-if="showDetailWorkspace && resolvedDetailPresentation === 'side-panel'"
       :model-value="showDetailWorkspace"
       :title="detailWorkspaceTitle"
-      :width="720"
+      :width="sidePanelWidth"
+      :resizable="true"
       mode="persistent"
+      @update:width="handleSidePanelWidthUpdate"
       @update:model-value="handleDetailClose"
     >
       <DetailLayout
@@ -1228,6 +1330,23 @@ function handleDetailWorkspaceSave() {
         :description-editable="false"
       >
         <template #meta>
+          <div
+            v-if="canSwitchDetailPresentation"
+            class="of-database-view__workspace-modes"
+            data-role="workspace-mode-switch"
+          >
+            <button
+              v-for="mode in workspaceModes"
+              :key="mode.value"
+              type="button"
+              class="of-database-view__workspace-mode-btn"
+              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === mode.value }"
+              :data-mode="mode.value"
+              @click="setPreferredDetailPresentation(mode.value)"
+            >
+              {{ mode.label }}
+            </button>
+          </div>
           <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
           <span class="of-database-view__workspace-chip">{{ activeViewType }}</span>
           <span class="of-database-view__workspace-chip">{{ resolvedDetailPresentation }}</span>
@@ -1292,9 +1411,11 @@ function handleDetailWorkspaceSave() {
       v-else-if="showDetailWorkspace"
       :model-value="showDetailWorkspace"
       :title="detailWorkspaceTitle"
-      :width="900"
+      :width="drawerWidth"
+      :resizable="resolvedDetailPresentation !== 'full-page'"
       :fullscreen="resolvedDetailPresentation === 'full-page'"
       :mask-closable="true"
+      @update:width="handleDrawerWidthUpdate"
       @update:model-value="handleDetailClose"
     >
       <DetailLayout
@@ -1304,6 +1425,23 @@ function handleDetailWorkspaceSave() {
         :description-editable="false"
       >
         <template #meta>
+          <div
+            v-if="canSwitchDetailPresentation"
+            class="of-database-view__workspace-modes"
+            data-role="workspace-mode-switch"
+          >
+            <button
+              v-for="mode in workspaceModes"
+              :key="mode.value"
+              type="button"
+              class="of-database-view__workspace-mode-btn"
+              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === mode.value }"
+              :data-mode="mode.value"
+              @click="setPreferredDetailPresentation(mode.value)"
+            >
+              {{ mode.label }}
+            </button>
+          </div>
           <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
           <span class="of-database-view__workspace-chip">{{ activeViewType }}</span>
           <span class="of-database-view__workspace-chip">{{ resolvedDetailPresentation }}</span>
@@ -1404,6 +1542,32 @@ function handleDetailWorkspaceSave() {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.of-database-view__workspace-modes {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
+  border-radius: var(--of-radius-pill, 999px);
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
+}
+
+.of-database-view__workspace-mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
+  border-radius: var(--of-radius-pill, 999px);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.of-database-view__workspace-mode-btn--active {
+  background: var(--of-row-action-surface, var(--of-surface-selected, var(--of-color-gray-100)));
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-database-view__detail-workspace-heading {

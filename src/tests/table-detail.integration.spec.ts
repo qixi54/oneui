@@ -283,6 +283,41 @@ describe("Table + Detail 集成", () => {
     expect(wrapper.find('[data-role="selection-bar"]').exists()).toBe(false);
   });
 
+  it("DataTable 支持按当前选择动态解析批量动作文案和禁用态", async () => {
+    const wrapper = mount(DataTable, {
+      props: {
+        tasks,
+        columns: [
+          { key: "title", label: "标题" },
+          { key: "status", label: "状态" },
+        ],
+        bulkActionItems: [
+          {
+            key: "archive",
+            label: ({ selectionCount }) => `归档 ${selectionCount} 项`,
+            disabled: ({ selectionCount }) => selectionCount < 2,
+          },
+        ],
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    const firstCheckbox = wrapper.find('input[id="of-table-row-checkbox-T-1"]');
+    await firstCheckbox.setValue(true);
+
+    const buttonsAfterFirstSelect = wrapper.findAll('[data-role="selection-bar"] button');
+    expect(buttonsAfterFirstSelect[1]?.text()).toContain("归档 1 项");
+    expect(buttonsAfterFirstSelect[1]?.attributes("disabled")).toBeDefined();
+
+    const secondCheckbox = wrapper.find('input[id="of-table-row-checkbox-T-2"]');
+    await secondCheckbox.setValue(true);
+
+    const buttonsAfterSecondSelect = wrapper.findAll('[data-role="selection-bar"] button');
+    expect(buttonsAfterSecondSelect[1]?.text()).toContain("归档 2 项");
+    expect(buttonsAfterSecondSelect[1]?.attributes("disabled")).toBeUndefined();
+  });
+
   it("DetailLayout 能渲染来自 task 的关键字段", () => {
     const wrapper = mount(DetailLayout, {
       props: {
