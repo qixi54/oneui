@@ -48,8 +48,8 @@ defineProps<{
 }
 
 .of-user-message__bubble {
-  background: var(--of-color-primary-600);
-  color: var(--of-color-text-inverse);
+  background: var(--of-surface-selected, #eceff3);
+  color: var(--of-text-primary, var(--of-color-text-inverse));
   border-radius: 12px 0 12px 12px;
   padding: 10px 14px;
   font-size: 14px;
@@ -61,7 +61,7 @@ defineProps<{
 
 .of-user-message__timestamp {
   font-size: 11px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   font-family: var(--of-font-sans);
 }
 
@@ -71,7 +71,7 @@ defineProps<{
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--of-color-primary-100);
+  background: var(--of-surface-muted, #f1f3f6);
   display: flex;
   align-items: center;
   justify-content: center;

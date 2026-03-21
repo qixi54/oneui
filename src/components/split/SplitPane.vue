@@ -104,13 +104,15 @@ onUnmounted(() => {
     >
       <slot name="first" />
     </div>
-    <div
+    <button
+      type="button"
       class="of-split-pane__divider"
+      aria-label="调整分栏尺寸"
       @mousedown="onDividerMousedown"
       @touchstart.prevent="onDividerMousedown"
     >
       <div class="of-split-pane__divider-inner" />
-    </div>
+    </button>
     <div class="of-split-pane__second">
       <slot name="second" />
     </div>
@@ -160,7 +162,7 @@ onUnmounted(() => {
   flex-shrink: 0;
   flex-grow: 0;
   position: relative;
-  background-color: var(--of-color-gray-200, #e5e7eb);
+  background-color: var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,12 +191,12 @@ onUnmounted(() => {
 }
 
 .of-split-pane__divider:hover {
-  background-color: var(--of-color-gray-400, #9ca3af);
+  background-color: var(--of-border-strong, var(--of-color-gray-400, #9ca3af));
 }
 
 /* 分隔条中间的指示线/点 */
 .of-split-pane__divider-inner {
-  background-color: var(--of-color-gray-400, #9ca3af);
+  background-color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
   border-radius: var(--of-radius-full, 9999px);
   opacity: 0.6;
   transition:
@@ -215,17 +217,17 @@ onUnmounted(() => {
 
 .of-split-pane__divider:hover > .of-split-pane__divider-inner {
   opacity: 1;
-  background-color: var(--of-color-gray-600, #4b5563);
+  background-color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
 }
 
 /* 拖拽中状态 */
 .of-split-pane--dragging > .of-split-pane__divider {
-  background-color: var(--of-color-primary, #6366f1);
+  background-color: var(--of-accent-default, #334155);
 }
 
 .of-split-pane--dragging > .of-split-pane__divider > .of-split-pane__divider-inner {
   opacity: 1;
-  background-color: var(--of-color-primary-foreground, #ffffff);
+  background-color: var(--of-surface-elevated, #ffffff);
 }
 
 /* 拖拽时禁用文本选中 */

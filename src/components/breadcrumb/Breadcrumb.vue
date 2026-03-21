@@ -57,7 +57,7 @@ function handleClick(item: BreadcrumbItemData) {
             :class="{ 'of-breadcrumb__link--active': index === items.length - 1 }"
             @click.prevent="item.onClick ? handleClick(item) : null"
           >
-            <component v-if="item.icon" :is="resolveIcon(item.icon)" class="of-breadcrumb__icon" />
+            <component :is="resolveIcon(item.icon)" v-if="item.icon" class="of-breadcrumb__icon" />
             {{ item.label }}
           </component>
           <span v-if="index < items.length - 1" class="of-breadcrumb__separator" aria-hidden="true">
@@ -96,7 +96,7 @@ function handleClick(item: BreadcrumbItemData) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-gray-600, #475569));
   font-size: 14px;
   text-decoration: none;
   transition: color 0.15s ease;
@@ -107,12 +107,12 @@ function handleClick(item: BreadcrumbItemData) {
 }
 
 .of-breadcrumb__link[href]:hover {
-  color: var(--of-color-primary, #7c3aed);
+  color: var(--of-accent-strong, #0f172a);
   cursor: pointer;
 }
 
 .of-breadcrumb__link--active {
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-gray-800, #1e293b));
   font-weight: 500;
   pointer-events: none;
   cursor: default;
@@ -121,7 +121,7 @@ function handleClick(item: BreadcrumbItemData) {
 .of-breadcrumb__separator {
   display: inline-flex;
   align-items: center;
-  color: var(--of-color-gray-300, #d1d5db);
+  color: var(--of-text-tertiary, var(--of-color-gray-400, #94a3b8));
   padding: 0 4px;
   font-size: 12px;
   user-select: none;

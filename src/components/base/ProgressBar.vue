@@ -11,11 +11,10 @@ interface ProgressBarProps {
   borderRadius?: number;
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<ProgressBarProps>(), {
   height: 4,
-  bgColor: "var(--of-color-gray-100)",
+  color: undefined,
+  bgColor: "var(--of-surface-muted, var(--of-color-gray-100))",
   showLabel: false,
   borderRadius: 2,
 });
@@ -24,12 +23,14 @@ defineSlots<{
   default?: () => VNodeChild;
 }>();
 
+defineOptions({ inheritAttrs: false });
+
 const clampedValue = computed(() => Math.min(100, Math.max(0, props.value)));
 
 const computedColor = computed(() =>
   clampedValue.value === 100
-    ? "var(--of-color-success)"
-    : (props.color ?? "var(--of-color-primary-500)"),
+    ? "var(--of-text-strong, var(--of-accent-strong))"
+    : (props.color ?? "var(--of-accent-default)"),
 );
 
 const trackStyle = computed(() => ({
@@ -89,7 +90,7 @@ const fillStyle = computed(() => ({
   gap: 8px;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--of-color-text-secondary, #8c8c8c);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #8c8c8c));
 }
 
 .of-progress-bar__slot {
@@ -99,6 +100,6 @@ const fillStyle = computed(() => ({
 
 .of-progress-bar__value {
   flex-shrink: 0;
-  color: var(--of-color-text-secondary, #8c8c8c);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #8c8c8c));
 }
 </style>

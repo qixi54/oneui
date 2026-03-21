@@ -31,6 +31,8 @@ const props = withDefaults(
   }>(),
   {
     readonly: false,
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
   },
 );
 
@@ -66,7 +68,10 @@ const resolvedPriority = computed(() =>
 
 const priorityBarStyle = computed(() => {
   if (props.item.barColor)
-    return { background: props.item.barColor, color: "var(--of-color-gray-800)" };
+    return {
+      background: props.item.barColor,
+      color: "var(--of-text-primary, var(--of-color-gray-800))",
+    };
   return {
     background: resolvedPriority.value.style.background,
     color: resolvedPriority.value.style.color,
@@ -139,10 +144,22 @@ function endDrag() {
   window.removeEventListener("mousemove", onDragMove);
   window.removeEventListener("mouseup", endDrag);
 }
+
+function handleRowKeydown(event: KeyboardEvent) {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  emit("click", props.item);
+}
 </script>
 
 <template>
-  <div class="gantt-row" @click="emit('click', item)">
+  <div
+    class="gantt-row"
+    role="button"
+    tabindex="0"
+    @click="emit('click', item)"
+    @keydown="handleRowKeydown"
+  >
     <div class="gantt-row__label">
       <span class="gantt-row__dot" :style="{ backgroundColor: dotColor }" />
       <span class="gantt-row__title">{{ item.title }}</span>
@@ -151,18 +168,32 @@ function endDrag() {
 
     <div class="gantt-row__chart" :style="{ width: `${trackWidth}px` }">
       <div
-        class="gantt-row__bar"
+        class="gantt-row__bar-shell"
         :class="{ 'gantt-row__bar--dragging': dragging }"
         :style="{
           left: `${leftPx}px`,
           width: `${barWidthPx}px`,
-          backgroundColor: priorityBarStyle.background,
-          color: priorityBarStyle.color,
         }"
-        @mousedown="beginDrag($event, 'move')"
       >
-        <span class="gantt-row__bar-label">{{ barDateLabel }}</span>
-        <span class="gantt-row__handle" @mousedown="beginDrag($event, 'resize-end')" />
+        <button
+          type="button"
+          class="gantt-row__bar"
+          :class="{ 'gantt-row__bar--dragging': dragging }"
+          :style="{
+            backgroundColor: priorityBarStyle.background,
+            color: priorityBarStyle.color,
+          }"
+          aria-label="拖动时间条"
+          @mousedown="beginDrag($event, 'move')"
+        >
+          <span class="gantt-row__bar-label">{{ barDateLabel }}</span>
+        </button>
+        <button
+          type="button"
+          class="gantt-row__handle"
+          aria-label="调整结束时间"
+          @mousedown.stop="beginDrag($event, 'resize-end')"
+        />
       </div>
     </div>
   </div>
@@ -174,13 +205,13 @@ function endDrag() {
   align-items: center;
   width: fit-content;
   min-width: 100%;
-  border-bottom: 1px solid var(--of-color-gray-100);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
   cursor: pointer;
   transition: var(--of-transition-fast);
 }
 
 .gantt-row:hover {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .gantt-row__label {
@@ -190,11 +221,11 @@ function endDrag() {
   align-items: center;
   gap: 8px;
   padding: 12px;
-  border-right: 1px solid var(--of-color-gray-200);
+  border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   overflow: hidden;
   position: sticky;
   left: 0;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   z-index: 1;
 }
 
@@ -209,7 +240,7 @@ function endDrag() {
   font-family: var(--of-font-sans);
   font-size: 12px;
   font-weight: 500;
-  color: var(--of-color-gray-800);
+  color: var(--of-text-primary, var(--of-color-gray-800));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -240,10 +271,10 @@ function endDrag() {
 }
 
 .gantt-row__bar {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 24px;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border: none;
   border-radius: var(--of-radius-md);
   display: flex;
   align-items: center;
@@ -253,6 +284,16 @@ function endDrag() {
   min-width: 40px;
   transition: filter 0.15s ease;
   user-select: none;
+  cursor: grab;
+}
+
+.gantt-row__bar-shell {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 24px;
+  display: flex;
+  align-items: center;
 }
 
 .gantt-row__bar:hover {
@@ -278,6 +319,9 @@ function endDrag() {
   margin-left: auto;
   flex-shrink: 0;
   cursor: ew-resize;
-  border-left: 1px solid var(--of-color-white-alpha-40);
+  border: none;
+  border-left: 1px solid var(--of-border-strong, var(--of-color-white-alpha-40));
+  background: transparent;
+  padding: 0;
 }
 </style>

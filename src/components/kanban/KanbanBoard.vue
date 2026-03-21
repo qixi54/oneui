@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { Plus } from "lucide-vue-next";
 import KanbanColumn from "./KanbanColumn.vue";
 import QuickAddRow from "./QuickAddRow.vue";
-import { buildKanbanColumns } from "../../types";
-import type { DataRecord, KanbanColumnData, Task } from "../../types";
+import { buildKanbanColumns, isSelectField } from "../../types";
+import type { DataRecord, KanbanColumnData, Task, TableSchema, ViewConfig } from "../../types";
 
 const props = withDefaults(
   defineProps<{
     columns?: KanbanColumnData[];
     records?: DataRecord[];
+    schema?: TableSchema;
+    view?: ViewConfig;
     kanbanFieldId?: string;
     laneOrder?: string[];
     laneTitles?: Record<string, string>;
@@ -18,7 +20,9 @@ const props = withDefaults(
   {
     columns: () => [],
     records: () => [],
-    kanbanFieldId: "status",
+    schema: undefined,
+    view: undefined,
+    kanbanFieldId: undefined,
     laneOrder: () => [],
     laneTitles: () => ({}),
     addColumnVisible: false,
@@ -31,15 +35,47 @@ const emit = defineEmits<{
   "card-click": [task: Task];
 }>();
 
+// 从 view 中解析配置，props 直传的优先级更高（允许覆盖）
+const effectiveKanbanFieldId = computed(
+  () => props.kanbanFieldId ?? props.view?.kanbanFieldId ?? "status",
+);
+
+// 如果 schema 有 select 字段的 options，自动提取 laneOrder 和 laneTitles
+const effectiveLaneOrder = computed(() => {
+  if (props.laneOrder && props.laneOrder.length > 0) return props.laneOrder;
+  if (props.schema) {
+    const field = props.schema.fields.find((f) => f.id === effectiveKanbanFieldId.value);
+    if (field && isSelectField(field)) {
+      return field.options.map((o) => o.value);
+    }
+  }
+  return undefined;
+});
+
+const effectiveLaneTitles = computed(() => {
+  if (props.laneTitles && Object.keys(props.laneTitles).length > 0) return props.laneTitles;
+  if (props.schema) {
+    const field = props.schema.fields.find((f) => f.id === effectiveKanbanFieldId.value);
+    if (field && isSelectField(field)) {
+      const titles: Record<string, string> = {};
+      for (const opt of field.options) {
+        titles[opt.value] = opt.label;
+      }
+      return titles;
+    }
+  }
+  return undefined;
+});
+
 const resolveColumns = () => {
   if (props.columns.length > 0) {
     return structuredClone(props.columns) as KanbanColumnData[];
   }
   if (props.records.length > 0) {
     return buildKanbanColumns(props.records, {
-      kanbanFieldId: props.kanbanFieldId,
-      laneOrder: props.laneOrder,
-      laneTitles: props.laneTitles,
+      kanbanFieldId: effectiveKanbanFieldId.value,
+      laneOrder: effectiveLaneOrder.value,
+      laneTitles: effectiveLaneTitles.value,
     });
   }
   return [];
@@ -49,7 +85,15 @@ const resolveColumns = () => {
 const localColumns = ref<KanbanColumnData[]>(resolveColumns());
 
 watch(
-  () => [props.columns, props.records, props.kanbanFieldId, props.laneOrder, props.laneTitles],
+  () => [
+    props.columns,
+    props.records,
+    props.kanbanFieldId,
+    props.laneOrder,
+    props.laneTitles,
+    props.view,
+    props.schema,
+  ],
   () => {
     localColumns.value = resolveColumns();
   },
@@ -150,10 +194,10 @@ function handleQuickAdd(columnId: string, title: string) {
   gap: 8px;
   width: 200px;
   min-height: 120px;
-  border: 2px dashed var(--of-color-gray-200);
+  border: 2px dashed var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-xl);
   background: transparent;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   font-size: 13px;
   cursor: pointer;
   flex-shrink: 0;
@@ -163,8 +207,8 @@ function handleQuickAdd(columnId: string, title: string) {
 }
 
 .of-add-column-btn:hover {
-  border-color: var(--of-color-gray-300);
-  background: var(--of-color-gray-50);
-  color: var(--of-color-gray-600);
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 </style>

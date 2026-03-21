@@ -6,15 +6,15 @@ export interface UseTableDataOptions {
   records?: Ref<DataRecord[] | undefined>;
 }
 
+type TableRowBase = { id: string } & Record<string, unknown>;
+
 /**
  * 将 Task[] 或 DataRecord[] 标准化为统一的行格式 T[]。
  *
  * - 优先使用 records：展开 fields 并保留 createdAt/updatedAt/__record 元信息
  * - 否则使用 tasks（原样透传，不做额外转换）
  */
-export function useTableData<T extends { id: string } & Record<string, any>>(
-  options: UseTableDataOptions,
-) {
+export function useTableData<T extends TableRowBase>(options: UseTableDataOptions) {
   const rows = computed<T[]>(() => {
     if (options.records?.value?.length) {
       return options.records.value.map((record) => ({
@@ -23,9 +23,9 @@ export function useTableData<T extends { id: string } & Record<string, any>>(
         createdAt: record.createdAt,
         updatedAt: record.updatedAt,
         __record: record,
-      })) as ({ id: string } & Record<string, any>)[] as T[];
+      })) as TableRowBase[] as T[];
     }
-    return (options.tasks?.value ?? []) as ({ id: string } & Record<string, any>)[] as T[];
+    return (options.tasks?.value ?? []) as unknown as TableRowBase[] as T[];
   });
 
   return { rows };

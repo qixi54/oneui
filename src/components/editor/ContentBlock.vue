@@ -7,6 +7,7 @@ const props = withDefaults(
     editable?: boolean;
   }>(),
   {
+    content: "",
     editable: false,
   },
 );
@@ -34,43 +35,65 @@ const paragraphs = computed(() => {
   if (!props.content) return [];
   return props.content.split("\n").filter((p) => p.trim().length > 0);
 });
+
+function handleKeydown(event: KeyboardEvent) {
+  if (!props.editable) return;
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  startEdit();
+}
 </script>
 
 <template>
-  <div class="content-block" :class="{ 'content-block--editable': editable }" @click="startEdit">
-    <!-- Edit Mode -->
-    <textarea
-      v-if="isEditing"
-      v-model="editValue"
-      class="content-block__textarea"
-      :rows="Math.max(3, editValue.split('\n').length)"
-      autofocus
-      @blur="finishEdit"
-      @keydown.escape="finishEdit"
-    />
-
-    <!-- Display Mode with slot or props -->
-    <template v-else>
-      <slot>
-        <p v-for="(para, i) in paragraphs" :key="i" class="content-block__para">
-          {{ para }}
-        </p>
-        <span v-if="paragraphs.length === 0" class="content-block__placeholder">
-          {{ editable ? "点击编辑内容..." : "" }}
-        </span>
-      </slot>
-    </template>
+  <textarea
+    v-if="isEditing"
+    v-model="editValue"
+    class="content-block__textarea"
+    aria-label="内容编辑器"
+    :rows="Math.max(3, editValue.split('\n').length)"
+    autofocus
+    @blur="finishEdit"
+    @keydown.escape="finishEdit"
+  />
+  <button
+    v-else-if="editable"
+    type="button"
+    class="content-block content-block--editable"
+    @click="startEdit"
+    @keydown="handleKeydown"
+  >
+    <slot>
+      <p v-for="(para, i) in paragraphs" :key="i" class="content-block__para">
+        {{ para }}
+      </p>
+      <span v-if="paragraphs.length === 0" class="content-block__placeholder">
+        {{ "点击编辑内容..." }}
+      </span>
+    </slot>
+  </button>
+  <div v-else class="content-block">
+    <slot>
+      <p v-for="(para, i) in paragraphs" :key="i" class="content-block__para">
+        {{ para }}
+      </p>
+      <span v-if="paragraphs.length === 0" class="content-block__placeholder">
+        {{ "" }}
+      </span>
+    </slot>
   </div>
 </template>
 
 <style scoped>
 .content-block {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  border: 1px solid transparent;
   border-radius: var(--of-radius-lg);
   padding: var(--of-spacing-4);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  text-align: left;
 }
 
 .content-block--editable {
@@ -79,13 +102,13 @@ const paragraphs = computed(() => {
 }
 
 .content-block--editable:hover {
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
 }
 
 .content-block__para {
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-color-gray-700);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   line-height: 1.6;
   margin: 0;
 }
@@ -93,22 +116,22 @@ const paragraphs = computed(() => {
 .content-block__placeholder {
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-color-gray-300);
+  color: var(--of-text-tertiary, var(--of-color-gray-300));
   font-style: italic;
 }
 
 .content-block__textarea {
   width: 100%;
   resize: vertical;
-  border: 1px solid var(--of-color-primary-300);
+  border: 1px solid var(--of-border-strong, rgba(15, 23, 42, 0.14));
   border-radius: var(--of-radius-sm);
   padding: 8px 10px;
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-color-gray-700);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   line-height: 1.6;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   outline: none;
-  box-shadow: 0 0 0 2px var(--of-color-primary-100);
+  box-shadow: 0 0 0 2px var(--of-surface-selected, #eceff3);
 }
 </style>

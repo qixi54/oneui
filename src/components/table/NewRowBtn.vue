@@ -29,23 +29,23 @@ const emit = defineEmits<{
 }
 
 .of-new-row-btn:hover {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-new-row-icon {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   flex-shrink: 0;
   transition: var(--of-transition-fast);
 }
 
 .of-new-row-label {
   font-size: 13px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   transition: var(--of-transition-fast);
 }
 
 .of-new-row-btn:hover .of-new-row-icon,
 .of-new-row-btn:hover .of-new-row-label {
-  color: var(--of-color-gray-600);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 </style>

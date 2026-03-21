@@ -15,26 +15,26 @@ export interface StatusSummaryProps {
   separator?: boolean;
 }
 
-defineOptions({ name: "StatusSummary", inheritAttrs: false });
-
-defineSlots<{
-  extra?: () => VNode[];
-}>();
-
 const props = withDefaults(defineProps<StatusSummaryProps>(), {
   size: "md",
   separator: false,
 });
 
+defineSlots<{
+  extra?: () => VNode[];
+}>();
+
+defineOptions({ name: "StatusSummary", inheritAttrs: false });
+
 const dotSize = computed(() => (props.size === "sm" ? "6px" : "7px"));
 const fontSize = computed(() => (props.size === "sm" ? "10px" : "11px"));
 
 function dotColor(item: StatusSummaryItem): string {
-  return item.color ?? "var(--of-color-gray-300)";
+  return item.color ?? "var(--of-border-subtle)";
 }
 
 function countColor(item: StatusSummaryItem): string {
-  return item.highlight ? dotColor(item) : "var(--of-color-text-primary)";
+  return item.highlight ? "var(--of-accent-strong)" : "var(--of-text-primary)";
 }
 </script>
 
@@ -52,15 +52,16 @@ function countColor(item: StatusSummaryItem): string {
           }"
         />
         <span class="of-status-summary__label" :style="{ fontSize }">{{ item.label }}</span>
-        <span
-          class="of-status-summary__count"
-          :style="{
-            fontSize,
-            color: countColor(item),
-            fontWeight: item.highlight ? '700' : '600',
-          }"
-          >{{ item.count }}</span
-        >
+          <span
+            class="of-status-summary__count"
+            :style="{
+              fontSize,
+              color: countColor(item),
+              fontWeight: item.highlight ? '700' : '600',
+            }"
+          >
+            {{ item.count }}
+          </span>
       </span>
     </template>
 
@@ -78,8 +79,8 @@ function countColor(item: StatusSummaryItem): string {
   flex-wrap: nowrap;
   gap: 14px;
   padding: 5px 13px;
-  background: var(--of-color-gray-50);
-  border-bottom: 1px solid var(--of-border-color);
+  background: var(--of-surface-elevated);
+  border-bottom: 1px solid var(--of-border-subtle);
   box-sizing: border-box;
   min-height: 0;
 }
@@ -99,7 +100,7 @@ function countColor(item: StatusSummaryItem): string {
 }
 
 .of-status-summary__label {
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary);
   line-height: 1.4;
   font-family: var(--of-font-sans, sans-serif);
 }
@@ -113,7 +114,7 @@ function countColor(item: StatusSummaryItem): string {
   display: inline-block;
   width: 1px;
   height: 12px;
-  background: var(--of-border-color);
+  background: var(--of-border-subtle);
   flex-shrink: 0;
   align-self: center;
 }

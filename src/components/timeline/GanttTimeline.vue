@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import GanttRow from "./GanttRow.vue";
 import type { DataRecord, GanttItem, TableSchema, Task, ViewConfig } from "../../types";
-import { taskToDataRecord } from "../../types";
+import { taskToDataRecord, buildGanttItems } from "../../types";
 
 interface TimelineRow {
   id: string;
@@ -30,9 +30,15 @@ const props = withDefaults(
     days?: number;
   }>(),
   {
+    records: undefined,
+    schema: undefined,
+    viewConfig: undefined,
     startFieldId: "startDate",
     endFieldId: "endDate",
     labelFieldId: "title",
+    items: undefined,
+    data: undefined,
+    startDate: undefined,
     days: 30,
   },
 );
@@ -78,42 +84,67 @@ function getDefaultStart(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 }
 
+// ─── ViewConfig 集成：字段映射 ───────────────────────────────────────────────
+const effectiveStartFieldId = computed(() => props.startFieldId ?? "startDate");
+const effectiveEndFieldId = computed(() => props.endFieldId ?? "endDate");
+const effectiveLabelFieldId = computed(() => props.labelFieldId ?? "title");
+
 const normalizedRecords = computed<DataRecord[]>(() => {
   if (props.records?.length) return props.records;
   if (props.data?.length) return props.data.map(taskToDataRecord);
   return [];
 });
 
-const timelineRows = computed<TimelineRow[]>(() => {
+// ─── 统一数据解析：优先 items > records > data ─────────────────────────────────
+const ganttItems = computed<GanttItem[]>(() => {
+  if (props.items?.length) return props.items;
   if (props.records?.length || props.data?.length) {
-    const rows: TimelineRow[] = [];
-    for (const record of normalizedRecords.value) {
-      const startDate = normalizeDateValue(record.fields[props.startFieldId]);
-      const endDate = normalizeDateValue(record.fields[props.endFieldId]);
-      const title = record.fields[props.labelFieldId];
-      if (!startDate || !endDate) continue;
-      rows.push({
-        id: record.id,
-        sourceRecordId: record.id,
-        title: typeof title === "string" && title ? title : record.id,
-        status: typeof record.fields.status === "string" ? record.fields.status : "",
-        priority: typeof record.fields.priority === "string" ? record.fields.priority : "",
-        startDate,
-        endDate,
-      });
-    }
-    return rows;
+    return buildGanttItems(normalizedRecords.value, {
+      startFieldId: effectiveStartFieldId.value,
+      endFieldId: effectiveEndFieldId.value,
+      labelFieldId: effectiveLabelFieldId.value,
+    });
   }
+  return [];
+});
 
-  return (props.items ?? []).map((item) => ({
-    id: item.id,
-    title: item.title,
-    status: item.status,
-    priority: item.priority,
-    startDate: item.startDate,
-    endDate: item.endDate,
-    barColor: item.barColor,
-  }));
+const timelineRows = computed<TimelineRow[]>(() => {
+  const rows: TimelineRow[] = ganttItems.value
+    .map((item) => {
+      const startDate = normalizeDateValue(item.startDate);
+      const endDate = normalizeDateValue(item.endDate);
+      return {
+        id: item.id,
+        sourceRecordId: item.id,
+        title: item.title,
+        status: item.status,
+        priority: item.priority,
+        startDate: startDate ?? item.startDate,
+        endDate: endDate ?? item.endDate,
+        barColor: item.barColor,
+      };
+    })
+    .filter(
+      (row) =>
+        normalizeDateValue(row.startDate) !== null && normalizeDateValue(row.endDate) !== null,
+    );
+
+  return rows;
+});
+
+// ─── ViewConfig sorts 排序 ──────────────────────────────────────────────────
+const sortedRows = computed<TimelineRow[]>(() => {
+  const rows = [...timelineRows.value];
+  const sortConfig = props.viewConfig?.sorts?.[0];
+  if (sortConfig) {
+    rows.sort((a, b) => {
+      const av = a[sortConfig.fieldId as keyof TimelineRow] ?? "";
+      const bv = b[sortConfig.fieldId as keyof TimelineRow] ?? "";
+      const cmp = String(av).localeCompare(String(bv));
+      return sortConfig.direction === "desc" ? -cmp : cmp;
+    });
+  }
+  return rows;
 });
 
 const minStartDate = computed(() => {
@@ -152,7 +183,7 @@ const dateHeaders = computed(() => {
 
 const internalRows = ref<TimelineRow[]>([]);
 watch(
-  timelineRows,
+  sortedRows,
   (rows) => {
     internalRows.value = rows.map((row) => ({ ...row }));
   },
@@ -273,17 +304,17 @@ function handleRowChange(payload: {
 <style scoped>
 .gantt-timeline {
   overflow: auto;
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-lg);
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   width: 100%;
 }
 
 .gantt-timeline__header {
   display: flex;
   align-items: stretch;
-  border-bottom: 1px solid var(--of-color-gray-200);
-  background: var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-panel, var(--of-color-gray-50));
   position: sticky;
   top: 0;
   z-index: 2;
@@ -294,17 +325,17 @@ function handleRowChange(payload: {
 .gantt-timeline__header-label {
   width: 240px;
   min-width: 240px;
-  border-right: 1px solid var(--of-color-gray-200);
+  border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   padding: 8px 12px;
   font-family: var(--of-font-sans);
   font-size: 11px;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   display: flex;
   align-items: center;
   position: sticky;
   left: 0;
   z-index: 3;
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-panel, var(--of-color-gray-50));
 }
 
 .gantt-timeline__header-dates {
@@ -317,17 +348,17 @@ function handleRowChange(payload: {
   padding: 6px 2px;
   font-family: var(--of-font-sans);
   font-size: 10px;
-  color: var(--of-color-gray-400);
-  border-right: 1px solid var(--of-color-gray-100);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
   white-space: nowrap;
   overflow: hidden;
   box-sizing: border-box;
 }
 
 .gantt-timeline__header-cell--today {
-  color: var(--of-color-primary-600);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   font-weight: 700;
-  background: var(--of-color-primary-50);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
 }
 
 .gantt-timeline__today-line {
@@ -335,7 +366,7 @@ function handleRowChange(payload: {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--of-color-primary-400);
+  background: var(--of-border-strong, var(--of-color-gray-300));
   opacity: 0.6;
   pointer-events: none;
   transform: translateX(-50%);
@@ -354,6 +385,6 @@ function handleRowChange(payload: {
   text-align: center;
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 </style>

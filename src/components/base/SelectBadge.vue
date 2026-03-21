@@ -12,19 +12,24 @@ export interface SelectBadgeProps {
   clickable?: boolean;
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<SelectBadgeProps>(), {
+  color: undefined,
+  dotColor: undefined,
+  textColor: undefined,
+  bgColor: undefined,
+  borderColor: undefined,
   dot: false,
   clickable: true,
 });
 
-defineSlots<{
-  default?: () => VNode[];
-}>();
-
 const emit = defineEmits<{
   click: [e: MouseEvent];
+}>();
+
+defineOptions({ inheritAttrs: false });
+
+defineSlots<{
+  default?: () => VNode[];
 }>();
 
 const COLOR_MAP: Record<string, { text: string; bg: string; border: string }> = {
@@ -96,6 +101,12 @@ const ChevronDown = resolveIcon("chevron-down");
 function handleClick(e: MouseEvent) {
   emit("click", e);
 }
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  handleClick(new MouseEvent("click"));
+}
 </script>
 
 <template>
@@ -103,14 +114,17 @@ function handleClick(e: MouseEvent) {
     class="one-select-badge"
     :class="{ 'one-select-badge--clickable': clickable }"
     :style="containerStyle"
+    role="button"
+    tabindex="0"
     v-bind="$attrs"
     @click="handleClick"
+    @keydown="handleKeydown"
   >
     <span v-if="dot" class="one-select-badge__dot" :style="dotStyle" />
     <span class="one-select-badge__text">
       <slot />
     </span>
-    <component v-if="clickable && ChevronDown" :is="ChevronDown" class="one-select-badge__arrow" />
+    <component :is="ChevronDown" v-if="clickable && ChevronDown" class="one-select-badge__arrow" />
   </span>
 </template>
 

@@ -14,7 +14,11 @@ const emit = defineEmits<{
   click: [item: GalleryItem];
 }>();
 
-const bannerColor = computed(() => props.item.bannerColor ?? "#BFDBFE");
+const bannerColor = computed(
+  () =>
+    props.item.bannerColor ??
+    "var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6))",
+);
 const hasImageCover = computed(
   () => typeof props.item.cover === "string" && /^https?:\/\//.test(props.item.cover),
 );
@@ -41,17 +45,19 @@ const formattedDate = computed(() => {
 });
 
 const statusDotColor: Record<string, string> = {
-  todo: "var(--of-color-gray-400)",
-  in_progress: "var(--of-color-info)",
-  blocked: "var(--of-color-warning)",
-  done: "var(--of-color-success)",
+  todo: "var(--of-text-tertiary, var(--of-color-gray-400))",
+  in_progress: "var(--of-accent-default, var(--of-text-secondary, var(--of-color-gray-500)))",
+  blocked: "var(--of-accent-strong, var(--of-color-error, #dc2626))",
+  done: "var(--of-text-strong, var(--of-color-gray-700, #374151))",
 };
 
-const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-color-gray-400)");
+const dotColor = computed(
+  () => statusDotColor[props.item.status] ?? "var(--of-text-tertiary, var(--of-color-gray-400))",
+);
 </script>
 
 <template>
-  <div class="gallery-card" @click="emit('click', item)">
+  <button class="gallery-card" type="button" @click="emit('click', item)">
     <!-- Cover -->
     <img v-if="hasImageCover" class="gallery-card__cover" :src="item.cover" alt="" />
     <div v-else class="gallery-card__banner" :style="{ backgroundColor: bannerColor }" />
@@ -89,21 +95,23 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
         <span class="gallery-card__date">{{ formattedDate }}</span>
       </div>
     </div>
-  </div>
+  </button>
 </template>
 
 <style scoped>
 .gallery-card {
   width: 260px;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  padding: 0;
   border-radius: var(--of-radius-xl);
-  border: 1px solid var(--of-color-gray-200);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  box-shadow: var(--of-shadow-card);
   overflow: hidden;
   cursor: pointer;
   transition: var(--of-transition-normal);
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 .gallery-card:hover {
@@ -139,7 +147,7 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
   font-family: var(--of-font-sans);
   font-size: 14px;
   font-weight: 600;
-  color: var(--of-color-gray-900);
+  color: var(--of-text-primary, var(--of-color-gray-900));
   line-height: 1.4;
   word-break: break-word;
 }
@@ -148,7 +156,7 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 .gallery-card__desc {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -160,7 +168,7 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 /* Divider */
 .gallery-card__divider {
   height: 1px;
-  background: var(--of-color-gray-100);
+  background: var(--of-border-subtle, var(--of-color-gray-100));
   flex-shrink: 0;
 }
 
@@ -178,14 +186,14 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 }
 
 .gallery-card__prop-icon {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   flex-shrink: 0;
 }
 
 .gallery-card__prop-key {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   white-space: nowrap;
 }
 
@@ -196,7 +204,7 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 .gallery-card__prop-value {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-color-gray-700);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   font-weight: 500;
   white-space: nowrap;
   max-width: 100px;
@@ -218,7 +226,7 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
   font-family: var(--of-font-sans);
   font-size: 11px;
   font-weight: 500;
-  color: var(--of-color-primary-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
 }
 
 .gallery-card__status-dot {
@@ -235,6 +243,6 @@ const dotColor = computed(() => statusDotColor[props.item.status] ?? "var(--of-c
 .gallery-card__date {
   font-family: var(--of-font-sans);
   font-size: 11px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 </style>

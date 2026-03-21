@@ -54,7 +54,7 @@ defineProps<{
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--of-color-gray-200);
+  background: var(--of-surface-muted, var(--of-color-gray-200));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,25 +81,25 @@ defineProps<{
 
 .of-ai-message__name {
   font-size: 12px;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   font-family: var(--of-font-sans);
   font-weight: 500;
 }
 
 .of-ai-message__bubble {
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
   border-radius: 0 12px 12px 12px;
   padding: 10px 14px;
   font-size: 14px;
   line-height: 1.6;
-  color: var(--of-color-gray-800);
+  color: var(--of-text-primary, var(--of-color-gray-800));
   font-family: var(--of-font-sans);
   word-break: break-word;
   white-space: pre-wrap;
 }
 
 .of-ai-message__bubble--error {
-  background: var(--of-color-error-light);
+  background: var(--of-surface-selected, var(--of-color-error-light));
   color: var(--of-color-error);
 }
 
@@ -109,7 +109,7 @@ defineProps<{
 
 .of-ai-message__timestamp {
   font-size: 11px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   font-family: var(--of-font-sans);
 }
 </style>

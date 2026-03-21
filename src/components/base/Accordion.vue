@@ -15,8 +15,6 @@ export interface AccordionProps {
   lazy?: boolean;
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<AccordionProps>(), {
   modelValue: undefined,
   multiple: false,
@@ -26,6 +24,8 @@ const props = withDefaults(defineProps<AccordionProps>(), {
 const emit = defineEmits<{
   "update:modelValue": [value: string | string[]];
 }>();
+
+defineOptions({ inheritAttrs: false });
 
 defineSlots<{
   default?: (props: { item: AccordionItem }) => unknown;
@@ -120,9 +120,9 @@ function toggleItem(item: AccordionItem) {
 }
 
 .of-accordion__item {
-  border: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border: 1px solid var(--of-border-subtle, #e5e7eb);
   border-radius: 12px;
-  background: var(--of-color-bg-elevated, #ffffff);
+  background: var(--of-surface-elevated, #ffffff);
   overflow: hidden;
 }
 
@@ -159,20 +159,20 @@ function toggleItem(item: AccordionItem) {
   font-size: 14px;
   line-height: 1.5;
   font-weight: 600;
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-accordion__subtitle {
   font-size: 12px;
   line-height: 1.5;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
 }
 
 .of-accordion__icon {
   flex-shrink: 0;
   font-size: 12px;
   line-height: 1;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-tertiary, var(--of-color-text-secondary, #6b7280));
 }
 
 .of-accordion__panel {

@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import BarChart from "./charts/BarChart.vue";
-import PieChart from "./charts/PieChart.vue";
-import DoughnutChart from "./charts/DoughnutChart.vue";
-import NumberCard from "./charts/NumberCard.vue";
-import TableChart from "./charts/TableChart.vue";
+import { computed, defineAsyncComponent } from "vue";
 
 type ChartType = "bar" | "pie" | "doughnut" | "number-card" | "table";
+
+type DashboardWidgetData = Record<string, unknown> | unknown[];
 
 interface DashboardWidget {
   id: string;
   type: ChartType;
   title?: string;
-  data?: unknown;
+  data?: DashboardWidgetData;
   config?: Record<string, unknown>;
   colSpan?: 1 | 2 | 3 | 4;
   rowSpan?: 1 | 2;
@@ -34,11 +31,11 @@ const props = withDefaults(
 );
 
 const chartMap = {
-  bar: BarChart,
-  pie: PieChart,
-  doughnut: DoughnutChart,
-  "number-card": NumberCard,
-  table: TableChart,
+  bar: defineAsyncComponent(() => import("./charts/BarChart.vue")),
+  pie: defineAsyncComponent(() => import("./charts/PieChart.vue")),
+  doughnut: defineAsyncComponent(() => import("./charts/DoughnutChart.vue")),
+  "number-card": defineAsyncComponent(() => import("./charts/NumberCard.vue")),
+  table: defineAsyncComponent(() => import("./charts/TableChart.vue")),
 };
 
 const layoutStyle = computed(() => ({
@@ -122,7 +119,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
         <component
           :is="chartMap[widget.type]"
           :title="widget.title"
-          :data="widget.data as any"
+          :data="widget.data"
           v-bind="widget.config ?? {}"
         />
       </article>
@@ -135,7 +132,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .of-dashboard__header {
@@ -148,7 +145,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: var(--of-color-text);
+  color: var(--of-text-primary, var(--of-color-text));
 }
 
 .of-dashboard__grid {
@@ -158,10 +155,11 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 
 .of-dashboard__item {
   min-height: 220px;
-  border: 1px solid var(--of-color-gray-100);
-  border-radius: var(--of-radius-lg);
-  background: var(--of-color-bg-canvas);
-  padding: 10px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
+  border-radius: var(--of-radius-xl);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  box-shadow: var(--of-card-shadow, var(--of-shadow-card));
+  padding: 14px;
 }
 
 @media (max-width: 960px) {

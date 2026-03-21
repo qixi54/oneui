@@ -3,9 +3,6 @@ import { watch, onUnmounted } from "vue";
 import { X } from "lucide-vue-next";
 import { useFocusTrap } from "../../composables/useFocusTrap";
 
-// Teleport 根节点无法自动继承 attrs（如 class），关闭自动继承
-defineOptions({ inheritAttrs: false });
-
 /**
  * Modal 组件 - 通用弹窗
  *
@@ -40,6 +37,7 @@ const props = withDefaults(
   }>(),
   {
     width: "500px",
+    title: undefined,
     closable: true,
     maskClosable: true,
     centered: true,
@@ -51,6 +49,9 @@ const emit = defineEmits<{
   /** 关闭时触发，更新 v-model 绑定值 */
   "update:modelValue": [value: boolean];
 }>();
+
+// Teleport 根节点无法自动继承 attrs（如 class），关闭自动继承
+defineOptions({ inheritAttrs: false });
 
 // ── Focus Trap ────────────────────────────────────────────────
 const {
@@ -102,8 +103,14 @@ onUnmounted(() => {
         v-if="modelValue"
         class="of-modal-backdrop"
         :style="{ zIndex: zIndex }"
-        @click.self="onMaskClick"
       >
+        <button
+          v-if="maskClosable"
+          type="button"
+          class="of-modal-backdrop__hitarea"
+          aria-label="关闭弹窗"
+          @click="onMaskClick"
+        />
         <div
           ref="modalRef"
           class="of-modal"
@@ -122,9 +129,9 @@ onUnmounted(() => {
             <button
               v-if="closable"
               class="of-modal__close"
-              @click="close"
               aria-label="关闭"
               type="button"
+              @click="close"
             >
               <X :size="18" />
             </button>
@@ -154,18 +161,24 @@ onUnmounted(() => {
   align-items: flex-start;
   justify-content: center;
   padding: var(--of-spacing-8, 32px) var(--of-spacing-4, 16px);
-  background: var(--of-color-black-alpha-50);
+  background: rgba(15, 23, 42, 0.36);
   overflow-y: auto;
+}
+
+.of-modal-backdrop__hitarea {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
 }
 
 /* ── Modal container ──────────────────────────────────────── */
 .of-modal {
   position: relative;
-  background: var(--of-color-bg-elevated, #ffffff);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
   border-radius: var(--of-radius-lg, 12px);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.16),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--of-shadow-modal);
   max-height: 85vh;
   overflow-y: auto;
   display: flex;
@@ -183,7 +196,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: var(--of-spacing-4, 16px) var(--of-spacing-6, 24px);
-  border-bottom: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   flex-shrink: 0;
   gap: var(--of-spacing-3, 12px);
 }
@@ -191,7 +204,7 @@ onUnmounted(() => {
 .of-modal__title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-text, #111827));
   margin: 0;
   line-height: 1.4;
   flex: 1;
@@ -211,19 +224,19 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   border-radius: var(--of-radius-md, 6px);
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   cursor: pointer;
   transition: var(--of-transition-fast, all 0.15s ease);
   flex-shrink: 0;
 }
 
 .of-modal__close:hover {
-  background: var(--of-color-gray-100, #f3f4f6);
-  color: var(--of-color-text, #111827);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-modal__close:active {
-  background: var(--of-color-gray-200, #e5e7eb);
+  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
 }
 
 /* ── Body ─────────────────────────────────────────────────── */
@@ -231,7 +244,7 @@ onUnmounted(() => {
   padding: var(--of-spacing-6, 24px);
   flex: 1;
   overflow-y: auto;
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-text, #111827));
   font-size: 14px;
   line-height: 1.6;
 }
@@ -243,7 +256,7 @@ onUnmounted(() => {
   justify-content: flex-end;
   gap: var(--of-spacing-3, 12px);
   padding: var(--of-spacing-4, 16px) var(--of-spacing-6, 24px);
-  border-top: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   flex-shrink: 0;
 }
 

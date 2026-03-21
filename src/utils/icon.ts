@@ -1,15 +1,8 @@
-// NOTE: 此处必须使用全量引入（* as LucideIcons），因为 resolveIcon 接受任意
-// 字符串作为图标名，在运行时动态查找对应组件（LucideIcons[key]）。
-// 静态分析无法提前知道用户会传入哪些图标名，故无法改为按需引入。
-// lucide-vue-next 在 vite.config.ts 中已配置为 external，不会打包进库产物，
-// 消费方按需引入由其自身 bundler 的 tree-shaking 决定。
-import * as LucideIcons from "lucide-vue-next";
-import type { Component } from "vue";
+import { defineAsyncComponent, type Component } from "vue";
 
-/**
- * 将 kebab-case 图标名转换为 PascalCase + Icon 后缀
- * 例如: 'trash-2' → 'Trash2Icon'
- */
+const iconCache = new Map<string, Component | undefined>();
+let iconRegistryPromise: Promise<typeof import("./iconRegistry")> | null = null;
+
 function toPascalCase(name: string): string {
   return (
     name
@@ -19,21 +12,41 @@ function toPascalCase(name: string): string {
   );
 }
 
-const iconCache = new Map<string, Component | undefined>();
+function toRegistryKey(name: string): string {
+  if (!name) return "";
+  if (name.endsWith("Icon")) return name;
+  if (name.includes("-")) return toPascalCase(name);
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}Icon`;
+}
 
-/**
- * 解析图标：支持 lucide 图标名字符串或直接传入 Vue 组件
- * @param icon lucide icon name (kebab-case) 或 Component
- * @returns Vue Component 或 undefined
- */
+function loadIconRegistry() {
+  iconRegistryPromise ??= import("./iconRegistry");
+  return iconRegistryPromise;
+}
+
+function createAsyncIcon(loaderKey: string): Component {
+  return defineAsyncComponent({
+    loader: async () => {
+      const { getIconLoader } = await loadIconRegistry();
+      const loader = getIconLoader(loaderKey);
+      if (!loader) {
+        throw new Error(`Unknown icon loader: ${loaderKey}`);
+      }
+      const mod = await loader();
+      return mod.default;
+    },
+    suspensible: false,
+  });
+}
+
 export function resolveIcon(icon: string | Component | undefined): Component | undefined {
   if (!icon) return undefined;
-  if (typeof icon !== "string") return icon as Component;
+  if (typeof icon !== "string") return icon;
 
   if (iconCache.has(icon)) return iconCache.get(icon);
 
-  const key = toPascalCase(icon);
-  const resolved = (LucideIcons as unknown as Record<string, Component>)[key];
+  const key = toRegistryKey(icon);
+  const resolved = key ? createAsyncIcon(key) : undefined;
   iconCache.set(icon, resolved);
   return resolved;
 }

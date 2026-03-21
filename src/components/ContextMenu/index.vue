@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch, type Component } from "vue";
+import { resolveIcon } from "../../utils/icon";
 
 export interface ContextMenuItem {
   key: string;
   label: string;
-  icon?: string;
+  icon?: string | Component;
   disabled?: boolean;
   danger?: boolean;
   separator?: boolean;
   children?: ContextMenuItem[];
 }
-
-defineOptions({
-  name: "ContextMenu",
-});
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +26,10 @@ const emit = defineEmits<{
   select: [key: string];
   close: [];
 }>();
+
+defineOptions({
+  name: "ContextMenu",
+});
 
 const menuRef = ref<HTMLElement | null>(null);
 
@@ -110,7 +111,7 @@ onBeforeUnmount(() => {
           role="menuitem"
           @click="handleSelect(item)"
         >
-          <span v-if="item.icon" class="of-context-menu__icon">{{ item.icon }}</span>
+          <component :is="resolveIcon(item.icon)" v-if="item.icon" class="of-context-menu__icon" />
           <span class="of-context-menu__label">{{ item.label }}</span>
           <span v-if="item.children?.length" class="of-context-menu__submenu-indicator">›</span>
         </button>
@@ -126,7 +127,7 @@ onBeforeUnmount(() => {
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-border-color);
   border-radius: 8px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--of-shadow-context-menu);
   z-index: 9999;
   user-select: none;
 }
@@ -167,8 +168,7 @@ onBeforeUnmount(() => {
 
 .of-context-menu__icon {
   width: 16px;
-  text-align: center;
-  font-size: 14px;
+  height: 16px;
   flex: 0 0 16px;
 }
 

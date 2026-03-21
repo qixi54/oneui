@@ -4,16 +4,14 @@ import { ChevronDownIcon, ChevronRightIcon } from "lucide-vue-next";
 import type { SidebarItem } from "../../types";
 import { resolveIcon } from "../../utils/icon";
 
-const densityRef = inject<ComputedRef<string>>("density");
-const density = computed(() => densityRef?.value ?? "comfortable");
-
 defineProps<{
   items: SidebarItem[];
 }>();
-
 const emit = defineEmits<{
   (e: "item-click", item: SidebarItem): void;
 }>();
+const densityRef = inject<ComputedRef<string>>("density");
+const density = computed(() => densityRef?.value ?? "comfortable");
 
 // 记录展开状态
 const expandedIds = ref<Set<string>>(new Set());
@@ -115,8 +113,8 @@ function isExpanded(item: SidebarItem): boolean {
   flex-direction: column;
   width: var(--of-sidebar-width);
   height: 100%;
-  background: var(--of-color-bg-elevated);
-  border-right: var(--of-border);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border-right: 1px solid var(--of-border-subtle, var(--of-border-color));
   padding: var(--of-spacing-4) var(--of-spacing-3);
   gap: var(--of-spacing-2);
   overflow-y: auto;
@@ -149,7 +147,7 @@ function isExpanded(item: SidebarItem): boolean {
   font-family: var(--of-font-sans);
   font-size: 13px;
   font-weight: 400;
-  color: var(--of-color-gray-600);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
   line-height: 1.4;
   text-align: left;
   width: 100%;
@@ -163,20 +161,20 @@ function isExpanded(item: SidebarItem): boolean {
 }
 
 .of-sidebar__item:hover:not(.of-sidebar__item--active) {
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
 }
 
 .of-sidebar__item--active {
-  background: var(--of-color-primary-50);
-  color: var(--of-color-primary-600);
+  background: var(--of-surface-selected);
+  color: var(--of-accent-strong);
 }
 
 .of-sidebar__item--active .of-sidebar__item-icon {
-  color: var(--of-color-primary-600);
+  color: var(--of-accent-strong);
 }
 
 .of-sidebar__item-icon {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   flex-shrink: 0;
 }
 
@@ -195,8 +193,8 @@ function isExpanded(item: SidebarItem): boolean {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  background: var(--of-color-gray-100);
-  color: var(--of-color-gray-500);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   font-size: 11px;
   font-weight: 500;
   border-radius: var(--of-radius-full);
@@ -205,12 +203,12 @@ function isExpanded(item: SidebarItem): boolean {
 }
 
 .of-sidebar__item--active .of-sidebar__item-badge {
-  background: var(--of-color-primary-100);
-  color: var(--of-color-primary-600);
+  background: var(--of-accent-soft);
+  color: var(--of-accent-strong);
 }
 
 .of-sidebar__item-chevron {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -224,7 +222,7 @@ function isExpanded(item: SidebarItem): boolean {
 .of-sidebar__footer {
   flex-shrink: 0;
   padding-top: var(--of-spacing-2);
-  border-top: var(--of-border);
+  border-top: 1px solid var(--of-border-subtle, var(--of-border-color));
 }
 
 /* ── Density: compact ── */

@@ -2,9 +2,6 @@
 import { computed, inject, type ComputedRef } from "vue";
 import { SearchIcon, BellIcon } from "lucide-vue-next";
 
-const densityRef = inject<ComputedRef<string>>("density");
-const density = computed(() => densityRef?.value ?? "comfortable");
-
 const props = withDefaults(
   defineProps<{
     username?: string;
@@ -17,12 +14,13 @@ const props = withDefaults(
     notifyCount: 0,
   },
 );
-
 const emit = defineEmits<{
   (e: "search", value: string): void;
   (e: "notify-click"): void;
   (e: "avatar-click"): void;
 }>();
+const densityRef = inject<ComputedRef<string>>("density");
+const density = computed(() => densityRef?.value ?? "comfortable");
 
 const avatarInitial = computed(() =>
   props.username ? props.username.charAt(0).toUpperCase() : "U",
@@ -57,6 +55,7 @@ function handleAvatarClick() {
         <input
           class="of-navbar__search-input"
           type="text"
+          aria-label="搜索"
           :placeholder="searchPlaceholder"
           @input="handleSearch"
         />
@@ -89,8 +88,8 @@ function handleAvatarClick() {
   height: var(--of-navbar-height);
   padding: 0 var(--of-spacing-5);
   gap: var(--of-spacing-4);
-  background: var(--of-color-bg-elevated);
-  border-bottom: var(--of-border);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-border-color));
   box-sizing: border-box;
 }
 
@@ -105,7 +104,7 @@ function handleAvatarClick() {
   font-family: var(--of-font-sans);
   font-size: 16px;
   font-weight: 700;
-  color: var(--of-color-primary-600);
+  color: var(--of-accent-strong, var(--of-color-text-primary));
   letter-spacing: -0.02em;
 }
 
@@ -123,16 +122,16 @@ function handleAvatarClick() {
   width: 280px;
   height: 36px;
   padding: 0 var(--of-spacing-3);
-  background: var(--of-color-gray-50);
-  border: var(--of-border);
+  background: var(--of-surface-panel, var(--of-color-gray-50));
+  border: 1px solid var(--of-border-subtle, var(--of-border-color));
   border-radius: var(--of-radius-lg);
   box-sizing: border-box;
   transition: var(--of-transition-fast);
 }
 
 .of-navbar__search:focus-within {
-  border-color: var(--of-color-primary-300);
-  background: var(--of-color-bg-elevated);
+  border-color: var(--of-border-strong, var(--of-accent-default));
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
 }
 
 .of-navbar__search-icon {
@@ -147,12 +146,12 @@ function handleAvatarClick() {
   outline: none;
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-color-gray-700);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   min-width: 0;
 }
 
 .of-navbar__search-input::placeholder {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
 /* ── Right ── */
@@ -171,18 +170,18 @@ function handleAvatarClick() {
   width: 36px;
   height: 36px;
   background: transparent;
-  border: var(--of-border);
+  border: 1px solid var(--of-border-subtle, var(--of-border-color));
   border-radius: var(--of-radius-lg);
   cursor: pointer;
   transition: var(--of-transition-fast);
 }
 
 .of-navbar__notify-btn:hover {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-navbar__notify-icon {
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
 }
 
 .of-navbar__notify-badge {
@@ -192,7 +191,7 @@ function handleAvatarClick() {
   min-width: 14px;
   height: 14px;
   padding: 0 3px;
-  background: var(--of-color-error);
+  background: var(--of-accent-strong);
   color: var(--of-color-text-inverse);
   font-family: var(--of-font-sans);
   font-size: 9px;
@@ -209,7 +208,7 @@ function handleAvatarClick() {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: var(--of-color-primary-500);
+  background: var(--of-accent-default);
   border: none;
   border-radius: var(--of-radius-full);
   cursor: pointer;
@@ -222,7 +221,7 @@ function handleAvatarClick() {
 }
 
 .of-navbar__avatar:hover {
-  background: var(--of-color-primary-600);
+  background: var(--of-accent-strong);
 }
 
 /* ── Density: compact ── */

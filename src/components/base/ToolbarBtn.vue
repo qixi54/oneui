@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, type Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
 
-defineOptions({ inheritAttrs: false });
-
 const props = defineProps<{
-  icon: string;
+  icon: string | Component;
   label: string;
   active?: boolean;
 }>();
@@ -13,6 +11,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "click", event: MouseEvent): void;
 }>();
+
+defineOptions({ inheritAttrs: false });
 
 // icon prop 为运行时字符串，通过 resolveIcon 动态查找 Lucide 组件。
 // 全量引入由 icon.ts 统一处理，此处无需重复引入 lucide-vue-next。
@@ -43,35 +43,35 @@ function handleClick(event: MouseEvent) {
   gap: 6px;
   padding: 5px 10px;
   background: transparent;
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle);
   border-radius: var(--of-radius-md);
   cursor: pointer;
   font-family: var(--of-font-sans);
   font-size: 12px;
   font-weight: 400;
-  color: var(--of-color-gray-600);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
   line-height: 1;
   white-space: nowrap;
   transition: var(--of-transition-fast);
 }
 
 .of-toolbar-btn .of-toolbar-btn__icon {
-  color: var(--of-color-gray-500);
+  color: var(--of-text-tertiary, var(--of-color-gray-500));
   flex-shrink: 0;
 }
 
 .of-toolbar-btn:hover:not(.of-toolbar-btn--active) {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-selected, var(--of-color-gray-50));
 }
 
 .of-toolbar-btn--active {
-  background: var(--of-color-primary-50);
-  color: var(--of-color-primary-600);
-  border-color: var(--of-color-primary-200);
+  background: var(--of-surface-selected);
+  color: var(--of-accent-strong, var(--of-text-strong));
+  border-color: var(--of-border-strong);
 }
 
 .of-toolbar-btn--active .of-toolbar-btn__icon {
-  color: var(--of-color-primary-600);
+  color: var(--of-accent-strong, var(--of-text-strong));
 }
 
 .of-toolbar-btn__label {

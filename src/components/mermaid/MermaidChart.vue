@@ -1,6 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from "vue";
 
+interface MermaidAPI {
+  initialize(config: {
+    startOnLoad: boolean;
+    theme: "default" | "dark" | "neutral" | "forest";
+    securityLevel: "loose";
+  }): void;
+  render(id: string, code: string): Promise<{ svg: string }>;
+}
+
+type MermaidWindow = Window & {
+  mermaid?: MermaidAPI;
+};
+
 /**
  * MermaidChart 组件 - Mermaid 图表渲染
  *
@@ -44,7 +57,7 @@ async function renderChart() {
 
   try {
     // 优先用全局 window.mermaid（CDN），否则动态 import（npm 安装方式）
-    let mermaid: any = (window as any).mermaid;
+    let mermaid: MermaidAPI | undefined = (window as MermaidWindow).mermaid;
     if (!mermaid) {
       const mod = await import("mermaid");
       mermaid = mod.default;
@@ -63,8 +76,8 @@ async function renderChart() {
     if (containerRef.value) {
       containerRef.value.innerHTML = svg;
     }
-  } catch (e: any) {
-    errorMsg.value = e?.message || "图表渲染失败，请检查 Mermaid 语法";
+  } catch (e: unknown) {
+    errorMsg.value = e instanceof Error ? e.message : "图表渲染失败，请检查 Mermaid 语法";
   } finally {
     isLoading.value = false;
   }
@@ -113,9 +126,9 @@ watch(
   width: 100%;
   overflow-x: auto;
   padding: var(--of-spacing-4, 16px);
-  background: var(--of-color-bg-canvas, #ffffff);
-  border: 1px solid var(--of-color-gray-100, #f0f0f0);
-  border-radius: var(--of-radius-lg, 8px);
+  background: var(--of-surface-panel, var(--of-color-bg-canvas, #ffffff));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-100, #f0f0f0));
+  border-radius: var(--of-radius-xl, 8px);
   box-sizing: border-box;
   min-height: 60px;
   text-align: center;
@@ -134,16 +147,16 @@ watch(
   justify-content: center;
   gap: var(--of-spacing-2, 8px);
   padding: var(--of-spacing-4, 16px);
-  background: var(--of-color-bg-canvas, #ffffff);
-  border: 1px solid var(--of-color-gray-100, #f0f0f0);
-  border-radius: var(--of-radius-lg, 8px);
+  background: var(--of-surface-panel, var(--of-color-bg-canvas, #ffffff));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-100, #f0f0f0));
+  border-radius: var(--of-radius-xl, 8px);
   min-height: 60px;
   box-sizing: border-box;
 }
 
 .of-mermaid__loading-text {
   font-size: 13px;
-  color: var(--of-color-text-secondary, #8c8c8c);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #8c8c8c));
 }
 
 /* Spinner 动画 */
@@ -151,8 +164,8 @@ watch(
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid var(--of-color-gray-200, #e8e8e8);
-  border-top-color: var(--of-color-primary, #6366f1);
+  border: 2px solid var(--of-border-subtle, var(--of-color-gray-200, #e8e8e8));
+  border-top-color: var(--of-accent-default, #334155);
   border-radius: 50%;
   animation: of-mermaid-spin 0.8s linear infinite;
   flex-shrink: 0;
@@ -170,9 +183,9 @@ watch(
   align-items: flex-start;
   gap: var(--of-spacing-2, 8px);
   padding: var(--of-spacing-3, 12px) var(--of-spacing-4, 16px);
-  background: var(--of-color-red-50, #fff2f0);
-  border: 1px solid var(--of-color-red-200, #ffccc7);
-  border-radius: var(--of-radius-lg, 8px);
+  background: var(--of-surface-selected, var(--of-color-red-50, #fff2f0));
+  border: 1px solid var(--of-border-subtle, var(--of-color-red-200, #ffccc7));
+  border-radius: var(--of-radius-xl, 8px);
   box-sizing: border-box;
   min-height: 60px;
 }
@@ -184,7 +197,7 @@ watch(
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--of-color-red-500, #dc2626);
+  background: var(--of-color-error, #dc2626);
   color: var(--of-color-text-inverse);
   font-size: 12px;
   font-weight: 700;
@@ -194,7 +207,7 @@ watch(
 
 .of-mermaid__error-text {
   font-size: 13px;
-  color: var(--of-color-red-600, #dc2626);
+  color: var(--of-color-error, #dc2626);
   line-height: 1.5;
   word-break: break-all;
 }

@@ -3,6 +3,7 @@ import { mount } from "@vue/test-utils";
 import DataTable from "../components/table/DataTable.vue";
 import TableDataRow from "../components/table/TableDataRow.vue";
 import DetailLayout from "../components/detail/DetailLayout.vue";
+import type { FieldDef } from "../components/table/FieldCell.vue";
 import type { Task } from "../types";
 
 describe("Table + Detail 集成", () => {
@@ -23,6 +24,19 @@ describe("Table + Detail 集成", () => {
       assignee: "王五",
     },
   ];
+
+  function setViewportWidth(width: number) {
+    Object.defineProperty(window, "innerWidth", {
+      value: width,
+      configurable: true,
+    });
+  }
+
+  function getRowHeights(wrapper: ReturnType<typeof mount>) {
+    return wrapper
+      .findAll(".of-table-row")
+      .map((row) => Number.parseFloat((row.element as HTMLElement).style.height || "0"));
+  }
 
   it("DataTable 点击行会透出 row-click 事件", async () => {
     const onRowClick = vi.fn();
@@ -46,6 +60,121 @@ describe("Table + Detail 集成", () => {
     expect(onRowClick.mock.calls[0][0]).toMatchObject({ id: "T-1", title: "完善集成测试" });
   });
 
+  it("TableDataRow 可以通过键盘激活点击事件", async () => {
+    const onClick = vi.fn();
+    const wrapper = mount(TableDataRow, {
+      props: {
+        row: {
+          id: "T-1",
+          title: "完善集成测试",
+          status: "in_progress",
+        },
+        columns: [{ key: "title", label: "标题" }],
+        selectable: false,
+        onClick,
+      },
+    });
+
+    await wrapper.find('[role="row"]').trigger("keydown", { key: "Enter" });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0]).toMatchObject({ id: "T-1", title: "完善集成测试" });
+  });
+
+  it("DataTable 的 cell slot 可以覆盖默认单元格渲染", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1280);
+    const fieldDefs: FieldDef[] = [
+      { id: "title", type: "text", label: "标题" },
+      { id: "status", type: "select", label: "状态", options: [] },
+      { id: "priority", type: "select", label: "优先级", options: [] },
+    ];
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          columns: [
+            { key: "title", label: "标题" },
+            { key: "status", label: "状态" },
+            { key: "priority", label: "优先级" },
+          ],
+          fieldDefs,
+        },
+        slots: {
+          cell: `
+            <template #default="{ row, col }">
+              <span class="custom-cell">{{ col.key }}:{{ row.title }}</span>
+            </template>
+          `,
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.findAll(".custom-cell")).toHaveLength(tasks.length * 3);
+      expect(wrapper.text()).toContain("title:完善集成测试");
+      expect(wrapper.find(".of-field-cell").exists()).toBe(false);
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
+  it("DataTable 在移动端也会透传 cell slot", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(375);
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          columns: [
+            { key: "title", label: "标题" },
+            { key: "status", label: "状态" },
+            { key: "priority", label: "优先级" },
+          ],
+        },
+        slots: {
+          cell: `
+            <template #default="{ row, col }">
+              <span class="custom-cell">{{ col.key }}:{{ row.title }}</span>
+            </template>
+          `,
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.findAll(".custom-cell")).toHaveLength(tasks.length * 3);
+      expect(wrapper.text()).toContain("title:完善集成测试");
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
+  it("DataTable 的 grid 语义应包含 row / columnheader / gridcell", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1280);
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          columns: [
+            { key: "title", label: "标题" },
+            { key: "status", label: "状态" },
+          ],
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('[role="grid"]').exists()).toBe(true);
+      expect(wrapper.findAll('[role="row"]').length).toBeGreaterThanOrEqual(3);
+      expect(wrapper.findAll('[role="columnheader"]').length).toBeGreaterThanOrEqual(2);
+      expect(wrapper.findAll('[role="gridcell"]').length).toBeGreaterThan(0);
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
   it("selectable=false 时表头和数据行都不渲染 checkbox", async () => {
     const wrapper = mount(DataTable, {
       props: {
@@ -66,27 +195,61 @@ describe("Table + Detail 集成", () => {
   });
 
   it("fill 列会应用最小宽度，避免窄容器下被压扁", async () => {
-    const wrapper = mount(DataTable, {
-      props: {
-        tasks,
-        columns: [
-          { key: "title", label: "标题", width: "fill", minWidth: 260 },
-          { key: "status", label: "状态", width: 90 },
-        ],
-      },
-    });
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1280);
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          columns: [
+            { key: "title", label: "标题", width: "fill", minWidth: 260 },
+            { key: "status", label: "状态", width: 90 },
+          ],
+        },
+      });
 
-    await wrapper.vm.$nextTick();
+      await wrapper.vm.$nextTick();
 
-    const titleHeader = wrapper.findAll(".of-th").find((cell) => cell.text().includes("标题"));
-    const titleCell = wrapper.find(".of-td-title").element.parentElement as HTMLElement | null;
+      const titleHeader = wrapper
+        .findAll('[role="columnheader"]')
+        .find((cell) => cell.text().includes("标题"));
+      const titleCell = wrapper
+        .findAll(".of-td")
+        .find((cell) => cell.text().includes("完善集成测试"));
 
-    expect(titleHeader).toBeTruthy();
-    expect(titleCell).not.toBeNull();
-    expect((titleHeader!.element as HTMLElement).style.minWidth).toBe("260px");
-    expect((titleHeader!.element as HTMLElement).style.flex).toBe("1 1 260px");
-    expect(titleCell!.style.minWidth).toBe("260px");
-    expect(titleCell!.style.flex).toBe("1 1 260px");
+      expect(titleHeader).toBeTruthy();
+      expect(titleCell).toBeTruthy();
+      expect((titleHeader!.element as HTMLElement).style.minWidth).toBe("260px");
+      expect((titleHeader!.element as HTMLElement).style.flex).toBe("1 1 260px");
+      expect((titleCell!.element as HTMLElement).style.minWidth).toBe("260px");
+      expect((titleCell!.element as HTMLElement).style.flex).toBe("1 1 260px");
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
+  it("DataTable 预留 density=compact 的契约位", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1280);
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          density: "compact",
+          columns: [
+            { key: "title", label: "标题" },
+            { key: "status", label: "状态" },
+          ],
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      expect((wrapper.props() as Record<string, unknown>).density).toBe("compact");
+      expect(getRowHeights(wrapper).length).toBeGreaterThan(0);
+    } finally {
+      setViewportWidth(originalWidth);
+    }
   });
 
   it("DetailLayout 能渲染来自 task 的关键字段", () => {

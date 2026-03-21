@@ -14,7 +14,7 @@ withDefaults(
     <!-- 头像 -->
     <div
       class="comment-item__avatar"
-      :style="{ backgroundColor: comment.avatarColor ?? 'var(--of-color-primary-500)' }"
+      :style="{ backgroundColor: comment.avatarColor ?? 'var(--of-accent-default)' }"
     >
       {{ comment.authorInitial }}
     </div>

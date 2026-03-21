@@ -190,6 +190,49 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
     if (!options.serverSide) pagination.value.total = data.length;
   }
 
+  /**
+   * Row-level partial update — updates a single row without replacing the
+   * entire dataset. Does NOT reset pagination, selection, or scroll position.
+   */
+  function patchRow(rowId: string, fields: Partial<Record<string, unknown>>) {
+    const data = rawData.value as T[];
+    const idx = data.findIndex((r) => (r as Record<string, unknown>)["id"] === rowId);
+    if (idx === -1) return;
+    data[idx] = { ...data[idx], ...fields } as T;
+    triggerRef(rawData);
+  }
+
+  /**
+   * Insert a row at a specific position without full data replacement.
+   */
+  function insertRow(row: T, position?: number) {
+    const data = rawData.value as T[];
+    if (position !== undefined && position >= 0 && position <= data.length) {
+      data.splice(position, 0, row);
+    } else {
+      data.push(row);
+    }
+    triggerRef(rawData);
+    if (!options.serverSide) pagination.value.total = data.length;
+  }
+
+  /**
+   * Remove rows by id without full data replacement.
+   */
+  function removeRows(rowIds: (string | number)[]) {
+    const idSet = new Set(rowIds.map(String));
+    const data = rawData.value as T[];
+    rawData.value = data.filter(
+      (r) => !idSet.has(String((r as Record<string, unknown>)["id"])),
+    ) as T[];
+    triggerRef(rawData);
+    // Clean up selection for removed rows
+    for (const id of rowIds) {
+      selectedRows.value.delete(id);
+    }
+    if (!options.serverSide) pagination.value.total = (rawData.value as T[]).length;
+  }
+
   return {
     data: processedData,
     rawData: readonly(rawData),
@@ -212,5 +255,8 @@ export function useTable<T extends Record<string, unknown>>(options: UseTableOpt
     refresh,
     fetchData,
     setData,
+    patchRow,
+    insertRow,
+    removeRows,
   };
 }

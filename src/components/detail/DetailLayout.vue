@@ -214,8 +214,8 @@ function onDescriptionUpdate(value: string) {
 }
 
 .detail-layout__badge--role {
-  color: var(--of-role-default-text);
-  background-color: var(--of-role-default-bg);
+  color: var(--of-text-secondary);
+  background-color: var(--of-surface-muted);
 }
 
 .detail-layout__meta-text {

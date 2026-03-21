@@ -1,0 +1,32 @@
+:root,
+:root[data-of-theme="neutral"] {
+  --of-surface-canvas: #f6f7f9;
+  --of-surface-elevated: #ffffff;
+  --of-surface-panel: #fbfcfd;
+  --of-surface-muted: #f1f3f6;
+  --of-surface-selected: #eceff3;
+
+  --of-border-subtle: rgba(15, 23, 42, 0.08);
+  --of-border-strong: rgba(15, 23, 42, 0.14);
+
+  --of-text-primary: #0f172a;
+  --of-text-secondary: #526071;
+  --of-text-tertiary: #7a8797;
+  --of-text-strong: #09111f;
+  --of-link-default: #334155;
+  --of-link-hover: #1f2a37;
+  --of-link-visited: #475569;
+
+  --of-accent-default: #334155;
+  --of-accent-strong: #0f172a;
+  --of-accent-soft: #dbe2ea;
+
+  --of-chart-series-1: #516072;
+  --of-chart-series-2: #748399;
+  --of-chart-series-3: #91a2b8;
+  --of-chart-series-4: #b0bfd0;
+  --of-chart-series-5: #d0d9e4;
+
+  --of-card-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+  --of-card-shadow-hover: 0 16px 32px rgba(15, 23, 42, 0.08);
+}

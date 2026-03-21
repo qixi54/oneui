@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@oneflowui/ui.svg)](https://www.npmjs.com/package/@oneflowui/ui)
 [![license](https://img.shields.io/npm/l/@oneflowui/ui.svg)](https://github.com/qixi54/oneui/blob/main/LICENSE)
 
-A **Vue 3 + TypeScript** component library for building task management and productivity applications. Ships **75+ ready-to-use components** covering views, AI chat, dashboards, editors, and more.
+A **Vue 3 + TypeScript** UI library for building task management and productivity applications. It now includes a page-level `DatabaseView` solution on top of the component layer.
 
 > [中文文档](./README.md)
 
@@ -93,7 +93,7 @@ pnpm add mermaid   # required only when using MermaidChart
 ```ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import OneflowUI from '@oneflowui/ui'
+import OneflowUI from '@oneflowui/ui/plugin'
 import '@oneflowui/ui/styles'
 
 const app = createApp(App)
@@ -107,6 +107,27 @@ app.mount('#app')
 import { KanbanBoard, DataTable, AiMessageList, MermaidChart } from '@oneflowui/ui'
 import '@oneflowui/ui/styles'
 ```
+
+Note: starting from `0.5.4`, the plugin entry is separated from the root entry. Use `@oneflowui/ui/plugin` for `app.use(...)`, and keep named imports on `@oneflowui/ui`.
+
+### Theme Layers
+
+OneUI now ships with a neutral default theme and an optional product skin without changing component logic.
+
+- Default theme: `neutral`
+- Optional skin: `ops-console`
+
+Recommended usage is to keep components on shared tokens and switch the theme at the app layer instead of overriding component internals.
+
+```ts
+import '@oneflowui/ui/styles'
+
+document.documentElement.dataset.ofTheme = 'neutral'
+// or
+document.documentElement.dataset.ofTheme = 'ops-console'
+```
+
+This structure is meant to keep the component layer reusable while letting product-specific styling live above it.
 
 ---
 

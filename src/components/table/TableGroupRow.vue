@@ -3,8 +3,6 @@ import { computed } from "vue";
 import type { ColorMap } from "../../types";
 import { resolveBadge } from "../../composables/useBadge";
 
-defineOptions({ name: "TableGroupRow" });
-
 const props = withDefaults(
   defineProps<{
     groupKey: string;
@@ -12,47 +10,94 @@ const props = withDefaults(
     collapsed?: boolean;
     colorMap?: ColorMap;
     selectable?: boolean;
+    /** Nesting level for multi-level grouping (0-based) */
+    level?: number;
+    /** Aggregation results to display inline */
+    aggregations?: Record<string, number>;
   }>(),
-  { collapsed: false, selectable: true },
+  {
+    collapsed: false,
+    colorMap: undefined,
+    selectable: true,
+    level: 0,
+    aggregations: undefined,
+  },
 );
 
 const emit = defineEmits<{ toggle: [] }>();
 
 const badge = computed(() => {
   if (!props.colorMap) return null;
-  const resolved = resolveBadge(props.groupKey, props.colorMap);
-  // resolveBadge returns { style: { color, background }, label, dot }
-  return resolved;
+  return resolveBadge(props.groupKey, props.colorMap);
 });
 
 const displayLabel = computed(() => props.groupKey || "(空)");
+const indentPx = computed(() => props.level * 16);
+
+const formattedAggregations = computed(() => {
+  if (!props.aggregations) return [];
+  return Object.entries(props.aggregations).map(([key, value]) => {
+    const [, fn] = key.split(":");
+    const label =
+      fn === "sum"
+        ? "总计"
+        : fn === "avg"
+          ? "平均"
+          : fn === "min"
+            ? "最小"
+            : fn === "max"
+              ? "最大"
+              : "计数";
+    const formatted =
+      typeof value === "number" && !Number.isInteger(value) ? value.toFixed(2) : String(value);
+    return { key, label, value: formatted };
+  });
+});
+
+function handleToggleKeyDown(event: KeyboardEvent) {
+  if (event.target !== event.currentTarget) return;
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  emit("toggle");
+}
 </script>
 
 <template>
-  <div class="of-table-group-row" @click="emit('toggle')">
-    <!-- Checkbox spacer (matches checkbox column width in TableDataRow) -->
-    <div v-if="selectable" class="of-table-group-row__checkbox-spacer" />
+  <div
+    class="of-table-group-row"
+    role="row"
+    tabindex="0"
+    :aria-expanded="!collapsed"
+    :style="{ paddingLeft: `${12 + indentPx}px` }"
+    @click="emit('toggle')"
+    @keydown="handleToggleKeyDown"
+  >
+    <div class="of-table-group-row__cell" role="gridcell">
+      <!-- Checkbox spacer (matches checkbox column width in TableDataRow) -->
+      <div v-if="selectable" class="of-table-group-row__checkbox-spacer" />
 
-    <!-- Chevron toggle indicator -->
-    <span
-      class="of-table-group-row__chevron"
-      :class="{ 'of-table-group-row__chevron--collapsed': collapsed }"
-      >▼</span
-    >
+      <!-- Chevron toggle indicator -->
+      <span class="of-table-group-row__chevron" :class="{ 'of-table-group-row__chevron--collapsed': collapsed }">▼</span>
 
-    <!-- Group label: badge if colorMap has a matching entry, plain text otherwise -->
-    <span v-if="badge" class="of-table-group-row__badge" :style="badge.style">
-      <span
-        v-if="badge.dot"
-        class="of-table-group-row__badge-dot"
-        :style="{ background: badge.dot }"
-      />
-      {{ badge.label }}
-    </span>
-    <span v-else class="of-table-group-row__label">{{ displayLabel }}</span>
+      <!-- Group label: badge if colorMap has a matching entry, plain text otherwise -->
+      <span v-if="badge" class="of-table-group-row__badge" :style="badge.style">
+        <span
+          v-if="badge.dot"
+          class="of-table-group-row__badge-dot"
+          :style="{ background: badge.dot }"
+        />
+        {{ badge.label }}
+      </span>
+      <span v-else class="of-table-group-row__label">{{ displayLabel }}</span>
 
-    <!-- Row count -->
-    <span class="of-table-group-row__count">({{ count }})</span>
+      <!-- Row count -->
+      <span class="of-table-group-row__count">({{ count }})</span>
+
+      <!-- Aggregation values -->
+      <span v-for="agg in formattedAggregations" :key="agg.key" class="of-table-group-row__agg">
+        {{ agg.label }}: {{ agg.value }}
+      </span>
+    </div>
   </div>
 </template>
 
@@ -61,20 +106,33 @@ const displayLabel = computed(() => props.groupKey || "(空)");
   display: flex;
   align-items: center;
   height: 36px;
-  padding: 0 12px;
-  gap: 8px;
-  background: var(--of-color-gray-50);
-  border-bottom: 1px solid var(--of-color-gray-200);
+  background: var(--of-surface-panel, var(--of-color-gray-50));
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary, var(--of-color-text-primary));
   box-sizing: border-box;
   user-select: none;
 }
 
+.of-table-group-row__cell {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
 .of-table-group-row:hover {
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
+}
+
+.of-table-group-row:focus-visible {
+  outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
+  outline-offset: -2px;
 }
 
 .of-table-group-row__checkbox-spacer {
@@ -84,7 +142,7 @@ const displayLabel = computed(() => props.groupKey || "(空)");
 
 .of-table-group-row__chevron {
   font-size: var(--of-font-size-xs);
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
   width: 14px;
   text-align: center;
   flex-shrink: 0;
@@ -121,7 +179,7 @@ const displayLabel = computed(() => props.groupKey || "(空)");
 .of-table-group-row__label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary, var(--of-color-text-primary));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -129,8 +187,16 @@ const displayLabel = computed(() => props.groupKey || "(空)");
 
 .of-table-group-row__count {
   font-size: 12px;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
   font-weight: 400;
   white-space: nowrap;
+}
+
+.of-table-group-row__agg {
+  font-size: 11px;
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  font-weight: 400;
+  white-space: nowrap;
+  margin-left: 4px;
 }
 </style>

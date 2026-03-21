@@ -9,28 +9,31 @@ export interface AvatarProps {
   role?: string;
 }
 
-defineOptions({ name: "Avatar", inheritAttrs: false });
-
 const props = withDefaults(defineProps<AvatarProps>(), {
+  color: undefined,
+  bg: undefined,
+  role: undefined,
   size: 28,
 });
 
+defineOptions({ name: "Avatar", inheritAttrs: false });
+
 const ROLE_COLORS: Record<string, { color: string; bg: string }> = {
-  BE: { color: "var(--of-role-be-text, #4F46E5)", bg: "var(--of-role-be-bg, #EEF2FF)" },
-  FE: { color: "var(--of-role-fe-text, #059669)", bg: "var(--of-role-fe-bg, #ECFDF5)" },
-  PM: { color: "var(--of-role-pm-text, #db2777)", bg: "var(--of-role-pm-bg, #fce7f3)" },
-  DBA: { color: "var(--of-role-dba-text, #c2410c)", bg: "var(--of-role-dba-bg, #fff7ed)" },
-  ARCH: { color: "var(--of-role-arch-text, #7C3AED)", bg: "var(--of-role-arch-bg, #F5F3FF)" },
-  OPM: { color: "var(--of-role-pm-text, #db2777)", bg: "var(--of-role-pm-bg, #fce7f3)" },
+  BE: { color: "var(--of-accent-strong)", bg: "var(--of-surface-selected)" },
+  FE: { color: "var(--of-text-strong)", bg: "var(--of-surface-panel)" },
+  PM: { color: "var(--of-text-primary)", bg: "var(--of-surface-muted)" },
+  DBA: { color: "var(--of-accent-default)", bg: "var(--of-surface-elevated)" },
+  ARCH: { color: "var(--of-text-secondary)", bg: "var(--of-surface-selected)" },
+  OPM: { color: "var(--of-text-primary)", bg: "var(--of-surface-muted)" },
 };
 
 const PALETTE = [
-  { color: "var(--of-role-be-text, #4F46E5)", bg: "var(--of-role-be-bg, #EEF2FF)" },
-  { color: "var(--of-role-fe-text, #059669)", bg: "var(--of-role-fe-bg, #ECFDF5)" },
-  { color: "var(--of-role-pm-text, #db2777)", bg: "var(--of-role-pm-bg, #fce7f3)" },
-  { color: "var(--of-role-dba-text, #c2410c)", bg: "var(--of-role-dba-bg, #fff7ed)" },
-  { color: "var(--of-role-arch-text, #7C3AED)", bg: "var(--of-role-arch-bg, #F5F3FF)" },
-  { color: "var(--of-role-pm-text, #db2777)", bg: "var(--of-role-pm-bg, #fce7f3)" },
+  { color: "var(--of-accent-default)", bg: "var(--of-surface-muted)" },
+  { color: "var(--of-accent-strong)", bg: "var(--of-surface-panel)" },
+  { color: "var(--of-text-primary)", bg: "var(--of-surface-selected)" },
+  { color: "var(--of-text-secondary)", bg: "var(--of-surface-elevated)" },
+  { color: "var(--of-text-strong)", bg: "var(--of-surface-muted)" },
+  { color: "var(--of-accent-default)", bg: "var(--of-surface-panel)" },
 ];
 
 function hashCode(str: string): number {

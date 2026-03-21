@@ -15,8 +15,6 @@
  * />
  */
 
-defineOptions({ inheritAttrs: false });
-
 defineProps<{
   label: string;
   modelValue: number;
@@ -29,22 +27,27 @@ defineProps<{
 defineEmits<{
   "update:modelValue": [value: number];
 }>();
+
+defineOptions({ inheritAttrs: false });
+
+const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
 </script>
 
 <template>
   <div class="of-range-slider" v-bind="$attrs">
-    <label class="of-range-slider__label">
-      {{ label }}
+    <label class="of-range-slider__label" :for="sliderId">
+      <span>{{ label }}</span>
+      <input
+        :id="sliderId"
+        :value="modelValue"
+        type="range"
+        :min="min"
+        :max="max"
+        :step="step ?? 1"
+        class="of-range-slider__input"
+        @input="$emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
+      />
     </label>
-    <input
-      :value="modelValue"
-      @input="$emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
-      type="range"
-      :min="min"
-      :max="max"
-      :step="step ?? 1"
-      class="of-range-slider__input"
-    />
     <p v-if="description" class="of-range-slider__description">
       {{ description }}
     </p>
@@ -59,7 +62,9 @@ defineEmits<{
 }
 
 .of-range-slider__label {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-size: 14px;
   font-weight: 500;
   color: var(--of-color-text);
@@ -81,9 +86,9 @@ defineEmits<{
   width: 18px;
   height: 18px;
   border-radius: var(--of-radius-full);
-  background: var(--of-color-primary-600);
+  background: var(--of-accent-default);
   cursor: pointer;
-  border: 2px solid var(--of-color-bg-canvas);
+  border: 2px solid var(--of-surface-elevated);
   box-shadow: var(--of-shadow-card);
 }
 
@@ -91,19 +96,19 @@ defineEmits<{
   width: 18px;
   height: 18px;
   border-radius: var(--of-radius-full);
-  background: var(--of-color-primary-600);
+  background: var(--of-accent-default);
   cursor: pointer;
-  border: 2px solid var(--of-color-bg-canvas);
+  border: 2px solid var(--of-surface-elevated);
   box-shadow: var(--of-shadow-card);
 }
 
 .of-range-slider__input::-webkit-slider-thumb:hover {
-  background: var(--of-color-primary-700);
+  background: var(--of-accent-strong);
   box-shadow: var(--of-shadow-card-hover);
 }
 
 .of-range-slider__input::-moz-range-thumb:hover {
-  background: var(--of-color-primary-700);
+  background: var(--of-accent-strong);
   box-shadow: var(--of-shadow-card-hover);
 }
 

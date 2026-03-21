@@ -41,3 +41,63 @@ export { useTableColumns } from "./useTableColumns";
 export type { UseTableColumnsOptions } from "./useTableColumns";
 
 export { useBreakpoint } from "./useBreakpoint";
+
+export { useColumnResize } from "./useColumnResize";
+export type { UseColumnResizeOptions } from "./useColumnResize";
+
+export { useFixedColumns } from "./useFixedColumns";
+export type { UseFixedColumnsOptions } from "./useFixedColumns";
+
+export { useKeyboardNavigation } from "./useKeyboardNavigation";
+export type { UseKeyboardNavigationOptions, SelectedCell } from "./useKeyboardNavigation";
+
+export { useRowDrag } from "./useRowDrag";
+export type { RowReorderPayload, RowGroupChangePayload } from "./useRowDrag";
+
+export { useDraftRows } from "./useDraftRows";
+export type { UseDraftRowsOptions } from "./useDraftRows";
+
+export { useWorkerSort } from "./useWorkerSort";
+
+export { useSchemaEngine } from "./useSchemaEngine";
+export type {
+  ValidationRule,
+  FilterFieldConfig,
+  FilterPanelConfig,
+  UseSchemaEngineOptions,
+} from "./useSchemaEngine";
+
+export { useSupabaseProvider } from "./useSupabaseProvider";
+export type {
+  SupabaseQueryBuilder,
+  SupabaseFilterBuilder,
+  UseSupabaseProviderOptions,
+} from "./useSupabaseProvider";
+
+export {
+  useViewPersistence,
+  createLocalStorageBackend,
+  createSupabaseBackend,
+} from "./useViewPersistence";
+export type {
+  ViewStorageBackend,
+  SupabaseViewBackendOptions,
+  UseViewPersistenceOptions,
+} from "./useViewPersistence";
+
+export { useDatabaseView } from "./useDatabaseView";
+export type {
+  DatabaseViewMode,
+  DatabaseViewFetchParams,
+  DatabaseViewFetchResult,
+  DatabaseViewProvider,
+  DatabaseSchemaEvent,
+  DatabaseViewActions,
+  DatabaseViewDetailOptions,
+  DatabaseViewNavigationOptions,
+  UseDatabaseViewOptions,
+  UseDatabaseViewResult,
+} from "./useDatabaseView";
+
+export { useSearch } from "./useSearch";
+export type { UseSearchOptions, SearchHighlight } from "./useSearch";

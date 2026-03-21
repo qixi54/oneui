@@ -33,6 +33,7 @@ function onKeydown(e: KeyboardEvent) {
     v-model="local"
     class="of-field-input"
     type="datetime-local"
+    :aria-label="field.label"
     @keydown="onKeydown"
     @blur="emit('commit', local || null)"
   />
@@ -50,5 +51,13 @@ function onKeydown(e: KeyboardEvent) {
   background: transparent;
   color: var(--of-color-text, #1a1a1a);
   cursor: pointer;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .of-field-input {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
 }
 </style>

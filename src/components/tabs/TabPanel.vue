@@ -39,9 +39,9 @@ const isActive = computed<boolean>(() => activeTab?.value === props.name);
   <div
     v-if="keepAlive ? true : isActive"
     v-show="keepAlive ? isActive : true"
+    :id="`of-panel-${name}`"
     class="of-tab-panel"
     role="tabpanel"
-    :id="`of-panel-${name}`"
     :aria-labelledby="`of-tab-${name}`"
     :hidden="keepAlive && !isActive ? true : undefined"
   >

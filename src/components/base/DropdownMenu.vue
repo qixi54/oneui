@@ -25,11 +25,11 @@ export interface MenuItem {
   variant?: "default" | "destructive";
 }
 
-defineOptions({ inheritAttrs: false });
-
 defineProps<{
   items: MenuItem[];
 }>();
+
+defineOptions({ inheritAttrs: false });
 
 const isOpen = ref(false);
 const triggerRef = ref<HTMLButtonElement | null>(null);
@@ -89,7 +89,13 @@ function closeMenu() {
     </button>
 
     <transition name="of-dropdown-fade">
-      <div v-if="isOpen" class="of-dropdown-menu__backdrop" @click="closeMenu" />
+      <button
+        v-if="isOpen"
+        type="button"
+        class="of-dropdown-menu__backdrop"
+        aria-label="关闭菜单"
+        @click="closeMenu"
+      />
     </transition>
 
     <transition name="of-dropdown-slide">
@@ -97,16 +103,16 @@ function closeMenu() {
         <button
           v-for="(item, index) in items"
           :key="index"
-          @click="handleItemClick(item)"
           :class="[
             'of-dropdown-menu__item',
             `of-dropdown-menu__item--${item.variant || 'default'}`,
           ]"
           role="menuitem"
+          @click="handleItemClick(item)"
         >
           <component
-            v-if="item.icon"
             :is="resolveIcon(item.icon)"
+            v-if="item.icon"
             class="of-dropdown-menu__item-icon"
           />
           <span>{{ item.label }}</span>
@@ -138,14 +144,20 @@ function closeMenu() {
 }
 
 .of-dropdown-menu__trigger:hover {
-  background: var(--of-color-gray-100);
-  color: var(--of-color-text);
+  background: var(--of-surface-selected);
+  color: var(--of-text-primary);
 }
 
 .of-dropdown-menu__backdrop {
   position: fixed;
   inset: 0;
   z-index: 99;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: default;
 }
 
 .of-dropdown-menu__content {
@@ -154,8 +166,8 @@ function closeMenu() {
   right: 0;
   z-index: 100;
   min-width: 160px;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-gray-200);
+  background: var(--of-surface-elevated);
+  border: 1px solid var(--of-border-subtle);
   border-radius: var(--of-radius-md);
   box-shadow: var(--of-shadow-panel);
   margin-top: 4px;
@@ -179,15 +191,15 @@ function closeMenu() {
 }
 
 .of-dropdown-menu__item:hover {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-selected);
 }
 
 .of-dropdown-menu__item--destructive {
-  color: var(--of-color-red-600);
+  color: var(--of-text-primary);
 }
 
 .of-dropdown-menu__item--destructive:hover {
-  background: var(--of-color-red-50);
+  background: var(--of-surface-muted);
 }
 
 .of-dropdown-menu__item-icon {

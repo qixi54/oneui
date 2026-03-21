@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, type Component } from "vue";
 import {
   Type,
   Hash,
@@ -31,6 +31,7 @@ withDefaults(
     searchable?: boolean;
   }>(),
   {
+    currentType: undefined,
     searchable: true,
   },
 );
@@ -44,7 +45,7 @@ const searchQuery = ref("");
 interface FieldTypeOption {
   type: FieldType;
   label: string;
-  icon: any;
+  icon: Component;
   category: string;
 }
 
@@ -144,37 +145,37 @@ function handleSelect(type: FieldType) {
   max-height: 320px;
   display: flex;
   flex-direction: column;
-  background: var(--of-color-bg-elevated, #fff);
-  border: 1px solid var(--of-border, #e2e8f0);
-  border-radius: 8px;
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
+  border: 1px solid var(--of-border-subtle, var(--of-border, #e2e8f0));
+  border-radius: var(--of-radius-lg, 8px);
   box-shadow: var(--of-shadow-popover);
   overflow: hidden;
 }
 
 .of-field-type-picker__search {
   padding: 8px;
-  border-bottom: 1px solid var(--of-border, #e2e8f0);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-border, #e2e8f0));
   flex-shrink: 0;
 }
 
 .of-field-type-picker__search-input {
   width: 100%;
   padding: 6px 8px;
-  border: 1px solid var(--of-border, #e2e8f0);
+  border: 1px solid var(--of-border-subtle, var(--of-border, #e2e8f0));
   border-radius: 4px;
   font-size: 12px;
   outline: none;
-  background: var(--of-color-gray-50);
-  color: var(--of-color-text);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  color: var(--of-text-primary, var(--of-color-text));
   box-sizing: border-box;
 }
 
 .of-field-type-picker__search-input:focus {
-  border-color: var(--of-color-primary-500);
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
 }
 
 .of-field-type-picker__search-input::placeholder {
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
 }
 
 .of-field-type-picker__list {
@@ -188,7 +189,7 @@ function handleSelect(type: FieldType) {
 
 .of-field-type-picker__group-label {
   font-size: 11px;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
   padding: 6px 8px 2px;
   font-weight: 500;
   user-select: none;
@@ -205,22 +206,22 @@ function handleSelect(type: FieldType) {
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  color: var(--of-color-text);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   text-align: left;
   transition: background 0.15s;
 }
 
 .of-field-type-picker__item:hover {
-  background: var(--of-color-bg-hover);
+  background: var(--of-surface-muted, var(--of-color-bg-hover));
 }
 
 .of-field-type-picker__item--active {
-  background: var(--of-color-primary-50);
-  color: var(--of-color-primary-500);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-700));
 }
 
 .of-field-type-picker__item--active:hover {
-  background: var(--of-color-primary-50);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
 }
 
 .of-field-type-picker__icon {

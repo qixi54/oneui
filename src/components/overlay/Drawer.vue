@@ -14,6 +14,7 @@ const props = withDefaults(
   }>(),
   {
     width: 390,
+    title: undefined,
     showClose: true,
     maskClosable: true,
     zIndex: 1000,
@@ -79,8 +80,14 @@ onBeforeUnmount(() => {
         v-if="modelValue"
         class="of-drawer-overlay"
         :style="{ zIndex }"
-        @click="maskClosable && handleClose()"
       >
+        <button
+          v-if="maskClosable"
+          type="button"
+          class="of-drawer-overlay__hitarea"
+          aria-label="关闭抽屉"
+          @click="handleClose"
+        />
         <aside
           ref="drawerRef"
           class="of-drawer"
@@ -124,7 +131,15 @@ onBeforeUnmount(() => {
   inset: 0;
   display: flex;
   justify-content: flex-end;
-  background: var(--of-color-black-alpha-45);
+  background: rgba(15, 23, 42, 0.32);
+}
+
+.of-drawer-overlay__hitarea {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
 }
 
 .of-drawer {
@@ -133,11 +148,9 @@ onBeforeUnmount(() => {
   right: 0;
   height: 100vh;
   max-width: 100vw;
-  background: var(--of-color-bg-elevated, #ffffff);
-  border-left: 1px solid var(--of-color-gray-200, #e5e7eb);
-  box-shadow:
-    -12px 0 32px rgba(0, 0, 0, 0.12),
-    -2px 0 8px rgba(0, 0, 0, 0.08);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
+  border-left: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  box-shadow: var(--of-shadow-drawer);
   overflow: hidden;
 }
 
@@ -154,7 +167,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 12px;
   padding: var(--of-spacing-4, 16px) var(--of-spacing-5, 20px);
-  border-bottom: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   flex-shrink: 0;
 }
 
@@ -168,7 +181,7 @@ onBeforeUnmount(() => {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-drawer__close {
@@ -181,7 +194,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: var(--of-radius-md, 6px);
   background: transparent;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   cursor: pointer;
   flex-shrink: 0;
   line-height: 1;
@@ -189,8 +202,8 @@ onBeforeUnmount(() => {
 }
 
 .of-drawer__close:hover {
-  background: var(--of-color-gray-100, #f3f4f6);
-  color: var(--of-color-text, #111827);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-drawer__body {

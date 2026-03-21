@@ -1,0 +1,114 @@
+<script setup lang="ts">
+import { nextTick, onMounted, ref } from "vue";
+import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
+
+const props = defineProps<{ value?: CellValue; field: FieldDef }>();
+const emit = defineEmits<{ commit: [value: CellValue | null]; cancel: []; tabNext: [] }>();
+
+const editorRef = ref<HTMLDivElement | null>(null);
+const local = ref(typeof props.value === "string" ? props.value : "");
+
+onMounted(() =>
+  nextTick(() => {
+    if (editorRef.value) {
+      editorRef.value.innerHTML = local.value;
+      editorRef.value.focus();
+    }
+  }),
+);
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === "Escape") {
+    e.preventDefault();
+    emit("cancel");
+  }
+  // Ctrl/Cmd+Enter to commit
+  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    emit("commit", editorRef.value?.innerHTML ?? local.value);
+  }
+}
+
+function onBlur() {
+  emit("commit", editorRef.value?.innerHTML ?? local.value);
+}
+
+function execCommand(cmd: string) {
+  document.execCommand(cmd, false);
+  editorRef.value?.focus();
+}
+</script>
+
+<template>
+  <div class="of-field-richtext">
+    <div class="of-field-richtext-toolbar">
+      <button type="button" class="of-field-richtext-btn" @mousedown.prevent="execCommand('bold')">
+        <strong>B</strong>
+      </button>
+      <button
+        type="button"
+        class="of-field-richtext-btn"
+        @mousedown.prevent="execCommand('italic')"
+      >
+        <em>I</em>
+      </button>
+      <button
+        type="button"
+        class="of-field-richtext-btn"
+        @mousedown.prevent="execCommand('underline')"
+      >
+        <u>U</u>
+      </button>
+    </div>
+    <div
+      ref="editorRef"
+      class="of-field-richtext-editor"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      tabindex="0"
+      @keydown="onKeydown"
+      @blur="onBlur"
+    />
+  </div>
+</template>
+
+<style scoped>
+.of-field-richtext {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 60px;
+}
+.of-field-richtext-toolbar {
+  display: flex;
+  gap: 2px;
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+}
+.of-field-richtext-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--of-text-secondary, var(--of-color-gray-600));
+}
+.of-field-richtext-btn:hover {
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+}
+.of-field-richtext-editor {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 13px;
+  outline: none;
+  min-height: 40px;
+  line-height: 1.5;
+  color: var(--of-text-primary, var(--of-color-text, #1a1a1a));
+}
+</style>

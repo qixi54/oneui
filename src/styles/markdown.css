@@ -125,13 +125,13 @@
 }
 
 .of-prose a {
-  color: var(--of-color-primary-600, #2563eb) !important;
+  color: var(--of-link-default, var(--of-accent-default, #334155)) !important;
   text-decoration: none !important;
   transition: color 200ms !important;
 }
 
 .of-prose a:hover {
-  color: var(--of-color-primary-700, #1d4ed8) !important;
+  color: var(--of-link-hover, var(--of-accent-strong, #0f172a)) !important;
   text-decoration: underline !important;
 }
 

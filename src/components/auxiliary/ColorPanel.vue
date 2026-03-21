@@ -10,7 +10,7 @@ const props = withDefaults(
     label?: string;
   }>(),
   {
-    presets: () => ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"],
+    presets: () => ["#0f172a", "#334155", "#526071", "#7a8797", "#dbe2ea", "#eceff3"],
     showInput: true,
     label: "颜色",
   },
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 }>();
 
 const colorValue = computed({
-  get: () => props.modelValue || "#3b82f6",
+  get: () => props.modelValue || "#526071",
   set: (value: string) => {
     emit("update:modelValue", value);
     emit("change", value);
@@ -46,6 +46,7 @@ function handlePresetPick(color: string) {
         v-model="colorValue"
         class="of-color-panel__picker"
         type="color"
+        :aria-label="`${label}选择器`"
         :disabled="disabled"
       />
       <input
@@ -53,8 +54,9 @@ function handlePresetPick(color: string) {
         v-model="colorValue"
         class="of-color-panel__input"
         type="text"
+        :aria-label="`${label}值输入`"
         :disabled="disabled"
-        placeholder="#3b82f6"
+        placeholder="#526071"
       />
     </div>
     <div class="of-color-panel__presets">

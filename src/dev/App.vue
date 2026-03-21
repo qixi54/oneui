@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import {
   // Base
   ViewTab,
@@ -63,6 +63,7 @@ import {
   DataTable,
   FieldCell,
   ContextMenu,
+  TableToolbar,
   // AI
   AiThinking,
   AiStreamingCursor,
@@ -117,6 +118,9 @@ import type {
   Task,
   TableSchema,
   DataRecord,
+  ViewConfig,
+  FilterCondition,
+  FilterLogic,
 } from "../index";
 import type { ButtonOption } from "../components/base";
 import type { ChatMessage } from "../composables/useAiChat";
@@ -124,6 +128,36 @@ import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
 import { DEFAULT_TABLE_SCHEMA, isSelectField } from "../types";
 
 const toast = useToast();
+const themeMode = ref<"neutral" | "ops-console">("neutral");
+
+const themeSwatches = {
+  canvas: "var(--of-surface-canvas)",
+  elevated: "var(--of-surface-elevated)",
+  panel: "var(--of-surface-panel)",
+  muted: "var(--of-surface-muted)",
+  selected: "var(--of-surface-selected)",
+  accent: "var(--of-accent-default)",
+  accentStrong: "var(--of-accent-strong)",
+  accentSoft: "var(--of-accent-soft)",
+  borderSubtle: "var(--of-border-subtle)",
+  borderStrong: "var(--of-border-strong)",
+  textPrimary: "var(--of-text-primary)",
+  textSecondary: "var(--of-text-secondary)",
+  textTertiary: "var(--of-text-tertiary)",
+  series1: "var(--of-chart-series-1)",
+  series2: "var(--of-chart-series-2)",
+  series3: "var(--of-chart-series-3)",
+  series4: "var(--of-chart-series-4)",
+  series5: "var(--of-chart-series-5)",
+};
+
+function applyThemeMode(nextTheme: "neutral" | "ops-console") {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.ofTheme = nextTheme;
+}
+
+watch(themeMode, applyThemeMode, { immediate: true });
+onMounted(() => applyThemeMode(themeMode.value));
 
 // ── 导航 ──
 const activeSection = ref("base");
@@ -138,6 +172,7 @@ const sections = [
   { key: "mermaid", label: "图表" },
   { key: "gallery", label: "画廊" },
   { key: "gantt", label: "甘特图" },
+  { key: "database-view", label: "页面级方案" },
   { key: "form", label: "表单设计器" },
   { key: "editor", label: "内容编辑器" },
   { key: "detail", label: "详情页" },
@@ -282,7 +317,7 @@ const galleryItems: GalleryItem[] = [
     status: "blocked",
     priority: "P0",
     role: "BE",
-    bannerColor: "#BFDBFE",
+    bannerColor: themeSwatches.selected,
     extraProps: [
       { key: "负责角色", value: "BE", icon: "user" },
       { key: "优先级", value: "P0", icon: "flag" },
@@ -295,7 +330,7 @@ const galleryItems: GalleryItem[] = [
     status: "in_progress",
     priority: "P1",
     role: "FE",
-    bannerColor: "#BBF7D0",
+    bannerColor: themeSwatches.accentSoft,
     extraProps: [
       { key: "负责角色", value: "FE", icon: "user" },
       { key: "优先级", value: "P1", icon: "flag" },
@@ -308,7 +343,7 @@ const galleryItems: GalleryItem[] = [
     status: "todo",
     priority: "P2",
     role: "QA",
-    bannerColor: "#FDE68A",
+    bannerColor: themeSwatches.muted,
     extraProps: [
       { key: "负责角色", value: "QA", icon: "user" },
       { key: "优先级", value: "P2", icon: "flag" },
@@ -321,7 +356,7 @@ const galleryItems: GalleryItem[] = [
     status: "done",
     priority: "P3",
     role: "BE",
-    bannerColor: "#DDD6FE",
+    bannerColor: themeSwatches.panel,
     extraProps: [
       { key: "负责角色", value: "BE", icon: "user" },
       { key: "优先级", value: "P3", icon: "flag" },
@@ -352,7 +387,7 @@ const galleryRecords: DataRecord[] = [
       status: "todo",
       priority: "P2",
       assignee: "BE",
-      coverUrl: "#BFDBFE",
+      coverUrl: themeSwatches.selected,
       role: "BE",
     },
     updatedAt: "2026-03-02",
@@ -368,7 +403,7 @@ const ganttItems: GanttItem[] = [
     priority: "P0",
     startDate: "2026-02-03",
     endDate: "2026-02-14",
-    barColor: "#FEE2E2",
+    barColor: themeSwatches.selected,
   },
   {
     id: "gn2",
@@ -377,7 +412,7 @@ const ganttItems: GanttItem[] = [
     priority: "P1",
     startDate: "2026-02-08",
     endDate: "2026-02-20",
-    barColor: "#FEF3C7",
+    barColor: themeSwatches.accentSoft,
   },
   {
     id: "gn3",
@@ -386,7 +421,7 @@ const ganttItems: GanttItem[] = [
     priority: "P2",
     startDate: "2026-02-14",
     endDate: "2026-02-24",
-    barColor: "#BFDBFE",
+    barColor: themeSwatches.muted,
   },
   {
     id: "gn4",
@@ -395,9 +430,620 @@ const ganttItems: GanttItem[] = [
     priority: "P3",
     startDate: "2026-02-20",
     endDate: "2026-03-01",
-    barColor: "#F1F5F9",
+    barColor: themeSwatches.panel,
   },
 ];
+
+// ── 页面级方案 / DatabaseView ──
+type DatabaseDemoScenario = "normal" | "loading" | "empty" | "error";
+type DatabaseDemoMode = "local" | "provider";
+type DatabaseDemoViewMode = "table" | "kanban" | "gallery" | "timeline";
+
+const databaseDemoScenario = ref<DatabaseDemoScenario>("normal");
+const databaseDemoMode = ref<DatabaseDemoMode>("provider");
+const databaseDemoViewMode = ref<DatabaseDemoViewMode>("table");
+const databaseDemoSearchKeyword = ref("");
+const databaseDemoFilterConditions = ref<FilterCondition[]>([]);
+const databaseDemoFilterLogic = ref<FilterLogic>("and");
+const databaseDemoGroupField = ref("");
+const databaseDemoSort = ref<{ field: string | null; order: "asc" | "desc" | null }>({
+  field: "startDate",
+  order: "asc",
+});
+const databaseDemoActionLog = ref<string[]>(["DatabaseView 页面级 shell 已就绪"]);
+
+const databaseDemoDefaultColumns: TableColumn[] = [
+  { key: "title", label: "标题", width: 220 },
+  { key: "status", label: "状态", width: 110, type: "status" },
+  { key: "priority", label: "优先级", width: 100, type: "priority" },
+  { key: "assignee", label: "负责人", width: 120 },
+  { key: "startDate", label: "开始日期", width: 120, type: "date" },
+  { key: "endDate", label: "结束日期", width: 120, type: "date" },
+  { key: "summary", label: "摘要", width: "fill" },
+  { key: "coverUrl", label: "封面", width: 120 },
+];
+
+const databaseDemoColumns = ref<TableColumn[]>(
+  databaseDemoDefaultColumns.map((column) => ({ ...column })),
+);
+
+const databaseDemoViewTabs = [
+  { value: "table", label: "表格", icon: "table-2" },
+  { value: "kanban", label: "看板", icon: "layout-grid" },
+  { value: "gallery", label: "画廊", icon: "image" },
+  { value: "timeline", label: "时间线", icon: "gantt-chart" },
+];
+
+const databaseDemoViewPresets: ViewConfig[] = [
+  {
+    viewId: "database-table",
+    viewType: "table",
+    name: "页面表格",
+    visibleFields: ["title", "status", "priority", "assignee", "startDate", "endDate", "summary"],
+    sorts: [{ fieldId: "startDate", direction: "asc" }],
+  },
+  {
+    viewId: "database-kanban",
+    viewType: "kanban",
+    name: "页面看板",
+    visibleFields: ["title", "status", "priority", "assignee", "summary"],
+    kanbanFieldId: "status",
+  },
+  {
+    viewId: "database-gallery",
+    viewType: "gallery",
+    name: "页面画廊",
+    visibleFields: ["title", "status", "priority", "assignee", "coverUrl", "summary"],
+    galleryCoverFieldId: "coverUrl",
+    galleryCardFields: ["status", "priority", "assignee"],
+  },
+  {
+    viewId: "database-timeline",
+    viewType: "timeline",
+    name: "页面时间线",
+    visibleFields: ["title", "status", "priority", "assignee", "startDate", "endDate"],
+    sorts: [{ fieldId: "startDate", direction: "asc" }],
+  },
+];
+
+const databaseDemoSchema: TableSchema = {
+  tableId: "database-demo",
+  name: "DatabaseView 页面级方案",
+  fields: [
+    {
+      id: "title",
+      name: "标题",
+      type: "text",
+      width: 220,
+    },
+    {
+      id: "status",
+      name: "状态",
+      type: "select",
+      width: 120,
+      options: [
+        { value: "todo", label: "待处理" },
+        { value: "doing", label: "进行中" },
+        { value: "done", label: "已完成" },
+        { value: "blocked", label: "已阻塞" },
+      ],
+    },
+    {
+      id: "priority",
+      name: "优先级",
+      type: "select",
+      width: 100,
+      options: [
+        { value: "P0", label: "P0" },
+        { value: "P1", label: "P1" },
+        { value: "P2", label: "P2" },
+        { value: "P3", label: "P3" },
+      ],
+    },
+    {
+      id: "assignee",
+      name: "负责人",
+      type: "user",
+      width: 120,
+    },
+    {
+      id: "startDate",
+      name: "开始日期",
+      type: "date",
+      width: 120,
+    },
+    {
+      id: "endDate",
+      name: "结束日期",
+      type: "date",
+      width: 120,
+    },
+    {
+      id: "summary",
+      name: "摘要",
+      type: "richtext",
+      width: 320,
+    },
+    {
+      id: "coverUrl",
+      name: "封面",
+      type: "url",
+      width: 120,
+    },
+  ],
+  views: databaseDemoViewPresets,
+};
+
+const databaseDemoSavedViews = [
+  { id: "table", name: "表格视图" },
+  { id: "kanban", name: "看板视图" },
+  { id: "gallery", name: "画廊视图" },
+  { id: "timeline", name: "时间线视图" },
+];
+
+const databaseDemoSupportedCapabilities = [
+  {
+    title: "DatabaseView/useDatabaseView 接入形态",
+    description: "页面级方案按 shell + composable 的方式组织，方便后续替换成正式导出。",
+  },
+  {
+    title: "detailPresentation 页面契约",
+    description: "桌面端默认 right-side workspace，移动端保留 sheet fallback，页面层统一 detail state。",
+  },
+  {
+    title: "density 页面契约",
+    description: "compact / standard / comfortable 作为页面与表格共享密度语义，统一行高与视觉密度。",
+  },
+  {
+    title: "local / provider 双模式",
+    description: "local 直接消费 schema + records；provider 预留 fetch / refresh / mutation 入口。",
+  },
+  {
+    title: "页面状态透传",
+    description: "normal、loading、empty、error 四态都可以在页面壳层统一处理。",
+  },
+  {
+    title: "视图与工具栏编排",
+    description: "table / kanban / gallery / timeline 与 search / filter / sort / group / save-view 联动。",
+  },
+  {
+    title: "schema + records + viewConfig",
+    description: "当前 Demo 证明页面级方案可以被数据模型驱动，而不是只靠单个组件拼接。",
+  },
+];
+
+const databaseDemoPendingCapabilities = [
+  {
+    title: "真实 provider 数据闭环",
+    description: "当前 Demo 只证明接入口，真实 fetch / refresh / mutation 仍需上层业务接管。",
+  },
+  {
+    title: "持久化与权限",
+    description: "视图保存、字段可见性、操作权限、ACL 还不应在组件层硬编码。",
+  },
+  {
+    title: "写操作编排",
+    description: "create / update / delete / schema change 需要依赖具体应用的数据源和策略。",
+  },
+  {
+    title: "完整详情工作区",
+    description: "更重的 record drawer / detail workspace 仍应由页面层继续扩展，不在这里假定完成。",
+  },
+];
+
+const databaseDemoRecords: DataRecord[] = [
+  {
+    id: "db-1",
+    fields: {
+      title: "DatabaseView 页面壳",
+      status: "doing",
+      priority: "P1",
+      assignee: "FE",
+      startDate: "2026-03-18",
+      endDate: "2026-03-22",
+      summary: "把 local / provider 两种模式与 actions 契约收成一个页面级入口。",
+      coverUrl: themeSwatches.selected,
+    },
+    updatedAt: "2026-03-19",
+  },
+  {
+    id: "db-2",
+    fields: {
+      title: "Toolbar 契约接入",
+      status: "todo",
+      priority: "P2",
+      assignee: "FE",
+      startDate: "2026-03-20",
+      endDate: "2026-03-24",
+      summary: "将 TableToolbar、搜索、排序、字段管理与保存视图事件统一接入。",
+      coverUrl: themeSwatches.accentSoft,
+    },
+    updatedAt: "2026-03-18",
+  },
+  {
+    id: "db-3",
+    fields: {
+      title: "空态 / 错态 / 加载态",
+      status: "blocked",
+      priority: "P0",
+      assignee: "QA",
+      startDate: "2026-03-16",
+      endDate: "2026-03-21",
+      summary: "确保页面级方案能稳定透传 normal、loading、empty、error 四种状态。",
+      coverUrl: themeSwatches.selected,
+    },
+    updatedAt: "2026-03-17",
+  },
+  {
+    id: "db-4",
+    fields: {
+      title: "README 页面级方案章节",
+      status: "done",
+      priority: "P3",
+      assignee: "DX",
+      startDate: "2026-03-14",
+      endDate: "2026-03-16",
+      summary: "补充接入说明、模式说明和 actions 契约示例，和 dev demo 保持一致。",
+      coverUrl: themeSwatches.panel,
+    },
+    updatedAt: "2026-03-16",
+  },
+];
+
+const databaseDemoSelectedRecordId = ref(databaseDemoRecords[0]?.id ?? "");
+
+function getDatabaseEntityId(value: unknown) {
+  if (value && typeof value === "object") {
+    const entity = value as { id?: unknown; sourceRecordId?: unknown };
+    if (typeof entity.sourceRecordId === "string" && entity.sourceRecordId) return entity.sourceRecordId;
+    if (typeof entity.id === "string" && entity.id) return entity.id;
+  }
+  return "";
+}
+
+const databaseDemoVisibleFields = computed(() =>
+  databaseDemoColumns.value.filter((column) => !column.hidden).map((column) => column.key),
+);
+
+const databaseDemoCurrentView = computed<ViewConfig>(() => {
+  const preset =
+    databaseDemoViewPresets.find((view) => view.viewType === databaseDemoViewMode.value) ??
+    databaseDemoViewPresets[0];
+
+  return {
+    ...preset,
+    viewId: preset.viewId,
+    viewType: databaseDemoViewMode.value,
+    name: preset.name,
+    visibleFields: databaseDemoVisibleFields.value,
+    sorts:
+      databaseDemoSort.value.field && databaseDemoSort.value.order
+        ? [
+            {
+              fieldId: databaseDemoSort.value.field,
+              direction: databaseDemoSort.value.order,
+            },
+          ]
+        : preset.sorts,
+    groups: databaseDemoGroupField.value ? [{ fieldId: databaseDemoGroupField.value }] : undefined,
+  };
+});
+
+function pushDatabaseDemoLog(message: string) {
+  databaseDemoActionLog.value = [message, ...databaseDemoActionLog.value].slice(0, 6);
+}
+
+function getDatabaseRecordText(record: DataRecord, fieldId: string) {
+  const value = record.fields[fieldId];
+  if (Array.isArray(value)) return value.join(", ");
+  if (value === null || value === undefined) return "";
+  return String(value);
+}
+
+function getDatabaseEntityLabel(value: unknown) {
+  if (value && typeof value === "object") {
+    const entity = value as { title?: unknown; id?: unknown; fields?: Record<string, unknown> };
+    if (typeof entity.title === "string" && entity.title) return entity.title;
+    if (entity.fields && typeof entity.fields.title === "string" && entity.fields.title) {
+      return entity.fields.title;
+    }
+    if (typeof entity.id === "string" && entity.id) return entity.id;
+  }
+  return "record";
+}
+
+function matchesDatabaseFilter(value: unknown, condition: FilterCondition) {
+  const text = Array.isArray(value) ? value.join(", ").toLowerCase() : String(value ?? "").toLowerCase();
+  const needle = condition.value.trim().toLowerCase();
+
+  switch (condition.operator) {
+    case "equals":
+      return text === needle;
+    case "not_equals":
+      return text !== needle;
+    case "contains":
+      return text.includes(needle);
+    case "not_contains":
+      return !text.includes(needle);
+    case "starts_with":
+      return text.startsWith(needle);
+    case "ends_with":
+      return text.endsWith(needle);
+    case "gt":
+      return Number(value) > Number(condition.value);
+    case "gte":
+      return Number(value) >= Number(condition.value);
+    case "lt":
+      return Number(value) < Number(condition.value);
+    case "lte":
+      return Number(value) <= Number(condition.value);
+    case "is_empty":
+      return text === "";
+    case "is_not_empty":
+      return text !== "";
+    default:
+      return true;
+  }
+}
+
+const databaseDemoVisibleRecords = computed(() => {
+  const keyword = databaseDemoSearchKeyword.value.trim().toLowerCase();
+  const sortField = databaseDemoSort.value.field;
+  const sortOrder = databaseDemoSort.value.order;
+
+  const filtered = databaseDemoRecords.filter((record) => {
+    const matchesKeyword =
+      !keyword ||
+      ["title", "status", "priority", "assignee", "summary"].some((fieldId) =>
+        getDatabaseRecordText(record, fieldId).toLowerCase().includes(keyword),
+      );
+
+    const matchesFilters =
+      databaseDemoFilterConditions.value.length === 0
+        ? true
+        : databaseDemoFilterLogic.value === "and"
+          ? databaseDemoFilterConditions.value.every((condition) =>
+              matchesDatabaseFilter(record.fields[condition.field], condition),
+            )
+          : databaseDemoFilterConditions.value.some((condition) =>
+              matchesDatabaseFilter(record.fields[condition.field], condition),
+            );
+
+    return matchesKeyword && matchesFilters;
+  });
+
+  if (!sortField || !sortOrder) return filtered;
+
+  return [...filtered].sort((left, right) => {
+    const a = getDatabaseRecordText(left, sortField);
+    const b = getDatabaseRecordText(right, sortField);
+    const compare = a.localeCompare(b, "zh-Hans-CN");
+    return sortOrder === "desc" ? -compare : compare;
+  });
+});
+
+const databaseDemoSelectedRecord = computed(() => {
+  const selectedId = databaseDemoSelectedRecordId.value;
+  const recordById =
+    databaseDemoRecords.find((record) => record.id === selectedId) ??
+    databaseDemoVisibleRecords.value.find((record) => record.id === selectedId);
+  return (
+    recordById ??
+    databaseDemoVisibleRecords.value[0] ??
+    databaseDemoRecords[0] ??
+    null
+  );
+});
+
+function databaseRecordToTask(record: DataRecord): Task {
+  return {
+    id: record.id,
+    title: getDatabaseRecordText(record, "title") || record.id,
+    description: getDatabaseRecordText(record, "summary"),
+    status: getDatabaseRecordText(record, "status") || "todo",
+    priority: getDatabaseRecordText(record, "priority") || "P3",
+    assignee: getDatabaseRecordText(record, "assignee") || undefined,
+    startDate: getDatabaseRecordText(record, "startDate") || undefined,
+    endDate: getDatabaseRecordText(record, "endDate") || undefined,
+  };
+}
+
+const databaseDemoSelectedTask = computed<Task | null>(() =>
+  databaseDemoSelectedRecord.value ? databaseRecordToTask(databaseDemoSelectedRecord.value) : null,
+);
+
+const databaseDemoSelectedPropItems = computed<PropItem[]>(() => {
+  const record = databaseDemoSelectedRecord.value;
+  if (!record) return [];
+
+  return [
+    {
+      key: "记录 ID",
+      value: record.id,
+    },
+    {
+      key: "状态",
+      value: getDatabaseRecordText(record, "status") || "todo",
+      valueColor: themeSwatches.accent,
+      valueBg: themeSwatches.selected,
+    },
+    {
+      key: "优先级",
+      value: getDatabaseRecordText(record, "priority") || "P3",
+      valueColor: themeSwatches.textPrimary,
+      valueBg: themeSwatches.muted,
+    },
+    {
+      key: "负责人",
+      value: getDatabaseRecordText(record, "assignee") || "—",
+    },
+    {
+      key: "视图模式",
+      value: databaseDemoMode.value,
+    },
+    {
+      key: "当前视图",
+      value: databaseDemoViewMode.value,
+    },
+    {
+      key: "最近更新",
+      value: record.updatedAt ?? "—",
+    },
+  ];
+});
+
+const databaseDemoSelectedComments = computed<CommentData[]>(() => {
+  const record = databaseDemoSelectedRecord.value;
+  if (!record) return [];
+
+  const title = getDatabaseRecordText(record, "title") || record.id;
+  return [
+    {
+      id: `${record.id}-c1`,
+      author: "Page Shell",
+      authorInitial: "P",
+      avatarColor: themeSwatches.accent,
+      action: "selected record",
+      content: `当前页面工作区选中的是「${title}」。切换视图或点击其他卡片会同步更新这里。`,
+      time: "now",
+    },
+    {
+      id: `${record.id}-c2`,
+      author: "Provider",
+      authorInitial: "D",
+      avatarColor: themeSwatches.textSecondary,
+      action: "workspace snapshot",
+      content: `local/provider 都会把当前记录交给 detail workspace；真实保存、权限和回滚还要由上层实现。`,
+      time: record.updatedAt ?? "—",
+    },
+  ];
+});
+
+const databaseDemoShellSnapshot = computed(() => ({
+  mode: databaseDemoMode.value,
+  scenario: databaseDemoScenario.value,
+  selectedRecordId: databaseDemoSelectedRecordId.value || null,
+  currentView: databaseDemoCurrentView.value,
+  searchKeyword: databaseDemoSearchKeyword.value,
+  filterLogic: databaseDemoFilterLogic.value,
+  filters: databaseDemoFilterConditions.value,
+  sort: databaseDemoSort.value,
+  groupField: databaseDemoGroupField.value || null,
+  visibleRecordCount: databaseDemoVisibleRecords.value.length,
+  actionLog: databaseDemoActionLog.value,
+}));
+
+function handleDatabaseScenarioChange(scenario: DatabaseDemoScenario) {
+  databaseDemoScenario.value = scenario;
+  pushDatabaseDemoLog(`scenario -> ${scenario}`);
+}
+
+function handleDatabaseModeChange(mode: DatabaseDemoMode) {
+  databaseDemoMode.value = mode;
+  pushDatabaseDemoLog(`mode -> ${mode}`);
+}
+
+function handleDatabaseViewChange(view: string) {
+  if (["table", "kanban", "gallery", "timeline"].includes(view)) {
+    databaseDemoViewMode.value = view as DatabaseDemoViewMode;
+  }
+  pushDatabaseDemoLog(`view -> ${view}`);
+}
+
+function handleDatabaseColumnsUpdate(columns: TableColumn[]) {
+  databaseDemoColumns.value = columns;
+  pushDatabaseDemoLog(`update:columns -> ${columns.filter((column) => !column.hidden).length} visible`);
+}
+
+function handleDatabaseSearchUpdate(keyword: string) {
+  databaseDemoSearchKeyword.value = keyword;
+  pushDatabaseDemoLog(`update:searchKeyword -> ${keyword || "(empty)"}`);
+}
+
+function handleDatabaseAddFilter() {
+  const condition: FilterCondition = {
+    id: `filter-${Date.now().toString(36)}`,
+    field: "status",
+    operator: "equals",
+    value: "doing",
+  };
+  databaseDemoFilterConditions.value = [...databaseDemoFilterConditions.value, condition];
+  pushDatabaseDemoLog(`add-filter -> ${condition.field} ${condition.operator} ${condition.value}`);
+}
+
+function handleDatabaseRemoveFilter(id: string) {
+  databaseDemoFilterConditions.value = databaseDemoFilterConditions.value.filter(
+    (condition) => condition.id !== id,
+  );
+  pushDatabaseDemoLog(`remove-filter -> ${id}`);
+}
+
+function handleDatabaseUpdateFilter(id: string, update: Partial<FilterCondition>) {
+  databaseDemoFilterConditions.value = databaseDemoFilterConditions.value.map((condition) =>
+    condition.id === id ? { ...condition, ...update } : condition,
+  );
+  pushDatabaseDemoLog(`update-filter -> ${id}`);
+}
+
+function handleDatabaseClearFilters() {
+  databaseDemoFilterConditions.value = [];
+  pushDatabaseDemoLog("clear-filters");
+}
+
+function handleDatabaseFilterLogicUpdate(logic: FilterLogic) {
+  databaseDemoFilterLogic.value = logic;
+  pushDatabaseDemoLog(`update:filterLogic -> ${logic}`);
+}
+
+function handleDatabaseSort(field: string) {
+  const nextOrder =
+    databaseDemoSort.value.field === field && databaseDemoSort.value.order === "asc"
+      ? "desc"
+      : "asc";
+  databaseDemoSort.value = { field, order: nextOrder };
+  pushDatabaseDemoLog(`sort -> ${field}:${nextOrder}`);
+}
+
+function handleDatabaseGroup(field: string | null) {
+  databaseDemoGroupField.value = field ?? "";
+  pushDatabaseDemoLog(`group -> ${field ?? "none"}`);
+}
+
+function selectDatabaseRecord(recordId: string, source?: string) {
+  if (!recordId) return;
+  databaseDemoSelectedRecordId.value = recordId;
+  pushDatabaseDemoLog(`selected-record -> ${recordId}${source ? ` (${source})` : ""}`);
+}
+
+function handleDatabaseSaveView(name: string) {
+  pushDatabaseDemoLog(`save-view -> ${name}`);
+}
+
+function handleDatabaseLoadView(viewId: string) {
+  if (["table", "kanban", "gallery", "timeline"].includes(viewId)) {
+    databaseDemoViewMode.value = viewId as DatabaseDemoViewMode;
+  }
+  pushDatabaseDemoLog(`load-view -> ${viewId}`);
+}
+
+function handleDatabaseRetry() {
+  databaseDemoScenario.value = "normal";
+  pushDatabaseDemoLog("retry -> normal");
+}
+
+function restoreDatabaseDemo() {
+  databaseDemoScenario.value = "normal";
+  databaseDemoViewMode.value = "table";
+  databaseDemoMode.value = "provider";
+  databaseDemoSelectedRecordId.value = databaseDemoRecords[0]?.id ?? "";
+  databaseDemoSearchKeyword.value = "";
+  databaseDemoFilterConditions.value = [];
+  databaseDemoFilterLogic.value = "and";
+  databaseDemoGroupField.value = "";
+  databaseDemoSort.value = { field: "startDate", order: "asc" };
+  databaseDemoColumns.value = databaseDemoDefaultColumns.map((column) => ({ ...column }));
+  pushDatabaseDemoLog("restore -> default shell state");
+}
 
 // ── FormDesigner ──
 const formSchema = ref<TableSchema>({
@@ -447,21 +1093,21 @@ const detailProps: PropItem[] = [
   {
     key: "状态",
     value: "已阻塞",
-    valueColor: "var(--of-status-blocked-text)",
-    valueBg: "var(--of-status-blocked-bg)",
-    dotColor: "var(--of-status-blocked-text)",
+    valueColor: themeSwatches.accentStrong,
+    valueBg: themeSwatches.selected,
+    dotColor: themeSwatches.accentStrong,
   },
   {
     key: "优先级",
     value: "P0",
-    valueColor: "var(--of-priority-p0-text)",
-    valueBg: "var(--of-priority-p0-bg)",
+    valueColor: themeSwatches.textPrimary,
+    valueBg: themeSwatches.muted,
   },
   {
     key: "负责角色",
     value: "BE",
-    valueColor: "var(--of-role-be-text)",
-    valueBg: "var(--of-role-be-bg)",
+    valueColor: themeSwatches.accent,
+    valueBg: themeSwatches.selected,
   },
   { key: "创建时间", value: "2026-02-05" },
   { key: "截止日期", value: "2026-02-20" },
@@ -472,7 +1118,7 @@ const detailComments: CommentData[] = [
     id: "c1",
     author: "BE Agent",
     authorInitial: "B",
-    avatarColor: "var(--of-color-primary-500)",
+    avatarColor: themeSwatches.accent,
     action: "完成了代码提交",
     content: "commit: auth-middleware-v2 分支已推送，待 OAuth2 服务就绪后合并。",
     time: "3 小时前",
@@ -481,7 +1127,7 @@ const detailComments: CommentData[] = [
     id: "c2",
     author: "ARCH",
     authorInitial: "A",
-    avatarColor: "var(--of-color-warning)",
+    avatarColor: themeSwatches.textSecondary,
     action: "更新了状态",
     content: "OAuth2 服务延期，该任务标记为已阻塞，等待解除。",
     time: "1 天前",
@@ -617,7 +1263,7 @@ const kanbanColumns: KanbanColumnData[] = [
   {
     id: "todo",
     title: "待开始",
-    color: "var(--of-color-gray-500)",
+    color: themeSwatches.textSecondary,
     tasks: [
       {
         id: "t1",
@@ -640,7 +1286,7 @@ const kanbanColumns: KanbanColumnData[] = [
   {
     id: "doing",
     title: "进行中",
-    color: "var(--of-color-info)",
+    color: themeSwatches.accent,
     tasks: [
       {
         id: "t3",
@@ -826,7 +1472,7 @@ const dashboardWidgets = [
 ];
 
 // ── Auxiliary ──
-const auxColor = ref("#6366f1");
+const auxColor = ref(themeSwatches.accent);
 const auxPerson = ref<string | null>(null);
 const auxFiles = ref<File[]>([]);
 const auxPeople = [
@@ -888,9 +1534,19 @@ function handleInlineEditCommit(
 ) {
   const row = rows.find((item) => item.id === rowId);
   if (row) {
-    (row as any)[fieldId] = value as any;
+    row[fieldId] = value;
   }
 }
+
+function readInlineCellValue(
+  row: { id: string; [key: string]: unknown },
+  fieldId: string,
+): CellValue {
+  return row[fieldId] as CellValue;
+}
+
+const sectionStatuses = ["pending", "updating", "done", "editing"] as const;
+type SectionStatus = (typeof sectionStatuses)[number];
 
 // ── 业务组件 demo 数据 ──
 const viewModeVal = ref("side");
@@ -898,7 +1554,7 @@ const viewSwitcherTab = ref("table");
 
 // ── v3 信息组件 demo 数据 ──
 const sectionCollapsed = ref(false);
-const sectionStatus = ref<"pending" | "updating" | "done" | "editing">("done");
+const sectionStatus = ref<SectionStatus>("done");
 const personaExpanded = ref(false);
 const persona2Expanded = ref(false);
 
@@ -927,7 +1583,7 @@ const accordionContents: Record<string, string> = {
   item1:
     "OneUI 是基于 Vue 3 + TypeScript 的任务管理视图组件库，提供 75+ 个开箱即用的组件，涵盖 Table、Kanban、Gantt、AI Chat 等业务场景组件。",
   item2:
-    '通过 pnpm add @oneflowui/ui 安装，然后 import OneflowUI from "@oneflowui/ui" 并 app.use(OneflowUI) 全局注册即可使用所有组件。',
+    '通过 pnpm add @oneflowui/ui 安装，然后 import OneflowUI from "@oneflowui/ui/plugin" 并 app.use(OneflowUI) 全局注册即可使用所有组件。',
   item3:
     '支持。通过命名导出方式按需引入：import { KanbanBoard, DataTable } from "@oneflowui/ui"，配合 Tree-shaking 减少打包体积。',
 };
@@ -998,6 +1654,13 @@ function onCtxSelect(key: string) {
     <!-- 顶部导航 -->
     <header class="dev-header">
       <div class="dev-header__logo">⚡ OneflowUI Dev</div>
+      <div class="dev-header__theme">
+        <span class="dev-header__theme-label">Theme</span>
+        <select v-model="themeMode" class="dev-header__theme-select">
+          <option value="neutral">Neutral</option>
+          <option value="ops-console">Ops Console</option>
+        </select>
+      </div>
       <nav class="dev-header__nav">
         <button
           v-for="s in sections"
@@ -1152,7 +1815,7 @@ function onCtxSelect(key: string) {
             >
             <span
               class="of-badge"
-              style="color: var(--of-badge-purple-text); background: var(--of-badge-purple-bg)"
+              style="color: var(--of-accent-strong); background: var(--of-surface-selected)"
               >审核中</span
             >
           </div>
@@ -1166,64 +1829,45 @@ function onCtxSelect(key: string) {
           <div class="dev-row" style="gap: 8px; flex-wrap: wrap">
             <span
               class="of-badge"
-              style="
-                color: var(--of-priority-p0-text);
-                background: var(--of-priority-p0-bg);
-                font-weight: 600;
-              "
+              style="color: var(--of-accent-strong); background: var(--of-surface-selected); font-weight: 600"
               >P0</span
             >
             <span
               class="of-badge"
-              style="
-                color: var(--of-status-blocked-text);
-                background: var(--of-status-blocked-bg);
-                font-weight: 600;
-              "
+              style="color: var(--of-text-secondary); background: var(--of-surface-muted); font-weight: 600"
               >P1</span
             >
             <span
               class="of-badge"
-              style="
-                color: var(--of-status-in-progress-text);
-                background: var(--of-status-in-progress-bg);
-                font-weight: 600;
-              "
+              style="color: var(--of-accent-default); background: var(--of-accent-soft); font-weight: 600"
               >P2</span
             >
             <span
               class="of-badge"
-              style="
-                color: var(--of-color-text-secondary);
-                background: var(--of-status-todo-bg);
-                font-weight: 600;
-              "
+              style="color: var(--of-text-secondary); background: var(--of-surface-panel); font-weight: 600"
               >P3</span
             >
           </div>
           <div class="dev-row" style="gap: 8px; flex-wrap: wrap; margin-top: 12px">
-            <span style="font-size: 12px; color: var(--of-color-text-tertiary)">自定义值：</span>
+            <span style="font-size: 12px; color: var(--of-text-tertiary)">自定义值：</span>
             <span
               class="of-badge"
-              style="color: var(--of-priority-p0-text); background: var(--of-priority-p0-bg)"
+              style="color: var(--of-accent-strong); background: var(--of-surface-selected)"
               >紧急</span
             >
             <span
               class="of-badge"
-              style="color: var(--of-status-blocked-text); background: var(--of-status-blocked-bg)"
+              style="color: var(--of-text-secondary); background: var(--of-surface-muted)"
               >高</span
             >
             <span
               class="of-badge"
-              style="
-                color: var(--of-status-in-progress-text);
-                background: var(--of-status-in-progress-bg);
-              "
+              style="color: var(--of-accent-default); background: var(--of-accent-soft)"
               >中</span
             >
             <span
               class="of-badge"
-              style="color: var(--of-color-text-secondary); background: var(--of-status-todo-bg)"
+              style="color: var(--of-text-secondary); background: var(--of-surface-panel)"
               >低</span
             >
           </div>
@@ -1235,12 +1879,12 @@ function onCtxSelect(key: string) {
           <div class="dev-row" style="gap: 8px; flex-wrap: wrap">
             <span
               class="of-badge"
-              style="color: var(--of-role-be-text); background: var(--of-role-be-bg)"
+              style="color: var(--of-accent-default); background: var(--of-surface-selected)"
               >BE</span
             >
             <span
               class="of-badge"
-              style="color: var(--of-badge-blue-text); background: var(--of-badge-blue-bg)"
+              style="color: var(--of-accent-default); background: var(--of-accent-soft)"
               >FE</span
             >
             <span
@@ -1250,22 +1894,22 @@ function onCtxSelect(key: string) {
             >
             <span
               class="of-badge"
-              style="color: var(--of-status-blocked-text); background: var(--of-status-blocked-bg)"
+              style="color: var(--of-text-secondary); background: var(--of-surface-muted)"
               >ARCH</span
             >
             <span
               class="of-badge"
-              style="color: var(--of-badge-purple-text); background: var(--of-badge-purple-bg)"
+              style="color: var(--of-accent-strong); background: var(--of-surface-selected)"
               >PM</span
             >
             <span
               class="of-badge"
-              style="color: var(--of-badge-purple-text); background: var(--of-badge-purple-bg)"
+              style="color: var(--of-accent-strong); background: var(--of-surface-selected)"
               >审核中</span
             >
             <span
               class="of-badge"
-              style="color: var(--of-badge-blue-text); background: var(--of-badge-blue-bg)"
+              style="color: var(--of-accent-default); background: var(--of-accent-soft)"
               >部署中</span
             >
           </div>
@@ -1278,8 +1922,8 @@ function onCtxSelect(key: string) {
           </p>
           <pre
             style="
-              background: #1e293b;
-              color: #e2e8f0;
+              background: var(--of-surface-elevated);
+              color: var(--of-text-primary);
               padding: 16px;
               border-radius: 8px;
               font-size: 13px;
@@ -1290,9 +1934,9 @@ function onCtxSelect(key: string) {
 
 // 完全自定义状态映射：
 const myStatusMap: ColorMap = {
-  draft:     { text: '#64748B', bg: '#F1F5F9', label: '草稿' },
-  reviewing: { text: '#7C3AED', bg: '#EDE9FE', label: '审核中' },
-  published: { text: '#22C55E', bg: '#DCFCE7', label: '已发布' },
+  draft:     { text: 'var(--of-text-secondary)', bg: 'var(--of-surface-muted)', label: '草稿' },
+  reviewing: { text: 'var(--of-accent-strong)', bg: 'var(--of-surface-selected)', label: '审核中' },
+  published: { text: 'var(--of-color-success)', bg: 'var(--of-color-success-light)', label: '已发布' },
 }
 
 // 传给任意组件：
@@ -1330,7 +1974,7 @@ const myStatusMap: ColorMap = {
                 >
                   <template #logo>
                     <span
-                      style="font-size: 15px; font-weight: 700; color: var(--of-color-primary-500)"
+              style="font-size: 15px; font-weight: 700; color: var(--of-accent-default)"
                       >⚡ OneFlow</span
                     >
                   </template>
@@ -1870,6 +2514,375 @@ const myStatusMap: ColorMap = {
       </template>
 
       <!-- ══════════════════════════════════════════════════════
+           页面级方案
+      ════════════════════════════════════════════════════════ -->
+      <template v-if="activeSection === 'database-view'">
+        <section class="dev-section">
+          <h2>DatabaseView 页面级方案证明</h2>
+          <p class="dev-desc">
+            当前先用现有组件组合出页面级 shell，目标接入形态是 DatabaseView / useDatabaseView。
+            local 模式直接使用 schema + records，provider 模式保留数据拉取与刷新入口；actions 只负责
+            回传页面变更，不把业务逻辑锁死在组件内部。当前对齐的页面契约还包括
+            detailPresentation 与 density：桌面端默认右侧 workspace，移动端保留 sheet fallback；
+            页面密度则统一在 compact / standard / comfortable 三档里表达。点击任一记录会把 selected
+            record 送入 detail workspace，展示当前工作区的主内容、属性和活动记录。
+          </p>
+
+          <pre class="database-shell__code"><code>import { DatabaseView, useDatabaseView } from "@oneflowui/ui"
+
+const view = useDatabaseView({
+  mode: "provider",
+  schemaSource: "remote-or-local-schema",
+  dataSource: "records-provider",
+  // page contract preview:
+  // detailPresentation: "side-panel",
+  // density: "standard",
+  actions: {
+    onFetch,
+    onRefresh,
+    onUpdateRecord,
+    onCreateRecord,
+    onDeleteRecord,
+    onSaveView,
+    onSchemaChange,
+  },
+})
+
+// 现在 dev app 先用现有组件组合出等价的页面级 shell
+// 等 DatabaseView/useDatabaseView 导出接入后可无缝替换。</code></pre>
+
+          <div class="database-shell">
+            <div class="database-shell__bar">
+              <div class="dev-row" style="gap: 8px">
+                <span class="database-shell__label">source mode</span>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--info': databaseDemoMode === 'local' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseModeChange('local')"
+                >
+                  local
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--info': databaseDemoMode === 'provider' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseModeChange('provider')"
+                >
+                  provider
+                </button>
+              </div>
+
+              <div class="dev-row" style="gap: 8px">
+                <span class="database-shell__label">page state</span>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--success': databaseDemoScenario === 'normal' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseScenarioChange('normal')"
+                >
+                  normal
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--warning': databaseDemoScenario === 'loading' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseScenarioChange('loading')"
+                >
+                  loading
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--success': databaseDemoScenario === 'empty' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseScenarioChange('empty')"
+                >
+                  empty
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--error': databaseDemoScenario === 'error' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseScenarioChange('error')"
+                >
+                  error
+                </button>
+              </div>
+
+              <div class="dev-row" style="gap: 8px">
+                <span class="database-shell__label">current view</span>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--info': databaseDemoViewMode === 'table' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseViewChange('table')"
+                >
+                  table
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--info': databaseDemoViewMode === 'kanban' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseViewChange('kanban')"
+                >
+                  kanban
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--info': databaseDemoViewMode === 'gallery' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseViewChange('gallery')"
+                >
+                  gallery
+                </button>
+                <button
+                  class="dev-btn"
+                  :class="{ 'dev-btn--info': databaseDemoViewMode === 'timeline' }"
+                  style="padding: 6px 12px; font-size: 12px"
+                  @click="handleDatabaseViewChange('timeline')"
+                >
+                  timeline
+                </button>
+                <button
+                  class="dev-btn"
+                  style="padding: 6px 12px; font-size: 12px; background: var(--of-color-gray-500)"
+                  @click="restoreDatabaseDemo"
+                >
+                  restore default
+                </button>
+              </div>
+            </div>
+
+            <div class="database-shell__toolbar">
+              <TableToolbar
+                :columns="databaseDemoColumns"
+                :current-view="databaseDemoViewMode"
+                :view-tabs="databaseDemoViewTabs"
+                :filter-conditions="databaseDemoFilterConditions"
+                :filter-logic="databaseDemoFilterLogic"
+                :filter-active="databaseDemoFilterConditions.length > 0"
+                :current-sort="databaseDemoSort"
+                :current-group="databaseDemoGroupField || undefined"
+                :search-keyword="databaseDemoSearchKeyword"
+                :show-view-switch="true"
+                :show-filter="true"
+                :show-sort="true"
+                :show-group="true"
+                :show-columns="true"
+                :show-search="true"
+                :saved-views="databaseDemoSavedViews"
+                @update:currentView="handleDatabaseViewChange"
+                @update:columns="handleDatabaseColumnsUpdate"
+                @update:searchKeyword="handleDatabaseSearchUpdate"
+                @add-filter="handleDatabaseAddFilter"
+                @remove-filter="handleDatabaseRemoveFilter"
+                @update-filter="handleDatabaseUpdateFilter"
+                @clear-filters="handleDatabaseClearFilters"
+                @update:filterLogic="handleDatabaseFilterLogicUpdate"
+                @sort="handleDatabaseSort"
+                @group="handleDatabaseGroup"
+                @save-view="handleDatabaseSaveView"
+                @load-view="handleDatabaseLoadView"
+              />
+            </div>
+
+            <div class="database-shell__grid">
+              <div class="database-shell__main">
+                <div v-if="databaseDemoScenario === 'loading'" class="database-shell__state">
+                  <div class="database-shell__spinner" />
+                  <div>
+                    <div class="database-shell__state-title">页面级视图加载中</div>
+                    <div class="database-shell__state-desc">
+                      provider 模式下可在这里挂载真实 fetch / refresh 过程。
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else-if="databaseDemoScenario === 'error'" class="database-shell__state database-shell__state--error">
+                  <div class="database-shell__state-title">页面级视图出错</div>
+                  <div class="database-shell__state-desc">
+                    这里代表 provider 拉取失败、schema 未就绪或 actions 回调抛错后的统一错误面。
+                  </div>
+                  <button class="dev-btn dev-btn--error" @click="handleDatabaseRetry">retry</button>
+                </div>
+
+                <EmptyState
+                  v-else-if="databaseDemoScenario === 'empty'"
+                  icon="inbox"
+                  title="暂无记录"
+                  description="这是页面级方案需要透传的空态，建议由外层 shell 统一处理。"
+                  :action="{ label: '恢复演示数据', onClick: restoreDatabaseDemo }"
+                />
+
+                <template v-else>
+                  <div class="database-shell__view-meta">
+                    <span class="database-shell__badge">mode: {{ databaseDemoMode }}</span>
+                    <span class="database-shell__badge">view: {{ databaseDemoViewMode }}</span>
+                    <span class="database-shell__badge">
+                      visible fields: {{ databaseDemoVisibleFields.length }}
+                    </span>
+                    <span class="database-shell__badge">
+                      records: {{ databaseDemoVisibleRecords.length }}
+                    </span>
+                  </div>
+
+                  <DataTable
+                    v-if="databaseDemoViewMode === 'table'"
+                    :records="databaseDemoVisibleRecords"
+                    :schema="databaseDemoSchema"
+                    :view="databaseDemoCurrentView"
+                    :columns="databaseDemoColumns"
+                    :group-by="databaseDemoGroupField || undefined"
+                    @row-click="
+                      (row) => {
+                        const id = getDatabaseEntityId(row);
+                        if (id) selectDatabaseRecord(id, 'table');
+                        pushDatabaseDemoLog(`row-click -> ${getDatabaseEntityLabel(row)}`);
+                      }
+                    "
+                  />
+                  <KanbanBoard
+                    v-else-if="databaseDemoViewMode === 'kanban'"
+                    :records="databaseDemoVisibleRecords"
+                    :schema="databaseDemoSchema"
+                    :view="databaseDemoCurrentView"
+                    @card-click="
+                      (task) => {
+                        const id = getDatabaseEntityId(task);
+                        if (id) selectDatabaseRecord(id, 'kanban');
+                        pushDatabaseDemoLog(`card-click -> ${getDatabaseEntityLabel(task)}`);
+                      }
+                    "
+                  />
+                  <GalleryView
+                    v-else-if="databaseDemoViewMode === 'gallery'"
+                    :records="databaseDemoVisibleRecords"
+                    :schema="databaseDemoSchema"
+                    :view="databaseDemoCurrentView"
+                    :columns="2"
+                    :addable="false"
+                    @card-click="
+                      (item) => {
+                        const id = getDatabaseEntityId(item);
+                        if (id) selectDatabaseRecord(id, 'gallery');
+                        pushDatabaseDemoLog(`card-click -> ${getDatabaseEntityLabel(item)}`);
+                      }
+                    "
+                  />
+                  <div v-else style="overflow-x: auto">
+                    <GanttTimeline
+                      :records="databaseDemoVisibleRecords"
+                      :schema="databaseDemoSchema"
+                      :view-config="databaseDemoCurrentView"
+                      :days="18"
+                      @row-click="
+                        (item) => {
+                          const id = getDatabaseEntityId(item);
+                          if (id) selectDatabaseRecord(id, 'timeline');
+                          pushDatabaseDemoLog(`row-click -> ${getDatabaseEntityLabel(item)}`);
+                        }
+                      "
+                    />
+                  </div>
+                </template>
+              </div>
+
+              <aside class="database-shell__aside">
+                <div class="database-shell__aside-card">
+                  <div class="database-shell__aside-title">Actions Contract</div>
+                  <ul class="database-shell__list">
+                    <li>local: schema + records + viewConfig 直接驱动页面。</li>
+                    <li>provider: 保留 fetch / refresh / mutation 回调入口。</li>
+                    <li>actions: update / create / delete / save / schema 变更只回传结果。</li>
+                    <li>toolbar: currentView / columns / filters / sort / group 统一交给 shell。</li>
+                  </ul>
+                </div>
+
+                <div class="database-shell__aside-card">
+                  <div class="database-shell__aside-title">Now supported</div>
+                  <div class="database-shell__card-list">
+                    <div
+                      v-for="item in databaseDemoSupportedCapabilities"
+                      :key="item.title"
+                      class="database-shell__card-item"
+                    >
+                      <div class="database-shell__card-item-title">{{ item.title }}</div>
+                      <div class="database-shell__card-item-desc">{{ item.description }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="database-shell__aside-card">
+                  <div class="database-shell__aside-title">Pending</div>
+                  <div class="database-shell__card-list">
+                    <div
+                      v-for="item in databaseDemoPendingCapabilities"
+                      :key="item.title"
+                      class="database-shell__card-item"
+                    >
+                      <div class="database-shell__card-item-title">{{ item.title }}</div>
+                      <div class="database-shell__card-item-desc">{{ item.description }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="database-shell__aside-card">
+                  <div class="database-shell__aside-title">Recent actions</div>
+                  <div class="database-shell__log">
+                    <div
+                      v-for="(item, index) in databaseDemoActionLog"
+                      :key="`${index}-${item}`"
+                      class="database-shell__log-item"
+                    >
+                      {{ item }}
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <div class="database-shell__workspace">
+          <div class="database-shell__workspace-head">
+                <div>
+                  <div class="database-shell__aside-title">Selected record / detail workspace</div>
+                  <div class="database-shell__workspace-desc">
+                    这里证明页面级方案可以把当前选中记录和右侧工作区连起来，并为 detailPresentation
+                    和 density 这类页面契约预留统一承接位置。
+                  </div>
+                </div>
+                <div class="database-shell__workspace-meta">
+                  <span class="database-shell__badge">
+                    selected: {{ databaseDemoSelectedRecordId || "none" }}
+                  </span>
+                  <span class="database-shell__badge">detail: side-panel</span>
+                  <span class="database-shell__badge">density: standard</span>
+                  <span class="database-shell__badge">
+                    task title: {{ databaseDemoSelectedTask?.title || "—" }}
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="databaseDemoSelectedTask" class="database-shell__workspace-body">
+                <DetailLayout
+                  :task="databaseDemoSelectedTask"
+                  :prop-items="databaseDemoSelectedPropItems"
+                  :comments="databaseDemoSelectedComments"
+                />
+              </div>
+              <EmptyState
+                v-else
+                icon="inbox"
+                title="未选中记录"
+                description="点击任一记录后，detail workspace 会切换到对应任务。"
+              />
+            </div>
+
+            <pre class="dev-json-preview">{{ JSON.stringify(databaseDemoShellSnapshot, null, 2) }}</pre>
+          </div>
+        </section>
+      </template>
+
+      <!-- ══════════════════════════════════════════════════════
            表单设计器
       ════════════════════════════════════════════════════════ -->
       <template v-if="activeSection === 'form'">
@@ -2095,8 +3108,8 @@ const myStatusMap: ColorMap = {
               v-if="filterActive"
               style="
                 font-size: 12px;
-                color: var(--of-color-primary-500);
-                background: var(--of-color-primary-100);
+                color: var(--of-accent-default);
+                background: var(--of-accent-soft);
                 padding: 2px 8px;
                 border-radius: 12px;
               "
@@ -2179,7 +3192,7 @@ const myStatusMap: ColorMap = {
             <div style="flex: 1" />
             <span
               v-if="selectedCount > 0"
-              style="font-size: 13px; color: var(--of-color-primary-500)"
+              style="font-size: 13px; color: var(--of-accent-default)"
             >
               已选 {{ selectedCount }} 条
             </span>
@@ -2293,7 +3306,7 @@ const myStatusMap: ColorMap = {
                   <FieldCell
                     :row-id="row.id"
                     :field="f"
-                    :value="(row as any)[f.id]"
+                    :value="readInlineCellValue(row, f.id)"
                     @commit="
                       (rowId, fieldId, val) =>
                         handleInlineEditCommit(inlineEditRows, rowId, fieldId, val)
@@ -2320,7 +3333,7 @@ const myStatusMap: ColorMap = {
                   <FieldCell
                     :row-id="row.id"
                     :field="f"
-                    :value="(row as any)[f.id]"
+                    :value="readInlineCellValue(row, f.id)"
                     @commit="
                       (rowId, fieldId, val) =>
                         handleInlineEditCommit(selectRows, rowId, fieldId, val)
@@ -2502,7 +3515,13 @@ const myStatusMap: ColorMap = {
               </p>
               <ColorPanel
                 v-model="auxColor"
-                :presets="['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6']"
+                :presets="[
+                  'var(--of-accent-default)',
+                  'var(--of-color-warning)',
+                  'var(--of-color-success)',
+                  'var(--of-color-error)',
+                  'var(--of-accent-strong)',
+                ]"
                 :show-input="false"
               />
             </div>
@@ -2605,7 +3624,7 @@ const myStatusMap: ColorMap = {
                   width: 32px;
                   height: 32px;
                   border-radius: 50%;
-                  background: var(--of-color-primary-50);
+                  background: var(--of-surface-selected);
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -2660,7 +3679,7 @@ const myStatusMap: ColorMap = {
                   line-height: 1.6;
                 "
               >
-                <span style="color: var(--of-color-primary-300)">const</span> result =
+                <span style="color: var(--of-border-strong)">const</span> result =
                 <span style="color: var(--of-badge-green-border)">await</span>
                 llm.generate(prompt)<AiStreamingCursor
                   style="background: var(--of-color-gray-200)"
@@ -2726,7 +3745,7 @@ const myStatusMap: ColorMap = {
                   width: 32px;
                   height: 32px;
                   border-radius: 50%;
-                  background: var(--of-color-primary-50);
+                  background: var(--of-surface-selected);
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -2762,7 +3781,7 @@ const myStatusMap: ColorMap = {
                     width: 28px;
                     height: 28px;
                     border-radius: 50%;
-                    background: var(--of-color-primary-50);
+                    background: var(--of-surface-selected);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -2920,9 +3939,9 @@ const html = renderMarkdown(markdownStr)
               <pre class="composable-code">
 // 完全自定义状态映射：
 const myStatusMap: ColorMap = {
-  draft:    { text:'#64748B', bg:'#F1F5F9', label:'草稿' },
-  review:   { text:'#7C3AED', bg:'#EDE9FE', label:'审核中' },
-  published:{ text:'#22C55E', bg:'#DCFCE7', label:'已发布' },
+  draft:    { text:'var(--of-text-secondary)', bg:'var(--of-surface-muted)', label:'草稿' },
+  review:   { text:'var(--of-accent-strong)', bg:'var(--of-surface-selected)', label:'审核中' },
+  published:{ text:'var(--of-color-success)', bg:'var(--of-color-success-light)', label:'已发布' },
 }
 // 传给任意组件：
 // &lt;DataTable :status-color-map="myStatusMap" /&gt;
@@ -3077,7 +4096,7 @@ const myStatusMap: ColorMap = {
               <span style="font-size: 13px; color: var(--of-color-text-secondary)">禁用（开）</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px">
-              <OneSwitch :model-value="true" active-color="var(--of-badge-purple-text)" />
+              <OneSwitch :model-value="true" active-color="var(--of-accent-strong)" />
               <span style="font-size: 13px; color: var(--of-color-text-secondary)">自定义颜色</span>
             </div>
           </div>
@@ -3486,23 +4505,23 @@ const myStatusMap: ColorMap = {
           </p>
           <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap">
             <button
-              v-for="s in ['pending', 'updating', 'done', 'editing']"
+              v-for="s in sectionStatuses"
               :key="s"
-              @click="sectionStatus = s as any"
+              @click="sectionStatus = s"
               :style="{
                 padding: '4px 12px',
                 borderRadius: '6px',
                 border:
                   sectionStatus === s
-                    ? '1px solid var(--of-color-primary-500)'
+                    ? '1px solid var(--of-accent-default)'
                     : '1px solid var(--of-border-color)',
                 background:
                   sectionStatus === s
-                    ? 'var(--of-color-primary-50)'
+                    ? 'var(--of-surface-selected)'
                     : 'var(--of-color-bg-elevated)',
                 color:
                   sectionStatus === s
-                    ? 'var(--of-color-primary-500)'
+                    ? 'var(--of-accent-default)'
                     : 'var(--of-color-text-secondary)',
                 fontSize: '12px',
                 cursor: 'pointer',
@@ -3728,7 +4747,7 @@ const myStatusMap: ColorMap = {
               title="小红书冷启动推广方案"
               subtitle="5人 · 8章节 · 2轮"
               type="模板"
-              type-color="var(--of-color-primary-500)"
+              type-color="var(--of-accent-default)"
               date="2026-03-12"
             >
               <template #actions>
@@ -3737,8 +4756,8 @@ const myStatusMap: ColorMap = {
                     font-size: 11px;
                     padding: 3px 10px;
                     border-radius: 6px;
-                    background: var(--of-color-primary-50);
-                    color: var(--of-color-primary-500);
+                    background: var(--of-surface-selected);
+                    color: var(--of-accent-default);
                     border: none;
                     cursor: pointer;
                   "
@@ -3761,8 +4780,8 @@ const myStatusMap: ColorMap = {
                     font-size: 11px;
                     padding: 3px 10px;
                     border-radius: 6px;
-                    background: var(--of-color-success-light);
-                    color: var(--of-color-success);
+                      background: var(--of-color-success-light);
+                      color: var(--of-color-success);
                     border: none;
                     cursor: pointer;
                   "
@@ -3786,7 +4805,7 @@ const myStatusMap: ColorMap = {
               name="策略大师"
               title="首席策略师"
               icon="🎯"
-              color="var(--of-color-primary-500)"
+              color="var(--of-accent-default)"
               subtitle="整合全局，把控从洞察到转化的完整链路"
               :tags="['策略', '全局统筹']"
               v-model:expanded="personaExpanded"
@@ -3820,14 +4839,14 @@ const myStatusMap: ColorMap = {
               name="账号搭建师"
               title="运营专家"
               icon="🏗️"
-              color="#ec4899"
+              color="var(--of-accent-strong)"
               :done="true"
             />
             <PersonaCard
               name="离线成员"
               title="数据分析师"
               icon="📈"
-              color="var(--of-badge-purple-text)"
+              color="var(--of-text-tertiary)"
               :disabled="true"
             />
           </div>
@@ -3843,26 +4862,32 @@ const myStatusMap: ColorMap = {
 }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--of-color-bg-canvas);
+  font-family: var(--of-font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  background: var(--of-surface-canvas);
+  color: var(--of-text-primary);
 }
 
-/* CSS 变量 */
 :root {
-  --of-color-primary: #7c3aed;
-  --of-color-primary-50: #f5f3ff;
-  --of-color-primary-100: #ede9fe;
-  --of-color-primary-200: #ddd6fe;
-  --of-color-primary-300: #c4b5fd;
-  --of-color-primary-400: #a78bfa;
-  --of-color-primary-500: #7c3aed;
-  --of-color-primary-600: #7c3aed;
-  --of-color-primary-700: #6d28d9;
-  --of-color-primary-foreground: #fff;
-  --of-color-text: #111827;
-  --of-color-text-secondary: #6b7280;
-  --of-color-bg-canvas: #f8fafc;
-  --of-color-bg-elevated: #ffffff;
+  --of-color-primary: var(--of-accent-default);
+  --of-color-primary-50: var(--of-surface-selected);
+  --of-color-primary-100: var(--of-accent-soft);
+  --of-color-primary-200: var(--of-border-subtle);
+  --of-color-primary-300: var(--of-border-strong);
+  --of-color-primary-400: var(--of-accent-default);
+  --of-color-primary-500: var(--of-accent-default);
+  --of-color-primary-600: var(--of-accent-default);
+  --of-color-primary-700: var(--of-accent-strong);
+  --of-color-primary-foreground: #ffffff;
+  --of-color-text: var(--of-text-primary);
+  --of-color-text-primary: var(--of-text-primary);
+  --of-color-text-secondary: var(--of-text-secondary);
+  --of-color-text-tertiary: var(--of-text-tertiary);
+  --of-color-text-inverse: #ffffff;
+  --of-color-bg-canvas: var(--of-surface-canvas);
+  --of-color-bg-elevated: var(--of-surface-elevated);
+  --of-color-bg-hover: var(--of-surface-muted);
+  --of-color-bg-active: var(--of-surface-selected);
+  --of-color-bg-code: #0f172a;
   --of-color-gray-50: #f9fafb;
   --of-color-gray-100: #f3f4f6;
   --of-color-gray-200: #e5e7eb;
@@ -3873,31 +4898,35 @@ body {
   --of-color-gray-700: #374151;
   --of-color-gray-800: #1f2937;
   --of-color-gray-900: #111827;
-  --of-color-blue-50: #eff6ff;
-  --of-color-blue-100: #dbeafe;
-  --of-color-blue-200: #bfdbfe;
-  --of-color-blue-500: #3b82f6;
-  --of-color-blue-600: #2563eb;
-  --of-color-green-50: #f0fdf4;
-  --of-color-green-200: #bbf7d0;
+  --of-color-blue-50: var(--of-surface-selected);
+  --of-color-blue-100: var(--of-accent-soft);
+  --of-color-blue-200: var(--of-border-subtle);
+  --of-color-blue-500: var(--of-accent-default);
+  --of-color-blue-600: var(--of-accent-strong);
+  --of-color-green-50: rgba(34, 197, 94, 0.12);
+  --of-color-green-200: rgba(34, 197, 94, 0.28);
   --of-color-green-500: #22c55e;
   --of-color-green-600: #16a34a;
-  --of-color-orange-50: #fff7ed;
-  --of-color-orange-200: #fed7aa;
-  --of-color-orange-500: #f97316;
+  --of-color-orange-50: rgba(245, 158, 11, 0.12);
+  --of-color-orange-200: rgba(245, 158, 11, 0.28);
+  --of-color-orange-500: #f59e0b;
   --of-color-orange-600: #ea580c;
-  --of-color-red-50: #fef2f2;
-  --of-color-red-200: #fecaca;
+  --of-color-red-50: rgba(239, 68, 68, 0.12);
+  --of-color-red-200: rgba(239, 68, 68, 0.28);
   --of-color-red-500: #ef4444;
   --of-color-red-600: #dc2626;
   --of-color-red-700: #b91c1c;
-  --of-color-purple-50: #faf5ff;
-  --of-color-purple-600: #9333ea;
-  --of-color-yellow-50: #fffbeb;
+  --of-color-purple-50: var(--of-surface-selected);
+  --of-color-purple-600: var(--of-accent-strong);
+  --of-color-yellow-50: rgba(245, 158, 11, 0.12);
   --of-color-yellow-500: #f59e0b;
   --of-color-success: #22c55e;
   --of-color-warning: #f59e0b;
   --of-color-error: #ef4444;
+  --of-color-info: var(--of-accent-default);
+  --of-color-success-light: rgba(34, 197, 94, 0.12);
+  --of-color-warning-light: rgba(245, 158, 11, 0.12);
+  --of-color-error-light: rgba(239, 68, 68, 0.12);
   --of-spacing-1: 4px;
   --of-spacing-2: 8px;
   --of-spacing-3: 12px;
@@ -3918,6 +4947,25 @@ body {
   --of-statusbar-height: 32px;
   --of-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --of-font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --of-border-color: var(--of-border-subtle);
+  --of-color-info-light: var(--of-surface-selected);
+  --of-color-bg-hover: var(--of-surface-muted);
+  --of-color-bg-active: var(--of-surface-selected);
+  --of-role-be-text: var(--of-accent-default);
+  --of-role-be-bg: var(--of-surface-selected);
+  --of-role-fe-text: var(--of-text-primary);
+  --of-role-fe-bg: var(--of-surface-muted);
+  --of-badge-blue-text: var(--of-accent-default);
+  --of-badge-blue-bg: var(--of-accent-soft);
+  --of-badge-green-text: var(--of-color-success);
+  --of-badge-green-bg: rgba(34, 197, 94, 0.12);
+  --of-badge-green-border: rgba(34, 197, 94, 0.38);
+  --of-badge-orange-text: var(--of-color-warning);
+  --of-badge-orange-bg: rgba(245, 158, 11, 0.12);
+  --of-badge-red-text: var(--of-color-error);
+  --of-badge-red-bg: rgba(239, 68, 68, 0.12);
+  --of-badge-purple-text: var(--of-accent-strong);
+  --of-badge-purple-bg: var(--of-surface-selected);
 }
 
 .dev-app {
@@ -3942,7 +4990,7 @@ body {
 .dev-header__logo {
   font-weight: 700;
   font-size: 16px;
-  color: var(--of-color-primary-500);
+  color: var(--of-accent-default);
   white-space: nowrap;
 }
 .dev-header__nav {
@@ -3966,7 +5014,7 @@ body {
 }
 .dev-nav-btn.active {
   background: var(--of-color-bg-active);
-  color: var(--of-color-primary-500);
+  color: var(--of-accent-default);
   font-weight: 600;
 }
 
@@ -4016,7 +5064,7 @@ body {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  background: var(--of-color-primary-500);
+  background: var(--of-accent-default);
   color: var(--of-color-text-inverse);
   transition: all 0.15s;
 }
@@ -4025,13 +5073,13 @@ body {
   cursor: not-allowed;
 }
 .dev-btn:hover:not(:disabled) {
-  background: var(--of-color-primary-700);
+  background: var(--of-accent-strong);
 }
 .dev-btn--info {
   background: var(--of-color-info);
 }
 .dev-btn--info:hover:not(:disabled) {
-  background: var(--of-color-primary-600);
+  background: var(--of-accent-default);
 }
 .dev-btn--success {
   background: var(--of-color-success);
@@ -4050,6 +5098,29 @@ body {
 }
 .dev-btn--error:hover:not(:disabled) {
   background: var(--of-color-error);
+}
+
+.dev-header__theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dev-header__theme-label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--of-text-tertiary, var(--of-color-text-secondary));
+}
+
+.dev-header__theme-select {
+  min-width: 132px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-text-primary, var(--of-color-text-primary));
+  font-size: 13px;
 }
 
 /* ── 徽章样式 ── */
@@ -4072,6 +5143,243 @@ body {
   font-size: 12px;
   line-height: 1.5;
   overflow-x: auto;
+}
+
+.database-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.database-shell__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--of-border-color);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--of-color-bg-elevated), var(--of-color-bg-hover));
+}
+
+.database-shell__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--of-color-text-tertiary);
+}
+
+.database-shell__toolbar {
+  overflow-x: auto;
+}
+
+.database-shell__code {
+  margin: 12px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--of-border-color);
+  border-radius: 10px;
+  background: var(--of-color-bg-code);
+  color: var(--of-color-gray-200);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.database-shell__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+
+.database-shell__main {
+  min-width: 0;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--of-border-color);
+  border-radius: 10px;
+  background: var(--of-color-bg-canvas);
+}
+
+.database-shell__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.database-shell__workspace {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--of-border-color);
+  border-radius: 10px;
+  background: var(--of-color-bg-elevated);
+}
+
+.database-shell__workspace-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.database-shell__workspace-desc {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--of-color-text-secondary);
+}
+
+.database-shell__workspace-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.database-shell__workspace-body {
+  overflow-x: auto;
+}
+
+.database-shell__aside-card {
+  padding: 16px;
+  border: 1px solid var(--of-border-color);
+  border-radius: 10px;
+  background: var(--of-color-bg-elevated);
+}
+
+.database-shell__aside-title {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--of-color-text-primary);
+}
+
+.database-shell__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--of-color-text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.database-shell__log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.database-shell__card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.database-shell__card-item {
+  padding: 10px 12px;
+  border: 1px solid var(--of-color-gray-100);
+  border-radius: 8px;
+  background: var(--of-color-bg-canvas);
+}
+
+.database-shell__card-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--of-color-text-primary);
+}
+
+.database-shell__card-item-desc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--of-color-text-secondary);
+}
+
+.database-shell__log-item {
+  padding: 8px 10px;
+  border: 1px solid var(--of-color-gray-100);
+  border-radius: 8px;
+  background: var(--of-color-bg-canvas);
+  color: var(--of-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.database-shell__view-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.database-shell__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  background: var(--of-surface-selected);
+  color: var(--of-accent-default);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.database-shell__state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 160px;
+  padding: 20px;
+  border: 1px dashed var(--of-border-color);
+  border-radius: 10px;
+  background: var(--of-color-bg-hover);
+}
+
+.database-shell__state--error {
+  flex-direction: column;
+  align-items: flex-start;
+  border-color: var(--of-color-red-200);
+  background: var(--of-color-red-50);
+}
+
+.database-shell__spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--of-accent-soft);
+  border-top-color: var(--of-accent-default);
+  border-radius: 50%;
+  animation: database-shell-spin 1s linear infinite;
+}
+
+.database-shell__state-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--of-color-text-primary);
+}
+
+.database-shell__state-desc {
+  margin-top: 4px;
+  color: var(--of-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@keyframes database-shell-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 960px) {
+  .database-shell__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .demo-table {
@@ -4109,8 +5417,8 @@ body {
 .composable-badge {
   display: inline-block;
   padding: 2px 10px;
-  background: var(--of-color-primary-100);
-  color: var(--of-color-primary-500);
+  background: var(--of-accent-soft);
+  color: var(--of-accent-default);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;

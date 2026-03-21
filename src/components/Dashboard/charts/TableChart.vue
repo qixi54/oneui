@@ -69,13 +69,14 @@ withDefaults(defineProps<Props>(), {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--of-color-text);
+  color: var(--of-text-primary, var(--of-color-text));
 }
 
 .of-table-chart__wrapper {
   overflow: auto;
-  border: 1px solid var(--of-color-gray-100);
-  border-radius: var(--of-radius-md);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
+  border-radius: var(--of-radius-lg);
+  background: var(--of-surface-panel, var(--of-color-bg-elevated));
 }
 
 .of-table-chart__table {
@@ -87,13 +88,13 @@ withDefaults(defineProps<Props>(), {
 .of-table-chart__table th,
 .of-table-chart__table td {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--of-color-gray-100);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
   white-space: nowrap;
 }
 
 .of-table-chart__table th {
-  background: var(--of-color-gray-50);
-  color: var(--of-color-text-secondary);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
   font-weight: 600;
 }
 </style>

@@ -45,3 +45,4 @@ export { default as MonitorItem } from "./MonitorItem.vue";
 export type { MonitorItemProps } from "./MonitorItem.vue";
 export { default as PersonaCard } from "./PersonaCard.vue";
 export type { PersonaCardProps } from "./PersonaCard.vue";
+export { default as SearchHighlight } from "./SearchHighlight.vue";

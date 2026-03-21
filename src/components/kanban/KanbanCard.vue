@@ -25,6 +25,8 @@ const props = withDefaults(
   }>(),
   {
     dragging: false,
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
   },
 );
 
@@ -56,8 +58,9 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 </script>
 
 <template>
-  <div
+  <button
     class="of-kanban-card"
+    type="button"
     :class="{ 'of-kanban-card--dragging': dragging }"
     @click="emit('click', task)"
   >
@@ -77,7 +80,7 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
       <span class="of-badge" :style="priorityStyle">{{ priorityLabel }}</span>
       <span class="of-badge" :style="statusStyle">{{ statusLabel }}</span>
     </div>
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -85,10 +88,11 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  text-align: left;
   border-radius: var(--of-radius-lg);
   padding: 12px 14px;
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   box-shadow: var(--of-shadow-card);
   cursor: pointer;
   transition: var(--of-transition-normal);
@@ -98,7 +102,7 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 
 .of-kanban-card:hover {
   box-shadow: var(--of-shadow-card-hover);
-  border-color: var(--of-color-gray-300);
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
 }
 
 .of-kanban-card--dragging {
@@ -108,7 +112,7 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 .of-card-title {
   font-size: 13px;
   font-weight: 500;
-  color: var(--of-color-gray-900);
+  color: var(--of-text-primary, var(--of-color-gray-900));
   line-height: 1.5;
   word-break: break-word;
 }
@@ -122,13 +126,13 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 .of-card-id {
   font-size: 11px;
   font-weight: 500;
-  color: var(--of-color-primary-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   white-space: nowrap;
 }
 
 .of-card-date {
   font-size: 11px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   white-space: nowrap;
 }
 
@@ -143,8 +147,8 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
   border-radius: var(--of-radius-full);
   font-size: 10px;
   font-weight: 500;
-  background: var(--of-color-primary-50);
-  color: var(--of-color-primary-600);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-secondary, var(--of-color-gray-600));
   white-space: nowrap;
 }
 

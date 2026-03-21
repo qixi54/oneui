@@ -26,6 +26,7 @@ export {
   StatusSummary,
   InfoCard,
   PersonaCard,
+  SearchHighlight,
 } from "./components/base";
 export type {
   ButtonOption,
@@ -53,6 +54,9 @@ export type {
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
 
+// ─── Field (standalone) ─────────────────────────────────────────────────────
+export { default as FieldMarkdownPreview } from "./components/field/FieldMarkdownPreview.vue";
+
 // ─── Table ───────────────────────────────────────────────────────────────────
 export {
   DataTable,
@@ -62,7 +66,10 @@ export {
   NewRowBtn,
   TableFilterPanel,
   TableColumnManager,
+  TableToolbar,
   FieldCell,
+  FieldTypePicker,
+  ColumnHeaderMenu,
 } from "./components/table";
 // ExcelExport 可选导入（需要 xlsx 依赖）：import { ExcelExport } from 'oneflow-ui/dist/components/table'
 
@@ -82,6 +89,15 @@ export { ContentBlock, BlockQuote, CodeBlock, RefLink, RichTextEditor } from "./
 
 // ─── Form ────────────────────────────────────────────────────────────────────
 export { FormDesigner } from "./components/form";
+
+// ─── Database ────────────────────────────────────────────────────────────────
+export { DatabaseView } from "./components/database";
+export type {
+  DatabaseViewActions as DatabaseViewComponentActions,
+  DatabaseViewSchemaEvent,
+  DatabaseViewViewTab,
+  DatabaseViewProps,
+} from "./components/database";
 
 // ─── Auxiliary ───────────────────────────────────────────────────────────────
 export { ColorPanel, PersonPanel, FileUpload } from "./components/auxiliary";
@@ -156,12 +172,21 @@ export type {
   FormulaFieldDef,
   SelectOption,
   CellValue,
+  ActiveCell,
+  AggregationFn,
+  AggregationConfig,
+  DraftRowState,
   DataRecord,
   SortConfig,
   GroupConfig,
   FilterCondition as SchemaFilterCondition,
   ViewConfig,
   TableSchema,
+  CurrencyFieldDef,
+  RichTextFieldDef,
+  AutoNumberFieldDef,
+  CreatorFieldDef,
+  ProgressFieldDef,
   ViewTabItem,
   TableColumn,
   KanbanColumnData,
@@ -180,7 +205,18 @@ export {
   dataRecordToTask,
   buildKanbanColumns,
   buildGalleryItems,
+  buildGanttItems,
 } from "./types";
+
+// ─── Supabase Adapter ───────────────────────────────────────────────────────
+export {
+  rowToDataRecord,
+  rowsToDataRecords,
+  dataRecordToRow,
+  fieldsToRow,
+  useSupabaseAdapter,
+} from "./utils/supabaseAdapter";
+export type { RowAdapterOptions, UseSupabaseAdapterOptions } from "./utils/supabaseAdapter";
 
 export type { ChatMessage, UseAiChatOptions } from "./composables/useAiChat";
 export type { UseStreamOptions, StreamMode, RetryOptions } from "./composables/useStream";
@@ -195,6 +231,21 @@ export type {
 } from "./composables/useToast";
 export type { UseVirtualListOptions } from "./composables/useVirtualList";
 export type { EditingCell } from "./composables/useInlineEdit";
+export type { UseColumnResizeOptions } from "./composables/useColumnResize";
+export type { UseFixedColumnsOptions } from "./composables/useFixedColumns";
+export type { UseKeyboardNavigationOptions } from "./composables/useKeyboardNavigation";
+export type { RowReorderPayload, RowGroupChangePayload } from "./composables/useRowDrag";
+export type { UseDraftRowsOptions } from "./composables/useDraftRows";
+export type {
+  ValidationRule,
+  FilterFieldConfig,
+  FilterPanelConfig,
+  UseSchemaEngineOptions,
+} from "./composables/useSchemaEngine";
+
+// ─── Utils: Supabase Schema Introspection ───────────────────────────────────
+export { inferSchema, fetchSchemaFromSupabase, humanizeColumnName } from "./utils/supabaseSchema";
+export type { PgColumnInfo, InferSchemaOptions } from "./utils/supabaseSchema";
 
 // ─── Composables ─────────────────────────────────────────────────────────────
 export {
@@ -213,175 +264,45 @@ export { useMarkdown } from "./composables/useMarkdown";
 export { useToast } from "./composables/useToast";
 export { useVirtualList } from "./composables/useVirtualList";
 export { useInlineEdit } from "./composables/useInlineEdit";
+export { useColumnResize } from "./composables/useColumnResize";
+export { useFixedColumns } from "./composables/useFixedColumns";
+export { useKeyboardNavigation } from "./composables/useKeyboardNavigation";
+export { useRowDrag } from "./composables/useRowDrag";
+export { useDraftRows } from "./composables/useDraftRows";
+export { useWorkerSort } from "./composables/useWorkerSort";
+export { useSchemaEngine } from "./composables/useSchemaEngine";
+export { useSupabaseProvider } from "./composables/useSupabaseProvider";
+export type {
+  SupabaseQueryBuilder,
+  SupabaseFilterBuilder,
+  UseSupabaseProviderOptions,
+} from "./composables/useSupabaseProvider";
 
-// ─── Plugin Install ───────────────────────────────────────────────────────────
-import type { App } from "vue";
-import {
-  ViewTab,
-  ToolbarBtn,
-  AddViewBtn,
-  Badge,
-  RangeSlider,
-  ProgressBar,
-  ButtonGroup,
-  EmptyState,
-  StatisticCard,
-  DropdownMenu,
-  StatusIndicator,
-  Switch,
-  Stepper,
-  Accordion,
-  Avatar,
-  RefTag,
-  DescBlock,
-  ViewModeGroup,
-  ViewSwitcher,
-  SelectBadge,
-  ChainItem,
-  SectionBlock,
-  MonitorItem,
-  StatusSummary,
-  InfoCard,
-  PersonaCard,
-} from "./components/base";
-import { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
-import {
-  DataTable,
-  TableHeaderRow,
-  TableDataRow,
-  TableGroupRow,
-  NewRowBtn,
-} from "./components/table";
-import { TableFilterPanel, TableColumnManager, FieldCell } from "./components/table";
-import { KanbanBoard, KanbanColumn, KanbanCard, QuickAddRow } from "./components/kanban";
-import { GalleryView, GalleryCard } from "./components/gallery";
-import { ActivityTimeline, GanttTimeline, GanttRow } from "./components/timeline";
-import { ContentBlock, BlockQuote, CodeBlock, RefLink, RichTextEditor } from "./components/editor";
-import { FormDesigner } from "./components/form";
-import { ColorPanel, PersonPanel, FileUpload } from "./components/auxiliary";
-import { DetailLayout, PropPanel, PropRow, CommentItem } from "./components/detail";
-import {
-  Dashboard,
-  BarChart,
-  PieChart,
-  DoughnutChart,
-  NumberCard,
-  TableChart,
-} from "./components/Dashboard";
-import {
-  AiThinking,
-  AiStreamingCursor,
-  AiMessageBubble,
-  UserMessageBubble,
-  AiMessageList,
-  AiSender,
-} from "./components/ai";
-import { Modal, Dialog, Drawer, SidePanel } from "./components/overlay";
-import { ToastContainer, ToastItem } from "./components/toast";
-import { Tabs, TabPanel } from "./components/tabs";
-import { Breadcrumb, BreadcrumbItem } from "./components/breadcrumb";
-import { MermaidChart } from "./components/mermaid";
-import { SplitPane } from "./components/split";
-import ContextMenu from "./components/ContextMenu/index.vue";
+export {
+  useViewPersistence,
+  createLocalStorageBackend,
+  createSupabaseBackend,
+} from "./composables/useViewPersistence";
+export type {
+  ViewStorageBackend,
+  SupabaseViewBackendOptions,
+  UseViewPersistenceOptions,
+} from "./composables/useViewPersistence";
 
-const components = [
-  ViewTab,
-  ToolbarBtn,
-  AddViewBtn,
-  Badge,
-  RangeSlider,
-  ProgressBar,
-  ButtonGroup,
-  EmptyState,
-  StatisticCard,
-  DropdownMenu,
-  StatusIndicator,
-  Switch,
-  Stepper,
-  Accordion,
-  Avatar,
-  AppLayout,
-  Navbar,
-  Sidebar,
-  StatusBar,
-  DataTable,
-  TableHeaderRow,
-  TableDataRow,
-  TableGroupRow,
-  NewRowBtn,
-  TableFilterPanel,
-  TableColumnManager,
-  FieldCell,
-  KanbanBoard,
-  KanbanColumn,
-  KanbanCard,
-  QuickAddRow,
-  GalleryView,
-  GalleryCard,
-  ActivityTimeline,
-  GanttTimeline,
-  GanttRow,
-  ContentBlock,
-  BlockQuote,
-  CodeBlock,
-  RefLink,
-  RichTextEditor,
-  FormDesigner,
-  ColorPanel,
-  PersonPanel,
-  FileUpload,
-  DetailLayout,
-  PropPanel,
-  PropRow,
-  CommentItem,
-  Dashboard,
-  BarChart,
-  PieChart,
-  DoughnutChart,
-  NumberCard,
-  TableChart,
-  AiThinking,
-  AiStreamingCursor,
-  AiMessageBubble,
-  UserMessageBubble,
-  AiMessageList,
-  AiSender,
-  Modal,
-  Dialog,
-  Drawer,
-  SidePanel,
-  ToastContainer,
-  ToastItem,
-  Tabs,
-  TabPanel,
-  Breadcrumb,
-  BreadcrumbItem,
-  MermaidChart,
-  SplitPane,
-  RefTag,
-  DescBlock,
-  ViewModeGroup,
-  ViewSwitcher,
-  ContextMenu,
-  SelectBadge,
-  ChainItem,
-  SectionBlock,
-  MonitorItem,
-  StatusSummary,
-  InfoCard,
-  PersonaCard,
-];
+export { useDatabaseView } from "./composables/useDatabaseView";
+export type {
+  DatabaseViewMode,
+  DatabaseViewFetchParams,
+  DatabaseViewFetchResult,
+  DatabaseViewProvider,
+  DatabaseSchemaEvent,
+  DatabaseViewActions,
+  UseDatabaseViewOptions,
+  UseDatabaseViewResult,
+} from "./composables/useDatabaseView";
 
-export const OneflowUI = {
-  install(app: App) {
-    components.forEach((component) => {
-      app.component(component.name || (component as any).__name || "", component);
-    });
-  },
-};
-
-export default OneflowUI;
-
-// Import global styles
-import "./styles/variables.css";
-import "./styles/markdown.css";
+export { useSearch } from "./composables/useSearch";
+export type {
+  UseSearchOptions,
+  SearchHighlight as SearchHighlightSegment,
+} from "./composables/useSearch";

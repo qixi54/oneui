@@ -118,7 +118,13 @@ watch(
 </script>
 
 <template>
-  <div ref="triggerRef" class="of-field-multiselect" tabindex="0" @keydown="onKeydown">
+  <button
+    ref="triggerRef"
+    type="button"
+    class="of-field-multiselect"
+    aria-label="多选字段编辑器"
+    @keydown="onKeydown"
+  >
     <div v-if="selectedOptions.length" class="of-field-multiselect__chips">
       <span
         v-for="opt in selectedOptions"
@@ -138,29 +144,32 @@ watch(
         class="of-field-multiselect__dropdown"
         :style="dropdownStyle"
       >
-        <div
+        <button
           v-for="(opt, i) in options"
           :key="opt.value"
+          type="button"
           class="of-field-multiselect__option"
+          role="checkbox"
+          :aria-checked="draftValues.includes(opt.value)"
           :class="{ active: i === activeIndex, selected: draftValues.includes(opt.value) }"
           @mouseenter="activeIndex = i"
           @click.stop="toggleValue(opt.value)"
+          @focusin="activeIndex = i"
+          @keydown.enter.prevent="toggleValue(opt.value)"
+          @keydown.space.prevent="toggleValue(opt.value)"
         >
-          <input
+          <span
             class="of-field-multiselect__checkbox"
-            type="checkbox"
-            tabindex="-1"
-            :checked="draftValues.includes(opt.value)"
-            @change.prevent
+            :class="{ 'of-field-multiselect__checkbox--checked': draftValues.includes(opt.value) }"
+            aria-hidden="true"
           />
           <span
             v-if="opt.color"
             class="of-field-multiselect__badge"
             :style="{ background: opt.color }"
-            >{{ opt.label }}</span
-          >
+            >{{ opt.label }}</span>
           <span v-else>{{ opt.label }}</span>
-        </div>
+        </button>
         <div class="of-field-multiselect__actions">
           <button class="of-field-multiselect__btn" type="button" @click.stop="cancelAndClose">
             取消
@@ -175,7 +184,7 @@ watch(
         </div>
       </div>
     </Teleport>
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -186,6 +195,9 @@ watch(
   display: flex;
   align-items: center;
   outline: none;
+  border: none;
+  background: transparent;
+  text-align: left;
 }
 
 .of-field-multiselect__chips {
@@ -196,16 +208,16 @@ watch(
 
 .of-field-multiselect__placeholder {
   font-size: 13px;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
 }
 
 .of-field-multiselect__dropdown {
   position: fixed;
   z-index: 9999;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-border-color);
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  background: var(--of-surface-elevated, var(--of-surface-panel));
+  border: 1px solid var(--of-border-subtle, var(--of-border-strong));
+  border-radius: 8px;
+  box-shadow: var(--of-shadow-dropdown);
   overflow: hidden;
 }
 
@@ -219,13 +231,30 @@ watch(
   gap: 8px;
 }
 
+.of-field-multiselect__checkbox {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-300));
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background: var(--of-surface-elevated, var(--of-color-bg-canvas));
+}
+
+.of-field-multiselect__checkbox--checked {
+  background: var(--of-accent-default, var(--of-text-strong));
+  border-color: var(--of-accent-default, var(--of-text-strong));
+  box-shadow: inset 0 0 0 2px var(--of-surface-elevated, var(--of-surface-panel));
+}
+
 .of-field-multiselect__option:hover,
 .of-field-multiselect__option.active {
-  background: var(--of-color-bg-hover);
+  background: var(--of-surface-selected, var(--of-color-bg-hover));
 }
 
 .of-field-multiselect__option.selected {
   font-weight: 600;
+  color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
 }
 
 .of-field-multiselect__checkbox {
@@ -236,33 +265,33 @@ watch(
 .of-field-multiselect__badge {
   display: inline-block;
   padding: 1px 6px;
-  border-radius: 3px;
+  border-radius: 6px;
   font-size: 12px;
   color: var(--of-color-text-inverse);
   line-height: 18px;
-  background: var(--of-color-primary-500);
+  background: var(--of-accent-default, var(--of-text-strong));
 }
 
 .of-field-multiselect__actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  border-top: 1px solid var(--of-color-border-light);
+  border-top: 1px solid var(--of-border-subtle, var(--of-color-border-light));
   padding: 8px;
 }
 
 .of-field-multiselect__btn {
-  border: 1px solid var(--of-border-color);
-  background: var(--of-color-bg-elevated);
-  border-radius: 4px;
+  border: 1px solid var(--of-border-subtle, var(--of-border-strong));
+  background: var(--of-surface-elevated, var(--of-surface-panel));
+  border-radius: 6px;
   font-size: 12px;
   padding: 3px 10px;
   cursor: pointer;
 }
 
 .of-field-multiselect__btn--primary {
-  border-color: var(--of-color-primary-500);
-  background: var(--of-color-primary-500);
+  border-color: var(--of-accent-default, var(--of-text-strong));
+  background: var(--of-accent-default, var(--of-text-strong));
   color: var(--of-color-text-inverse);
 }
 </style>

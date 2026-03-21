@@ -15,17 +15,22 @@ function select(n: number) {
 </script>
 
 <template>
-  <div class="of-field-rating" @keydown.escape="emit('cancel')" tabindex="0">
-    <span
+  <div class="of-field-rating" tabindex="0" role="radiogroup" aria-label="评分" @keydown.escape="emit('cancel')">
+    <button
       v-for="n in maxStars"
       :key="n"
       class="of-field-rating__star"
       :class="{ filled: n <= (hoverIndex || currentValue) }"
+      type="button"
+      :aria-label="`评分 ${n} 星`"
       @mouseenter="hoverIndex = n"
       @mouseleave="hoverIndex = 0"
+      @focus="hoverIndex = n"
+      @blur="hoverIndex = 0"
       @click.stop="select(n)"
-      >★</span
     >
+      ★
+    </button>
   </div>
 </template>
 
@@ -39,11 +44,11 @@ function select(n: number) {
 .of-field-rating__star {
   font-size: 18px;
   cursor: pointer;
-  color: var(--of-color-gray-300, #ccc);
+  color: var(--of-text-tertiary, var(--of-color-gray-300, #ccc));
   transition: color 0.1s;
 }
 
 .of-field-rating__star.filled {
-  color: var(--of-color-warning);
+  color: var(--of-accent-strong, var(--of-text-strong));
 }
 </style>

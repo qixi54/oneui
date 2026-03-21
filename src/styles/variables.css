@@ -77,7 +77,10 @@
   --of-color-text-secondary: var(--of-color-gray-500);
   --of-color-text-tertiary: var(--of-color-gray-400);
   --of-color-text-inverse: #ffffff;
-  --of-color-text-link: var(--of-color-primary-500);
+  --of-link-default: var(--of-color-primary-600);
+  --of-link-hover: var(--of-color-primary-700);
+  --of-link-visited: var(--of-color-primary-800);
+  --of-color-text-link: var(--of-link-default);
   --of-color-text: var(--of-color-text-primary);
   --of-color-text-muted: var(--of-color-gray-300);
 
@@ -126,22 +129,22 @@
   --of-role-default-bg: var(--of-color-gray-100);
 
   /* ─── Badge Color Palette ─── */
-  --of-badge-blue-text: #2563eb;
+  --of-badge-blue-text: #1d4ed8;
   --of-badge-blue-bg: #dbeafe;
   --of-badge-blue-border: #93c5fd;
-  --of-badge-green-text: #16a34a;
+  --of-badge-green-text: #15803d;
   --of-badge-green-bg: #dcfce7;
   --of-badge-green-border: #86efac;
-  --of-badge-orange-text: #d97706;
+  --of-badge-orange-text: #b45309;
   --of-badge-orange-bg: #fef3c7;
   --of-badge-orange-border: #fcd34d;
-  --of-badge-red-text: #dc2626;
+  --of-badge-red-text: #b91c1c;
   --of-badge-red-bg: #fee2e2;
   --of-badge-red-border: #fca5a5;
-  --of-badge-purple-text: #7c3aed;
+  --of-badge-purple-text: #6d28d9;
   --of-badge-purple-bg: #f5f3ff;
   --of-badge-purple-border: #c4b5fd;
-  --of-badge-gray-text: #64748b;
+  --of-badge-gray-text: #475569;
   --of-badge-gray-bg: #f1f5f9;
   --of-badge-gray-border: #cbd5e1;
 

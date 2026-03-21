@@ -3,6 +3,13 @@ import { computed } from "vue";
 import type { Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
 
+const props = defineProps<{
+  icon: string | Component;
+  iconColor?: "blue" | "green" | "orange" | "red" | "purple";
+  value: string | number;
+  label: string;
+}>();
+
 /**
  * StatisticCard 组件 - 统计卡片
  *
@@ -19,33 +26,26 @@ import { resolveIcon } from "../../utils/icon";
 
 defineOptions({ inheritAttrs: false });
 
-const props = defineProps<{
-  icon: string | Component;
-  iconColor?: "blue" | "green" | "orange" | "red" | "purple";
-  value: string | number;
-  label: string;
-}>();
-
 const colorMap: Record<string, { bg: string; text: string }> = {
   blue: {
-    bg: "var(--of-color-blue-50)",
-    text: "var(--of-color-blue-600)",
+    bg: "var(--of-surface-muted)",
+    text: "var(--of-accent-default)",
   },
   green: {
-    bg: "var(--of-color-green-50)",
-    text: "var(--of-color-green-600)",
+    bg: "var(--of-surface-panel)",
+    text: "var(--of-text-strong)",
   },
   orange: {
-    bg: "var(--of-color-orange-50)",
-    text: "var(--of-color-orange-600)",
+    bg: "var(--of-surface-selected)",
+    text: "var(--of-accent-strong)",
   },
   red: {
-    bg: "var(--of-color-red-50)",
-    text: "var(--of-color-red-600)",
+    bg: "var(--of-surface-muted)",
+    text: "var(--of-text-primary)",
   },
   purple: {
-    bg: "var(--of-color-purple-50)",
-    text: "var(--of-color-purple-600)",
+    bg: "var(--of-surface-panel)",
+    text: "var(--of-text-secondary)",
   },
 };
 
@@ -77,8 +77,8 @@ const colorClass = computed(() => {
   align-items: center;
   gap: var(--of-spacing-4);
   padding: var(--of-spacing-4);
-  background: var(--of-color-bg-canvas);
-  border: 1px solid var(--of-color-gray-100);
+  background: var(--of-surface-elevated, var(--of-color-bg-canvas));
+  border: 1px solid var(--of-border-subtle);
   border-radius: var(--of-radius-lg);
 }
 

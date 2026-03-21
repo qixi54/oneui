@@ -13,6 +13,7 @@ export interface SidePanelProps {
 
 const props = withDefaults(defineProps<SidePanelProps>(), {
   width: 500,
+  title: undefined,
   showClose: true,
   mode: "persistent",
 });
@@ -145,8 +146,8 @@ function close() {
   z-index: 200;
   display: flex;
   flex-direction: column;
-  background: var(--of-color-bg-elevated, #ffffff);
-  box-shadow: -2px 0 20px rgba(0, 0, 0, 0.13);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
+  box-shadow: var(--of-shadow-panel);
   overflow: hidden;
   max-width: 100vw;
 }
@@ -156,7 +157,7 @@ function close() {
   align-items: center;
   gap: var(--of-spacing-3, 12px);
   padding: var(--of-spacing-4, 16px);
-  border-bottom: 1px solid var(--of-color-gray-200, #f0f0f0);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   flex-shrink: 0;
 }
 
@@ -170,7 +171,7 @@ function close() {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-side-panel__title-placeholder {
@@ -187,14 +188,14 @@ function close() {
   border: none;
   border-radius: var(--of-radius-md, 6px);
   background: transparent;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .of-side-panel__close:hover {
-  background: var(--of-color-gray-100, #f3f4f6);
-  color: var(--of-color-text, #111827);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-side-panel__body {

@@ -30,7 +30,14 @@ function onKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="of-field-checkbox" tabindex="0" @click.stop="toggle" @keydown="onKeydown">
+  <div
+    class="of-field-checkbox"
+    role="checkbox"
+    :aria-checked="checked"
+    tabindex="0"
+    @click.stop="toggle"
+    @keydown="onKeydown"
+  >
     <span class="of-field-checkbox__icon">{{ checked ? "☑" : "☐" }}</span>
   </div>
 </template>

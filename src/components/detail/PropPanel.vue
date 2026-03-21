@@ -28,9 +28,11 @@ function toggleCollapse() {
 <template>
   <div class="prop-panel">
     <!-- 标题行 -->
-    <div
+    <component
+      :is="collapsible ? 'button' : 'div'"
       class="prop-panel__header"
       :class="{ 'prop-panel__header--collapsible': collapsible }"
+      :type="collapsible ? 'button' : undefined"
       @click="toggleCollapse"
     >
       <span class="prop-panel__title">{{ title }}</span>
@@ -40,7 +42,7 @@ function toggleCollapse() {
         :class="{ 'prop-panel__chevron--up': !collapsed }"
         :size="14"
       />
-    </div>
+    </component>
 
     <!-- 属性列表 -->
     <div v-show="!collapsed" class="prop-panel__body">

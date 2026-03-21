@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { SearchHighlight } from "../../composables/useSearch";
 
-defineOptions({ inheritAttrs: false });
-
 defineProps<{
   segments: SearchHighlight[];
 }>();
+
+defineOptions({ inheritAttrs: false });
+
 </script>
 
 <template>
@@ -19,8 +20,8 @@ defineProps<{
 
 <style scoped>
 .of-search-hl__match {
-  background: var(--of-color-warning-100, #fef3c7);
-  color: var(--of-color-warning-800, #92400e);
+  background: var(--of-surface-selected, #fef3c7);
+  color: var(--of-text-strong, #92400e);
   border-radius: 2px;
   padding: 0 1px;
 }

@@ -90,6 +90,7 @@ function onDragEnd() {
         <input
           type="checkbox"
           class="of-col-manager__checkbox"
+          :aria-label="`显示列 ${col.label}`"
           :checked="!col.hidden"
           @change="toggleVisible(col)"
         />
@@ -101,8 +102,8 @@ function onDragEnd() {
 
 <style scoped>
 .of-col-manager {
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-gray-200);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-xl);
   box-shadow: var(--of-shadow-modal);
   min-width: 220px;
@@ -120,14 +121,14 @@ function onDragEnd() {
 .of-col-manager__title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--of-color-gray-800);
+  color: var(--of-text-primary, var(--of-color-gray-800));
 }
 
 .of-col-manager__close {
   border: none;
   background: none;
   cursor: pointer;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   padding: 2px;
   border-radius: var(--of-radius-sm);
   display: flex;
@@ -135,8 +136,8 @@ function onDragEnd() {
 }
 
 .of-col-manager__close:hover {
-  color: var(--of-color-gray-600);
-  background: var(--of-color-gray-100);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
+  background: var(--of-surface-muted, var(--of-color-gray-100));
 }
 
 .of-col-manager__actions {
@@ -151,17 +152,17 @@ function onDragEnd() {
   gap: 4px;
   font-size: 11px;
   font-family: var(--of-font-sans);
-  color: var(--of-color-gray-500);
-  background: var(--of-color-gray-50);
-  border: 1px solid var(--of-color-gray-200);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-md);
   padding: 3px 8px;
   cursor: pointer;
 }
 
 .of-col-manager__action-btn:hover {
-  background: var(--of-color-gray-100);
-  color: var(--of-color-gray-700);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-700));
 }
 
 .of-col-manager__row {
@@ -169,7 +170,7 @@ function onDragEnd() {
   align-items: center;
   gap: 8px;
   padding: 5px 0;
-  border-bottom: 1px solid var(--of-color-gray-50);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-50));
 }
 
 .of-col-manager__row:last-child {
@@ -177,7 +178,7 @@ function onDragEnd() {
 }
 
 .of-col-manager__drag {
-  color: var(--of-color-gray-300);
+  color: var(--of-text-tertiary, var(--of-color-gray-300));
   cursor: grab;
   display: flex;
   align-items: center;
@@ -195,12 +196,12 @@ function onDragEnd() {
 
 .of-col-manager__label {
   font-size: 12px;
-  color: var(--of-color-gray-800);
+  color: var(--of-text-primary, var(--of-color-gray-800));
   flex: 1;
 }
 
 .of-col-manager__label.dimmed {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   text-decoration: line-through;
 }
 </style>

@@ -41,13 +41,13 @@ function handleClick(e: MouseEvent) {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  background: var(--of-color-primary-50);
+  background: var(--of-surface-selected, #eceff3);
   border-radius: var(--of-radius-sm);
   padding: 2px 8px;
   font-family: var(--of-font-sans);
   font-size: 12px;
   font-weight: 500;
-  color: var(--of-color-primary-500);
+  color: var(--of-accent-default, #334155);
   cursor: pointer;
   text-decoration: none;
   line-height: 1.5;
@@ -56,8 +56,8 @@ function handleClick(e: MouseEvent) {
 }
 
 .ref-link:hover {
-  background: var(--of-color-primary-100);
-  color: var(--of-color-primary-600);
+  background: var(--of-surface-muted, #f1f3f6);
+  color: var(--of-accent-strong, #0f172a);
 }
 
 .ref-link__icon {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import type { TableColumn, ColorMap } from "../../types";
+import { computed, type CSSProperties } from "vue";
+import type { TableColumn, ColorMap, Density } from "../../types";
 import {
   DEFAULT_PRIORITY_MAP,
   DEFAULT_STATUS_MAP,
@@ -17,6 +17,7 @@ const props = withDefaults(
     selected?: boolean;
     selectable?: boolean;
     columns: TableColumn[];
+    density?: Density;
     /**
      * 优先级颜色映射，与内置默认映射合并（传入优先）
      */
@@ -30,6 +31,9 @@ const props = withDefaults(
     rowKey: "id",
     selected: false,
     selectable: true,
+    density: "standard",
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
   },
 );
 
@@ -38,12 +42,50 @@ const emit = defineEmits<{
   click: [row: TableRow];
 }>();
 
-function colStyle(col: TableColumn) {
-  if (col.width === "fill") {
-    const minWidth = `${col.minWidth ?? 220}px`;
-    return { flex: `1 1 ${minWidth}`, minWidth };
+const DENSITY_LAYOUT: Record<
+  Density,
+  {
+    rowHeight: number;
+    cellPaddingX: number;
+    cellPaddingY: number;
+    fillMinWidth: number;
   }
-  return { width: `${col.width}px`, flexShrink: "0", flexGrow: "0" };
+> = {
+  compact: {
+    rowHeight: 36,
+    cellPaddingX: 10,
+    cellPaddingY: 6,
+    fillMinWidth: 180,
+  },
+  standard: {
+    rowHeight: 44,
+    cellPaddingX: 12,
+    cellPaddingY: 8,
+    fillMinWidth: 220,
+  },
+  comfortable: {
+    rowHeight: 52,
+    cellPaddingX: 14,
+    cellPaddingY: 10,
+    fillMinWidth: 240,
+  },
+};
+
+const densityMetrics = computed(() => DENSITY_LAYOUT[props.density]);
+const rowStyle = computed<CSSProperties>(() => ({
+  minHeight: `${densityMetrics.value.rowHeight}px`,
+}));
+const cellStyle = computed<CSSProperties>(() => ({
+  padding: `${densityMetrics.value.cellPaddingY}px ${densityMetrics.value.cellPaddingX}px`,
+}));
+
+function colStyle(col: TableColumn) {
+  const padding = cellStyle.value;
+  if (col.width === "fill") {
+    const minWidth = `${col.minWidth ?? densityMetrics.value.fillMinWidth}px`;
+    return { ...padding, flex: `1 1 ${minWidth}`, minWidth };
+  }
+  return { ...padding, width: `${col.width}px`, flexShrink: "0", flexGrow: "0" };
 }
 
 const mergedPriorityMap = computed(() =>
@@ -84,26 +126,48 @@ function getRowId(): string {
   const value = props.row[props.rowKey];
   return value != null ? String(value) : "";
 }
+
+function handleRowKeyDown(event: KeyboardEvent) {
+  if (event.target !== event.currentTarget) return;
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  emit("click", props.row);
+}
 </script>
 
 <template>
   <div
     class="of-table-row"
     :class="{ 'of-table-row--selected': selected }"
+    role="row"
+    tabindex="0"
+    :aria-selected="selected || undefined"
+    :style="rowStyle"
     @click="emit('click', row)"
+    @keydown="handleRowKeyDown"
   >
     <!-- Checkbox 列 -->
-    <div v-if="selectable" class="of-td of-td-checkbox" @click.stop>
-      <input
-        type="checkbox"
-        class="of-checkbox"
-        :checked="selected"
-        @change="emit('select', getRowId())"
-      />
+    <div
+      v-if="selectable"
+      class="of-td of-td-checkbox"
+      role="gridcell"
+      :style="cellStyle"
+      @click.stop
+    >
+      <label class="of-checkbox-label" :for="`of-table-row-checkbox-${getRowId()}`">
+        <input
+          :id="`of-table-row-checkbox-${getRowId()}`"
+          type="checkbox"
+          class="of-checkbox"
+          :checked="selected"
+          @change="emit('select', getRowId())"
+        />
+        <span class="of-sr-only">选择当前行</span>
+      </label>
     </div>
 
     <!-- 数据列 -->
-    <div v-for="col in columns" :key="col.key" class="of-td" :style="colStyle(col)">
+    <div v-for="col in columns" :key="col.key" class="of-td" role="gridcell" :style="colStyle(col)">
       <slot name="cell" :row="row" :col="col">
         <!-- 状态列 -->
         <template v-if="col.key === 'status'">
@@ -155,41 +219,62 @@ function getRowId(): string {
 .of-table-row {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--of-color-gray-100);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
   cursor: pointer;
   transition: var(--of-transition-fast);
 }
 
 .of-table-row:hover {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+}
+
+.of-table-row:focus-visible {
+  outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
+  outline-offset: -2px;
 }
 
 .of-table-row--selected {
-  background: var(--of-color-primary-50);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
 }
 
 .of-td {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
   font-size: 13px;
-  color: var(--of-color-gray-700);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .of-td-checkbox {
   width: 20px;
   flex-shrink: 0;
   flex-grow: 0;
-  padding: 10px 12px;
 }
 
 .of-checkbox {
   width: 14px;
   height: 14px;
   cursor: pointer;
-  accent-color: var(--of-color-primary-500);
+  accent-color: var(--of-text-secondary, var(--of-color-gray-500));
   flex-shrink: 0;
+}
+
+.of-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.of-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .of-badge {
@@ -204,13 +289,13 @@ function getRowId(): string {
 }
 
 .of-badge--role {
-  background: var(--of-color-primary-50);
-  color: var(--of-color-primary-600);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
+  color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 
 .of-td-id {
   font-size: 12px;
-  color: var(--of-color-primary-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -219,7 +304,7 @@ function getRowId(): string {
 
 .of-td-title {
   font-size: 13px;
-  color: var(--of-color-gray-900);
+  color: var(--of-text-primary, var(--of-color-gray-900));
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -228,14 +313,14 @@ function getRowId(): string {
 
 .of-td-text {
   font-size: 13px;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .of-td-empty {
-  color: var(--of-color-gray-300);
+  color: var(--of-text-tertiary, var(--of-color-gray-300));
   font-size: 13px;
 }
 </style>

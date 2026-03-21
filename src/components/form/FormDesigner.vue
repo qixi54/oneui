@@ -11,6 +11,23 @@ import {
   type TableSchema,
 } from "../../types";
 
+const props = withDefaults(
+  defineProps<{
+    schema: TableSchema;
+    title?: string;
+    readonly?: boolean;
+  }>(),
+  {
+    title: "Form Designer",
+    readonly: false,
+  },
+);
+
+const emit = defineEmits<{
+  "update:schema": [schema: TableSchema];
+  change: [schema: TableSchema];
+}>();
+
 const FIELD_TYPE_OPTIONS: Array<{ value: FieldType; label: string }> = [
   { value: "text", label: "文本" },
   { value: "number", label: "数字" },
@@ -28,23 +45,6 @@ const FIELD_TYPE_OPTIONS: Array<{ value: FieldType; label: string }> = [
   { value: "relation", label: "关联" },
   { value: "formula", label: "公式" },
 ];
-
-const props = withDefaults(
-  defineProps<{
-    schema: TableSchema;
-    title?: string;
-    readonly?: boolean;
-  }>(),
-  {
-    title: "Form Designer",
-    readonly: false,
-  },
-);
-
-const emit = defineEmits<{
-  "update:schema": [schema: TableSchema];
-  change: [schema: TableSchema];
-}>();
 
 const localSchema = ref<TableSchema>(cloneSchema(props.schema));
 
@@ -231,6 +231,7 @@ function handleDragEnd() {
           <input
             :value="field.name"
             class="of-form-designer__input"
+            aria-label="字段名称"
             placeholder="字段名称"
             :disabled="readonly"
             @input="
@@ -241,6 +242,7 @@ function handleDragEnd() {
 
           <select
             class="of-form-designer__select"
+            aria-label="字段类型"
             :value="field.type"
             :disabled="readonly"
             @change="
@@ -252,9 +254,10 @@ function handleDragEnd() {
             </option>
           </select>
 
-          <label class="of-form-designer__checkbox-label">
+          <span class="of-form-designer__checkbox-label">
             <input
               type="checkbox"
+              aria-label="必填"
               :checked="Boolean(field.required)"
               :disabled="readonly"
               @change="
@@ -263,11 +266,12 @@ function handleDragEnd() {
               "
             />
             必填
-          </label>
+          </span>
 
-          <label class="of-form-designer__checkbox-label">
+          <span class="of-form-designer__checkbox-label">
             <input
               type="checkbox"
+              aria-label="隐藏"
               :checked="Boolean(field.hidden)"
               :disabled="readonly"
               @change="
@@ -276,7 +280,7 @@ function handleDragEnd() {
               "
             />
             隐藏
-          </label>
+          </span>
         </div>
 
         <button
@@ -291,10 +295,11 @@ function handleDragEnd() {
           v-if="field.type === 'select' || field.type === 'multi_select'"
           class="of-form-designer__options-wrap"
         >
-          <label class="of-form-designer__options-label">选项（逗号分隔）</label>
+          <span class="of-form-designer__options-label">选项（逗号分隔）</span>
           <input
             :value="optionsToString(field)"
             class="of-form-designer__input"
+            aria-label="选项列表"
             placeholder="例如：待办, 进行中, 完成"
             :disabled="readonly"
             @change="updateSelectOptions(field, String(($event.target as HTMLInputElement).value))"

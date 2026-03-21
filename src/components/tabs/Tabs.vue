@@ -106,6 +106,7 @@ provide("of-tabs-set", setActiveTab);
     <div class="of-tabs__nav" role="tablist" aria-label="tabs">
       <button
         v-for="tab in tabs"
+        :id="`of-tab-${tab.key}`"
         :key="tab.key"
         class="of-tabs__tab"
         :class="{
@@ -114,7 +115,6 @@ provide("of-tabs-set", setActiveTab);
         }"
         :disabled="tab.disabled"
         role="tab"
-        :id="`of-tab-${tab.key}`"
         :aria-selected="activeTab === tab.key"
         :aria-controls="`of-panel-${tab.key}`"
         :aria-disabled="tab.disabled"
@@ -123,7 +123,7 @@ provide("of-tabs-set", setActiveTab);
         @keydown="onTabKeydown($event, tab.key)"
       >
         <!-- 图标 -->
-        <component v-if="tab.icon" :is="resolveIcon(tab.icon)" class="of-tabs__tab-icon" />
+        <component :is="resolveIcon(tab.icon)" v-if="tab.icon" class="of-tabs__tab-icon" />
         <!-- 标签文字 -->
         <span class="of-tabs__tab-label">{{ tab.label }}</span>
         <!-- 角标 -->
@@ -145,14 +145,14 @@ provide("of-tabs-set", setActiveTab);
    CSS 自定义属性（回退值）
    ============================================================ */
 .of-tabs {
-  --_color-primary: var(--of-color-primary, #6366f1);
-  --_color-primary-light: var(--of-color-primary-light, #eef2ff);
+  --_color-primary: var(--of-accent-default, #334155);
+  --_color-primary-light: var(--of-surface-selected, #eceff3);
   --_color-text: var(--of-color-text, #1f2937);
   --_color-text-muted: var(--of-color-text-muted, #6b7280);
   --_color-border: var(--of-color-border, #e5e7eb);
   --_color-surface: var(--of-color-surface, #ffffff);
   --_color-bg-hover: var(--of-color-bg-hover, #f9fafb);
-  --_color-badge-bg: var(--of-color-badge-bg, #ef4444);
+  --_color-badge-bg: var(--of-color-badge-bg, #334155);
   --_color-badge-text: var(--of-color-badge-text, #ffffff);
   --_radius-sm: var(--of-radius-sm, 4px);
   --_radius-md: var(--of-radius-md, 6px);

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, type Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
 
 export interface ViewSwitcherTab {
   value: string;
   label: string;
-  icon?: string;
+  icon?: string | Component;
 }
 
 export interface ViewSwitcherProps {
@@ -20,14 +20,6 @@ export interface ViewSwitcherProps {
   sortLabel?: string;
   searchPlaceholder?: string;
 }
-
-const DEFAULT_TABS: ViewSwitcherTab[] = [
-  { value: "table", label: "表格", icon: "table-2" },
-  { value: "kanban", label: "看板", icon: "columns-3" },
-  { value: "timeline", label: "时间线", icon: "calendar" },
-];
-
-defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(defineProps<ViewSwitcherProps>(), {
   tabs: undefined,
@@ -50,7 +42,15 @@ defineEmits<{
   search: [query: string];
 }>();
 
+defineOptions({ inheritAttrs: false });
+
 const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
+
+const DEFAULT_TABS: ViewSwitcherTab[] = [
+  { value: "table", label: "表格", icon: "table-2" },
+  { value: "kanban", label: "看板", icon: "columns-3" },
+  { value: "timeline", label: "时间线", icon: "calendar" },
+];
 </script>
 
 <template>
@@ -64,11 +64,7 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
         :class="{ 'one-view-switcher__tab--active': modelValue === tab.value }"
         @click="$emit('update:modelValue', tab.value)"
       >
-        <component
-          v-if="tab.icon"
-          :is="resolveIcon(tab.icon)"
-          class="one-view-switcher__tab-icon"
-        />
+        <component :is="resolveIcon(tab.icon)" v-if="tab.icon" class="one-view-switcher__tab-icon" />
         <span>{{ tab.label }}</span>
       </button>
     </div>
@@ -112,8 +108,8 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
   gap: 12px;
   height: 44px;
   padding: 0 16px;
-  background: var(--of-color-bg-elevated, #ffffff);
-  border-bottom: 1px solid var(--of-color-gray-200, #e5e7eb);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   box-sizing: border-box;
 }
 
@@ -122,7 +118,7 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
   align-items: center;
   height: 30px;
   border-radius: 6px;
-  border: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   overflow: hidden;
 }
 
@@ -136,7 +132,7 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
   background: transparent;
   font-size: 11px;
   font-weight: 500;
-  color: var(--of-color-gray-500, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
@@ -151,8 +147,8 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
 }
 
 .one-view-switcher__tab--active {
-  background: var(--of-color-primary-50, #eef2ff);
-  color: var(--of-color-primary-500, #6366f1);
+  background: var(--of-surface-selected, #eceff3);
+  color: var(--of-accent-strong, #0f172a);
   font-weight: 600;
 }
 
@@ -164,7 +160,7 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
 .one-view-switcher__sep {
   width: 1px;
   height: 18px;
-  background: var(--of-color-gray-200, #e5e7eb);
+  background: var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   flex-shrink: 0;
 }
 
@@ -175,18 +171,18 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
   padding: 4px 8px;
   height: 28px;
   border-radius: 6px;
-  border: 1px solid var(--of-color-gray-200, #e5e7eb);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   background: transparent;
   font-size: 11px;
   font-weight: 500;
-  color: var(--of-color-gray-600, #4b5563);
+  color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
 }
 
 .one-view-switcher__tool-btn:hover {
-  background: var(--of-color-gray-50, #f9fafb);
+  background: var(--of-surface-selected, var(--of-color-gray-50, #f9fafb));
 }
 
 .one-view-switcher__spacer {
@@ -201,13 +197,13 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
   height: 28px;
   padding: 0 10px;
   border-radius: 6px;
-  background: var(--of-color-gray-100, #f3f4f6);
+  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
 }
 
 .one-view-switcher__search-icon {
   width: 12px;
   height: 12px;
-  color: var(--of-color-gray-400, #9ca3af);
+  color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
   flex-shrink: 0;
 }
 
@@ -216,11 +212,11 @@ const resolvedTabs = computed(() => props.tabs ?? DEFAULT_TABS);
   border: none;
   background: transparent;
   font-size: 11px;
-  color: var(--of-color-gray-600, #4b5563);
+  color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   outline: none;
 }
 
 .one-view-switcher__search-input::placeholder {
-  color: var(--of-color-gray-400, #9ca3af);
+  color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
 }
 </style>

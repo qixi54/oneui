@@ -7,5 +7,10 @@ export { default as TableColumnManager } from "./TableColumnManager.vue";
 export { default as FieldCell } from "./FieldCell.vue";
 export type { FieldDef, FieldType, FieldOption, CellValue } from "./FieldCell.vue";
 export { default as TableGroupRow } from "./TableGroupRow.vue";
+export { default as MobileListView } from "./MobileListView.vue";
+export { default as DetailSheet } from "./DetailSheet.vue";
+export { default as TableToolbar } from "./TableToolbar.vue";
+export { default as FieldTypePicker } from "./FieldTypePicker.vue";
+export { default as ColumnHeaderMenu } from "./ColumnHeaderMenu.vue";
 // ExcelExport 需要 xlsx 依赖，若需要可单独导入
 // export { default as ExcelExport }        from './ExcelExport.vue'

@@ -3,10 +3,10 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
 
-const { isMobile } = useBreakpoint();
-
 const props = defineProps<{ value?: CellValue; field: FieldDef }>();
 const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
+
+const { isMobile } = useBreakpoint();
 
 const triggerRef = ref<HTMLElement | null>(null);
 const dropdownRef = ref<HTMLElement | null>(null);
@@ -112,7 +112,7 @@ const selectedOption = computed(() => {
 </script>
 
 <template>
-  <div ref="triggerRef" class="of-field-select" tabindex="0" @keydown="onKeydown">
+  <div ref="triggerRef" class="of-field-select" tabindex="0" role="listbox" :aria-label="field.label" @keydown="onKeydown">
     <span
       v-if="selectedOption?.color"
       class="of-field-select__badge"
@@ -134,8 +134,14 @@ const selectedOption = computed(() => {
       >
         <div
           class="of-field-select__option of-field-select__option--clear"
+          role="option"
+          tabindex="0"
+          :aria-selected="selectedIndex === -1"
           :class="{ active: activeIndex === -1, selected: selectedIndex === -1 }"
           @click.stop="selectValue(null)"
+          @focusin="activeIndex = -1"
+          @keydown.enter.prevent="selectValue(null)"
+          @keydown.space.prevent="selectValue(null)"
         >
           —
         </div>
@@ -143,16 +149,19 @@ const selectedOption = computed(() => {
           v-for="(opt, i) in options"
           :key="opt.value"
           class="of-field-select__option"
+          role="option"
+          tabindex="0"
+          :aria-selected="i === selectedIndex"
           :class="{ active: i === activeIndex, selected: i === selectedIndex }"
           @mouseenter="activeIndex = i"
           @click.stop="selectValue(opt.value)"
+          @focusin="activeIndex = i"
+          @keydown.enter.prevent="selectValue(opt.value)"
+          @keydown.space.prevent="selectValue(opt.value)"
         >
-          <span
-            v-if="opt.color"
-            class="of-field-select__badge"
-            :style="{ background: opt.color }"
-            >{{ opt.label }}</span
-          >
+          <span v-if="opt.color" class="of-field-select__badge" :style="{ background: opt.color }">
+            {{ opt.label }}
+          </span>
           <span v-else>{{ opt.label }}</span>
         </div>
       </div>
@@ -173,15 +182,15 @@ const selectedOption = computed(() => {
 
 .of-field-select__display {
   font-size: 13px;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary, var(--of-color-text-primary));
 }
 
 .of-field-select__dropdown {
   position: fixed;
   z-index: 9999;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-border-color);
-  border-radius: 6px;
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-subtle, var(--of-border-strong));
+  border-radius: 8px;
   box-shadow: var(--of-shadow-dropdown);
   overflow: hidden;
   max-height: 260px;
@@ -199,21 +208,22 @@ const selectedOption = computed(() => {
 
 .of-field-select__option:hover,
 .of-field-select__option.active {
-  background: var(--of-color-bg-hover);
+  background: var(--of-surface-selected, var(--of-color-bg-hover));
 }
 
 .of-field-select__option.selected {
   font-weight: 600;
+  color: var(--of-text-primary, var(--of-color-text-primary));
 }
 
 .of-field-select__option--clear {
-  border-bottom: 1px solid var(--of-color-border-light);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-border-light));
 }
 
 .of-field-select__badge {
   display: inline-block;
   padding: 1px 6px;
-  border-radius: 3px;
+  border-radius: 6px;
   font-size: 12px;
   color: var(--of-color-text-inverse);
   line-height: 18px;

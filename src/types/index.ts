@@ -1,6 +1,6 @@
 // ─── Layout Density ─────────────────────────────────────────────────────────
 
-export type Density = "comfortable" | "compact";
+export type Density = "compact" | "standard" | "comfortable";
 
 // ─── Common Types ───────────────────────────────────────────────────────────
 
@@ -82,6 +82,7 @@ export interface DataTableProps {
   schema?: TableSchema;
   view?: ViewConfig;
   columns?: TableColumn[];
+  density?: Density;
   rowKey?: string;
   selectable?: boolean;
   addable?: boolean;

@@ -15,11 +15,11 @@ export interface StepperProps {
 
 export type StepStatus = "done" | "active" | "pending";
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<StepperProps>(), {
   direction: "horizontal",
 });
+
+defineOptions({ inheritAttrs: false });
 
 defineSlots<{
   "step-content"?: (props: { item: StepItem; index: number; status: StepStatus }) => unknown;
@@ -140,21 +140,21 @@ function getLineStatus(index: number): "done" | "pending" {
 }
 
 .of-stepper__indicator--done {
-  background: var(--of-color-success);
-  color: var(--of-color-bg-elevated, #ffffff);
-  border: 2px solid var(--of-color-success);
+  background: var(--of-accent-default);
+  color: var(--of-color-text-inverse);
+  border: 2px solid var(--of-accent-default);
 }
 
 .of-stepper__indicator--active {
   background: var(--of-color-bg-elevated, #ffffff);
-  color: var(--of-color-info);
-  border: 2px solid var(--of-color-info);
+  color: var(--of-accent-strong);
+  border: 2px solid var(--of-border-strong);
 }
 
 .of-stepper__indicator--pending {
-  background: var(--of-color-gray-300);
-  color: var(--of-color-text-secondary);
-  border: 2px solid var(--of-color-gray-300);
+  background: var(--of-surface-muted);
+  color: var(--of-text-tertiary);
+  border: 2px solid var(--of-border-subtle);
 }
 
 .of-stepper__content {
@@ -199,10 +199,10 @@ function getLineStatus(index: number): "done" | "pending" {
 }
 
 .of-stepper__line--done {
-  background: var(--of-color-success);
+  background: var(--of-accent-default);
 }
 
 .of-stepper__line--pending {
-  background: var(--of-color-gray-200);
+  background: var(--of-border-subtle);
 }
 </style>

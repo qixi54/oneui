@@ -65,6 +65,7 @@ function handleBlur() {
       v-model="inputValue"
       type="text"
       class="of-quick-add-input"
+      aria-label="快速创建任务"
       :placeholder="placeholder"
       @keydown="handleKeydown"
       @blur="handleBlur"
@@ -84,8 +85,8 @@ function handleBlur() {
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-gray-200);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-lg);
   cursor: pointer;
   transition: var(--of-transition-fast);
@@ -93,48 +94,48 @@ function handleBlur() {
 }
 
 .of-quick-add-trigger:hover {
-  border-color: var(--of-color-gray-300);
-  background: var(--of-color-gray-50);
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-quick-add-icon {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   flex-shrink: 0;
   transition: var(--of-transition-fast);
 }
 
 .of-quick-add-trigger:hover .of-quick-add-icon {
-  color: var(--of-color-gray-600);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 
 .of-quick-add-placeholder {
   font-size: 13px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   transition: var(--of-transition-fast);
   text-align: left;
 }
 
 .of-quick-add-trigger:hover .of-quick-add-placeholder {
-  color: var(--of-color-gray-600);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 
 .of-quick-add-input {
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-primary-400);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-strong, var(--of-color-gray-300));
   border-radius: var(--of-radius-lg);
   font-size: 13px;
-  color: var(--of-color-gray-900);
+  color: var(--of-text-primary, var(--of-color-gray-900));
   outline: none;
-  box-shadow: 0 0 0 3px var(--of-color-primary-50);
+  box-shadow: 0 0 0 3px var(--of-surface-selected, var(--of-color-gray-100));
   box-sizing: border-box;
   font-family: var(--of-font-sans);
   transition: var(--of-transition-fast);
 }
 
 .of-quick-add-input::placeholder {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 </style>

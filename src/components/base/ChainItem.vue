@@ -12,27 +12,33 @@ export interface ChainItemProps {
   borderColor?: string;
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<ChainItemProps>(), {
+  description: undefined,
+  avatar: undefined,
+  duration: undefined,
+  color: undefined,
+  bg: undefined,
+  borderColor: undefined,
   type: "source",
 });
 
+defineOptions({ inheritAttrs: false });
+
 const PRESETS = {
   source: {
-    color: "var(--of-badge-purple-text, #7C3AED)",
-    bg: "var(--of-badge-purple-bg, #F9F0FF)",
-    border: "var(--of-badge-purple-border, #E9D5FF)",
-    avatarBg: "var(--of-badge-purple-border, #E9D5FF)",
-    descColor: "var(--of-badge-purple-text, #6B21A8)",
+    color: "var(--of-accent-strong)",
+    bg: "var(--of-surface-panel)",
+    border: "var(--of-border-subtle)",
+    avatarBg: "var(--of-surface-selected)",
+    descColor: "var(--of-text-secondary)",
     defaultAvatar: "A",
   },
   result: {
-    color: "var(--of-color-success, #22C55E)",
-    bg: "var(--of-color-success-light, #F6FFED)",
-    border: "var(--of-color-success-border, #B7EB8F)",
-    avatarBg: "var(--of-color-success-border, #B7EB8F)",
-    descColor: "var(--of-color-success-dark, #165E26)",
+    color: "var(--of-accent-default)",
+    bg: "var(--of-surface-muted)",
+    border: "var(--of-border-subtle)",
+    avatarBg: "var(--of-surface-selected)",
+    descColor: "var(--of-text-primary)",
     defaultAvatar: "✓",
   },
 };

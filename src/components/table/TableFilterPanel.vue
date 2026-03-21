@@ -100,6 +100,7 @@ function isNoValue(op: FilterOperator) {
 
         <select
           class="of-filter-condition__select of-filter-condition__select--field"
+          aria-label="筛选字段"
           :value="cond.field"
           @change="
             emit('update-condition', cond.id, { field: ($event.target as HTMLSelectElement).value })
@@ -110,6 +111,7 @@ function isNoValue(op: FilterOperator) {
 
         <select
           class="of-filter-condition__select"
+          aria-label="筛选条件"
           :value="cond.operator"
           @change="
             emit('update-condition', cond.id, {
@@ -125,6 +127,7 @@ function isNoValue(op: FilterOperator) {
         <input
           v-if="!isNoValue(cond.operator)"
           class="of-filter-condition__input"
+          aria-label="筛选值"
           :value="cond.value"
           placeholder="输入值..."
           @input="
@@ -153,8 +156,8 @@ function isNoValue(op: FilterOperator) {
 
 <style scoped>
 .of-filter-panel {
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-gray-200);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-xl);
   box-shadow: var(--of-shadow-modal);
   min-width: 420px;
@@ -172,14 +175,14 @@ function isNoValue(op: FilterOperator) {
 .of-filter-panel__title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--of-color-gray-800);
+  color: var(--of-text-primary, var(--of-color-gray-800));
 }
 
 .of-filter-panel__close {
   border: none;
   background: none;
   cursor: pointer;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   padding: 2px;
   border-radius: var(--of-radius-sm);
   display: flex;
@@ -187,13 +190,13 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-panel__close:hover {
-  color: var(--of-color-gray-600);
-  background: var(--of-color-gray-100);
+  color: var(--of-text-secondary, var(--of-color-gray-600));
+  background: var(--of-surface-muted, var(--of-color-gray-100));
 }
 
 .of-filter-panel__empty {
   font-size: 12px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   text-align: center;
   padding: 12px 0;
 }
@@ -212,7 +215,7 @@ function isNoValue(op: FilterOperator) {
 
 .of-filter-condition__logic-label {
   font-size: 12px;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   width: 28px;
   text-align: center;
   flex-shrink: 0;
@@ -228,18 +231,18 @@ function isNoValue(op: FilterOperator) {
 .of-filter-condition__logic-btn {
   font-size: 11px;
   padding: 2px 6px;
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-sm);
   background: none;
   cursor: pointer;
-  color: var(--of-color-gray-500);
+  color: var(--of-text-secondary, var(--of-color-gray-500));
   margin: 0 1px;
 }
 
 .of-filter-condition__logic-btn.active {
-  background: var(--of-color-primary-100);
-  border-color: var(--of-color-primary-300);
-  color: var(--of-color-primary-700);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  color: var(--of-text-primary, var(--of-color-gray-700));
   font-weight: 600;
 }
 
@@ -247,11 +250,11 @@ function isNoValue(op: FilterOperator) {
 .of-filter-condition__input {
   font-size: 12px;
   font-family: var(--of-font-sans);
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-md);
   padding: 4px 8px;
-  background: var(--of-color-bg-elevated);
-  color: var(--of-color-gray-800);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-text-primary, var(--of-color-gray-800));
   outline: none;
 }
 
@@ -276,7 +279,7 @@ function isNoValue(op: FilterOperator) {
   border: none;
   background: none;
   cursor: pointer;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   padding: 3px;
   border-radius: var(--of-radius-sm);
   display: flex;
@@ -295,7 +298,7 @@ function isNoValue(op: FilterOperator) {
   gap: 12px;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid var(--of-color-gray-100);
+  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
 }
 
 .of-filter-panel__add-btn {
@@ -304,7 +307,7 @@ function isNoValue(op: FilterOperator) {
   gap: 4px;
   font-size: 12px;
   font-family: var(--of-font-sans);
-  color: var(--of-color-primary-600);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   background: none;
   border: none;
   cursor: pointer;
@@ -313,12 +316,12 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-panel__add-btn:hover {
-  background: var(--of-color-primary-50);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
 }
 
 .of-filter-panel__clear {
   font-size: 12px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   background: none;
   border: none;
   cursor: pointer;

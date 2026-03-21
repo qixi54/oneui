@@ -72,6 +72,7 @@ function triggerPick() {
       ref="fileInput"
       class="of-file-upload__native"
       type="file"
+      aria-label="选择文件"
       :multiple="multiple"
       :accept="accept"
       :disabled="disabled"
@@ -140,9 +141,9 @@ function triggerPick() {
 }
 
 .of-file-upload__dropzone.dragging {
-  border-color: var(--of-color-primary-500);
-  background: var(--of-color-primary-50);
-  color: var(--of-color-primary-600);
+  border-color: var(--of-accent-default);
+  background: var(--of-surface-selected);
+  color: var(--of-accent-strong);
 }
 
 .of-file-upload__dropzone.disabled {
@@ -163,7 +164,7 @@ function triggerPick() {
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 8px;
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle);
   border-radius: 8px;
   padding: 8px 10px;
   background: var(--of-color-bg-elevated);
@@ -197,7 +198,7 @@ function triggerPick() {
 }
 
 .of-file-upload__remove:hover {
-  background: var(--of-color-gray-100);
-  color: var(--of-color-gray-700);
+  background: var(--of-surface-selected);
+  color: var(--of-text-primary);
 }
 </style>

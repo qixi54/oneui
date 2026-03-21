@@ -1,10 +1,21 @@
-import { computed, onUnmounted, ref, watch, type ComputedRef, type Ref } from "vue";
+import {
+  computed,
+  getCurrentScope,
+  onScopeDispose,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from "vue";
 
 export interface UseVirtualListOptions<T> {
   items: Ref<T[]>;
   itemHeight: number | ((index: number) => number);
   overscan?: number;
   containerRef: Ref<HTMLElement | null>;
+  invalidateKey?: Ref<unknown>;
+  /** Optional callback to measure actual row height after render. When provided, measured heights override itemHeight. */
+  measureRow?: boolean;
 }
 
 export type VirtualItem<T> = {
@@ -17,41 +28,89 @@ type VisibleRange = {
   end: number;
 };
 
-export function useVirtualList<T>({
-  items,
-  itemHeight,
-  overscan = 5,
-  containerRef,
-}: UseVirtualListOptions<T>): {
+export function useVirtualList<T>(options: UseVirtualListOptions<T>): {
   visibleItems: ComputedRef<VirtualItem<T>[]>;
   totalHeight: ComputedRef<number>;
   offsetY: ComputedRef<number>;
   scrollToIndex: (index: number) => void;
   scrollToBottom: () => void;
+  observeRow: (el: HTMLElement | null, index: number) => void;
 } {
+  const { items, itemHeight, overscan = 5, containerRef } = options;
   const scrollTop = ref(0);
   const containerHeight = ref(0);
   const isFixedHeight = typeof itemHeight === "number";
   const normalizedOverscan = Math.max(0, overscan);
+  const measuredHeights = new Map<number, number>();
+  const measureTrigger = ref(0);
 
   let resizeObserver: ResizeObserver | null = null;
+  let rowResizeObserver: ResizeObserver | null = null;
   let currentContainer: HTMLElement | null = null;
 
+  function getEffectiveHeight(index: number): number {
+    if (measuredHeights.has(index)) return measuredHeights.get(index)!;
+    if (isFixedHeight) return itemHeight as number;
+    return (itemHeight as (index: number) => number)(index);
+  }
+
+  function setupRowMeasurement() {
+    if (!options.measureRow || typeof ResizeObserver === "undefined") return;
+
+    rowResizeObserver = new ResizeObserver((entries) => {
+      let changed = false;
+      for (const entry of entries) {
+        const el = entry.target as HTMLElement;
+        const indexStr = el.dataset.virtualIndex;
+        if (indexStr == null) continue;
+        const index = parseInt(indexStr, 10);
+        const height = entry.contentRect.height;
+        if (measuredHeights.get(index) !== height) {
+          measuredHeights.set(index, height);
+          changed = true;
+        }
+      }
+      if (changed) {
+        // Trigger recalculation by updating a reactive trigger
+        measureTrigger.value++;
+      }
+    });
+  }
+
+  setupRowMeasurement();
+
+  function resetMeasurements() {
+    if (measuredHeights.size === 0) return;
+    measuredHeights.clear();
+    measureTrigger.value++;
+    if (currentContainer) {
+      syncContainerMetrics(currentContainer);
+    }
+  }
+
+  function observeRow(el: HTMLElement | null, index: number) {
+    if (!el || !rowResizeObserver) return;
+    el.dataset.virtualIndex = String(index);
+    rowResizeObserver.observe(el);
+  }
+
   const cumulativeHeights = computed<number[]>(() => {
-    if (isFixedHeight) return [];
+    // Access trigger to establish dependency for measured height updates
+    void measureTrigger.value;
+
+    if (isFixedHeight && measuredHeights.size === 0) return [];
 
     const heights = new Array(items.value.length + 1).fill(0);
-    const getItemHeight = itemHeight as (index: number) => number;
 
     for (let index = 0; index < items.value.length; index += 1) {
-      heights[index + 1] = heights[index] + Math.max(0, getItemHeight(index));
+      heights[index + 1] = heights[index] + Math.max(0, getEffectiveHeight(index));
     }
 
     return heights;
   });
 
   const totalHeight = computed(() => {
-    if (isFixedHeight) {
+    if (isFixedHeight && measuredHeights.size === 0) {
       return items.value.length * (itemHeight as number);
     }
 
@@ -61,7 +120,7 @@ export function useVirtualList<T>({
   function getOffsetForIndex(index: number): number {
     const safeIndex = Math.max(0, Math.min(index, items.value.length));
 
-    if (isFixedHeight) {
+    if (isFixedHeight && measuredHeights.size === 0) {
       return safeIndex * (itemHeight as number);
     }
 
@@ -71,7 +130,7 @@ export function useVirtualList<T>({
   function findIndexForOffset(offset: number): number {
     if (items.value.length === 0) return 0;
 
-    if (isFixedHeight) {
+    if (isFixedHeight && measuredHeights.size === 0) {
       const height = itemHeight as number;
       return Math.max(
         0,
@@ -107,7 +166,7 @@ export function useVirtualList<T>({
       return { start: 0, end: initialEnd };
     }
 
-    if (isFixedHeight) {
+    if (isFixedHeight && measuredHeights.size === 0) {
       const height = itemHeight as number;
       const rawStart = Math.floor(scrollTop.value / height);
       const visibleCount = Math.ceil(containerHeight.value / height);
@@ -193,7 +252,37 @@ export function useVirtualList<T>({
     { immediate: true },
   );
 
-  watch(items, () => {
+  watch(
+    () => options.invalidateKey?.value,
+    () => {
+      resetMeasurements();
+    },
+    { immediate: true },
+  );
+
+  let prevItemCount = items.value.length;
+  let prevFirstId: unknown =
+    items.value.length > 0 ? (items.value[0] as Record<string, unknown>)?.id : undefined;
+
+  watch(items, (newItems) => {
+    const newCount = newItems.length;
+    const newFirstId = newCount > 0 ? (newItems[0] as Record<string, unknown>)?.id : undefined;
+
+    // Heuristic: same length + same first id → in-place update, preserve scroll
+    const isInPlaceUpdate = newCount === prevItemCount && newFirstId === prevFirstId;
+
+    prevItemCount = newCount;
+    prevFirstId = newFirstId;
+
+    if (isInPlaceUpdate) {
+      // Data update (e.g. patchRow) — do NOT touch scrollTop
+      return;
+    }
+
+    // Data replacement — clear measured heights cache
+    resetMeasurements();
+
+    // Data replacement — clamp scrollTop if beyond new total height
     const maxScrollTop = Math.max(0, totalHeight.value - containerHeight.value);
     if (scrollTop.value > maxScrollTop) {
       scrollTop.value = maxScrollTop;
@@ -220,11 +309,17 @@ export function useVirtualList<T>({
     scrollTop.value = target;
   }
 
-  onUnmounted(() => {
+  const dispose = () => {
     cleanupContainer(currentContainer);
     cleanupObserver();
+    rowResizeObserver?.disconnect();
+    rowResizeObserver = null;
     currentContainer = null;
-  });
+  };
+
+  if (getCurrentScope()) {
+    onScopeDispose(dispose);
+  }
 
   return {
     visibleItems,
@@ -232,5 +327,6 @@ export function useVirtualList<T>({
     offsetY,
     scrollToIndex,
     scrollToBottom,
+    observeRow,
   };
 }

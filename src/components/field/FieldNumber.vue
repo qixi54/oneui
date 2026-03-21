@@ -50,9 +50,10 @@ function onKeydown(e: KeyboardEvent) {
 <template>
   <input
     ref="inputRef"
+    v-model="local"
     class="of-field-input"
     type="number"
-    v-model="local"
+    :aria-label="field.label"
     @keydown="onKeydown"
     @blur="emit('commit', toCommittedValue())"
   />

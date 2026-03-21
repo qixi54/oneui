@@ -44,6 +44,7 @@ const props = withDefaults(
   }>(),
   {
     title: "提示",
+    content: undefined,
     confirmText: "确认",
     cancelText: "取消",
     type: "info",
@@ -166,23 +167,23 @@ function handleCancel() {
 }
 
 .of-dialog__icon--info {
-  background: var(--of-color-blue-50, #eff6ff);
-  color: var(--of-color-blue-500, #3b82f6);
+  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
+  color: var(--of-color-info, var(--of-text-secondary, var(--of-color-gray-500, #6b7280)));
 }
 
 .of-dialog__icon--warning {
-  background: var(--of-color-yellow-50, #fffbeb);
-  color: var(--of-color-yellow-500, #f59e0b);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  color: var(--of-color-warning, var(--of-text-secondary, var(--of-color-gray-500, #6b7280)));
 }
 
 .of-dialog__icon--danger {
-  background: var(--of-color-red-50, #fef2f2);
-  color: var(--of-color-red-500, #ef4444);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  color: var(--of-color-error, var(--of-text-strong, var(--of-color-gray-700, #374151)));
 }
 
 .of-dialog__icon--success {
-  background: var(--of-color-green-50, #f0fdf4);
-  color: var(--of-color-green-500, #22c55e);
+  background: var(--of-surface-panel, var(--of-color-gray-50, #f9fafb));
+  color: var(--of-color-success, var(--of-text-secondary, var(--of-color-gray-500, #6b7280)));
 }
 
 /* ── Content ──────────────────────────────────────────────── */
@@ -194,14 +195,14 @@ function handleCancel() {
 .of-dialog__title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-text, #111827));
   margin: 0 0 var(--of-spacing-2, 8px) 0;
   line-height: 1.4;
 }
 
 .of-dialog__text {
   font-size: 14px;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   margin: 0;
   line-height: 1.6;
 }
@@ -230,38 +231,38 @@ function handleCancel() {
 /* 取消按钮 */
 .of-dialog__btn--cancel {
   background: transparent;
-  border-color: var(--of-color-gray-300, #d1d5db);
-  color: var(--of-color-text-secondary, #6b7280);
+  border-color: var(--of-border-subtle, var(--of-color-gray-300, #d1d5db));
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
 }
 
 .of-dialog__btn--cancel:hover:not(:disabled) {
-  background: var(--of-color-gray-50, #f9fafb);
-  border-color: var(--of-color-gray-400, #9ca3af);
-  color: var(--of-color-text, #111827);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  border-color: var(--of-border-strong, var(--of-color-gray-400, #9ca3af));
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
-/* 确认按钮 - 主色 */
+/* 确认按钮 - 中性主按钮 */
 .of-dialog__btn--primary {
-  background: var(--of-color-primary, #7c3aed);
-  border-color: var(--of-color-primary, #7c3aed);
-  color: var(--of-color-text-inverse);
+  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  border-color: var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-dialog__btn--primary:hover:not(:disabled) {
-  background: var(--of-color-primary-hover, #6d28d9);
-  border-color: var(--of-color-primary-hover, #6d28d9);
+  background: var(--of-surface-muted, var(--of-color-gray-200, #e5e7eb));
+  border-color: var(--of-border-strong, var(--of-color-gray-300, #d1d5db));
 }
 
 /* 确认按钮 - 危险红色 */
 .of-dialog__btn--danger {
-  background: var(--of-color-red-600, #dc2626);
-  border-color: var(--of-color-red-600, #dc2626);
+  background: var(--of-color-error, #dc2626);
+  border-color: var(--of-color-error, #dc2626);
   color: var(--of-color-text-inverse);
 }
 
 .of-dialog__btn--danger:hover:not(:disabled) {
-  background: var(--of-color-red-700, #b91c1c);
-  border-color: var(--of-color-red-700, #b91c1c);
+  background: var(--of-text-strong, #b91c1c);
+  border-color: var(--of-text-strong, #b91c1c);
 }
 
 /* ── Spinner ──────────────────────────────────────────────── */

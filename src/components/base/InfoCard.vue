@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, type CSSProperties, type VNode } from "vue";
 
-defineOptions({ name: "InfoCard", inheritAttrs: false });
-
 export interface InfoCardProps {
   variant?: "memo" | "notify" | "history";
   title: string;
@@ -24,6 +22,15 @@ export interface InfoCardProps {
 }
 
 const props = withDefaults(defineProps<InfoCardProps>(), {
+  content: undefined,
+  borderColor: undefined,
+  tags: undefined,
+  author: undefined,
+  date: undefined,
+  meta: undefined,
+  subtitle: undefined,
+  type: undefined,
+  typeColor: undefined,
   variant: "memo",
   contentLines: 3,
   importance: "normal",
@@ -33,6 +40,7 @@ const props = withDefaults(defineProps<InfoCardProps>(), {
 const emit = defineEmits<{
   click: [e: MouseEvent];
 }>();
+defineOptions({ name: "InfoCard", inheritAttrs: false });
 
 defineSlots<{
   actions?: () => VNode[];
@@ -43,21 +51,21 @@ defineSlots<{
 // ── Border color resolution ──────────────────────────────────────────────────
 
 const TYPE_COLOR_MAP: Record<string, string> = {
-  模板: "var(--of-color-primary-500)",
-  template: "var(--of-color-primary-500)",
-  会话: "var(--of-color-success)",
-  session: "var(--of-color-success)",
+  模板: "var(--of-accent-default)",
+  template: "var(--of-accent-default)",
+  会话: "var(--of-text-strong)",
+  session: "var(--of-text-strong)",
 };
 
 const resolvedBorderColor = computed<string>(() => {
   if (props.variant === "memo") {
-    if (props.importance === "high") return "var(--of-color-error)";
-    return props.borderColor ?? "var(--of-color-info)";
+    if (props.importance === "high") return "var(--of-border-strong)";
+    return props.borderColor ?? "var(--of-accent-default)";
   }
   if (props.variant === "history") {
     if (props.typeColor) return props.typeColor;
     if (props.type && TYPE_COLOR_MAP[props.type]) return TYPE_COLOR_MAP[props.type];
-    return props.borderColor ?? "var(--of-color-primary-500)";
+    return props.borderColor ?? "var(--of-accent-default)";
   }
   return "transparent";
 });
@@ -70,8 +78,8 @@ const cardStyle = computed<CSSProperties>(() => {
   } as CSSProperties;
   if (props.variant === "notify") {
     (base as Record<string, string>)["--of-ic-unread-dot"] = props.unread
-      ? "var(--of-color-info)"
-      : "var(--of-color-text-tertiary)";
+      ? "var(--of-accent-default)"
+      : "var(--of-text-tertiary)";
   }
   return base;
 });
@@ -90,29 +98,29 @@ const contentStyle = computed<CSSProperties>(
 function tagStyle(index: number): CSSProperties {
   const PALETTES = [
     {
-      bg: "var(--of-badge-blue-bg)",
-      color: "var(--of-badge-blue-text)",
-      border: "var(--of-badge-blue-border)",
+      bg: "var(--of-surface-muted)",
+      color: "var(--of-accent-default)",
+      border: "var(--of-border-subtle)",
     },
     {
-      bg: "var(--of-badge-green-bg)",
-      color: "var(--of-badge-green-text)",
-      border: "var(--of-badge-green-border)",
+      bg: "var(--of-surface-panel)",
+      color: "var(--of-text-strong)",
+      border: "var(--of-border-subtle)",
     },
     {
-      bg: "var(--of-badge-orange-bg)",
-      color: "var(--of-badge-orange-text)",
-      border: "var(--of-badge-orange-border)",
+      bg: "var(--of-surface-selected)",
+      color: "var(--of-accent-strong)",
+      border: "var(--of-border-strong)",
     },
     {
-      bg: "var(--of-badge-purple-bg)",
-      color: "var(--of-badge-purple-text)",
-      border: "var(--of-badge-purple-border)",
+      bg: "var(--of-surface-panel)",
+      color: "var(--of-text-secondary)",
+      border: "var(--of-border-subtle)",
     },
     {
-      bg: "var(--of-badge-gray-bg)",
-      color: "var(--of-badge-gray-text)",
-      border: "var(--of-badge-gray-border)",
+      bg: "var(--of-surface-muted)",
+      color: "var(--of-text-tertiary)",
+      border: "var(--of-border-subtle)",
     },
   ];
   const t = PALETTES[index % PALETTES.length];
@@ -126,6 +134,12 @@ function tagStyle(index: number): CSSProperties {
 function handleClick(e: MouseEvent) {
   emit("click", e);
 }
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  handleClick(new MouseEvent("click"));
+}
 </script>
 
 <template>
@@ -133,12 +147,15 @@ function handleClick(e: MouseEvent) {
     class="of-info-card"
     :class="`of-info-card--${variant}`"
     :style="cardStyle"
+    role="button"
+    tabindex="0"
     v-bind="$attrs"
     @click="handleClick"
+    @keydown="handleKeydown"
   >
     <!-- ── MEMO variant ─────────────────────────────────────────────────── -->
     <template v-if="variant === 'memo'">
-      <div class="of-info-card__icon-area" v-if="$slots.icon">
+      <div v-if="$slots.icon" class="of-info-card__icon-area">
         <slot name="icon" />
       </div>
       <div class="of-info-card__body">
@@ -157,8 +174,7 @@ function handleClick(e: MouseEvent) {
               :key="tag"
               class="of-info-card__tag"
               :style="tagStyle(i)"
-              >{{ tag }}</span
-            >
+            >{{ tag }}</span>
           </template>
           <span v-if="author" class="of-info-card__meta-text">{{ author }}</span>
           <span v-if="date" class="of-info-card__meta-text">{{ date }}</span>
@@ -189,7 +205,7 @@ function handleClick(e: MouseEvent) {
 
     <!-- ── HISTORY variant ────────────────────────────────────────────── -->
     <template v-else-if="variant === 'history'">
-      <div class="of-info-card__icon-area" v-if="$slots.icon">
+      <div v-if="$slots.icon" class="of-info-card__icon-area">
         <slot name="icon" />
       </div>
       <div class="of-info-card__body">
@@ -302,9 +318,9 @@ function handleClick(e: MouseEvent) {
 /* ── Memo ─────────────────────────────────────────────────────────────────── */
 .of-info-card--memo {
   padding: 12px;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated);
   border-radius: 8px;
-  border-left: 4px solid var(--of-ic-border, var(--of-color-info));
+  border-left: 4px solid var(--of-ic-border, var(--of-accent-default));
   box-shadow: var(--of-shadow-card);
 }
 
@@ -319,13 +335,13 @@ function handleClick(e: MouseEvent) {
 /* ── Notify ───────────────────────────────────────────────────────────────── */
 .of-info-card--notify {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--of-color-border-light);
+  border-bottom: 1px solid var(--of-border-subtle);
   border-radius: 0;
-  background: v-bind("unread ? 'var(--of-color-warning-light)' : 'var(--of-color-bg-elevated)'");
+  background: v-bind("unread ? 'var(--of-surface-selected)' : 'var(--of-surface-elevated)'");
 }
 
 .of-info-card--notify:hover {
-  background: var(--of-color-bg-hover);
+  background: var(--of-surface-selected);
 }
 
 .of-info-card__dot {
@@ -333,7 +349,7 @@ function handleClick(e: MouseEvent) {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--of-ic-unread-dot, var(--of-color-text-tertiary));
+  background: var(--of-ic-unread-dot, var(--of-text-tertiary));
   flex-shrink: 0;
   margin-top: 4px;
   transition: background 0.15s ease;
@@ -357,14 +373,14 @@ function handleClick(e: MouseEvent) {
 /* ── History ──────────────────────────────────────────────────────────────── */
 .of-info-card--history {
   padding: 11px 14px;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-border-light);
+  background: var(--of-surface-elevated);
+  border: 1px solid var(--of-border-subtle);
   border-radius: 10px;
-  border-left: 3px solid var(--of-ic-border, var(--of-color-primary-500));
+  border-left: 3px solid var(--of-ic-border, var(--of-accent-default));
 }
 
 .of-info-card--history:hover {
-  border-color: var(--of-ic-border, var(--of-color-primary-500));
+  border-color: var(--of-ic-border, var(--of-accent-default));
 }
 
 .of-info-card--history .of-info-card__title {

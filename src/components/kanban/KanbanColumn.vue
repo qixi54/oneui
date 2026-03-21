@@ -22,6 +22,8 @@ const props = withDefaults(
   }>(),
   {
     ghostClass: "of-ghost",
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
   },
 );
 
@@ -73,7 +75,7 @@ const dotColor = computed(() => {
   const byTitle = merged[props.column.title];
   const found = byId ?? byTitle;
   // 优先用 dot 颜色，其次用 text 颜色作圆点，找不到用默认灰
-  return found?.dot ?? found?.text ?? "var(--of-color-gray-400)";
+  return found?.dot ?? found?.text ?? "var(--of-text-tertiary, var(--of-color-gray-400))";
 });
 </script>
 
@@ -132,7 +134,7 @@ const dotColor = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-panel, var(--of-color-gray-50));
   border-radius: var(--of-radius-xl);
   padding: 16px 12px;
   font-family: var(--of-font-sans);
@@ -154,12 +156,12 @@ const dotColor = computed(() => {
 .of-col-title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--of-color-gray-700);
+  color: var(--of-text-primary, var(--of-color-gray-700));
 }
 
 .of-col-count {
   font-size: 12px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
 .of-col-spacer {
@@ -174,7 +176,7 @@ const dotColor = computed(() => {
   height: 24px;
   border: none;
   background: transparent;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   border-radius: var(--of-radius-sm);
   cursor: pointer;
   transition: var(--of-transition-fast);
@@ -182,8 +184,8 @@ const dotColor = computed(() => {
 }
 
 .of-col-add-btn:hover {
-  background: var(--of-color-gray-200);
-  color: var(--of-color-gray-600);
+  background: var(--of-surface-muted, var(--of-color-gray-200));
+  color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 
 .of-col-cards {
@@ -201,8 +203,8 @@ const dotColor = computed(() => {
 /* 拖拽占位符 */
 :deep(.of-ghost) {
   opacity: 0.4;
-  border: 2px dashed var(--of-color-primary-300);
-  background: var(--of-color-primary-50);
+  border: 2px dashed var(--of-border-strong, var(--of-color-gray-300));
+  background: var(--of-surface-selected, var(--of-color-gray-100));
   border-radius: var(--of-radius-lg);
 }
 

@@ -29,7 +29,7 @@ defineProps<{ size?: "sm" | "md" }>();
   align-items: center;
   gap: 4px;
   padding: 8px 12px;
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
   border-radius: 0 12px 12px 12px;
 }
 
@@ -42,7 +42,7 @@ defineProps<{ size?: "sm" | "md" }>();
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--of-color-gray-500);
+  background: var(--of-text-secondary, var(--of-color-gray-500));
   animation: ofDotBounce 1.4s ease-in-out infinite;
 }
 

@@ -3,6 +3,19 @@ import { ref } from "vue";
 import { Download } from "lucide-vue-next";
 import type { TableColumn } from "../../types";
 
+interface XlsxModuleLike {
+  utils: {
+    aoa_to_sheet(data: unknown[][]): Record<string, unknown>;
+    book_new(): Record<string, unknown>;
+    book_append_sheet(
+      workbook: Record<string, unknown>,
+      worksheet: Record<string, unknown>,
+      name: string,
+    ): void;
+  };
+  writeFile(workbook: Record<string, unknown>, filename: string): void;
+}
+
 const props = withDefaults(
   defineProps<{
     data: Record<string, unknown>[];
@@ -20,18 +33,19 @@ const props = withDefaults(
 );
 
 const loading = ref(false);
+const loadOptionalModule = new Function(
+  "moduleName",
+  "return import(moduleName)",
+) as (moduleName: string) => Promise<unknown>;
 
 async function handleExport() {
   if (loading.value || props.disabled || !props.data.length) return;
   loading.value = true;
   try {
     // 动态加载 xlsx（调用方需安装：npm install xlsx）
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const XLSX = await import(/* @vite-ignore */ "xlsx").catch(() => {
+    const XLSX = (await loadOptionalModule("xlsx").catch(() => {
       throw new Error("请先安装 xlsx 包：npm install xlsx");
-    });
+    })) as XlsxModuleLike;
 
     // 构建表头行
     const headers = props.columns.map((c) => c.label);
@@ -84,9 +98,9 @@ async function handleExport() {
   font-family: var(--of-font-sans);
   font-size: 13px;
   font-weight: 500;
-  color: var(--of-color-gray-700);
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-color-gray-200);
+  color: var(--of-text-primary, var(--of-color-gray-700));
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-md);
   padding: 6px 12px;
   cursor: pointer;
@@ -100,9 +114,9 @@ async function handleExport() {
 }
 
 .of-excel-export:hover:not(.disabled) {
-  background: var(--of-color-gray-50);
-  border-color: var(--of-color-gray-300);
-  color: var(--of-color-gray-800);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  color: var(--of-text-primary, var(--of-color-gray-800));
 }
 
 .of-excel-export.disabled {

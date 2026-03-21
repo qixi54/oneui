@@ -15,11 +15,13 @@ interface BadgeTone {
   border: string;
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<BadgeProps>(), {
+  color: undefined,
+  priority: undefined,
   size: "md",
 });
+
+defineOptions({ inheritAttrs: false });
 
 defineSlots<{
   default?: () => VNode[];
@@ -27,39 +29,39 @@ defineSlots<{
 
 const COLOR_MAP: Record<string, BadgeTone> = {
   default: {
-    background: "var(--of-badge-gray-bg)",
-    text: "var(--of-badge-gray-text)",
-    border: "var(--of-badge-gray-border)",
+    background: "var(--of-surface-muted)",
+    text: "var(--of-text-secondary)",
+    border: "var(--of-border-subtle)",
   },
   blue: {
-    background: "var(--of-badge-blue-bg)",
-    text: "var(--of-badge-blue-text)",
-    border: "var(--of-badge-blue-border)",
+    background: "var(--of-surface-selected)",
+    text: "var(--of-accent-strong)",
+    border: "var(--of-border-subtle)",
   },
   green: {
-    background: "var(--of-badge-green-bg)",
-    text: "var(--of-badge-green-text)",
-    border: "var(--of-badge-green-border)",
+    background: "var(--of-surface-panel)",
+    text: "var(--of-text-strong)",
+    border: "var(--of-border-subtle)",
   },
   orange: {
-    background: "var(--of-badge-orange-bg)",
-    text: "var(--of-badge-orange-text)",
-    border: "var(--of-badge-orange-border)",
+    background: "var(--of-surface-muted)",
+    text: "var(--of-text-primary)",
+    border: "var(--of-border-strong)",
   },
   red: {
-    background: "var(--of-badge-red-bg)",
-    text: "var(--of-badge-red-text)",
-    border: "var(--of-badge-red-border)",
+    background: "var(--of-surface-selected)",
+    text: "var(--of-text-strong)",
+    border: "var(--of-border-strong)",
   },
   purple: {
-    background: "var(--of-badge-purple-bg)",
-    text: "var(--of-badge-purple-text)",
-    border: "var(--of-badge-purple-border)",
+    background: "var(--of-surface-panel)",
+    text: "var(--of-text-secondary)",
+    border: "var(--of-border-subtle)",
   },
   gray: {
-    background: "var(--of-badge-gray-bg)",
-    text: "var(--of-badge-gray-text)",
-    border: "var(--of-badge-gray-border)",
+    background: "var(--of-surface-muted)",
+    text: "var(--of-text-secondary)",
+    border: "var(--of-border-subtle)",
   },
 };
 
@@ -105,7 +107,7 @@ const badgeStyle = computed<CSSProperties>(() => {
   justify-content: center;
   width: fit-content;
   border: 1px solid var(--one-badge-border);
-  border-radius: 3px;
+  border-radius: 6px;
   background: var(--one-badge-bg);
   color: var(--one-badge-color);
   font-family: var(--of-font-sans);

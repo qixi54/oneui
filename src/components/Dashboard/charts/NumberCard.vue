@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
   unit: "",
   compare: "",
   trend: undefined,
-  color: "var(--of-color-blue-600)",
+  color: "var(--of-accent-strong)",
 });
 
 const displayValue = computed(() => {
@@ -47,9 +47,14 @@ const displayValue = computed(() => {
   width: 100%;
   height: 100%;
   min-height: 160px;
-  border: 1px solid var(--of-color-gray-100);
-  border-radius: var(--of-radius-lg);
-  background: linear-gradient(135deg, var(--of-color-gray-50), var(--of-color-bg-canvas));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
+  border-radius: var(--of-radius-xl);
+  background: linear-gradient(
+    145deg,
+    var(--of-surface-panel, var(--of-color-gray-50)),
+    var(--of-surface-elevated, var(--of-color-bg-canvas))
+  );
+  box-shadow: var(--of-card-shadow, var(--of-shadow-card));
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -60,7 +65,7 @@ const displayValue = computed(() => {
 .of-number-card__title {
   margin: 0;
   font-size: 13px;
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 
 .of-number-card__value-row {
@@ -77,16 +82,16 @@ const displayValue = computed(() => {
 }
 
 .of-number-card__trend.up {
-  color: var(--of-color-green-600);
+  color: var(--of-chart-series-2, #748399);
 }
 
 .of-number-card__trend.down {
-  color: var(--of-color-red-600);
+  color: var(--of-color-error, var(--of-color-red-600));
 }
 
 .of-number-card__compare {
   margin: 0;
   font-size: 12px;
-  color: var(--of-color-text-muted);
+  color: var(--of-text-tertiary, var(--of-color-text-muted));
 }
 </style>

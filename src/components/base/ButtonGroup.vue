@@ -24,8 +24,6 @@ export interface ButtonOption {
   icon?: string | Component; // lucide icon name (kebab-case) or component
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = defineProps<{
   options: ButtonOption[];
   modelValue: string | number;
@@ -34,6 +32,8 @@ const props = defineProps<{
 defineEmits<{
   "update:modelValue": [value: string | number];
 }>();
+
+defineOptions({ inheritAttrs: false });
 
 const columnClass = computed(() => {
   const count = props.options.length;
@@ -48,11 +48,11 @@ const columnClass = computed(() => {
     <button
       v-for="opt in options"
       :key="opt.value"
-      @click="$emit('update:modelValue', opt.value)"
       :class="[
         'of-button-group__item',
         modelValue === opt.value ? 'of-button-group__item--active' : '',
       ]"
+      @click="$emit('update:modelValue', opt.value)"
     >
       <div v-if="opt.icon" class="of-button-group__item-content">
         <component :is="resolveIcon(opt.icon)" class="of-button-group__item-icon" />
@@ -86,9 +86,9 @@ const columnClass = computed(() => {
 .of-button-group__item {
   padding: var(--of-spacing-3);
   border-radius: var(--of-radius-lg);
-  border: 1px solid var(--of-color-gray-200);
-  background: var(--of-color-bg-canvas);
-  color: var(--of-color-text-secondary);
+  border: 1px solid var(--of-border-subtle);
+  background: var(--of-surface-elevated, var(--of-color-bg-canvas));
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
   font-size: 14px;
   font-weight: 500;
   transition: var(--of-transition-fast);
@@ -99,14 +99,14 @@ const columnClass = computed(() => {
 }
 
 .of-button-group__item:hover:not(.of-button-group__item--active) {
-  background: var(--of-color-gray-50);
-  border-color: var(--of-color-gray-300);
+  background: var(--of-surface-selected, var(--of-color-gray-50));
+  border-color: var(--of-border-strong);
 }
 
 .of-button-group__item--active {
-  background: var(--of-color-primary-600);
-  border-color: var(--of-color-primary-600);
-  color: var(--of-color-primary-foreground);
+  background: var(--of-accent-default);
+  border-color: var(--of-accent-default);
+  color: var(--of-color-text-inverse);
 }
 
 .of-button-group__item-content {

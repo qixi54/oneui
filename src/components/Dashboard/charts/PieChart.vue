@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import * as echarts from "echarts";
+import { echarts, type EChartsType } from "../../../utils/echarts";
 
 interface PieDatum {
   name: string;
@@ -22,26 +22,49 @@ const props = withDefaults(defineProps<Props>(), {
     { name: "In Progress", value: 9 },
     { name: "Done", value: 18 },
   ],
-  colors: () => ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ef4444"],
+  colors: () => [
+    "var(--of-chart-series-1)",
+    "var(--of-chart-series-2)",
+    "var(--of-chart-series-3)",
+    "var(--of-chart-series-4)",
+    "var(--of-chart-series-5)",
+  ],
   doughnut: false,
   showLegend: true,
 });
 
 const chartRef = ref<HTMLElement | null>(null);
-let chart: any = null;
+let chart: EChartsType | null = null;
 let observer: ResizeObserver | null = null;
+
+function resolveColor(value: string): string {
+  if (typeof window === "undefined" || !value.startsWith("var(")) return value;
+  const token = value.slice(4, -1).trim();
+  return getComputedStyle(document.documentElement).getPropertyValue(token).trim() || value;
+}
 
 const render = () => {
   if (!chartRef.value) return;
   if (!chart) chart = echarts.init(chartRef.value);
+  const palette = props.colors.map(resolveColor);
 
   chart.setOption({
-    color: props.colors,
+    color: palette,
     title: props.title
-      ? { text: props.title, left: "center", textStyle: { fontSize: 14, fontWeight: 600 } }
+      ? {
+          text: props.title,
+          left: "center",
+          textStyle: {
+            fontSize: 14,
+            fontWeight: 600,
+            color: resolveColor("var(--of-text-primary)"),
+          },
+        }
       : undefined,
     tooltip: { trigger: "item" },
-    legend: props.showLegend ? { bottom: 0 } : undefined,
+    legend: props.showLegend
+      ? { bottom: 0, textStyle: { color: resolveColor("var(--of-text-secondary)") } }
+      : undefined,
     series: [
       {
         type: "pie",
@@ -49,6 +72,10 @@ const render = () => {
         center: ["50%", props.showLegend ? "45%" : "50%"],
         data: props.data,
         label: { formatter: "{b}: {d}%" },
+        itemStyle: {
+          borderColor: resolveColor("var(--of-surface-elevated)"),
+          borderWidth: 2,
+        },
       },
     ],
   });

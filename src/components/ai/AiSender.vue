@@ -76,6 +76,7 @@ function handleAction() {
         ref="textareaRef"
         v-model="content"
         class="of-ai-sender__textarea"
+        aria-label="消息输入框"
         :placeholder="placeholder ?? '输入消息...'"
         :disabled="disabled"
         rows="1"
@@ -99,15 +100,15 @@ function handleAction() {
 .of-ai-sender {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid var(--of-color-gray-200);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-xl);
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   transition: border-color 0.15s ease;
   overflow: hidden;
 }
 
 .of-ai-sender:focus-within {
-  border-color: var(--of-color-primary-400);
+  border-color: var(--of-border-strong, rgba(15, 23, 42, 0.14));
 }
 
 .of-ai-sender__tools {
@@ -115,7 +116,7 @@ function handleAction() {
   align-items: center;
   gap: 4px;
   padding: 6px 10px;
-  border-bottom: 1px solid var(--of-color-gray-100);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
 }
 
 .of-ai-sender__inner {
@@ -126,7 +127,7 @@ function handleAction() {
 }
 
 .of-ai-sender.is-disabled {
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-ai-sender__prefix {
@@ -147,7 +148,7 @@ function handleAction() {
   font-family: var(--of-font-sans);
   font-size: 14px;
   line-height: 22px;
-  color: var(--of-color-gray-800);
+  color: var(--of-text-primary, var(--of-color-gray-800));
   padding: 0;
   margin: 0;
   overflow-y: auto;
@@ -155,12 +156,12 @@ function handleAction() {
 }
 
 .of-ai-sender__textarea::placeholder {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
 .of-ai-sender__textarea:disabled {
   cursor: not-allowed;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
 .of-ai-sender__action-btn {
@@ -176,27 +177,27 @@ function handleAction() {
   transition:
     background 0.15s ease,
     opacity 0.15s ease;
-  background: var(--of-color-primary-600);
-  color: var(--of-color-text-inverse);
+  background: var(--of-accent-default, #334155);
+  color: var(--of-text-inverse, var(--of-color-text-inverse));
   padding: 0;
   margin-bottom: 2px;
 }
 
 .of-ai-sender__action-btn:hover {
-  background: var(--of-color-primary-700);
+  background: var(--of-accent-strong, #0f172a);
 }
 
 .of-ai-sender__action-btn.is-stop {
-  background: var(--of-color-gray-700);
+  background: var(--of-surface-muted, var(--of-color-gray-700));
 }
 
 .of-ai-sender__action-btn.is-stop:hover {
-  background: var(--of-color-gray-800);
+  background: var(--of-surface-panel, var(--of-color-gray-800));
 }
 
 .of-ai-sender__action-btn.is-empty {
-  background: var(--of-color-gray-200);
-  color: var(--of-color-gray-400);
+  background: var(--of-surface-muted, var(--of-color-gray-200));
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   cursor: default;
 }
 </style>

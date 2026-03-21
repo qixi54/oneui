@@ -12,7 +12,15 @@ export type FieldType =
   | "datetime"
   | "rating"
   | "url"
-  | "email";
+  | "email"
+  | "currency"
+  | "richtext"
+  | "auto_number"
+  | "creator"
+  | "progress"
+  | "relation"
+  | "attachment"
+  | "phone";
 
 export interface FieldOption {
   label: string;
@@ -38,7 +46,10 @@ const props = withDefaults(
     value?: CellValue;
     readonly?: boolean;
   }>(),
-  { readonly: false },
+  {
+    value: undefined,
+    readonly: false,
+  },
 );
 
 const emit = defineEmits<{
@@ -82,7 +93,19 @@ const editorMap: Record<FieldType, ReturnType<typeof defineAsyncComponent>> = {
   rating: defineAsyncComponent(() => import("@/components/field/FieldRating.vue")),
   url: defineAsyncComponent(() => import("@/components/field/FieldUrl.vue")),
   email: defineAsyncComponent(() => import("@/components/field/FieldEmail.vue")),
+  currency: defineAsyncComponent(() => import("@/components/field/FieldCurrency.vue")),
+  richtext: defineAsyncComponent(() => import("@/components/field/FieldRichText.vue")),
+  auto_number: defineAsyncComponent(() => import("@/components/field/FieldAutoNumber.vue")),
+  creator: defineAsyncComponent(() => import("@/components/field/FieldCreator.vue")),
+  progress: defineAsyncComponent(() => import("@/components/field/FieldProgress.vue")),
+  relation: defineAsyncComponent(() => import("@/components/field/FieldRelation.vue")),
+  attachment: defineAsyncComponent(() => import("@/components/field/FieldAttachment.vue")),
+  phone: defineAsyncComponent(() => import("@/components/field/FieldPhone.vue")),
 };
+
+const FieldMarkdownPreviewAsync = defineAsyncComponent(
+  () => import("@/components/field/FieldMarkdownPreview.vue"),
+);
 
 const currentEditor = computed(() => editorMap[props.field.type]);
 
@@ -96,13 +119,18 @@ const displayValue = computed(() => {
 </script>
 
 <template>
-  <div
+  <component
+    :is="isReadonly || editing ? 'div' : 'button'"
     class="of-field-cell"
     :class="{
       'of-field-cell--editing': editing,
       'of-field-cell--readonly': isReadonly,
     }"
+    :type="isReadonly || editing ? undefined : 'button'"
+    :aria-label="`${field.label}字段`"
     @click="handleClick"
+    @keydown.enter.prevent="handleClick"
+    @keydown.space.prevent="handleClick"
   >
     <template v-if="editing">
       <Suspense>
@@ -121,9 +149,14 @@ const displayValue = computed(() => {
     </template>
 
     <template v-else>
-      <span class="of-field-cell__display">{{ displayValue }}</span>
+      <FieldMarkdownPreviewAsync
+        v-if="field.type === 'richtext' && typeof value === 'string' && value"
+        :content="value"
+        :max-lines="2"
+      />
+      <span v-else class="of-field-cell__display">{{ displayValue }}</span>
     </template>
-  </div>
+  </component>
 </template>
 
 <style scoped>
@@ -139,13 +172,13 @@ const displayValue = computed(() => {
 }
 
 .of-field-cell:hover:not(.of-field-cell--readonly):not(.of-field-cell--editing) {
-  background: var(--of-color-bg-hover);
+  background: var(--of-surface-muted, var(--of-color-bg-hover));
 }
 
 .of-field-cell--editing {
-  outline: 2px solid var(--of-color-primary-500);
+  outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
   outline-offset: -1px;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   cursor: default;
   padding: 0;
 }
@@ -156,7 +189,7 @@ const displayValue = computed(() => {
 
 .of-field-cell__display {
   font-size: 13px;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary, var(--of-color-gray-700));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -165,6 +198,24 @@ const displayValue = computed(() => {
 
 .of-field-cell__loading {
   font-size: 13px;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+}
+
+/* Touch-optimized: all field editors get larger touch targets on mobile */
+@media (max-width: 768px), (pointer: coarse) {
+  .of-field-cell {
+    min-height: 44px;
+  }
+
+  .of-field-cell :deep(.of-field-input) {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+
+  .of-field-cell__display {
+    font-size: 15px;
+    padding: 8px 0;
+  }
 }
 </style>

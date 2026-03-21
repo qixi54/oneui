@@ -3,6 +3,15 @@ import { type Component } from "vue";
 import { Table2Icon, KanbanIcon, LayoutGridIcon, GanttChartIcon } from "lucide-vue-next";
 import type { ViewTabItem } from "../../types";
 
+defineProps<{
+  modelValue: string;
+  items: ViewTabItem[];
+}>();
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: string): void;
+}>();
+
 const ICON_MAP: Record<string, Component> = {
   "table-2": Table2Icon,
   kanban: KanbanIcon,
@@ -15,15 +24,6 @@ function resolveIcon(name: string): Component | undefined {
 }
 
 defineOptions({ inheritAttrs: false });
-
-defineProps<{
-  modelValue: string;
-  items: ViewTabItem[];
-}>();
-
-const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
-}>();
 
 function select(key: string) {
   emit("update:modelValue", key);
@@ -87,12 +87,12 @@ function select(key: string) {
 }
 
 .of-view-tab__item--active {
-  color: var(--of-color-primary-500);
-  border-bottom-color: var(--of-color-primary-500);
+  color: var(--of-accent-strong);
+  border-bottom-color: var(--of-accent-strong);
 }
 
 .of-view-tab__item--active .of-view-tab__icon {
-  color: var(--of-color-primary-500);
+  color: var(--of-accent-strong);
 }
 
 .of-view-tab__label {

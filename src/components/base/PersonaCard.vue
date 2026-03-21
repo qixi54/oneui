@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, type CSSProperties } from "vue";
+import { computed, type Component, type CSSProperties } from "vue";
+import { resolveIcon } from "../../utils/icon";
 
 export interface PersonaCardProps {
   name: string;
   title?: string;
-  icon?: string;
+  icon?: string | Component;
   color?: string;
   subtitle?: string;
   tags?: string[];
@@ -15,9 +16,12 @@ export interface PersonaCardProps {
   size?: "sm" | "md";
 }
 
-defineOptions({ name: "PersonaCard", inheritAttrs: false });
-
 const props = withDefaults(defineProps<PersonaCardProps>(), {
+  title: undefined,
+  icon: undefined,
+  color: undefined,
+  subtitle: undefined,
+  tags: undefined,
   size: "md",
   expanded: false,
   active: false,
@@ -30,6 +34,8 @@ const emit = defineEmits<{
   click: [];
 }>();
 
+defineOptions({ name: "PersonaCard", inheritAttrs: false });
+
 type PersonaPalette = {
   accent: string;
   bg: string;
@@ -39,52 +45,52 @@ type PersonaPalette = {
 
 const PALETTES: PersonaPalette[] = [
   {
-    accent: "var(--of-color-warning)",
-    bg: "var(--of-color-warning-light)",
-    border: "var(--of-badge-orange-border)",
-    tagBg: "var(--of-badge-orange-bg)",
+    accent: "var(--of-accent-default)",
+    bg: "var(--of-surface-muted)",
+    border: "var(--of-border-subtle)",
+    tagBg: "var(--of-surface-selected)",
   },
   {
-    accent: "var(--of-color-primary-500)",
-    bg: "var(--of-color-primary-50)",
-    border: "var(--of-color-primary-200)",
-    tagBg: "var(--of-color-primary-100)",
+    accent: "var(--of-accent-strong)",
+    bg: "var(--of-surface-panel)",
+    border: "var(--of-border-strong)",
+    tagBg: "var(--of-surface-muted)",
   },
   {
-    accent: "var(--of-role-pm-text)",
-    bg: "var(--of-role-pm-bg)",
-    border: "var(--of-badge-red-border)",
-    tagBg: "var(--of-badge-red-bg)",
+    accent: "var(--of-text-strong)",
+    bg: "var(--of-surface-selected)",
+    border: "var(--of-border-subtle)",
+    tagBg: "var(--of-surface-panel)",
   },
   {
-    accent: "var(--of-color-success)",
-    bg: "var(--of-color-success-light)",
-    border: "var(--of-badge-green-border)",
-    tagBg: "var(--of-badge-green-bg)",
+    accent: "var(--of-text-secondary)",
+    bg: "var(--of-surface-elevated)",
+    border: "var(--of-border-subtle)",
+    tagBg: "var(--of-surface-muted)",
   },
   {
-    accent: "var(--of-color-info)",
-    bg: "var(--of-color-info-light)",
-    border: "var(--of-badge-blue-border)",
-    tagBg: "var(--of-badge-blue-bg)",
+    accent: "var(--of-accent-default)",
+    bg: "var(--of-surface-muted)",
+    border: "var(--of-border-subtle)",
+    tagBg: "var(--of-surface-selected)",
   },
   {
-    accent: "var(--of-role-arch-text)",
-    bg: "var(--of-role-arch-bg)",
-    border: "var(--of-badge-purple-border)",
-    tagBg: "var(--of-badge-purple-bg)",
+    accent: "var(--of-accent-strong)",
+    bg: "var(--of-surface-panel)",
+    border: "var(--of-border-subtle)",
+    tagBg: "var(--of-surface-selected)",
   },
   {
-    accent: "var(--of-color-error)",
-    bg: "var(--of-color-error-light)",
-    border: "var(--of-badge-red-border)",
-    tagBg: "var(--of-badge-red-bg)",
+    accent: "var(--of-text-strong)",
+    bg: "var(--of-surface-elevated)",
+    border: "var(--of-border-strong)",
+    tagBg: "var(--of-surface-muted)",
   },
   {
-    accent: "var(--of-role-fe-text)",
-    bg: "var(--of-role-fe-bg)",
-    border: "var(--of-badge-green-border)",
-    tagBg: "var(--of-badge-green-bg)",
+    accent: "var(--of-text-secondary)",
+    bg: "var(--of-surface-selected)",
+    border: "var(--of-border-subtle)",
+    tagBg: "var(--of-surface-panel)",
   },
 ];
 
@@ -116,8 +122,15 @@ const avatarFontSize = computed(() => (props.size === "sm" ? 12 : 16));
 const nameFontSize = computed(() => (props.size === "sm" ? 12 : 13));
 const subtitleFontSize = computed(() => (props.size === "sm" ? 11 : 12));
 
+const iconComponent = computed(() => {
+  if (!props.icon) return undefined;
+  return resolveIcon(props.icon);
+});
+
 const displayIcon = computed(() => {
-  if (props.icon) return props.icon;
+  // When icon is a Component object, displayIcon is unused (template renders component)
+  if (props.icon && typeof props.icon === "string") return props.icon;
+  if (props.icon) return "";
   const n = props.name.trim();
   if (!n) return "?";
   return n.charAt(0);
@@ -152,15 +165,28 @@ function handleHeaderClick() {
   emit("update:expanded", !props.expanded);
   emit("click");
 }
+
+function handleHeaderKeydown(e: KeyboardEvent) {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  handleHeaderClick();
+}
 </script>
 
 <template>
   <div :class="containerClass" :style="containerStyle" v-bind="$attrs">
     <!-- Header row -->
-    <div class="of-persona-card__header" @click="handleHeaderClick">
+    <div
+      class="of-persona-card__header"
+      role="button"
+      tabindex="0"
+      @click="handleHeaderClick"
+      @keydown="handleHeaderKeydown"
+    >
       <!-- Avatar -->
       <span class="of-persona-card__avatar" :style="avatarStyle">
-        {{ displayIcon }}
+        <component :is="iconComponent" v-if="iconComponent" :size="avatarFontSize" />
+        <template v-else>{{ displayIcon }}</template>
       </span>
 
       <!-- Main content -->
@@ -180,8 +206,7 @@ function handleHeaderClick() {
           v-if="subtitle"
           class="of-persona-card__subtitle"
           :style="{ fontSize: `${subtitleFontSize}px` }"
-          >{{ subtitle }}</span
-        >
+          >{{ subtitle }}</span>
 
         <div v-if="tags && tags.length > 0" class="of-persona-card__tags">
           <span v-for="tag in tags" :key="tag" class="of-persona-card__tag">{{ tag }}</span>
@@ -384,8 +409,8 @@ function handleHeaderClick() {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--of-color-success-light);
-  color: var(--of-badge-green-text);
+  background: var(--of-surface-selected);
+  color: var(--of-text-primary);
   font-size: 10px;
   font-weight: 700;
   flex-shrink: 0;

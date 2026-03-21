@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch, type Component } from "vue";
+import { resolveIcon } from "../../utils/icon";
 
 export interface ContextMenuItem {
   key: string;
   label: string;
-  icon?: string;
+  icon?: string | Component;
   disabled?: boolean;
   danger?: boolean;
   separator?: boolean;
   children?: ContextMenuItem[];
 }
-
-defineOptions({
-  name: "ContextMenu",
-});
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +26,10 @@ const emit = defineEmits<{
   select: [key: string];
   close: [];
 }>();
+
+defineOptions({
+  name: "ContextMenu",
+});
 
 const menuRef = ref<HTMLElement | null>(null);
 
@@ -110,7 +111,7 @@ onBeforeUnmount(() => {
           role="menuitem"
           @click="handleSelect(item)"
         >
-          <span v-if="item.icon" class="of-context-menu__icon">{{ item.icon }}</span>
+          <component :is="resolveIcon(item.icon)" v-if="item.icon" class="of-context-menu__icon" />
           <span class="of-context-menu__label">{{ item.label }}</span>
           <span v-if="item.children?.length" class="of-context-menu__submenu-indicator">›</span>
         </button>
@@ -123,10 +124,10 @@ onBeforeUnmount(() => {
 .of-context-menu {
   min-width: 160px;
   padding: 4px 0;
-  background: var(--of-color-bg-elevated);
-  border: 1px solid var(--of-border-color);
-  border-radius: 8px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  border: 1px solid var(--of-border-subtle, var(--of-border-color));
+  border-radius: var(--of-radius-lg, 8px);
+  box-shadow: var(--of-shadow-context-menu);
   z-index: 9999;
   user-select: none;
 }
@@ -134,7 +135,7 @@ onBeforeUnmount(() => {
 .of-context-menu__sep {
   margin: 4px 0;
   border: 0;
-  border-top: 1px solid var(--of-color-border-light);
+  border-top: 1px solid var(--of-border-subtle, var(--of-color-border-light));
 }
 
 .of-context-menu__item {
@@ -148,16 +149,16 @@ onBeforeUnmount(() => {
   text-align: left;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary, var(--of-color-text-primary));
   cursor: pointer;
 }
 
 .of-context-menu__item:hover:not(.is-disabled) {
-  background: var(--of-color-bg-hover);
+  background: var(--of-surface-muted, var(--of-color-bg-hover));
 }
 
 .of-context-menu__item.is-disabled {
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
   cursor: default;
 }
 
@@ -167,8 +168,7 @@ onBeforeUnmount(() => {
 
 .of-context-menu__icon {
   width: 16px;
-  text-align: center;
-  font-size: 14px;
+  height: 16px;
   flex: 0 0 16px;
 }
 
@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
 
 .of-context-menu__submenu-indicator {
   margin-left: auto;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
   font-size: 12px;
 }
 </style>

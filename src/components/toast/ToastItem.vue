@@ -23,28 +23,28 @@ const iconMap = {
 /** 颜色映射（CSS 自定义属性） */
 const colorMap = {
   info: {
-    icon: "var(--of-color-blue-500, #3b82f6)",
-    border: "var(--of-color-blue-200, #bfdbfe)",
-    borderLeft: "var(--of-color-blue-500, #3b82f6)",
-    bg: "var(--of-color-blue-50, #eff6ff)",
+    icon: "var(--of-color-info, var(--of-accent-default, #334155))",
+    border: "var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb))",
+    borderLeft: "var(--of-color-info, var(--of-accent-default, #334155))",
+    bg: "var(--of-surface-panel, var(--of-color-bg-elevated, #ffffff))",
   },
   success: {
-    icon: "var(--of-color-green-500, #22c55e)",
-    border: "var(--of-color-green-200, #bbf7d0)",
-    borderLeft: "var(--of-color-green-500, #22c55e)",
-    bg: "var(--of-color-green-50, #f0fdf4)",
+    icon: "var(--of-color-success, var(--of-accent-default, #334155))",
+    border: "var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb))",
+    borderLeft: "var(--of-color-success, var(--of-accent-default, #334155))",
+    bg: "var(--of-surface-panel, var(--of-color-bg-elevated, #ffffff))",
   },
   warning: {
-    icon: "var(--of-color-orange-500, #f97316)",
-    border: "var(--of-color-orange-200, #fed7aa)",
-    borderLeft: "var(--of-color-orange-500, #f97316)",
-    bg: "var(--of-color-orange-50, #fff7ed)",
+    icon: "var(--of-color-warning, var(--of-accent-default, #334155))",
+    border: "var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb))",
+    borderLeft: "var(--of-color-warning, var(--of-accent-default, #334155))",
+    bg: "var(--of-surface-panel, var(--of-color-bg-elevated, #ffffff))",
   },
   error: {
-    icon: "var(--of-color-red-500, #ef4444)",
-    border: "var(--of-color-red-200, #fecaca)",
-    borderLeft: "var(--of-color-red-500, #ef4444)",
-    bg: "var(--of-color-red-50, #fef2f2)",
+    icon: "var(--of-color-error, var(--of-accent-default, #334155))",
+    border: "var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb))",
+    borderLeft: "var(--of-color-error, var(--of-accent-default, #334155))",
+    bg: "var(--of-surface-panel, var(--of-color-bg-elevated, #ffffff))",
   },
 };
 
@@ -92,13 +92,11 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
   max-width: 360px;
   min-width: 280px;
   padding: 12px 16px;
-  background: var(--of-color-bg-elevated, #ffffff);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
   border: 1px solid;
   border-left-width: 4px;
-  border-radius: var(--of-radius-md, 8px);
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    0 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: var(--of-radius-lg, 8px);
+  box-shadow: var(--of-shadow-toast);
   word-break: break-word;
 }
 
@@ -120,14 +118,14 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--of-color-text-primary, #1a1a1a);
+  color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
 }
 
 .of-toast__message {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
-  color: var(--of-color-text-secondary, #4b5563);
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #4b5563));
 }
 
 .of-toast__close {
@@ -141,7 +139,7 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
   border: none;
   border-radius: var(--of-radius-sm, 4px);
   background: transparent;
-  color: var(--of-color-text-tertiary, #9ca3af);
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary, #9ca3af));
   cursor: pointer;
   transition:
     background-color 0.15s ease,
@@ -150,11 +148,11 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
 }
 
 .of-toast__close:hover {
-  background: var(--of-color-black-alpha-08);
-  color: var(--of-color-text-primary, #1a1a1a);
+  background: var(--of-surface-muted, var(--of-color-black-alpha-08));
+  color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
 }
 
 .of-toast__close:active {
-  background: var(--of-color-black-alpha-14);
+  background: var(--of-surface-selected, var(--of-color-black-alpha-14));
 }
 </style>

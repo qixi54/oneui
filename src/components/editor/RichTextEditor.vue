@@ -5,6 +5,21 @@ import "@vueup/vue-quill/dist/vue-quill.snow.css";
 import Modal from "../overlay/Modal.vue";
 import { useToast } from "../../composables/useToast";
 
+interface QuillSelection {
+  index: number;
+}
+
+interface QuillInstanceLike {
+  getSelection(focus?: boolean): QuillSelection;
+  insertText(index: number, text: string, format: string, value: string): void;
+  setSelection(index: number, length: number): void;
+  format(name: string, value: string): void;
+}
+
+interface QuillEditorLike {
+  getQuill?: () => QuillInstanceLike | null;
+}
+
 interface Props {
   modelValue?: string;
   placeholder?: string;
@@ -30,7 +45,7 @@ const localHtml = ref(props.modelValue);
 const showLinkModal = ref(false);
 const linkText = ref("");
 const linkUrl = ref("");
-const editorRef = ref<any>(null);
+const editorRef = ref<QuillEditorLike | null>(null);
 
 const modules = {
   toolbar: {
@@ -125,18 +140,20 @@ function saveContent() {
 
     <Modal v-model="showLinkModal" title="插入链接" width="480px">
       <div class="of-rich-editor__form">
-        <label class="of-rich-editor__label" for="link-text">链接文本</label>
+        <span class="of-rich-editor__label">链接文本</span>
         <input
           id="link-text"
           v-model="linkText"
           class="of-rich-editor__input"
+          aria-label="链接文本"
           placeholder="请输入链接文本"
         />
-        <label class="of-rich-editor__label" for="link-url">链接地址</label>
+        <span class="of-rich-editor__label">链接地址</span>
         <input
           id="link-url"
           v-model="linkUrl"
           class="of-rich-editor__input"
+          aria-label="链接地址"
           placeholder="https://example.com"
         />
       </div>
@@ -158,9 +175,9 @@ function saveContent() {
 
 <style scoped>
 .of-rich-editor {
-  border: 1px solid var(--of-border-color);
+  border: 1px solid var(--of-border-subtle, var(--of-border-color));
   border-radius: var(--of-radius-md, 8px);
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
 }
 
 .of-rich-editor__toolbar-actions {
@@ -171,10 +188,10 @@ function saveContent() {
 }
 
 .of-rich-editor__btn {
-  border: 1px solid var(--of-color-gray-300);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-300));
   border-radius: 6px;
-  background: var(--of-color-bg-elevated);
-  color: var(--of-color-gray-700);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-text-primary, var(--of-color-gray-700));
   font-size: 12px;
   line-height: 1;
   padding: 8px 12px;
@@ -187,14 +204,14 @@ function saveContent() {
 }
 
 .of-rich-editor__btn--primary {
-  background: var(--of-color-primary-500);
-  color: var(--of-color-text-inverse);
-  border-color: var(--of-color-primary-500);
+  background: var(--of-accent-default, #334155);
+  color: var(--of-text-inverse, var(--of-color-text-inverse));
+  border-color: var(--of-accent-default, #334155);
 }
 
 .of-rich-editor__btn--primary:hover:not(:disabled) {
-  background: var(--of-color-primary-600);
-  border-color: var(--of-color-primary-600);
+  background: var(--of-accent-strong, #0f172a);
+  border-color: var(--of-accent-strong, #0f172a);
 }
 
 .of-rich-editor__form {
@@ -204,11 +221,11 @@ function saveContent() {
 
 .of-rich-editor__label {
   font-size: 12px;
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 
 .of-rich-editor__input {
-  border: 1px solid var(--of-border-color);
+  border: 1px solid var(--of-border-subtle, var(--of-border-color));
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 13px;
@@ -216,7 +233,7 @@ function saveContent() {
 
 .of-rich-editor :deep(.ql-toolbar.ql-snow) {
   border: none;
-  border-bottom: 1px solid var(--of-border-color);
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-border-color));
   padding: 8px 10px;
 }
 
@@ -227,19 +244,19 @@ function saveContent() {
 .of-rich-editor :deep(.ql-editor) {
   min-height: var(--of-rich-editor-min-height, 220px);
   font-size: 14px;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary, var(--of-color-text-primary));
 }
 
 .of-rich-editor :deep(.ql-snow .ql-picker.ql-expanded .ql-picker-options) {
-  border-color: var(--of-border-color);
+  border-color: var(--of-border-subtle, var(--of-border-color));
 }
 
 .of-rich-editor :deep(.ql-snow .ql-stroke) {
-  stroke: var(--of-color-text-secondary);
+  stroke: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 
 .of-rich-editor :deep(.ql-snow .ql-fill) {
-  fill: var(--of-color-text-secondary);
+  fill: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 
 .of-rich-editor :deep(.ql-snow .ql-active .ql-stroke),
@@ -247,7 +264,7 @@ function saveContent() {
 .of-rich-editor :deep(.ql-snow .ql-picker-item.ql-selected .ql-stroke),
 .of-rich-editor :deep(.ql-snow .ql-picker-label:hover .ql-stroke),
 .of-rich-editor :deep(.ql-snow .ql-picker-item:hover .ql-stroke) {
-  stroke: var(--of-color-primary-500);
+  stroke: var(--of-accent-default, #334155);
 }
 
 .of-rich-editor :deep(.ql-snow .ql-active .ql-fill),
@@ -255,6 +272,6 @@ function saveContent() {
 .of-rich-editor :deep(.ql-snow .ql-picker-item.ql-selected .ql-fill),
 .of-rich-editor :deep(.ql-snow .ql-picker-label:hover .ql-fill),
 .of-rich-editor :deep(.ql-snow .ql-picker-item:hover .ql-fill) {
-  fill: var(--of-color-primary-500);
+  fill: var(--of-accent-default, #334155);
 }
 </style>

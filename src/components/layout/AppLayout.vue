@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background: var(--of-color-bg-canvas);
+  background: var(--of-surface-canvas, var(--of-color-bg-canvas));
 }
 
 .of-app-layout__navbar {
@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
   transition: var(--of-transition-fast);
 }
 .of-app-layout__hamburger:hover {
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-muted, var(--of-color-gray-100));
 }
 
 /* 移动端 Drawer 侧边栏 */

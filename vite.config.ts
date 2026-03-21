@@ -3,8 +3,36 @@ import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
 
+const externalPackages = [
+  'vue',
+  'lucide-vue-next',
+  'echarts',
+  'mermaid',
+  'katex',
+  'highlight.js',
+  'marked',
+  'quill',
+  '@vueup/vue-quill',
+  'vue-draggable-plus',
+]
+
+function isExternal(id: string) {
+  return externalPackages.some(pkg => id === pkg || id.startsWith(`${pkg}/`))
+}
+
 export default defineConfig({
-  plugins: [vue(), dts({ include: 'src' })],
+  plugins: [
+    vue(),
+    dts({
+      include: ['src'],
+      exclude: [
+        'src/dev/**',
+        'src/tests/**',
+        'src/**/*.spec.ts',
+        'src/**/*.integration.spec.ts',
+      ],
+    }),
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -12,25 +40,17 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        plugin: resolve(__dirname, 'src/plugin.ts'),
+      },
       formats: ['es'],
     },
     target: ['es2020', 'chrome87', 'firefox78', 'safari14'],
     sourcemap: false,
     chunkSizeWarningLimit: 800,
     rollupOptions: {
-      external: [
-        'vue',
-        'lucide-vue-next',
-        'echarts',
-        'mermaid',
-        'katex',
-        'highlight.js',
-        'marked',
-        'quill',
-        '@vueup/vue-quill',
-        'vue-draggable-plus',
-      ],
+      external: isExternal,
       output: {
         preserveModules: true,
         preserveModulesRoot: 'src',

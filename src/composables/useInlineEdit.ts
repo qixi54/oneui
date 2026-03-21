@@ -5,9 +5,9 @@ export interface EditingCell {
   fieldId: string;
 }
 
-const editingCell = ref<EditingCell | null>(null);
-
 export function useInlineEdit() {
+  const editingCell = ref<EditingCell | null>(null);
+
   function activate(rowId: string, fieldId: string) {
     editingCell.value = { rowId, fieldId };
   }

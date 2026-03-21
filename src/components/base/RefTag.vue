@@ -1,36 +1,40 @@
 <script setup lang="ts">
-import { computed, type CSSProperties, type VNode } from "vue";
+import { computed, type Component, type CSSProperties, type VNode } from "vue";
 import { resolveIcon } from "../../utils/icon";
-
-defineOptions({ name: "RefTag", inheritAttrs: false });
 
 export interface RefTagProps {
   type?: "spec" | "wiki" | "task" | string;
-  icon?: string;
+  icon?: string | Component;
   color?: string;
   bg?: string;
   href?: string;
 }
 
 interface Preset {
-  icon: string;
+  icon: string | Component;
   color: string;
   bg: string;
 }
 
+const props = withDefaults(defineProps<RefTagProps>(), {
+  icon: undefined,
+  color: undefined,
+  bg: undefined,
+  href: undefined,
+  type: "spec",
+});
+
 const PRESETS: Record<string, Preset> = {
   spec: {
     icon: "file-text",
-    color: "var(--of-color-primary-700)",
-    bg: "var(--of-color-primary-50)",
+    color: "var(--of-text-strong)",
+    bg: "var(--of-surface-selected)",
   },
-  wiki: { icon: "book-open", color: "var(--of-color-green-600)", bg: "var(--of-color-green-50)" },
-  task: { icon: "link", color: "var(--of-color-orange-600)", bg: "var(--of-color-orange-50)" },
+  wiki: { icon: "book-open", color: "var(--of-text-secondary)", bg: "var(--of-surface-muted)" },
+  task: { icon: "link", color: "var(--of-accent-strong)", bg: "var(--of-surface-panel)" },
 };
 
-const props = withDefaults(defineProps<RefTagProps>(), {
-  type: "spec",
-});
+defineOptions({ name: "RefTag", inheritAttrs: false });
 
 defineSlots<{
   default?: () => VNode[];
@@ -61,7 +65,7 @@ const tagStyle = computed<CSSProperties>(() => {
     :rel="href ? 'noopener noreferrer' : undefined"
     v-bind="$attrs"
   >
-    <component v-if="iconComponent" :is="iconComponent" class="one-ref-tag__icon" />
+    <component :is="iconComponent" v-if="iconComponent" class="one-ref-tag__icon" />
     <span class="one-ref-tag__text">
       <slot />
     </span>
@@ -102,7 +106,7 @@ a.one-ref-tag:hover {
 .one-ref-tag__text {
   font-size: 11px;
   font-weight: 500;
-  font-family: "Inter", var(--of-font-sans), sans-serif;
+  font-family: var(--of-font-sans), sans-serif;
   color: var(--one-ref-tag-color);
 }
 </style>

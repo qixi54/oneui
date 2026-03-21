@@ -10,8 +10,6 @@ export interface SwitchProps {
   label?: string;
 }
 
-defineOptions({ inheritAttrs: false });
-
 const props = withDefaults(defineProps<SwitchProps>(), {
   disabled: false,
   size: "md",
@@ -22,6 +20,8 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean];
   change: [value: boolean];
 }>();
+
+defineOptions({ inheritAttrs: false });
 
 const sizeClass = computed(() => `of-switch--${props.size}`);
 
@@ -79,12 +79,12 @@ function toggle() {
   display: inline-block;
   flex-shrink: 0;
   border-radius: 999px;
-  background: var(--of-color-gray-300);
+  background: var(--of-border-subtle);
   transition: background 0.2s;
 }
 
 .of-switch--checked .of-switch__track {
-  background: var(--of-color-primary-500);
+  background: var(--of-accent-default);
 }
 
 .of-switch__thumb {
@@ -92,7 +92,7 @@ function toggle() {
   top: 2px;
   left: 2px;
   border-radius: 50%;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated);
   transition:
     left 0.2s,
     transform 0.2s;
@@ -126,6 +126,6 @@ function toggle() {
 .of-switch__label {
   font-size: 14px;
   line-height: 1.5;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary);
 }
 </style>

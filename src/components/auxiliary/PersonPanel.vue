@@ -46,19 +46,24 @@ function fallbackText(name: string) {
 
 <template>
   <div class="of-person-panel" :class="{ disabled }">
-    <label class="of-person-panel__label">负责人</label>
+    <span class="of-person-panel__label">负责人</span>
     <div class="of-person-panel__row">
       <div
         v-if="selectedPerson"
         class="of-person-panel__avatar"
-        :style="{ background: selectedPerson.color || 'var(--of-color-primary-500)' }"
+        :style="{ background: selectedPerson.color || 'var(--of-surface-selected)' }"
       >
         <img v-if="selectedPerson.avatar" :src="selectedPerson.avatar" :alt="selectedPerson.name" />
         <span v-else>{{ fallbackText(selectedPerson.name) }}</span>
       </div>
       <div v-else class="of-person-panel__avatar empty">-</div>
 
-      <select v-model="selectedId" class="of-person-panel__select" :disabled="disabled">
+      <select
+        v-model="selectedId"
+        class="of-person-panel__select"
+        aria-label="负责人"
+        :disabled="disabled"
+      >
         <option :value="null">{{ placeholder }}</option>
         <option v-for="person in people" :key="person.id" :value="person.id">
           {{ person.name }}<template v-if="person.title"> · {{ person.title }}</template>
@@ -94,7 +99,7 @@ function fallbackText(name: string) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--of-color-text-inverse);
+  color: var(--of-text-primary);
   font-size: 12px;
   font-weight: 600;
 }
@@ -106,8 +111,8 @@ function fallbackText(name: string) {
 }
 
 .of-person-panel__avatar.empty {
-  background: var(--of-color-gray-200);
-  color: var(--of-color-gray-500);
+  background: var(--of-surface-muted);
+  color: var(--of-text-tertiary);
 }
 
 .of-person-panel__select {

@@ -3,12 +3,14 @@ import { computed } from "vue";
 import { PlusIcon } from "lucide-vue-next";
 import GalleryCard from "./GalleryCard.vue";
 import { buildGalleryItems } from "../../types";
-import type { DataRecord, GalleryItem } from "../../types";
+import type { DataRecord, GalleryItem, TableSchema, ViewConfig } from "../../types";
 
 const props = withDefaults(
   defineProps<{
     items?: GalleryItem[];
     records?: DataRecord[];
+    schema?: TableSchema;
+    view?: ViewConfig;
     coverFieldId?: string;
     cardFieldIds?: string[];
     columns?: number;
@@ -17,6 +19,8 @@ const props = withDefaults(
   {
     items: () => [],
     records: () => [],
+    schema: undefined,
+    view: undefined,
     coverFieldId: "",
     cardFieldIds: () => [],
     columns: 4,
@@ -33,12 +37,27 @@ const gridStyle = computed(() => ({
   "--columns": props.columns,
 }));
 
+// ─── view-driven config with direct-prop override ─────────────────────────
+const effectiveCoverFieldId = computed(
+  () => props.coverFieldId || props.view?.galleryCoverFieldId || "",
+);
+
+const effectiveCardFieldIds = computed(() => {
+  if (props.cardFieldIds?.length) return props.cardFieldIds;
+  if (props.view?.galleryCardFields?.length) return props.view.galleryCardFields;
+  // 兜底：如果有 view.visibleFields，取其去掉 cover 字段
+  if (props.view?.visibleFields?.length) {
+    return props.view.visibleFields.filter((f) => f !== effectiveCoverFieldId.value);
+  }
+  return [];
+});
+
 const resolvedItems = computed(() => {
   if (props.items.length > 0) return props.items;
   if (props.records.length > 0) {
     return buildGalleryItems(props.records, {
-      coverFieldId: props.coverFieldId || undefined,
-      cardFieldIds: props.cardFieldIds,
+      coverFieldId: effectiveCoverFieldId.value || undefined,
+      cardFieldIds: effectiveCardFieldIds.value,
     });
   }
   return [];
@@ -76,7 +95,7 @@ const resolvedItems = computed(() => {
 .gallery-view__add-btn {
   width: 260px;
   min-height: 140px;
-  border: 1.5px dashed var(--of-color-gray-200);
+  border: 1.5px dashed var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-xl);
   background: transparent;
   cursor: pointer;
@@ -90,18 +109,18 @@ const resolvedItems = computed(() => {
 }
 
 .gallery-view__add-btn:hover {
-  background: var(--of-color-gray-50);
-  border-color: var(--of-color-gray-300);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
 }
 
 .gallery-view__add-icon {
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
 .gallery-view__add-label {
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
   font-weight: 500;
 }
 </style>

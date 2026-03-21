@@ -39,7 +39,7 @@ const emit = defineEmits<{
       :class="{ 'of-breadcrumb__link--active': active }"
       @click.prevent="emit('click', $event)"
     >
-      <component v-if="icon" :is="resolveIcon(icon)" class="of-breadcrumb__icon" />
+      <component :is="resolveIcon(icon)" v-if="icon" class="of-breadcrumb__icon" />
       <slot />
     </component>
   </li>
@@ -56,7 +56,7 @@ const emit = defineEmits<{
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--of-color-text-secondary, #6b7280);
+  color: var(--of-text-secondary, var(--of-color-gray-600, #475569));
   font-size: 14px;
   text-decoration: none;
   transition: color 0.15s ease;
@@ -67,12 +67,12 @@ const emit = defineEmits<{
 }
 
 .of-breadcrumb__link[href]:hover {
-  color: var(--of-color-primary, #7c3aed);
+  color: var(--of-accent-strong, #0f172a);
   cursor: pointer;
 }
 
 .of-breadcrumb__link--active {
-  color: var(--of-color-text, #111827);
+  color: var(--of-text-primary, var(--of-color-gray-800, #1e293b));
   font-weight: 500;
   pointer-events: none;
   cursor: default;

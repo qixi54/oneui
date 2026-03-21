@@ -13,8 +13,6 @@ export interface SectionBlockProps {
   statusLabels?: Record<string, string>;
 }
 
-defineOptions({ name: "SectionBlock", inheritAttrs: false });
-
 const props = withDefaults(defineProps<SectionBlockProps>(), {
   icon: undefined,
   status: undefined,
@@ -29,6 +27,8 @@ const emit = defineEmits<{
   save: [];
 }>();
 
+defineOptions({ name: "SectionBlock", inheritAttrs: false });
+
 defineSlots<{
   default?: () => unknown;
   editor?: () => unknown;
@@ -41,10 +41,10 @@ interface StatusTone {
 }
 
 const STATUS_TONE_MAP: Record<NonNullable<SectionBlockProps["status"]>, StatusTone> = {
-  pending: { background: "var(--of-color-gray-100)", text: "var(--of-color-gray-400)" },
-  updating: { background: "var(--of-color-primary-50)", text: "var(--of-color-primary-500)" },
-  done: { background: "var(--of-color-success-light)", text: "var(--of-badge-green-text)" },
-  editing: { background: "var(--of-color-primary-50)", text: "var(--of-color-primary-500)" },
+  pending: { background: "var(--of-surface-muted)", text: "var(--of-text-tertiary)" },
+  updating: { background: "var(--of-surface-selected)", text: "var(--of-accent-default)" },
+  done: { background: "var(--of-surface-muted)", text: "var(--of-text-strong)" },
+  editing: { background: "var(--of-surface-selected)", text: "var(--of-accent-strong)" },
 };
 
 const DEFAULT_STATUS_LABELS: Record<NonNullable<SectionBlockProps["status"]>, string> = {
@@ -75,12 +75,12 @@ const statusBadgeStyle = computed<CSSProperties>(() => {
 const blockStyle = computed<CSSProperties>(() => {
   if (props.status === "editing") {
     return {
-      borderColor: "var(--of-color-primary-500)",
-      boxShadow: "0 0 0 3px color-mix(in srgb, var(--of-color-primary-500) 8%, transparent)",
+      borderColor: "var(--of-border-strong)",
+      boxShadow: "0 0 0 3px color-mix(in srgb, var(--of-accent-default) 10%, transparent)",
     };
   }
   if (props.status === "done") {
-    return { borderColor: "var(--of-color-success-light)" };
+    return { borderColor: "var(--of-border-subtle)" };
   }
   return {};
 });
@@ -114,11 +114,18 @@ function onSave() {
     v-bind="$attrs"
   >
     <!-- Header -->
-    <div class="of-section-block__header" @click="toggleCollapse">
+    <div
+      class="of-section-block__header"
+      role="button"
+      tabindex="0"
+      @click="toggleCollapse"
+      @keydown.enter.prevent="toggleCollapse"
+      @keydown.space.prevent="toggleCollapse"
+    >
       <div class="of-section-block__header-left">
         <component
-          v-if="iconComponent"
           :is="iconComponent"
+          v-if="iconComponent"
           class="of-section-block__icon"
           :size="14"
           aria-hidden="true"
@@ -161,8 +168,9 @@ function onSave() {
             class="of-section-block__collapse-icon"
             :class="{ 'of-section-block__collapse-icon--collapsed': collapsed }"
             aria-hidden="true"
-            >▾</span
           >
+            ▾
+          </span>
         </button>
       </div>
     </div>
@@ -186,13 +194,13 @@ function onSave() {
 
 <style scoped>
 .of-section-block {
-  border: 1px solid var(--of-border-color);
+  border: 1px solid var(--of-border-subtle);
   border-radius: 8px;
   overflow: hidden;
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
-  background: var(--of-color-bg-elevated);
+  background: var(--of-surface-elevated);
   box-sizing: border-box;
   width: 100%;
 }
@@ -203,7 +211,7 @@ function onSave() {
   justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
-  background: var(--of-color-gray-50);
+  background: var(--of-surface-panel);
   cursor: pointer;
   user-select: none;
   min-height: 36px;
@@ -211,7 +219,7 @@ function onSave() {
 }
 
 .of-section-block__header:hover {
-  background: var(--of-color-gray-100);
+  background: var(--of-surface-selected);
 }
 
 .of-section-block__header-left {
@@ -238,7 +246,7 @@ function onSave() {
 .of-section-block__title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary);
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
@@ -261,10 +269,10 @@ function onSave() {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
-  border: 1px solid var(--of-border-color);
+  border: 1px solid var(--of-border-subtle);
   border-radius: 4px;
-  background: var(--of-color-bg-elevated);
-  color: var(--of-color-text-secondary);
+  background: var(--of-surface-elevated);
+  color: var(--of-text-secondary);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.5;
@@ -277,21 +285,21 @@ function onSave() {
 }
 
 .of-section-block__action-btn:hover {
-  background: var(--of-color-gray-100);
-  border-color: var(--of-color-gray-300);
-  color: var(--of-color-text-primary);
+  background: var(--of-surface-selected);
+  border-color: var(--of-border-strong);
+  color: var(--of-text-primary);
 }
 
 .of-section-block__action-btn--save {
-  border-color: var(--of-color-primary-500);
-  background: var(--of-color-primary-500);
-  color: var(--of-color-primary-foreground);
+  border-color: var(--of-accent-default);
+  background: var(--of-accent-default);
+  color: var(--of-color-text-inverse);
 }
 
 .of-section-block__action-btn--save:hover {
-  background: var(--of-color-primary-700);
-  border-color: var(--of-color-primary-700);
-  color: var(--of-color-primary-foreground);
+  background: var(--of-accent-strong);
+  border-color: var(--of-accent-strong);
+  color: var(--of-color-text-inverse);
 }
 
 .of-section-block__collapse-btn {
@@ -310,12 +318,12 @@ function onSave() {
 }
 
 .of-section-block__collapse-btn:hover {
-  background: var(--of-border-color);
+  background: var(--of-surface-selected);
 }
 
 .of-section-block__collapse-icon {
   font-size: 14px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary);
   line-height: 1;
   display: inline-block;
   transition: transform 0.2s;
@@ -340,7 +348,7 @@ function onSave() {
   padding: 10px 12px;
   font-size: 12px;
   line-height: 1.8;
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary);
   box-sizing: border-box;
 }
 </style>

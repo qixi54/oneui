@@ -21,14 +21,14 @@ export interface EmptyStateAction {
   onClick: () => void;
 }
 
-defineOptions({ inheritAttrs: false });
-
 defineProps<{
   icon?: string | Component; // lucide icon name or component
   title: string;
   description?: string;
   action?: EmptyStateAction;
 }>();
+
+defineOptions({ inheritAttrs: false });
 </script>
 
 <template>
@@ -41,7 +41,7 @@ defineProps<{
       <p v-if="description" class="of-empty-state__description">
         {{ description }}
       </p>
-      <button v-if="action" @click="action.onClick" class="of-empty-state__action">
+      <button v-if="action" class="of-empty-state__action" @click="action.onClick">
         {{ action.label }}
       </button>
     </div>
@@ -71,7 +71,7 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--of-color-gray-300);
+  color: var(--of-text-tertiary, var(--of-color-gray-300));
   opacity: 0.6;
 }
 
@@ -99,8 +99,8 @@ defineProps<{
 .of-empty-state__action {
   margin-top: var(--of-spacing-2);
   padding: 8px 16px;
-  background: var(--of-color-primary-600);
-  color: var(--of-color-primary-foreground);
+  background: var(--of-accent-default);
+  color: var(--of-color-text-inverse);
   border: none;
   border-radius: var(--of-radius-md);
   font-size: 14px;
@@ -110,6 +110,6 @@ defineProps<{
 }
 
 .of-empty-state__action:hover {
-  background: var(--of-color-primary-700);
+  background: var(--of-accent-strong);
 }
 </style>

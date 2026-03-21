@@ -50,6 +50,12 @@ const props = withDefaults(
   }>(),
   {
     type: "text",
+    statusColorMap: undefined,
+    priorityColorMap: undefined,
+    customColorMap: undefined,
+    valueColor: undefined,
+    valueBg: undefined,
+    dotColor: undefined,
   },
 );
 

@@ -66,17 +66,17 @@ withDefaults(
 }
 
 .of-statusbar__sync-icon--ok {
-  color: var(--of-color-success);
+  color: var(--of-accent-default);
 }
 
 .of-statusbar__sync-icon--warn {
-  color: var(--of-color-warning);
+  color: var(--of-text-tertiary);
 }
 
 .of-statusbar__sync-text {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary);
   line-height: 1;
 }
 
@@ -94,14 +94,14 @@ withDefaults(
 .of-statusbar__shortcuts {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-color-gray-400);
+  color: var(--of-text-tertiary);
   line-height: 1;
 }
 
 .of-statusbar__version {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-color-gray-300);
+  color: var(--of-border-subtle);
   line-height: 1;
 }
 </style>
