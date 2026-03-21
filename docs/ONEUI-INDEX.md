@@ -31,6 +31,24 @@
 - [Timeline 时间轴](#timeline-时间轴)
 - [Toast 通知](#toast-通知)
 - [Composables](#composables)
+- [Release & Verification](#release--verification)
+
+## Release & Verification
+
+### 0.8.0 产品力提升与交付闭环
+
+- `docs/plans/2026-03-21-oneui-productivity-upgrade-plan.md`
+- `docs/plans/2026-03-21-oneui-productivity-upgrade-verification.md`
+- `docs/plans/2026-03-22-release-0.8.0-proof.md`
+- `docs/CHANGELOG-v0.8.0.md`
+
+### 0.6.0 主题分层收口
+
+- `docs/plans/2026-03-21-oneui-neutral-theme-architecture-plan.md`
+- `docs/plans/2026-03-21-oneui-neutral-theme-architecture-verification.md`
+- `docs/CHANGELOG-v0.6.0.md`
+
+- [ONEUI-UI 主题与可选皮肤策略说明](/opt/Oneflow/flowlab/项目/oneui/code/develop/docs/DESIGN_STANDARD.md)
 
 ---
 

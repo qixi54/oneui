@@ -1336,15 +1336,15 @@ function handleDrawerWidthUpdate(width: number) {
             data-role="workspace-mode-switch"
           >
             <button
-              v-for="mode in workspaceModes"
-              :key="mode.value"
+              v-for="workspaceMode in workspaceModes"
+              :key="workspaceMode.value"
               type="button"
               class="of-database-view__workspace-mode-btn"
-              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === mode.value }"
-              :data-mode="mode.value"
-              @click="setPreferredDetailPresentation(mode.value)"
+              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === workspaceMode.value }"
+              :data-mode="workspaceMode.value"
+              @click="setPreferredDetailPresentation(workspaceMode.value)"
             >
-              {{ mode.label }}
+              {{ workspaceMode.label }}
             </button>
           </div>
           <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
@@ -1431,15 +1431,15 @@ function handleDrawerWidthUpdate(width: number) {
             data-role="workspace-mode-switch"
           >
             <button
-              v-for="mode in workspaceModes"
-              :key="mode.value"
+              v-for="workspaceMode in workspaceModes"
+              :key="workspaceMode.value"
               type="button"
               class="of-database-view__workspace-mode-btn"
-              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === mode.value }"
-              :data-mode="mode.value"
-              @click="setPreferredDetailPresentation(mode.value)"
+              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === workspaceMode.value }"
+              :data-mode="workspaceMode.value"
+              @click="setPreferredDetailPresentation(workspaceMode.value)"
             >
-              {{ mode.label }}
+              {{ workspaceMode.label }}
             </button>
           </div>
           <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
