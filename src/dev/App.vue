@@ -2520,12 +2520,12 @@ const myStatusMap: ColorMap = {
         <section class="dev-section">
           <h2>DatabaseView 页面级方案证明</h2>
           <p class="dev-desc">
-            当前先用现有组件组合出页面级 shell，目标接入形态是 DatabaseView / useDatabaseView。
+            这一段现在不再只是“未来接入形态”说明，而是用真实的 DatabaseView contract 去证明页面级工作区。
             local 模式直接使用 schema + records，provider 模式保留数据拉取与刷新入口；actions 只负责
-            回传页面变更，不把业务逻辑锁死在组件内部。当前对齐的页面契约还包括
+            回传页面变更，不把业务逻辑锁死在组件内部。当前已经对齐的页面契约包括
             detailPresentation 与 density：桌面端默认右侧 workspace，移动端保留 sheet fallback；
-            页面密度则统一在 compact / standard / comfortable 三档里表达。点击任一记录会把 selected
-            record 送入 detail workspace，展示当前工作区的主内容、属性和活动记录。
+            页面密度统一在 compact / standard / comfortable 三档里表达，行级操作也会沿着
+            inline edit -> row action -> detail workspace 这条梯子继续升级。
           </p>
 
           <pre class="database-shell__code"><code>import { DatabaseView, useDatabaseView } from "@oneflowui/ui"
@@ -2548,8 +2548,8 @@ const view = useDatabaseView({
   },
 })
 
-// 现在 dev app 先用现有组件组合出等价的页面级 shell
-// 等 DatabaseView/useDatabaseView 导出接入后可无缝替换。</code></pre>
+// dev app 现在保留显式 shell 控制条与观测面板，
+// 底层页面契约已经和 DatabaseView/useDatabaseView 对齐。</code></pre>
 
           <div class="database-shell">
             <div class="database-shell__bar">

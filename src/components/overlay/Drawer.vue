@@ -11,6 +11,7 @@ const props = withDefaults(
     showClose?: boolean;
     maskClosable?: boolean;
     zIndex?: number;
+    fullscreen?: boolean;
   }>(),
   {
     width: 390,
@@ -18,6 +19,7 @@ const props = withDefaults(
     showClose: true,
     maskClosable: true,
     zIndex: 1000,
+    fullscreen: false,
   },
 );
 
@@ -28,7 +30,7 @@ const emit = defineEmits<{
 const slots: Slots = useSlots();
 
 const drawerStyle = computed(() => ({
-  width: `${props.width}px`,
+  "--of-drawer-width": `${props.width}px`,
 }));
 
 // ── Focus Trap ────────────────────────────────────────────────
@@ -90,11 +92,12 @@ onBeforeUnmount(() => {
         />
         <aside
           ref="drawerRef"
-          class="of-drawer"
-          role="dialog"
-          aria-modal="true"
-          :aria-label="title"
-          :style="drawerStyle"
+        class="of-drawer"
+        :class="{ 'of-drawer--fullscreen': fullscreen }"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="title"
+        :style="drawerStyle"
           @click.stop
         >
           <div class="of-drawer__inner">
@@ -147,11 +150,17 @@ onBeforeUnmount(() => {
   top: 0;
   right: 0;
   height: 100vh;
+  width: min(var(--of-drawer-width, 390px), 100vw);
   max-width: 100vw;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
   border-left: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   box-shadow: var(--of-shadow-drawer);
   overflow: hidden;
+}
+
+.of-drawer--fullscreen {
+  width: 100vw;
+  border-left: none;
 }
 
 .of-drawer__inner {

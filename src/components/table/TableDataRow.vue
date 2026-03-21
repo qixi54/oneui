@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type CSSProperties } from "vue";
+import { computed, type CSSProperties, type Component } from "vue";
 import type { TableColumn, ColorMap, Density } from "../../types";
 import {
   DEFAULT_PRIORITY_MAP,
@@ -9,6 +9,15 @@ import {
 } from "../../composables/useBadge";
 
 type TableRow = Record<string, unknown> & { id: string };
+
+export interface RowActionItem {
+  key: string;
+  label: string;
+  onClick: () => void;
+  variant?: "default" | "danger";
+  icon?: string | Component;
+  disabled?: boolean;
+}
 
 const props = withDefaults(
   defineProps<{
@@ -26,6 +35,8 @@ const props = withDefaults(
      * 状态颜色映射，与内置默认映射合并（传入优先）
      */
     statusColorMap?: ColorMap;
+    showRowActions?: boolean;
+    rowActionItems?: RowActionItem[];
   }>(),
   {
     rowKey: "id",
@@ -34,6 +45,8 @@ const props = withDefaults(
     density: "standard",
     priorityColorMap: undefined,
     statusColorMap: undefined,
+    showRowActions: true,
+    rowActionItems: () => [],
   },
 );
 
@@ -133,6 +146,20 @@ function handleRowKeyDown(event: KeyboardEvent) {
   event.preventDefault();
   emit("click", props.row);
 }
+
+function handleActionClick(action: RowActionItem, event: MouseEvent) {
+  event.stopPropagation();
+  if (action.disabled) return;
+  action.onClick();
+}
+
+function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
+  event.stopPropagation();
+  if (action.disabled) return;
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  action.onClick();
+}
 </script>
 
 <template>
@@ -212,6 +239,35 @@ function handleRowKeyDown(event: KeyboardEvent) {
         </template>
       </slot>
     </div>
+
+    <div
+      v-if="showRowActions && rowActionItems.length"
+      class="of-table-row__actions"
+      aria-label="行快捷操作"
+      @click.stop
+    >
+      <slot
+        name="row-actions"
+        :row="row"
+        :row-id="getRowId()"
+        :items="rowActionItems"
+        :open-detail="() => emit('click', row)"
+      >
+        <button
+          v-for="action in rowActionItems"
+          :key="action.key"
+          type="button"
+          class="of-table-row__action-btn"
+          :class="{ 'of-table-row__action-btn--danger': action.variant === 'danger' }"
+          :disabled="action.disabled"
+          @click.stop="handleActionClick(action, $event)"
+          @keydown="handleActionKeydown(action, $event)"
+        >
+          <component :is="action.icon" v-if="action.icon" class="of-table-row__action-icon" />
+          <span>{{ action.label }}</span>
+        </button>
+      </slot>
+    </div>
   </div>
 </template>
 
@@ -219,6 +275,7 @@ function handleRowKeyDown(event: KeyboardEvent) {
 .of-table-row {
   display: flex;
   align-items: center;
+  position: relative;
   border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
   cursor: pointer;
   transition: var(--of-transition-fast);
@@ -322,5 +379,69 @@ function handleRowKeyDown(event: KeyboardEvent) {
 .of-td-empty {
   color: var(--of-text-tertiary, var(--of-color-gray-300));
   font-size: 13px;
+}
+
+.of-table-row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-left: auto;
+  min-width: 116px;
+  padding: 0 10px 0 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.of-table-row:hover .of-table-row__actions,
+.of-table-row:focus-within .of-table-row__actions,
+.of-table-row--selected .of-table-row__actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.of-table-row__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  border-radius: 999px;
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-text-secondary, var(--of-color-gray-600));
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--of-transition-fast);
+}
+
+.of-table-row__action-btn:hover:not(:disabled),
+.of-table-row__action-btn:focus-visible:not(:disabled) {
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-800));
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
+}
+
+.of-table-row__action-btn--danger {
+  color: var(--of-error-text, var(--of-color-error-600));
+}
+
+.of-table-row__action-btn--danger:hover:not(:disabled),
+.of-table-row__action-btn--danger:focus-visible:not(:disabled) {
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  border-color: var(--of-border-subtle, var(--of-color-gray-200));
+}
+
+.of-table-row__action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.of-table-row__action-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 </style>

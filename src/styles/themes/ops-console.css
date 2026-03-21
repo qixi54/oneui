@@ -4,9 +4,14 @@
   --of-surface-panel: rgba(245, 250, 255, 0.86);
   --of-surface-muted: rgba(220, 232, 242, 0.76);
   --of-surface-selected: rgba(196, 214, 230, 0.8);
+  --of-surface-workspace: rgba(244, 249, 253, 0.88);
+  --of-surface-workspace-raised: rgba(255, 255, 255, 0.92);
+  --of-surface-workspace-strong: rgba(235, 244, 251, 0.96);
 
   --of-border-subtle: rgba(23, 55, 82, 0.14);
   --of-border-strong: rgba(23, 55, 82, 0.22);
+  --of-workspace-border: rgba(23, 55, 82, 0.16);
+  --of-row-action-border: rgba(15, 76, 129, 0.18);
 
   --of-text-primary: #0b1f33;
   --of-text-secondary: #35506d;
@@ -19,6 +24,11 @@
   --of-accent-default: #0f4c81;
   --of-accent-strong: #0a2f52;
   --of-accent-soft: rgba(57, 119, 171, 0.18);
+  --of-row-action-hover: rgba(15, 76, 129, 0.08);
+  --of-row-action-active: rgba(15, 76, 129, 0.14);
+  --of-row-action-text: #0f4c81;
+  --of-status-active: #0f4c81;
+  --of-status-active-bg: rgba(15, 76, 129, 0.1);
 
   --of-chart-series-1: #0f4c81;
   --of-chart-series-2: #2d6f9f;

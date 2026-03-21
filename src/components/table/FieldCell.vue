@@ -62,6 +62,7 @@ const { isEditing, activate, commit: commitEdit, cancel } = useInlineEdit();
 
 const editing = computed(() => isEditing(props.rowId, props.field.id));
 const isReadonly = computed(() => props.readonly || props.field.readonly);
+const isActionable = computed(() => !isReadonly.value);
 
 function handleClick() {
   if (isReadonly.value) return;
@@ -125,9 +126,11 @@ const displayValue = computed(() => {
     :class="{
       'of-field-cell--editing': editing,
       'of-field-cell--readonly': isReadonly,
+      'of-field-cell--actionable': isActionable,
     }"
     :type="isReadonly || editing ? undefined : 'button'"
     :aria-label="`${field.label}字段`"
+    :title="isReadonly ? undefined : `点击编辑 ${field.label}`"
     @click="handleClick"
     @keydown.enter.prevent="handleClick"
     @keydown.space.prevent="handleClick"
@@ -185,6 +188,10 @@ const displayValue = computed(() => {
 
 .of-field-cell--readonly {
   cursor: default;
+}
+
+.of-field-cell--actionable:not(.of-field-cell--readonly):not(.of-field-cell--editing) {
+  cursor: text;
 }
 
 .of-field-cell__display {

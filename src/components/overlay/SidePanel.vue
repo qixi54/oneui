@@ -28,7 +28,7 @@ defineSlots<{
 }>();
 
 const panelStyle = computed<CSSProperties>(() => ({
-  width: `${props.width}px`,
+  "--of-side-panel-width": `${props.width}px`,
 }));
 
 // ── Focus Trap ────────────────────────────────────────────────
@@ -59,6 +59,7 @@ watch(
       deactivateTrap();
     }
   },
+  { immediate: true },
 );
 
 onBeforeUnmount(() => {
@@ -109,8 +110,8 @@ function close() {
       v-else
       v-show="modelValue"
       ref="sidePanelRef"
-      class="of-side-panel"
-      :style="panelStyle"
+    class="of-side-panel"
+    :style="panelStyle"
       role="dialog"
       aria-modal="true"
       :aria-label="title"
@@ -149,6 +150,7 @@ function close() {
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
   box-shadow: var(--of-shadow-panel);
   overflow: hidden;
+  width: min(var(--of-side-panel-width, 500px), 100vw);
   max-width: 100vw;
 }
 

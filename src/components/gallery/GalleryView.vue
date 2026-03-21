@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { PlusIcon } from "lucide-vue-next";
 import GalleryCard from "./GalleryCard.vue";
 import { buildGalleryItems } from "../../types";
@@ -33,9 +33,48 @@ const emit = defineEmits<{
   add: [];
 }>();
 
+const galleryRef = ref<HTMLElement | null>(null);
+const galleryWidth = ref(0);
+let resizeObserver: ResizeObserver | null = null;
+
+const resolvedColumns = computed(() => Math.max(1, Math.floor(props.columns)));
+
+const responsiveColumns = computed(() => {
+  const width = galleryWidth.value;
+  const base = resolvedColumns.value;
+  if (!width) return base;
+  if (width < 520) return 1;
+  if (width < 820) return Math.min(base, 2);
+  if (width < 1120) return Math.min(base, 3);
+  return base;
+});
+
 const gridStyle = computed(() => ({
-  "--columns": props.columns,
+  "--gallery-columns": String(responsiveColumns.value),
+  "--gallery-card-min-width": responsiveColumns.value <= 1 ? "0px" : "220px",
 }));
+
+function updateGalleryWidth(entry?: ResizeObserverEntry) {
+  if (entry) {
+    galleryWidth.value = Math.round(entry.contentRect.width);
+    return;
+  }
+  galleryWidth.value = Math.round(galleryRef.value?.getBoundingClientRect().width ?? 0);
+}
+
+onMounted(() => {
+  updateGalleryWidth();
+  if (typeof ResizeObserver === "undefined" || !galleryRef.value) return;
+  resizeObserver = new ResizeObserver((entries) => {
+    if (entries[0]) updateGalleryWidth(entries[0]);
+  });
+  resizeObserver.observe(galleryRef.value);
+});
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+});
 
 // ─── view-driven config with direct-prop override ─────────────────────────
 const effectiveCoverFieldId = computed(
@@ -65,7 +104,7 @@ const resolvedItems = computed(() => {
 </script>
 
 <template>
-  <div class="gallery-view" :style="gridStyle">
+  <div ref="galleryRef" class="gallery-view" :style="gridStyle">
     <GalleryCard
       v-for="item in resolvedItems"
       :key="item.id"
@@ -84,43 +123,59 @@ const resolvedItems = computed(() => {
 <style scoped>
 .gallery-view {
   display: grid;
-  grid-template-columns: repeat(var(--columns, 4), 260px);
+  grid-template-columns: repeat(var(--gallery-columns, 4), minmax(var(--gallery-card-min-width, 220px), 1fr));
   gap: 16px;
   overflow-x: auto;
-  padding: 4px 2px 8px;
+  padding: 12px;
   align-items: start;
+  container-type: inline-size;
+  background: var(--of-surface-workspace, var(--of-surface-elevated, var(--of-color-bg-elevated)));
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-100)));
+  border-radius: var(--of-radius-2xl, var(--of-radius-xl));
+  box-sizing: border-box;
 }
 
 /* Add Button */
 .gallery-view__add-btn {
-  width: 260px;
+  width: 100%;
   min-height: 140px;
-  border: 1.5px dashed var(--of-border-subtle, var(--of-color-gray-200));
+  border: 1.5px dashed var(--of-row-action-border, var(--of-border-subtle, var(--of-color-gray-200)));
   border-radius: var(--of-radius-xl);
-  background: transparent;
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: var(--of-transition-normal);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
   outline: none;
 }
 
 .gallery-view__add-btn:hover {
-  background: var(--of-surface-muted, var(--of-color-gray-50));
-  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  transform: translateY(-1px);
+  background: var(--of-row-action-hover, var(--of-surface-muted, var(--of-color-gray-50)));
+  border-color: var(--of-row-action-active, var(--of-border-strong, var(--of-color-gray-300)));
+  box-shadow: var(--of-card-shadow-hover, var(--of-shadow-card-hover));
+}
+
+.gallery-view__add-btn:focus-visible {
+  border-color: var(--of-status-active, var(--of-accent-default, var(--of-color-gray-400)));
+  box-shadow: 0 0 0 3px var(--of-accent-soft, rgba(15, 23, 42, 0.12));
 }
 
 .gallery-view__add-icon {
-  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  color: var(--of-status-active, var(--of-text-tertiary, var(--of-color-gray-400)));
 }
 
 .gallery-view__add-label {
   font-family: var(--of-font-sans);
   font-size: 13px;
-  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  color: var(--of-row-action-text, var(--of-text-tertiary, var(--of-color-gray-400)));
   font-weight: 500;
 }
 </style>

@@ -7,13 +7,16 @@ import type { Task, CommentData, PropItem } from "../../types";
 
 const props = withDefaults(
   defineProps<{
-    task: Task;
+    task?: Task | null;
+    title?: string;
     comments?: CommentData[];
     propItems?: PropItem[];
     descriptionContent?: string;
     descriptionEditable?: boolean;
   }>(),
   {
+    task: null,
+    title: "",
     comments: () => [],
     propItems: () => [],
     descriptionContent: "",
@@ -25,8 +28,16 @@ const emit = defineEmits<{
   "update:descriptionContent": [value: string];
 }>();
 
+const displayTitle = computed(() => props.title || props.task?.title || "未命名工作区");
+
 // 状态标签颜色
 const statusBadgeStyle = computed(() => {
+  if (!props.task) {
+    return {
+      text: "var(--of-color-text-secondary)",
+      bg: "var(--of-color-gray-100)",
+    };
+  }
   const map: Record<string, { text: string; bg: string }> = {
     todo: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)" },
     in_progress: {
@@ -46,6 +57,12 @@ const statusBadgeStyle = computed(() => {
 
 // 优先级标签颜色
 const priorityBadgeStyle = computed(() => {
+  if (!props.task) {
+    return {
+      text: "var(--of-color-text-secondary)",
+      bg: "var(--of-color-gray-100)",
+    };
+  }
   const map: Record<string, { text: string; bg: string }> = {
     P0: { text: "var(--of-priority-p0-text)", bg: "var(--of-priority-p0-bg)" },
     P1: { text: "var(--of-priority-p1-text)", bg: "var(--of-priority-p1-bg)" },
@@ -62,6 +79,7 @@ const priorityBadgeStyle = computed(() => {
 
 // 状态显示文字
 const statusLabel = computed(() => {
+  if (!props.task) return "";
   const labelMap: Record<string, string> = {
     todo: "待处理",
     in_progress: "进行中",
@@ -71,7 +89,20 @@ const statusLabel = computed(() => {
   return labelMap[props.task.status] ?? props.task.status;
 });
 
-const descriptionText = computed(() => props.descriptionContent || props.task.description || "");
+const displayStatusLabel = computed(() => {
+  if (!props.task) return "";
+  return statusLabel.value;
+});
+
+const displayPriorityLabel = computed(() => {
+  if (!props.task) return "";
+  return props.task.priority;
+});
+
+const displayRoleLabel = computed(() => props.task?.role ?? "");
+const displayAssigneeLabel = computed(() => props.task?.assignee ?? "");
+
+const descriptionText = computed(() => props.descriptionContent || props.task?.description || "");
 
 function onDescriptionUpdate(value: string) {
   emit("update:descriptionContent", value);
@@ -83,18 +114,18 @@ function onDescriptionUpdate(value: string) {
     <!-- 左栏：主内容 -->
     <div class="detail-layout__main">
       <!-- 任务标题 -->
-      <h1 class="detail-layout__title">{{ task.title }}</h1>
+      <h1 class="detail-layout__title">{{ displayTitle }}</h1>
 
       <!-- Meta 信息行 -->
       <div class="detail-layout__meta">
         <!-- 默认 meta：状态、优先级、角色 -->
-        <template v-if="!$slots.meta">
+        <template v-if="props.task && !$slots.meta">
           <!-- 状态徽章 -->
           <span
             class="detail-layout__badge"
             :style="{ color: statusBadgeStyle.text, backgroundColor: statusBadgeStyle.bg }"
           >
-            {{ statusLabel }}
+            {{ displayStatusLabel }}
           </span>
 
           <!-- 优先级徽章 -->
@@ -102,17 +133,17 @@ function onDescriptionUpdate(value: string) {
             class="detail-layout__badge"
             :style="{ color: priorityBadgeStyle.text, backgroundColor: priorityBadgeStyle.bg }"
           >
-            {{ task.priority }}
+            {{ displayPriorityLabel }}
           </span>
 
           <!-- 角色 -->
-          <span v-if="task.role" class="detail-layout__badge detail-layout__badge--role">
-            {{ task.role }}
+          <span v-if="displayRoleLabel" class="detail-layout__badge detail-layout__badge--role">
+            {{ displayRoleLabel }}
           </span>
 
           <!-- 指派人 -->
-          <span v-if="task.assignee" class="detail-layout__meta-text">
-            {{ task.assignee }}
+          <span v-if="displayAssigneeLabel" class="detail-layout__meta-text">
+            {{ displayAssigneeLabel }}
           </span>
         </template>
 
@@ -146,6 +177,10 @@ function onDescriptionUpdate(value: string) {
             <p v-else class="detail-layout__empty-hint">暂无活动记录</p>
           </slot>
         </div>
+      </div>
+
+      <div v-if="$slots.footer" class="detail-layout__footer">
+        <slot name="footer" />
       </div>
     </div>
 
@@ -268,6 +303,14 @@ function onDescriptionUpdate(value: string) {
   margin: 0;
 }
 
+.detail-layout__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
 /* ─── 右栏：属性面板 ─── */
 .detail-layout__sidebar {
   width: 320px;
@@ -299,6 +342,10 @@ function onDescriptionUpdate(value: string) {
     border: none;
     border-top: 1px solid var(--of-color-gray-200);
     padding: 16px;
+  }
+
+  .detail-layout__footer {
+    margin-top: 20px;
   }
 }
 </style>

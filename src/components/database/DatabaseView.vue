@@ -3,7 +3,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch, type Component } from
 import { AlertCircle, Database, Loader2 } from "lucide-vue-next";
 import EmptyState from "../base/EmptyState.vue";
 import FieldCell from "../table/FieldCell.vue";
-import DetailSheet from "../table/DetailSheet.vue";
+import DetailLayout from "../detail/DetailLayout.vue";
+import Drawer from "../overlay/Drawer.vue";
 import SidePanel from "../overlay/SidePanel.vue";
 import TableToolbar from "../table/TableToolbar.vue";
 import DataTable from "../table/DataTable.vue";
@@ -12,7 +13,6 @@ import GalleryView from "../gallery/GalleryView.vue";
 import GanttTimeline from "../timeline/GanttTimeline.vue";
 import type { EmptyStateAction } from "../base/EmptyState.vue";
 import type { FieldDef as CellFieldDef } from "../table/FieldCell.vue";
-import { useMarkdown } from "@/composables/useMarkdown";
 import {
   useDatabaseView,
   type DatabaseViewActions as ViewDatabaseActions,
@@ -153,8 +153,6 @@ const DETAIL_VIEW_ID = "detail";
 const MOBILE_BREAKPOINT = "(max-width: 768px)";
 
 defineOptions({ name: "DatabaseView", inheritAttrs: false });
-
-const { renderMarkdown } = useMarkdown({ showCopyButton: true });
 
 const isMobileViewport = ref(false);
 let mobileMediaQuery: MediaQueryList | null = null;
@@ -730,6 +728,16 @@ const detailWorkspaceRow = computed(() => ({
   ...detailRow.value,
   ...detailDraftFields.value,
 }));
+const detailWorkspaceTitle = computed(
+  () =>
+    normalizeCellValue(
+      selectedRecord.value?.fields?.title ??
+        selectedRecord.value?.fields?.name ??
+        selectedRecord.value?.fields?.subject ??
+        selectedRecord.value?.id ??
+        "记录详情",
+    ) || "记录详情",
+);
 const detailContentFieldIds = computed(
   () => new Set(detailFieldDefs.value.filter((field) => field.type === "richtext").map((field) => field.id)),
 );
@@ -739,6 +747,17 @@ const detailPropertyColumns = computed(() =>
 const detailContentColumns = computed(() =>
   detailColumns.value.filter((column) => detailContentFieldIds.value.has(column.key)),
 );
+const detailWorkspaceDescription = computed(() => {
+  const blocks = detailContentColumns.value
+    .map((column) => {
+      const value = getDetailCellValue(column.key);
+      const text = normalizeCellValue(value).trim();
+      if (!text) return "";
+      return `## ${column.label}\n\n${text}`;
+    })
+    .filter((block) => block.length > 0);
+  return blocks.join("\n\n");
+});
 const hasDetailDraftChanges = computed(() => Object.keys(detailDraftFields.value).length > 0);
 const visibleRecordFieldIds = computed(() => getVisibleFieldIds(resolvedSchema.value, resolvedRecords.value));
 
@@ -1046,12 +1065,6 @@ function getDetailCellValue(fieldId: string): CellValue {
   return detailRow.value[fieldId as keyof typeof detailRow.value] as CellValue;
 }
 
-function getRenderedDetailContent(fieldId: string): string {
-  const value = getDetailCellValue(fieldId);
-  if (typeof value !== "string" || !value) return "";
-  return renderMarkdown(value);
-}
-
 function handleDetailWorkspaceCommit(_rowId: string, fieldId: string, value: unknown) {
   detailDraftFields.value = {
     ...detailDraftFields.value,
@@ -1203,71 +1216,51 @@ function handleDetailWorkspaceSave() {
     <SidePanel
       v-if="showDetailWorkspace && resolvedDetailPresentation === 'side-panel'"
       :model-value="showDetailWorkspace"
-      title="记录详情"
-      :width="640"
+      :title="detailWorkspaceTitle"
+      :width="720"
       mode="persistent"
       @update:model-value="handleDetailClose"
     >
-      <div class="of-database-view__detail-workspace" :data-record-id="selectedRecord?.id ?? ''">
-        <div class="of-database-view__detail-workspace-header">
-          <div class="of-database-view__detail-workspace-heading">
-            <div class="of-database-view__detail-workspace-kicker">右侧工作区</div>
-            <h3 class="of-database-view__detail-workspace-title">
-              {{ selectedRecord?.fields?.title ?? selectedRecord?.id ?? "记录详情" }}
-            </h3>
-          </div>
-          <div class="of-database-view__detail-workspace-meta">
-            <span class="of-database-view__detail-workspace-id">{{ selectedRecord?.id }}</span>
-            <span class="of-database-view__detail-workspace-mode">side-panel</span>
-          </div>
-        </div>
+      <DetailLayout
+        :title="detailWorkspaceTitle"
+        :comments="[]"
+        :description-content="detailWorkspaceDescription"
+        :description-editable="false"
+      >
+        <template #meta>
+          <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
+          <span class="of-database-view__workspace-chip">{{ activeViewType }}</span>
+          <span class="of-database-view__workspace-chip">{{ resolvedDetailPresentation }}</span>
+        </template>
 
-        <div class="of-database-view__detail-workspace-body">
-          <section class="of-database-view__detail-workspace-properties">
-            <div
-              v-for="column in detailPropertyColumns"
-              :key="column.key"
-              class="of-database-view__detail-workspace-field"
-            >
-              <span class="of-database-view__detail-workspace-label">{{ column.label }}</span>
-              <div class="of-database-view__detail-workspace-value">
-                <FieldCell
-                  v-if="detailFieldDefs.length > 0"
-                  :row-id="detailWorkspaceRow.id"
-                  :field="getDetailFieldDef(column.key)"
-                  :value="getDetailCellValue(column.key)"
-                  :readonly="readonly"
-                  @commit="handleDetailWorkspaceCommit"
-                />
-                <span v-else class="of-database-view__detail-workspace-fallback">
-                  {{ getDetailCellValue(column.key) ?? "—" }}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          <section
-            v-if="detailContentColumns.length > 0"
-            class="of-database-view__detail-workspace-content"
-          >
-            <div
-              v-for="column in detailContentColumns"
-              :key="column.key"
-              class="of-database-view__detail-workspace-content-block"
-            >
-              <span class="of-database-view__detail-workspace-content-label">{{ column.label }}</span>
-              <!-- eslint-disable vue/no-v-html -->
-              <!-- Markdown is rendered from the shared sanitizer pipeline in useMarkdown. -->
+        <template #props>
+          <div class="of-database-view__detail-workspace" :data-record-id="selectedRecord?.id ?? ''">
+            <section class="of-database-view__detail-workspace-properties">
               <div
-                class="of-database-view__detail-workspace-markdown of-markdown"
-                v-html="getRenderedDetailContent(column.key)"
-              />
-              <!-- eslint-enable vue/no-v-html -->
-            </div>
-          </section>
-        </div>
+                v-for="column in detailPropertyColumns"
+                :key="column.key"
+                class="of-database-view__detail-workspace-field"
+              >
+                <span class="of-database-view__detail-workspace-label">{{ column.label }}</span>
+                <div class="of-database-view__detail-workspace-value">
+                  <FieldCell
+                    v-if="detailFieldDefs.length > 0"
+                    :row-id="detailWorkspaceRow.id"
+                    :field="getDetailFieldDef(column.key)"
+                    :value="getDetailCellValue(column.key)"
+                    :readonly="readonly"
+                    @commit="handleDetailWorkspaceCommit"
+                  />
+                  <span v-else class="of-database-view__detail-workspace-fallback">
+                    {{ getDetailCellValue(column.key) ?? "—" }}
+                  </span>
+                </div>
+              </div>
+            </section>
+          </div>
+        </template>
 
-        <div class="of-database-view__detail-workspace-footer">
+        <template #footer>
           <button
             class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--delete"
             type="button"
@@ -1291,23 +1284,85 @@ function handleDetailWorkspaceSave() {
           >
             保存
           </button>
-        </div>
-      </div>
+        </template>
+      </DetailLayout>
     </SidePanel>
 
-    <DetailSheet
+    <Drawer
       v-else-if="showDetailWorkspace"
-      :visible="showDetailWorkspace"
-      :row="detailRow"
-      :columns="detailColumns"
-      :field-defs="detailFieldDefs"
-      :full-page="resolvedDetailPresentation === 'full-page'"
-      :readonly="readonly"
-      @close="handleDetailClose"
-      @save="handleDetailSave"
-      @delete="handleDetailDelete"
-      @cell-edit="handleCellEdit"
-    />
+      :model-value="showDetailWorkspace"
+      :title="detailWorkspaceTitle"
+      :width="900"
+      :fullscreen="resolvedDetailPresentation === 'full-page'"
+      :mask-closable="true"
+      @update:model-value="handleDetailClose"
+    >
+      <DetailLayout
+        :title="detailWorkspaceTitle"
+        :comments="[]"
+        :description-content="detailWorkspaceDescription"
+        :description-editable="false"
+      >
+        <template #meta>
+          <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
+          <span class="of-database-view__workspace-chip">{{ activeViewType }}</span>
+          <span class="of-database-view__workspace-chip">{{ resolvedDetailPresentation }}</span>
+        </template>
+
+        <template #props>
+          <div class="of-database-view__detail-workspace" :data-record-id="selectedRecord?.id ?? ''">
+            <section class="of-database-view__detail-workspace-properties">
+              <div
+                v-for="column in detailPropertyColumns"
+                :key="column.key"
+                class="of-database-view__detail-workspace-field"
+              >
+                <span class="of-database-view__detail-workspace-label">{{ column.label }}</span>
+                <div class="of-database-view__detail-workspace-value">
+                  <FieldCell
+                    v-if="detailFieldDefs.length > 0"
+                    :row-id="detailWorkspaceRow.id"
+                    :field="getDetailFieldDef(column.key)"
+                    :value="getDetailCellValue(column.key)"
+                    :readonly="readonly"
+                    @commit="handleDetailWorkspaceCommit"
+                  />
+                  <span v-else class="of-database-view__detail-workspace-fallback">
+                    {{ getDetailCellValue(column.key) ?? "—" }}
+                  </span>
+                </div>
+              </div>
+            </section>
+          </div>
+        </template>
+
+        <template #footer>
+          <button
+            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--delete"
+            type="button"
+            @click="handleDetailDelete(selectedRecord?.id ?? detailWorkspaceRow.id)"
+          >
+            删除
+          </button>
+          <div class="of-database-view__detail-workspace-footer-spacer" />
+          <button
+            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--cancel"
+            type="button"
+            @click="handleDetailClose"
+          >
+            取消
+          </button>
+          <button
+            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--save"
+            type="button"
+            :disabled="readonly || !hasDetailDraftChanges"
+            @click="handleDetailWorkspaceSave"
+          >
+            保存
+          </button>
+        </template>
+      </DetailLayout>
+    </Drawer>
   </section>
 </template>
 

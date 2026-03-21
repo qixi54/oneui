@@ -17,6 +17,7 @@ import FieldCell, {
   type FieldDef as CellFieldDef,
   type CellValue,
 } from "./FieldCell.vue";
+import type { RowActionItem } from "./TableDataRow.vue";
 import { useInlineEdit } from "@/composables/useInlineEdit";
 import { useVirtualList } from "@/composables/useVirtualList";
 import { useTable } from "@/composables/useTable";
@@ -82,6 +83,8 @@ const props = withDefaults(
     enableFieldManagement?: boolean;
     /** Density preset used for table, list, and detail affordances */
     density?: Density;
+    /** 显示默认行级快捷操作 */
+    showRowActions?: boolean;
   }>(),
   {
     tasks: () => [],
@@ -109,6 +112,7 @@ const props = withDefaults(
     aggregations: () => [],
     enableFieldManagement: false,
     density: "standard",
+    showRowActions: true,
   },
 );
 
@@ -201,6 +205,65 @@ const detailSheetTableRow = computed(() =>
   detailSheetRow.value as (Record<string, unknown> & { id: string }) | null,
 );
 type TableRowRecord = Record<string, unknown> & { id: string };
+
+const editableFieldKeys = computed(() =>
+  (props.fieldDefs ?? [])
+    .filter((field) => !field.readonly)
+    .map((field) => field.id),
+);
+
+function getFirstEditableFieldKey(row: T): string | null {
+  if (props.readonly) return null;
+  for (const col of effectiveColumns.value) {
+    if (col.hidden) continue;
+    if (!editableFieldKeys.value.includes(col.key)) continue;
+    if (row[col.key] === undefined && !(col.key in row)) continue;
+    return col.key;
+  }
+  return null;
+}
+
+function buildRowActionItems(row: T): RowActionItem[] {
+  const items: RowActionItem[] = [
+    {
+      key: "detail",
+      label: "详情",
+      onClick: () => handleRowClick(row),
+    },
+  ];
+  const editableFieldKey = getFirstEditableFieldKey(row);
+  if (editableFieldKey) {
+    items.push({
+      key: "edit",
+      label: "编辑",
+      onClick: () => handleInlineEdit(row, editableFieldKey),
+    });
+  }
+  return items;
+}
+
+function handleInlineEdit(row: T, fieldKey?: string) {
+  const rowId = getRowId(row);
+  const targetFieldKey = fieldKey ?? getFirstEditableFieldKey(row);
+  if (!targetFieldKey) {
+    handleRowClick(row);
+    return;
+  }
+  inlineEdit.activate(rowId, targetFieldKey);
+  if (props.enableKeyboard) {
+    setActiveCell(rowId, targetFieldKey);
+  }
+}
+
+function handleRowActionClick(row: T, actionKey: string) {
+  if (actionKey === "detail") {
+    handleRowClick(row);
+    return;
+  }
+  if (actionKey === "edit") {
+    handleInlineEdit(row);
+  }
+}
 
 // ── Inline Edit ────────────────────────────────────────────────────────────
 
@@ -833,6 +896,26 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                           <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
                         </slot>
                       </div>
+                      <div
+                        v-if="showRowActions"
+                        class="of-table-row__actions"
+                        aria-label="行快捷操作"
+                        @click.stop
+                      >
+                        <template v-for="action in buildRowActionItems(item as T)" :key="action.key">
+                          <button
+                            type="button"
+                            class="of-table-row__action-btn"
+                            :class="{
+                              'of-table-row__action-btn--danger': action.variant === 'danger',
+                            }"
+                            :disabled="action.disabled"
+                            @click.stop="handleRowActionClick(item as T, action.key)"
+                          >
+                            <span>{{ action.label }}</span>
+                          </button>
+                        </template>
+                      </div>
                     </div>
                   </template>
                 </div>
@@ -862,7 +945,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                   @focusout="syncHover(null)"
                   @click="handleRowClick(item as T)"
                   @keydown="handleRowKeyDown($event, item as T)"
-                >
+                  >
                   <div
                     v-if="effectiveSelectable"
                     class="of-td of-td-checkbox"
@@ -897,6 +980,24 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                       />
                       <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
                     </slot>
+                  </div>
+                  <div
+                    v-if="showRowActions"
+                    class="of-table-row__actions"
+                    aria-label="行快捷操作"
+                    @click.stop
+                  >
+                    <template v-for="action in buildRowActionItems(item as T)" :key="action.key">
+                      <button
+                        type="button"
+                        class="of-table-row__action-btn"
+                        :class="{ 'of-table-row__action-btn--danger': action.variant === 'danger' }"
+                        :disabled="action.disabled"
+                        @click.stop="handleRowActionClick(item as T, action.key)"
+                      >
+                        <span>{{ action.label }}</span>
+                      </button>
+                    </template>
                   </div>
                 </div>
               </template>
@@ -1060,6 +1161,8 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                   :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
                   v-bind="dataRowProps(item as T)"
                   :density="density"
+                  :show-row-actions="showRowActions"
+                  :row-action-items="buildRowActionItems(item as T)"
                   :draggable="enableRowDrag"
                   :class="dragRowClasses(item as T)"
                   @select="handleSelect"
@@ -1106,6 +1209,8 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
               v-else
               v-bind="dataRowProps(item as T)"
               :density="density"
+              :show-row-actions="showRowActions"
+              :row-action-items="buildRowActionItems(item as T)"
               :draggable="enableRowDrag"
               :class="dragRowClasses(item as T)"
               @select="handleSelect"
@@ -1367,6 +1472,69 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 
 .of-table-row--hover {
   background: var(--of-surface-muted, var(--of-color-gray-50));
+}
+
+.of-table-row {
+  position: relative;
+}
+
+.of-table-row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-left: auto;
+  min-width: 116px;
+  padding: 0 10px 0 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.of-table-row:hover .of-table-row__actions,
+.of-table-row:focus-within .of-table-row__actions,
+.of-table-row--selected .of-table-row__actions,
+.of-table-row--hover .of-table-row__actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.of-table-row__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  border-radius: 999px;
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-text-secondary, var(--of-color-gray-600));
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--of-transition-fast);
+}
+
+.of-table-row__action-btn:hover:not(:disabled),
+.of-table-row__action-btn:focus-visible:not(:disabled) {
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-800));
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
+}
+
+.of-table-row__action-btn--danger {
+  color: var(--of-error-text, var(--of-color-error-600));
+}
+
+.of-table-row__action-btn--danger:hover:not(:disabled),
+.of-table-row__action-btn--danger:focus-visible:not(:disabled) {
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  border-color: var(--of-border-subtle, var(--of-color-gray-200));
+}
+
+.of-table-row__action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 /* Draft toolbar */

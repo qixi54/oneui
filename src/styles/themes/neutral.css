@@ -5,9 +5,14 @@
   --of-surface-panel: #fbfcfd;
   --of-surface-muted: #f1f3f6;
   --of-surface-selected: #eceff3;
+  --of-surface-workspace: #ffffff;
+  --of-surface-workspace-raised: #ffffff;
+  --of-surface-workspace-strong: #f8fafc;
 
   --of-border-subtle: rgba(15, 23, 42, 0.08);
   --of-border-strong: rgba(15, 23, 42, 0.14);
+  --of-workspace-border: rgba(15, 23, 42, 0.1);
+  --of-row-action-border: rgba(15, 23, 42, 0.14);
 
   --of-text-primary: #0f172a;
   --of-text-secondary: #526071;
@@ -20,6 +25,11 @@
   --of-accent-default: #334155;
   --of-accent-strong: #0f172a;
   --of-accent-soft: #dbe2ea;
+  --of-row-action-hover: rgba(51, 65, 85, 0.06);
+  --of-row-action-active: rgba(51, 65, 85, 0.12);
+  --of-row-action-text: #334155;
+  --of-status-active: #334155;
+  --of-status-active-bg: rgba(51, 65, 85, 0.08);
 
   --of-chart-series-1: #516072;
   --of-chart-series-2: #748399;

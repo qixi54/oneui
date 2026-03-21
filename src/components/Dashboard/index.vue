@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from "vue";
 
 type ChartType = "bar" | "pie" | "doughnut" | "number-card" | "table";
 
@@ -38,10 +44,56 @@ const chartMap = {
   table: defineAsyncComponent(() => import("./charts/TableChart.vue")),
 };
 
+const dashboardRef = ref<HTMLElement | null>(null);
+const dashboardWidth = ref(0);
+let resizeObserver: ResizeObserver | null = null;
+
+const resolvedColumns = computed(() => Math.max(1, Math.floor(props.columns)));
+
+const responsiveColumns = computed(() => {
+  const width = dashboardWidth.value;
+  const base = resolvedColumns.value;
+  if (!width) return base;
+  if (width < 560) return 1;
+  if (width < 840) return Math.min(base, 2);
+  if (width < 1120) return Math.min(base, 3);
+  return base;
+});
+
 const layoutStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${props.columns}, minmax(0, 1fr))`,
+  "--dashboard-columns": String(responsiveColumns.value),
   gap: `${props.gap}px`,
 }));
+
+function updateDashboardWidth(entry?: ResizeObserverEntry) {
+  if (entry) {
+    dashboardWidth.value = Math.round(entry.contentRect.width);
+    return;
+  }
+  dashboardWidth.value = Math.round(dashboardRef.value?.getBoundingClientRect().width ?? 0);
+}
+
+onMounted(() => {
+  updateDashboardWidth();
+  if (typeof ResizeObserver === "undefined" || !dashboardRef.value) return;
+  resizeObserver = new ResizeObserver((entries) => {
+    if (entries[0]) updateDashboardWidth(entries[0]);
+  });
+  resizeObserver.observe(dashboardRef.value);
+});
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+});
+
+function resolveWidgetStyle(widget: DashboardWidget) {
+  const maxSpan = responsiveColumns.value;
+  return {
+    gridColumn: `span ${Math.min(widget.colSpan ?? 1, maxSpan)}`,
+    gridRow: `span ${widget.rowSpan ?? 1}`,
+  };
+}
 
 const fallbackWidgets = computed<DashboardWidget[]>(() => {
   if (props.widgets.length > 0) return props.widgets;
@@ -101,7 +153,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 </script>
 
 <template>
-  <section class="of-dashboard">
+  <section ref="dashboardRef" class="of-dashboard">
     <header class="of-dashboard__header">
       <h3 class="of-dashboard__title">{{ title }}</h3>
     </header>
@@ -111,10 +163,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
         v-for="widget in fallbackWidgets"
         :key="widget.id"
         class="of-dashboard__item"
-        :style="{
-          gridColumn: `span ${widget.colSpan ?? 1}`,
-          gridRow: `span ${widget.rowSpan ?? 1}`,
-        }"
+        :style="resolveWidgetStyle(widget)"
       >
         <component
           :is="chartMap[widget.type]"
@@ -133,6 +182,12 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  container-type: inline-size;
+  background: var(--of-surface-workspace, var(--of-surface-elevated, var(--of-color-bg-elevated)));
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-100)));
+  border-radius: var(--of-radius-2xl, var(--of-radius-xl));
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .of-dashboard__header {
@@ -151,22 +206,32 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 .of-dashboard__grid {
   display: grid;
   align-items: stretch;
+  grid-template-columns: repeat(var(--dashboard-columns, 4), minmax(0, 1fr));
+  grid-auto-rows: minmax(220px, auto);
 }
 
 .of-dashboard__item {
   min-height: 220px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-100)));
   border-radius: var(--of-radius-xl);
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
   box-shadow: var(--of-card-shadow, var(--of-shadow-card));
   padding: 14px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.of-dashboard__item:hover {
+  transform: translateY(-1px);
+  border-color: var(--of-row-action-border, var(--of-border-strong, var(--of-color-gray-300)));
+  box-shadow: var(--of-card-shadow-hover, var(--of-shadow-card-hover));
+  background: var(--of-surface-workspace-strong, var(--of-surface-elevated, var(--of-color-bg-elevated)));
 }
 
 @media (max-width: 960px) {
-  .of-dashboard__grid {
-    grid-template-columns: 1fr;
-  }
-
   .of-dashboard__item {
     grid-column: span 1;
   }
