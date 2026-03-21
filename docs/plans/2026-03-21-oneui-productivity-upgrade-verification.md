@@ -138,16 +138,22 @@ npm run build
 
 - `plan/detail`: `verified`
 - `task-dep-graph`: `verified`
-- `verification-report/upsert`: `pending writeback`
-- `plan/complete`: `pending writeback`
+- `verification-report/upsert`: `done`
+- `plan/complete`: `already_completed`
 
 ### 7.3 留痕占位
 
-- `task log`: `in progress`
-- `doc output`: `in progress`
-- `verification report`: `pending final writeback`
+- `task log`: `已写回`
+- `doc output`: `已提交（本文）`
+- `verification report`: `done`
 
 ## 8. Closeout Notes
 
-- 本地代码与验证已经满足 closeout 条件，剩余动作只有 FlowAPI 的 `verification-report/upsert -> task complete -> plan/complete` 写回。
-- 本文档作为 QA closeout 主证据，同时配合 planning doc 与 task logs 一起完成溯源。
+- 本地代码与验证已经满足 closeout 条件，`verification-report/upsert` 已写回，`plan/complete` 已经是 `already completed` 状态。
+- 当前 `plan.detail` 仍提示 `next_required_action=upgrade_delivery_profile`，建议后续如需严格清洁可发起 `service_delivery` profile 收口 plan；不影响现有完成态（`verification/verdict` 已全部 pass）。
+- 本文档作为 QA closeout 主证据，同时配合 planning doc、task output 与 verification-report upsert 一起完成溯源。
+- `report.verdict=pass`、`delivery.verdict=pass` 已记录，delivery evidence 包含：
+  - `publish-dryrun.json`
+  - `npm-pack-json.txt`
+  - Vite5 consumer build log
+  - Vite8 consumer build log
