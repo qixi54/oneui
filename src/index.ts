@@ -245,6 +245,17 @@ export type { UseKeyboardNavigationOptions } from "./composables/useKeyboardNavi
 export type { RowReorderPayload, RowGroupChangePayload } from "./composables/useRowDrag";
 export type { UseDraftRowsOptions } from "./composables/useDraftRows";
 export type {
+  UseDataTableSelectionOptions,
+  UseDataTableSelectionReturn,
+} from "./composables/useDataTableSelection";
+export type {
+  DataTableDetailSheetBaseRow,
+  DataTableDetailSheetRow,
+  DataTableCellEditPayload,
+  DataTableDetailSavePayload,
+  DataTableRowClickResult,
+} from "./composables/useDataTableDetailSheet";
+export type {
   ValidationRule,
   FilterFieldConfig,
   FilterPanelConfig,
@@ -277,6 +288,8 @@ export { useFixedColumns } from "./composables/useFixedColumns";
 export { useKeyboardNavigation } from "./composables/useKeyboardNavigation";
 export { useRowDrag } from "./composables/useRowDrag";
 export { useDraftRows } from "./composables/useDraftRows";
+export { useDataTableSelection } from "./composables/useDataTableSelection";
+export { useDataTableDetailSheet, buildDetailSheetCellEditPayloads } from "./composables/useDataTableDetailSheet";
 export { useWorkerSort } from "./composables/useWorkerSort";
 export { useSchemaEngine } from "./composables/useSchemaEngine";
 export { useSupabaseProvider } from "./composables/useSupabaseProvider";

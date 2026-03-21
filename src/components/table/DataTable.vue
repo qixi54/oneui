@@ -25,15 +25,12 @@ import FieldCell, {
 } from "./FieldCell.vue";
 import type {
   BulkActionItem,
-  BulkActionContext,
-  ResolvedBulkActionItem,
 } from "../../types/data-table";
 import {
   normalizeFieldType,
   resolveRowId,
   resolveFieldDef,
   resolveFirstEditableFieldKey,
-  buildResolvedBulkActionItems,
   buildDataRowStyle,
   buildBodyCellStyle,
   buildGroupSpacerStyle,
@@ -52,6 +49,8 @@ import { useFixedColumns } from "@/composables/useFixedColumns";
 import { useRowDrag } from "@/composables/useRowDrag";
 import { useDraftRows } from "@/composables/useDraftRows";
 import { useDataTableLayout } from "@/composables/useDataTableLayout";
+import { useDataTableSelection } from "@/composables/useDataTableSelection";
+import { useDataTableDetailSheet } from "@/composables/useDataTableDetailSheet";
 import type {
   Density,
   Task,
@@ -197,12 +196,15 @@ const {
   containerResponsive: computed(() => props.containerResponsive ?? true),
   isMobile,
 });
-const detailSheetVisible = ref(false);
 type RowWithRecord = T & { __record?: DataRecord };
-const detailSheetRow = ref<RowWithRecord | null>(null);
-const detailSheetTableRow = computed(() =>
-  detailSheetRow.value as (Record<string, unknown> & { id: string }) | null,
-);
+const {
+  detailSheetVisible,
+  detailSheetTableRow,
+  handleRowClick: handleDetailSheetRowClick,
+  handleMobileRowClick: openMobileDetailSheet,
+  buildDetailSavePayloads,
+  closeDetailSheet,
+} = useDataTableDetailSheet<RowWithRecord, DataRecord>();
 type TableRowRecord = Record<string, unknown> & { id: string };
 
 const editableFieldKeys = computed(() =>
@@ -555,44 +557,20 @@ const effectiveAddable = computed(() => (props.readonly ? false : props.addable)
 
 // ── Selection ──────────────────────────────────────────────────────────────
 
-const selectedIdsArray = computed(() => Array.from(selectedRows.value));
-const indeterminate = computed(() => selectedRows.value.size > 0 && !isAllSelected.value);
-const selectedDataRows = computed(() =>
-  sortedData.value.filter((row) => selectedRows.value.has(getRowId(row))),
-);
-const bulkActionContext = computed<BulkActionContext<T | DataRecord>>(() => ({
-  selectionCount: selectedDataRows.value.length,
-  rowIds: selectedDataRows.value.map((row) => getRowId(row)),
-  rows: [...selectedDataRows.value],
-}));
-const hasSelectionBar = computed(
-  () => props.showSelectionBar && effectiveSelectable.value && selectedRows.value.size > 0,
-);
-const resolvedBulkActionItems = computed<ResolvedBulkActionItem[]>(() =>
-  buildResolvedBulkActionItems(props.bulkActionItems, bulkActionContext.value),
-);
-
-function handleSelectAll() {
-  toggleSelectAll(sortedData.value);
-}
-
-function handleSelect(id: string | number) {
-  const row = sortedData.value.find((r) => r[props.rowKey] === id);
-  if (row) toggleRowSelection(row, 0);
-}
-
-function handleBulkAction(action: BulkActionItem | ResolvedBulkActionItem) {
-  emit("bulk-action", {
-    actionKey: action.key,
-    rowIds: bulkActionContext.value.rowIds,
-    rows: bulkActionContext.value.rows,
+const { indeterminate, hasSelectionBar, resolvedBulkActionItems, handleSelectAll, handleSelect, handleBulkAction } =
+  useDataTableSelection<T>({
+    rows: sortedData,
+    selectedRows,
+    rowKey: toRef(props, "rowKey"),
+    selectable: effectiveSelectable,
+    bulkActionItems: toRef(props, "bulkActionItems"),
+    showSelectionBar: toRef(props, "showSelectionBar"),
+    emitSelectionChange: (ids) => emit("selection-change", ids),
+    toggleSelectAll,
+    toggleRowSelection: (row, index = 0) => toggleRowSelection(row, index),
+    clearSelection,
+    emitBulkAction: (payload) => emit("bulk-action", payload),
   });
-  if (action.clearSelectionAfter || action.key === "clear-selection") {
-    clearSelection();
-  }
-}
-
-watch(selectedIdsArray, (ids) => emit("selection-change", ids), { immediate: false });
 
 // ── Event Handlers ─────────────────────────────────────────────────────────
 
@@ -610,18 +588,18 @@ function onCellCommit(rowId: string, fieldId: string, value: unknown) {
 }
 
 function handleRowClick(row: T) {
-  if (isMobile.value) {
-    detailSheetRow.value = row;
-    detailSheetVisible.value = true;
+  const result = handleDetailSheetRowClick({
+    row: row as RowWithRecord,
+    isMobile: isMobile.value,
+  });
+  if (result.type === "emit-record") {
+    emit("row-click-record", result.row);
+    emit("row-click", result.row);
     return;
   }
-  const record = (row as RowWithRecord).__record;
-  if (record) {
-    emit("row-click-record", record);
-    emit("row-click", record);
-    return;
+  if (result.type === "emit-row") {
+    emit("row-click", result.row);
   }
-  emit("row-click", row);
 }
 
 function handleRowKeyDown(event: KeyboardEvent, row: T) {
@@ -731,13 +709,12 @@ function dragRowClasses(item: T): Record<string, boolean> {
 // ── Mobile handlers ────────────────────────────────────────────────────────
 
 function handleMobileRowClick(row: T) {
-  detailSheetRow.value = row;
-  detailSheetVisible.value = true;
+  openMobileDetailSheet(row as RowWithRecord);
 }
 
 function handleDetailSave(payload: { rowId: string; fields: Record<string, unknown> }) {
-  for (const [fieldId, value] of Object.entries(payload.fields)) {
-    emit("cell-edit", { rowId: payload.rowId, fieldId, value });
+  for (const editPayload of buildDetailSavePayloads(payload)) {
+    emit("cell-edit", editPayload);
   }
 }
 </script>
@@ -759,7 +736,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
       :detail-row="detailSheetTableRow"
       @row-click="(row) => handleMobileRowClick(row as T)"
       @add-row="emit('add-row')"
-      @close-detail="detailSheetVisible = false"
+      @close-detail="closeDetailSheet"
       @detail-save="handleDetailSave"
       @row-delete="(id: string) => emit('row-delete', id)"
       @cell-edit="(payload) => emit('cell-edit', payload)"

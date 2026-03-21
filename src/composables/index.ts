@@ -58,6 +58,19 @@ export { useDraftRows } from "./useDraftRows";
 export type { UseDraftRowsOptions } from "./useDraftRows";
 
 export { useWorkerSort } from "./useWorkerSort";
+export { useDataTableSelection } from "./useDataTableSelection";
+export type {
+  UseDataTableSelectionOptions,
+  UseDataTableSelectionReturn,
+} from "./useDataTableSelection";
+export { useDataTableDetailSheet, buildDetailSheetCellEditPayloads } from "./useDataTableDetailSheet";
+export type {
+  DataTableDetailSheetBaseRow,
+  DataTableDetailSheetRow,
+  DataTableCellEditPayload,
+  DataTableDetailSavePayload,
+  DataTableRowClickResult,
+} from "./useDataTableDetailSheet";
 
 export { useSchemaEngine } from "./useSchemaEngine";
 export type {
