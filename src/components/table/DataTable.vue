@@ -4,6 +4,8 @@ import {
   computed,
   toRef,
   watch,
+  onMounted,
+  onBeforeUnmount,
   defineAsyncComponent,
   type ComponentPublicInstance,
   type CSSProperties,
@@ -43,6 +45,14 @@ import type {
   GroupConfig,
   FieldType,
 } from "../../types";
+
+export interface BulkActionItem {
+  key: string;
+  label: string;
+  variant?: "default" | "danger";
+  disabled?: boolean;
+  clearSelectionAfter?: boolean;
+}
 
 // ── Props ──────────────────────────────────────────────────────────────────
 
@@ -85,6 +95,12 @@ const props = withDefaults(
     density?: Density;
     /** 显示默认行级快捷操作 */
     showRowActions?: boolean;
+    /** 显示批量操作条 */
+    showSelectionBar?: boolean;
+    /** 批量操作定义，默认仅提供清空选择 */
+    bulkActionItems?: BulkActionItem[];
+    /** 开启表格容器感知密度收缩 */
+    containerResponsive?: boolean;
   }>(),
   {
     tasks: () => [],
@@ -113,6 +129,9 @@ const props = withDefaults(
     enableFieldManagement: false,
     density: "standard",
     showRowActions: true,
+    showSelectionBar: true,
+    bulkActionItems: () => [],
+    containerResponsive: true,
   },
 );
 
@@ -141,6 +160,7 @@ const emit = defineEmits<{
   "schema-hide-field": [fieldId: string];
   "schema-delete-field": [fieldId: string];
   "schema-duplicate-field": [fieldId: string];
+  "bulk-action": [payload: { actionKey: string; rowIds: string[]; rows: (T | DataRecord)[] }];
 }>();
 const ColumnHeaderMenu = defineAsyncComponent(() => import("./ColumnHeaderMenu.vue"));
 const FieldTypePicker = defineAsyncComponent(() => import("./FieldTypePicker.vue"));
@@ -184,8 +204,52 @@ const TABLE_DENSITY_METRICS: Record<
 };
 
 const density = computed<Density>(() => props.density ?? "standard");
-const densityMetrics = computed(() => TABLE_DENSITY_METRICS[density.value]);
-const densityClass = computed(() => `of-data-table--${density.value}`);
+const tableContainerWidth = ref(0);
+let tableResizeObserver: ResizeObserver | null = null;
+
+function syncTableContainerWidth() {
+  tableContainerWidth.value = tableContainerRef.value?.clientWidth ?? 0;
+}
+
+onMounted(() => {
+  syncTableContainerWidth();
+  if (typeof ResizeObserver === "undefined" || !tableContainerRef.value) return;
+  tableResizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0];
+    if (!entry) return;
+    tableContainerWidth.value = entry.contentRect.width;
+  });
+  tableResizeObserver.observe(tableContainerRef.value);
+});
+
+onBeforeUnmount(() => {
+  tableResizeObserver?.disconnect();
+  tableResizeObserver = null;
+});
+
+const containerDensity = computed<Density>(() => {
+  if (!props.containerResponsive || isMobile.value) {
+    return density.value;
+  }
+  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 860) {
+    return "compact";
+  }
+  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 1080 && density.value === "comfortable") {
+    return "standard";
+  }
+  return density.value;
+});
+const densityMetrics = computed(() => TABLE_DENSITY_METRICS[containerDensity.value]);
+const densityClass = computed(() => `of-data-table--${containerDensity.value}`);
+const containerWidthClass = computed(() => {
+  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 860) {
+    return "of-data-table--container-tight";
+  }
+  if (tableContainerWidth.value > 0 && tableContainerWidth.value <= 1080) {
+    return "of-data-table--container-medium";
+  }
+  return "of-data-table--container-wide";
+});
 const densityStyle = computed(() => ({
   "--of-data-table-group-row-height": `${densityMetrics.value.groupRowHeight}px`,
   "--of-data-table-mobile-card-padding-x": `${densityMetrics.value.mobileCardPaddingX}px`,
@@ -297,7 +361,7 @@ const {
 } = useColumnResize({
     columns: resolvedColumns,
     rows: normalizedData,
-    density,
+    density: containerDensity,
     onResize: (colKey, width) => emit("column-resize", { colKey, width }),
   });
 
@@ -329,6 +393,7 @@ const {
   sort,
   toggleSort,
   selectedRows,
+  clearSelection,
   toggleSelectAll,
   toggleRowSelection,
   isAllSelected,
@@ -389,7 +454,7 @@ const { visibleItems, totalHeight, offsetY, scrollToIndex, observeRow } = useVir
   },
   overscan: 5,
   containerRef: scrollContainerRef,
-  invalidateKey: density,
+  invalidateKey: containerDensity,
   measureRow: true,
 });
 
@@ -568,6 +633,22 @@ const effectiveAddable = computed(() => (props.readonly ? false : props.addable)
 
 const selectedIdsArray = computed(() => Array.from(selectedRows.value));
 const indeterminate = computed(() => selectedRows.value.size > 0 && !isAllSelected.value);
+const selectedDataRows = computed(() =>
+  sortedData.value.filter((row) => selectedRows.value.has(getRowId(row))),
+);
+const hasSelectionBar = computed(
+  () => props.showSelectionBar && effectiveSelectable.value && selectedRows.value.size > 0,
+);
+const resolvedBulkActionItems = computed<BulkActionItem[]>(() => {
+  const defaults: BulkActionItem[] = [
+    {
+      key: "clear-selection",
+      label: "清空选择",
+      clearSelectionAfter: true,
+    },
+  ];
+  return [...defaults, ...(props.bulkActionItems ?? [])];
+});
 
 function handleSelectAll() {
   toggleSelectAll(sortedData.value);
@@ -576,6 +657,18 @@ function handleSelectAll() {
 function handleSelect(id: string | number) {
   const row = sortedData.value.find((r) => r[props.rowKey] === id);
   if (row) toggleRowSelection(row, 0);
+}
+
+function handleBulkAction(action: BulkActionItem) {
+  const rowIds = selectedDataRows.value.map((row) => getRowId(row));
+  emit("bulk-action", {
+    actionKey: action.key,
+    rowIds,
+    rows: [...selectedDataRows.value],
+  });
+  if (action.clearSelectionAfter || action.key === "clear-selection") {
+    clearSelection();
+  }
 }
 
 watch(selectedIdsArray, (ids) => emit("selection-change", ids), { immediate: false });
@@ -793,12 +886,32 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
     v-else
     ref="tableContainerRef"
     class="of-data-table"
-    :class="densityClass"
+    :class="[densityClass, containerWidthClass]"
     :style="densityStyle"
     role="grid"
     tabindex="0"
     @keydown="enableKeyboard ? handleKeyDown($event) : undefined"
   >
+    <div v-if="hasSelectionBar" class="of-data-table-selection-bar" data-role="selection-bar">
+      <div class="of-data-table-selection-bar__summary">
+        <span class="of-data-table-selection-bar__count">{{ selectedRows.size }}</span>
+        <span class="of-data-table-selection-bar__text">条记录已选中</span>
+      </div>
+      <div class="of-data-table-selection-bar__actions">
+        <button
+          v-for="action in resolvedBulkActionItems"
+          :key="action.key"
+          type="button"
+          class="of-data-table-selection-bar__btn"
+          :class="{ 'of-data-table-selection-bar__btn--danger': action.variant === 'danger' }"
+          :disabled="action.disabled"
+          @click="handleBulkAction(action)"
+        >
+          {{ action.label }}
+        </button>
+      </div>
+    </div>
+
     <!-- Fixed columns mode -->
     <template v-if="hasFixedColumns">
       <div class="of-data-table-body" style="position: relative">
@@ -821,7 +934,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
           :enable-resize="enableResize"
           :enable-field-menu="enableFieldManagement"
           :enable-add-field="enableFieldManagement"
-          :density="density"
+          :density="containerDensity"
             @sort="toggleSort"
             @select-all="handleSelectAll"
             @resize-start="onResizeStart"
@@ -1021,7 +1134,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
             :enable-resize="enableResize"
             :enable-field-menu="enableFieldManagement"
             :enable-add-field="enableFieldManagement"
-            :density="density"
+            :density="containerDensity"
             @sort="toggleSort"
             @resize-start="onResizeStart"
             @resize-dblclick="onAutoFitColumn"
@@ -1134,7 +1247,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
             :enable-resize="enableResize"
             :enable-field-menu="enableFieldManagement"
             :enable-add-field="enableFieldManagement"
-            :density="density"
+            :density="containerDensity"
             @sort="toggleSort"
             @select-all="handleSelectAll"
             @resize-start="onResizeStart"
@@ -1160,7 +1273,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                   v-else
                   :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
                   v-bind="dataRowProps(item as T)"
-                  :density="density"
+                  :density="containerDensity"
                   :show-row-actions="showRowActions"
                   :row-action-items="buildRowActionItems(item as T)"
                   :draggable="enableRowDrag"
@@ -1208,7 +1321,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
             <TableDataRow
               v-else
               v-bind="dataRowProps(item as T)"
-              :density="density"
+              :density="containerDensity"
               :show-row-actions="showRowActions"
               :row-action-items="buildRowActionItems(item as T)"
               :draggable="enableRowDrag"
@@ -1328,6 +1441,85 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   overflow-y: auto;
 }
 
+.of-data-table-selection-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid
+    var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
+  background: var(
+    --of-surface-workspace-strong,
+    var(--of-surface-selected, var(--of-color-gray-100))
+  );
+}
+
+.of-data-table-selection-bar__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.of-data-table-selection-bar__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--of-status-active-bg, var(--of-surface-elevated, #fff));
+  color: var(--of-status-active, var(--of-row-action-text, var(--of-text-primary, #111827)));
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.of-data-table-selection-bar__text {
+  color: var(--of-text-secondary, var(--of-color-gray-600));
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.of-data-table-selection-bar__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.of-data-table-selection-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  border: 1px solid var(--of-row-action-border, var(--of-border-subtle, var(--of-color-gray-200)));
+  border-radius: 999px;
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-row-action-text, var(--of-text-primary, var(--of-color-gray-800)));
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--of-transition-fast);
+}
+
+.of-data-table-selection-bar__btn:hover:not(:disabled),
+.of-data-table-selection-bar__btn:focus-visible:not(:disabled) {
+  background: var(--of-row-action-hover, var(--of-surface-selected, var(--of-color-gray-100)));
+}
+
+.of-data-table-selection-bar__btn--danger {
+  color: var(--of-error-text, var(--of-color-error-600));
+}
+
+.of-data-table-selection-bar__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .of-data-table--compact :deep(.of-table-group-row) {
   height: var(--of-data-table-group-row-height);
 }
@@ -1382,6 +1574,19 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 }
 
 @media (max-width: 768px) {
+  .of-data-table-selection-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .of-data-table-selection-bar__actions {
+    justify-content: stretch;
+  }
+
+  .of-data-table-selection-bar__btn {
+    width: 100%;
+  }
+
   .of-data-table-scroll-container {
     max-height: 100dvh;
     overflow-x: auto;
@@ -1535,6 +1740,15 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 .of-table-row__action-btn:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.of-data-table--container-tight .of-table-row__actions {
+  min-width: 92px;
+  padding-right: 6px;
+}
+
+.of-data-table--container-tight .of-table-row__action-btn {
+  padding: 4px 8px;
 }
 
 /* Draft toolbar */

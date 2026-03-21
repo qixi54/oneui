@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { AlertCircle, Inbox, Loader2 } from "lucide-vue-next";
 import PropPanel from "./PropPanel.vue";
 import CommentItem from "./CommentItem.vue";
 import { ContentBlock } from "../editor";
 import type { Task, CommentData, PropItem } from "../../types";
+
+type DetailLayoutState = "ready" | "loading" | "empty" | "error";
 
 const props = withDefaults(
   defineProps<{
@@ -13,6 +16,9 @@ const props = withDefaults(
     propItems?: PropItem[];
     descriptionContent?: string;
     descriptionEditable?: boolean;
+    state?: DetailLayoutState;
+    stateTitle?: string;
+    stateDescription?: string;
   }>(),
   {
     task: null,
@@ -21,6 +27,9 @@ const props = withDefaults(
     propItems: () => [],
     descriptionContent: "",
     descriptionEditable: false,
+    state: "ready",
+    stateTitle: "",
+    stateDescription: "",
   },
 );
 
@@ -29,6 +38,26 @@ const emit = defineEmits<{
 }>();
 
 const displayTitle = computed(() => props.title || props.task?.title || "未命名工作区");
+const isReadyState = computed(() => props.state === "ready");
+const stateIcon = computed(() => {
+  if (props.state === "loading") return Loader2;
+  if (props.state === "error") return AlertCircle;
+  return Inbox;
+});
+const stateTitle = computed(() => {
+  if (props.stateTitle) return props.stateTitle;
+  if (props.state === "loading") return "正在准备工作区";
+  if (props.state === "error") return "工作区加载失败";
+  if (props.state === "empty") return "暂无详情内容";
+  return "";
+});
+const stateDescription = computed(() => {
+  if (props.stateDescription) return props.stateDescription;
+  if (props.state === "loading") return "请稍候，当前记录的详情数据正在整理。";
+  if (props.state === "error") return "暂时无法展示当前详情，请稍后重试。";
+  if (props.state === "empty") return "当前记录还没有可展示的描述、属性或活动记录。";
+  return "";
+});
 
 // 状态标签颜色
 const statusBadgeStyle = computed(() => {
@@ -151,41 +180,51 @@ function onDescriptionUpdate(value: string) {
         <slot name="meta" />
       </div>
 
-      <!-- 描述区 -->
-      <div class="detail-layout__section">
-        <div class="detail-layout__section-title">描述</div>
-        <div class="detail-layout__description">
-          <slot name="description">
-            <ContentBlock
-              :content="descriptionText"
-              :editable="descriptionEditable"
-              @update:content="onDescriptionUpdate"
-            />
-            <p v-if="!descriptionText" class="detail-layout__desc-placeholder">暂无描述</p>
-          </slot>
+      <div v-if="!isReadyState" class="detail-layout__state" :data-role="`detail-state-${props.state}`">
+        <component :is="stateIcon" class="detail-layout__state-icon" :size="20" />
+        <div class="detail-layout__state-copy">
+          <div class="detail-layout__state-title">{{ stateTitle }}</div>
+          <p class="detail-layout__state-description">{{ stateDescription }}</p>
         </div>
       </div>
 
-      <!-- 活动记录区 -->
-      <div class="detail-layout__section">
-        <div class="detail-layout__section-title">活动记录</div>
-        <div class="detail-layout__comments">
-          <slot name="comments">
-            <div v-if="comments && comments.length > 0" class="detail-layout__comment-list">
-              <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" />
-            </div>
-            <p v-else class="detail-layout__empty-hint">暂无活动记录</p>
-          </slot>
+      <template v-else>
+        <!-- 描述区 -->
+        <div class="detail-layout__section">
+          <div class="detail-layout__section-title">描述</div>
+          <div class="detail-layout__description">
+            <slot name="description">
+              <ContentBlock
+                :content="descriptionText"
+                :editable="descriptionEditable"
+                @update:content="onDescriptionUpdate"
+              />
+              <p v-if="!descriptionText" class="detail-layout__desc-placeholder">暂无描述</p>
+            </slot>
+          </div>
         </div>
-      </div>
 
-      <div v-if="$slots.footer" class="detail-layout__footer">
-        <slot name="footer" />
-      </div>
+        <!-- 活动记录区 -->
+        <div class="detail-layout__section">
+          <div class="detail-layout__section-title">活动记录</div>
+          <div class="detail-layout__comments">
+            <slot name="comments">
+              <div v-if="comments && comments.length > 0" class="detail-layout__comment-list">
+                <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" />
+              </div>
+              <p v-else class="detail-layout__empty-hint">暂无活动记录</p>
+            </slot>
+          </div>
+        </div>
+
+        <div v-if="$slots.footer" class="detail-layout__footer">
+          <slot name="footer" />
+        </div>
+      </template>
     </div>
 
     <!-- 右栏：属性面板 -->
-    <div class="detail-layout__sidebar">
+    <div v-if="isReadyState" class="detail-layout__sidebar">
       <slot name="props">
         <PropPanel v-if="propItems && propItems.length > 0" :items="propItems" title="属性" />
       </slot>
@@ -279,6 +318,38 @@ function onDescriptionUpdate(value: string) {
 /* 描述内容 */
 .detail-layout__description {
   min-height: 48px;
+}
+
+.detail-layout__state {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 220px;
+  padding: 16px 0;
+}
+
+.detail-layout__state-icon {
+  color: var(--of-text-secondary, var(--of-color-gray-500));
+  flex-shrink: 0;
+}
+
+.detail-layout__state-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-layout__state-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--of-text-primary, var(--of-color-gray-900));
+}
+
+.detail-layout__state-description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--of-text-secondary, var(--of-color-gray-500));
 }
 
 .detail-layout__desc-placeholder {

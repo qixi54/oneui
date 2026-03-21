@@ -252,6 +252,37 @@ describe("Table + Detail 集成", () => {
     }
   });
 
+  it("DataTable 选中行后会显示批量操作条，并支持清空选择", async () => {
+    const wrapper = mount(DataTable, {
+      props: {
+        tasks,
+        columns: [
+          { key: "title", label: "标题" },
+          { key: "status", label: "状态" },
+        ],
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    const firstCheckbox = wrapper.find('input[id="of-table-row-checkbox-T-1"]');
+    await firstCheckbox.setValue(true);
+
+    const selectionBar = wrapper.find('[data-role="selection-bar"]');
+    expect(selectionBar.exists()).toBe(true);
+    expect(selectionBar.text()).toContain("1");
+    expect(selectionBar.text()).toContain("条记录已选中");
+
+    await selectionBar.find("button").trigger("click");
+
+    expect(wrapper.emitted("bulk-action")).toBeTruthy();
+    expect(wrapper.emitted("bulk-action")?.[0]?.[0]).toMatchObject({
+      actionKey: "clear-selection",
+      rowIds: ["T-1"],
+    });
+    expect(wrapper.find('[data-role="selection-bar"]').exists()).toBe(false);
+  });
+
   it("DetailLayout 能渲染来自 task 的关键字段", () => {
     const wrapper = mount(DetailLayout, {
       props: {
@@ -267,5 +298,18 @@ describe("Table + Detail 集成", () => {
     expect(wrapper.text()).toContain("进行中");
     expect(wrapper.text()).toContain("P1");
     expect(wrapper.text()).toContain("补齐 Task 2.4 的联调覆盖");
+  });
+
+  it("DetailLayout 在非 ready 状态下会渲染统一状态壳", () => {
+    const wrapper = mount(DetailLayout, {
+      props: {
+        title: "详情工作区",
+        state: "loading",
+      },
+    });
+
+    expect(wrapper.find('[data-role="detail-state-loading"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("正在准备工作区");
+    expect(wrapper.find(".detail-layout__sidebar").exists()).toBe(false);
   });
 });
