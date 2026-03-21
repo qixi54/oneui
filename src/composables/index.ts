@@ -99,5 +99,7 @@ export type {
   UseDatabaseViewResult,
 } from "./useDatabaseView";
 
+export { useDatabaseViewport, useDatabaseWorkspaceState } from "./useDatabaseWorkspace";
+
 export { useSearch } from "./useSearch";
 export type { UseSearchOptions, SearchHighlight } from "./useSearch";

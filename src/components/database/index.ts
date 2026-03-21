@@ -1,7 +1,7 @@
 export { default as DatabaseView } from "./DatabaseView.vue";
 export type {
-  DatabaseViewActions,
+  DatabaseViewComponentActions as DatabaseViewActions,
   DatabaseViewSchemaEvent,
   DatabaseViewViewTab,
   DatabaseViewProps,
-} from "./DatabaseView.vue";
+} from "../../contracts/database";

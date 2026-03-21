@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch, type Component } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { AlertCircle, Database, Loader2 } from "lucide-vue-next";
 import EmptyState from "../base/EmptyState.vue";
 import FieldCell from "../table/FieldCell.vue";
@@ -13,91 +13,32 @@ import GalleryView from "../gallery/GalleryView.vue";
 import GanttTimeline from "../timeline/GanttTimeline.vue";
 import type { EmptyStateAction } from "../base/EmptyState.vue";
 import type { FieldDef as CellFieldDef } from "../table/FieldCell.vue";
+import { useDatabaseView } from "../../composables/useDatabaseView";
 import {
-  useDatabaseView,
-  type DatabaseViewActions as ViewDatabaseActions,
-  type DatabaseViewMode,
-  type DatabaseSchemaEvent,
-  type DatabaseViewProvider as ViewDatabaseProvider,
-} from "../../composables/useDatabaseView";
+  DATABASE_DETAIL_VIEW_ID as DETAIL_VIEW_ID,
+  DEFAULT_DRAWER_WIDTH,
+  DEFAULT_SIDE_PANEL_WIDTH,
+  clampWorkspaceWidth,
+  readWorkspacePreferences,
+  useDatabaseViewport,
+  useDatabaseWorkspaceState,
+} from "../../composables/useDatabaseWorkspace";
+import type {
+  DatabaseViewProps,
+  DatabaseViewResolvedDetailPresentation,
+  DatabaseViewSchemaEvent,
+  DatabaseViewViewTab,
+} from "../../contracts/database";
 import type { FilterCondition as ToolbarFilterCondition, FilterLogic } from "../../composables/useTableFilter";
 import type {
   CellValue,
   DataRecord,
   FieldDef as SchemaFieldDef,
-  Density,
   TableColumn,
   TableSchema,
   ViewConfig,
 } from "../../types";
 import { buildGanttItems } from "../../types";
-
-export interface DatabaseViewViewTab {
-  value: string;
-  label: string;
-  icon?: string | Component;
-}
-
-export type DatabaseViewSchemaEvent = DatabaseSchemaEvent;
-
-export interface DatabaseViewActions extends ViewDatabaseActions<DataRecord> {
-  onViewChange?: (payload: { tableId: string; view: ViewConfig }) => void | Promise<void>;
-  onViewLoad?: (payload: { tableId: string; viewId: string }) => void | Promise<void>;
-  onViewSave?: (payload: { tableId: string; viewId: string; name: string }) => void | Promise<void>;
-  onRecordChange?: (payload: {
-    tableId: string;
-    recordId: string;
-    startDate?: string;
-    endDate?: string;
-  }) => void | Promise<void>;
-}
-
-export interface DatabaseViewUiOptions {
-  enableFieldManagement?: boolean;
-}
-
-export type DatabaseViewDetailPresentation = "auto" | "side-panel" | "sheet" | "full-page";
-type DatabaseViewResolvedDetailPresentation = Exclude<DatabaseViewDetailPresentation, "auto">;
-
-interface DatabaseViewWorkspacePreferences {
-  activeViewId?: string;
-  detailPresentation?: DatabaseViewResolvedDetailPresentation;
-  sidePanelWidth?: number;
-  drawerWidth?: number;
-  searchKeyword?: string;
-}
-
-export interface DatabaseViewProps {
-  tableId?: string;
-  mode?: DatabaseViewMode;
-  detailPresentation?: DatabaseViewDetailPresentation;
-  density?: Density;
-  schema?: TableSchema | null;
-  records?: DataRecord[];
-  views?: ViewConfig[];
-  provider?: ViewDatabaseProvider<DataRecord>;
-  defaultView?: ViewConfig;
-  currentViewId?: string;
-  initialViewId?: string;
-  selectedRecordId?: string | null;
-  initialSelectedRecordId?: string | null;
-  searchKeyword?: string;
-  loading?: boolean;
-  error?: string | Error | null;
-  viewTabs?: DatabaseViewViewTab[];
-  actions?: DatabaseViewActions;
-  ui?: DatabaseViewUiOptions;
-  showToolbar?: boolean;
-  showViewSwitch?: boolean;
-  showFilter?: boolean;
-  showSort?: boolean;
-  showGroup?: boolean;
-  showColumns?: boolean;
-  showSearch?: boolean;
-  readonly?: boolean;
-  pageSize?: number;
-  autoLoad?: boolean;
-}
 
 const props = withDefaults(defineProps<DatabaseViewProps>(), {
   tableId: "database-view",
@@ -158,34 +99,7 @@ const emit = defineEmits<{
   refresh: [];
 }>();
 
-const DETAIL_VIEW_ID = "detail";
-const MOBILE_BREAKPOINT = "(max-width: 768px)";
-const WORKSPACE_STORAGE_PREFIX = "oneui-database-workspace:";
-const DEFAULT_SIDE_PANEL_WIDTH = 720;
-const DEFAULT_DRAWER_WIDTH = 900;
-const MIN_DETAIL_PANEL_WIDTH = 420;
-const MAX_DETAIL_PANEL_WIDTH = 1320;
-
 defineOptions({ name: "DatabaseView", inheritAttrs: false });
-
-const isMobileViewport = ref(false);
-let mobileMediaQuery: MediaQueryList | null = null;
-
-function syncMobileViewport() {
-  isMobileViewport.value = mobileMediaQuery?.matches ?? false;
-}
-
-onMounted(() => {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-  mobileMediaQuery = window.matchMedia(MOBILE_BREAKPOINT);
-  syncMobileViewport();
-  mobileMediaQuery.addEventListener("change", syncMobileViewport);
-});
-
-onBeforeUnmount(() => {
-  mobileMediaQuery?.removeEventListener("change", syncMobileViewport);
-  mobileMediaQuery = null;
-});
 
 function cloneView(view: ViewConfig): ViewConfig {
   return {
@@ -198,38 +112,6 @@ function cloneView(view: ViewConfig): ViewConfig {
     fixedColumns: view.fixedColumns ? [...view.fixedColumns] : undefined,
     galleryCardFields: view.galleryCardFields ? [...view.galleryCardFields] : undefined,
   };
-}
-
-function clampWorkspaceWidth(width: number, fallback: number): number {
-  if (!Number.isFinite(width)) return fallback;
-  return Math.max(MIN_DETAIL_PANEL_WIDTH, Math.min(MAX_DETAIL_PANEL_WIDTH, width));
-}
-
-function getWorkspaceStorageKey(tableId?: string): string | null {
-  const normalized = (tableId ?? "").trim();
-  return normalized ? `${WORKSPACE_STORAGE_PREFIX}${normalized}` : null;
-}
-
-function readWorkspacePreferences(tableId?: string): DatabaseViewWorkspacePreferences {
-  const storageKey = getWorkspaceStorageKey(tableId);
-  if (!storageKey || typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(storageKey);
-    if (!raw) return {};
-    return JSON.parse(raw) as DatabaseViewWorkspacePreferences;
-  } catch {
-    return {};
-  }
-}
-
-function writeWorkspacePreferences(tableId: string | undefined, prefs: DatabaseViewWorkspacePreferences) {
-  const storageKey = getWorkspaceStorageKey(tableId);
-  if (!storageKey || typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(storageKey, JSON.stringify(prefs));
-  } catch {
-    // ignore storage failures
-  }
 }
 
 function inferFieldIdsFromRecords(records: DataRecord[]): string[] {
@@ -564,6 +446,7 @@ function buildDetailEmptyAction(fallbackViewId: string | null): EmptyStateAction
 }
 
 const initialWorkspacePreferences = readWorkspacePreferences(props.tableId);
+const { isMobileViewport } = useDatabaseViewport();
 const schemaSource = computed(() => props.schema ?? null);
 const recordSource = computed(() => props.records ?? []);
 const viewSource = computed(() => {
@@ -651,16 +534,19 @@ const resolvedSchema = computed(() => databaseView.schema.value ?? schemaSource.
 const resolvedRecords = computed<DataRecord[]>(() => [...databaseView.records.value]);
 const activeViewType = computed(() => activeView.value.viewType || "table");
 const detailDraftFields = ref<Record<string, unknown>>({});
-const preferredDetailPresentation = ref<DatabaseViewResolvedDetailPresentation | null>(
-  initialWorkspacePreferences.detailPresentation ?? null,
-);
-const sidePanelWidth = ref(
-  clampWorkspaceWidth(initialWorkspacePreferences.sidePanelWidth ?? DEFAULT_SIDE_PANEL_WIDTH, DEFAULT_SIDE_PANEL_WIDTH),
-);
-const drawerWidth = ref(
-  clampWorkspaceWidth(initialWorkspacePreferences.drawerWidth ?? DEFAULT_DRAWER_WIDTH, DEFAULT_DRAWER_WIDTH),
-);
-const searchKeyword = ref(props.searchKeyword || initialWorkspacePreferences.searchKeyword || "");
+const {
+  preferredDetailPresentation,
+  sidePanelWidth,
+  drawerWidth,
+  searchKeyword,
+} = useDatabaseWorkspaceState({
+  tableId: toRef(props, "tableId"),
+  activeViewId: databaseView.activeViewId,
+  initialSearchKeyword: props.searchKeyword || initialWorkspacePreferences.searchKeyword || "",
+  initialDetailPresentation: initialWorkspacePreferences.detailPresentation ?? null,
+  initialSidePanelWidth: initialWorkspacePreferences.sidePanelWidth,
+  initialDrawerWidth: initialWorkspacePreferences.drawerWidth,
+});
 const filterLogic = ref<FilterLogic>("and");
 const toolbarFilters = ref<ToolbarFilterCondition[]>([]);
 const detailWorkspaceActive = ref(
@@ -682,20 +568,6 @@ watch(
 watch(searchKeyword, (keyword) => {
   emit("update:searchKeyword", keyword);
 });
-
-watch(
-  [activeViewId, searchKeyword, preferredDetailPresentation, sidePanelWidth, drawerWidth],
-  ([nextViewId, nextSearchKeyword, nextDetailPresentation, nextSidePanelWidth, nextDrawerWidth]) => {
-    writeWorkspacePreferences(props.tableId, {
-      activeViewId: nextViewId,
-      searchKeyword: nextSearchKeyword,
-      detailPresentation: nextDetailPresentation ?? undefined,
-      sidePanelWidth: nextSidePanelWidth,
-      drawerWidth: nextDrawerWidth,
-    });
-  },
-  { immediate: true },
-);
 
 watch(
   activeView,

@@ -300,6 +300,7 @@ export type {
   UseDatabaseViewOptions,
   UseDatabaseViewResult,
 } from "./composables/useDatabaseView";
+export { useDatabaseViewport, useDatabaseWorkspaceState } from "./composables/useDatabaseWorkspace";
 
 export { useSearch } from "./composables/useSearch";
 export type {

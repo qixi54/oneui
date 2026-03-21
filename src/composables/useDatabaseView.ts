@@ -1,124 +1,28 @@
 import { computed, ref, shallowRef, watch, type Ref } from "vue";
 import type { DataRecord, SortConfig, TableSchema, ViewConfig } from "../types";
-import type { SortState } from "./useTable";
+import type {
+  DatabaseSchemaEvent,
+  DatabaseViewDetailOptions,
+  DatabaseViewFetchParams,
+  DatabaseViewMode,
+  DatabaseViewNavigationOptions,
+  DatabaseViewSortState,
+  UseDatabaseViewOptions,
+  UseDatabaseViewResult,
+} from "../contracts/database";
 
-export type DatabaseViewMode = "local" | "provider";
-
-export interface DatabaseViewFetchParams {
-  tableId: string;
-  schema: TableSchema | null;
-  view: ViewConfig;
-  page: number;
-  pageSize: number;
-  sort: SortState;
-  selectedRecordId: string | null;
-}
-
-export interface DatabaseViewFetchResult<T extends DataRecord = DataRecord> {
-  records?: readonly T[] | T[];
-  data?: readonly T[] | T[];
-  total?: number;
-  schema?: TableSchema | null;
-  views?: readonly ViewConfig[] | ViewConfig[] | null;
-  activeViewId?: string | null;
-  selectedRecordId?: string | null;
-}
-
-export interface DatabaseViewProvider<T extends DataRecord = DataRecord> {
-  mode?: DatabaseViewMode;
-  onFetch?: (params: DatabaseViewFetchParams) => Promise<DatabaseViewFetchResult<T>>;
-  onRefresh?: (params: DatabaseViewFetchParams) => Promise<void> | void;
-}
-
-export type DatabaseSchemaEvent =
-  | { type: "schema-add-field"; fieldType: string }
-  | { type: "schema-rename-field"; fieldId: string; newName: string }
-  | { type: "schema-change-field-type"; fieldId: string; newType: string }
-  | { type: "schema-hide-field"; fieldId: string }
-  | { type: "schema-delete-field"; fieldId: string }
-  | { type: "schema-duplicate-field"; fieldId: string };
-
-export interface DatabaseViewActions<T extends DataRecord = DataRecord> {
-  onCellEdit?: (payload: { rowId: string; fieldId: string; value: unknown }) => Promise<void> | void;
-  onSelectRecord?: (record: T | null) => Promise<void> | void;
-  onSchemaEvent?: (event: DatabaseSchemaEvent) => Promise<void> | void;
-  onSaveView?: (view: ViewConfig) => Promise<void> | void;
-  onDeleteView?: (viewId: string) => Promise<void> | void;
-  onRefresh?: () => Promise<void> | void;
-}
-
-export interface DatabaseViewDetailOptions {
-  clearSelection?: boolean;
-}
-
-export interface DatabaseViewNavigationOptions {
-  wrap?: boolean;
-  openDetail?: boolean;
-}
-
-export interface UseDatabaseViewOptions<T extends DataRecord = DataRecord> {
-  tableId: string;
-  mode?: DatabaseViewMode;
-  schema?: Ref<TableSchema | null | undefined> | TableSchema | null | undefined;
-  records?: Ref<readonly T[] | T[] | undefined> | readonly T[] | T[] | undefined;
-  views?: Ref<readonly ViewConfig[] | ViewConfig[] | undefined> | readonly ViewConfig[] | ViewConfig[] | undefined;
-  provider?: DatabaseViewProvider<T>;
-  actions?: DatabaseViewActions<T>;
-  defaultView?: ViewConfig;
-  initialViewId?: string;
-  initialSelectedRecordId?: string | null;
-  initialDetailOpen?: boolean;
-  pageSize?: number;
-  autoLoad?: boolean;
-}
-
-export interface UseDatabaseViewResult<T extends DataRecord = DataRecord> {
-  tableId: string;
-  mode: Readonly<Ref<DatabaseViewMode>>;
-  schema: Readonly<Ref<TableSchema | null>>;
-  records: Readonly<Ref<readonly T[]>>;
-  views: Readonly<Ref<ViewConfig[]>>;
-  activeViewId: Readonly<Ref<string>>;
-  activeView: Readonly<Ref<ViewConfig>>;
-  selectedRecordId: Readonly<Ref<string | null>>;
-  selectedRecord: Readonly<Ref<T | null>>;
-  selectedRecordIndex: Readonly<Ref<number>>;
-  selectedRecordOrdinal: Readonly<Ref<number | null>>;
-  hasSelectedRecord: Readonly<Ref<boolean>>;
-  detailOpen: Readonly<Ref<boolean>>;
-  detailRecord: Readonly<Ref<T | null>>;
-  loading: Readonly<Ref<boolean>>;
-  error: Readonly<Ref<Error | null>>;
-  page: Readonly<Ref<number>>;
-  pageSize: Readonly<Ref<number>>;
-  totalCount: Readonly<Ref<number>>;
-  viewList: Readonly<Ref<{ id: string; name: string; type: ViewConfig["viewType"] }[]>>;
-  isProviderMode: Readonly<Ref<boolean>>;
-  isLocalMode: Readonly<Ref<boolean>>;
-  refresh: () => Promise<void>;
-  getRecordById: (recordId: string) => T | null;
-  getRecordIndex: (recordId: string) => number;
-  selectRecord: (record: T | string | null) => void;
-  openRecordDetail: (record?: T | string | null) => void;
-  closeRecordDetail: (options?: DatabaseViewDetailOptions) => void;
-  toggleRecordDetail: (record?: T | string | null) => void;
-  selectNextRecord: (options?: DatabaseViewNavigationOptions) => void;
-  selectPreviousRecord: (options?: DatabaseViewNavigationOptions) => void;
-  switchView: (viewId: string) => void;
-  setActiveViewId: (viewId: string) => void;
-  createView: (name: string, baseConfig?: Partial<ViewConfig>) => Promise<string>;
-  saveView: (config?: Partial<ViewConfig>) => Promise<void>;
-  deleteView: (viewId: string) => Promise<void>;
-  duplicateView: (sourceViewId: string, newName: string) => Promise<string>;
-  updateActiveView: (patch: Partial<ViewConfig>) => void;
-  setSelectedRecord: (record: T | string | null) => void;
-  clearSelectedRecord: () => void;
-  setPage: (page: number) => void;
-  setPageSize: (pageSize: number) => void;
-  emitCellEdit: (payload: { rowId: string; fieldId: string; value: unknown }) => Promise<void>;
-  emitSchemaEvent: (event: DatabaseSchemaEvent) => Promise<void>;
-  setRecords: (next: readonly T[] | T[]) => void;
-}
+export type {
+  DatabaseViewMode,
+  DatabaseViewFetchParams,
+  DatabaseViewFetchResult,
+  DatabaseViewProvider,
+  DatabaseSchemaEvent,
+  DatabaseViewActions,
+  DatabaseViewDetailOptions,
+  DatabaseViewNavigationOptions,
+  UseDatabaseViewOptions,
+  UseDatabaseViewResult,
+} from "../contracts/database";
 
 function isRefLike<T>(value: unknown): value is Ref<T> {
   return Boolean(value && typeof value === "object" && "value" in value);
@@ -250,7 +154,7 @@ function mergeViewLayers(
   return merged;
 }
 
-function toSortState(view: ViewConfig | null): SortState {
+function toSortState(view: ViewConfig | null): DatabaseViewSortState {
   const firstSort = view?.sorts?.[0];
   if (!firstSort) {
     return { field: null, order: null };
