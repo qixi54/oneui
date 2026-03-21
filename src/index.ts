@@ -73,6 +73,14 @@ export {
 } from "./components/table";
 // ExcelExport 可选导入（需要 xlsx 依赖）：import { ExcelExport } from 'oneflow-ui/dist/components/table'
 
+// ─── Plugin Registry ────────────────────────────────────────────────────────
+export {
+  pluginComponentNames,
+  pluginComponentRegistry,
+  installPluginComponents,
+  registerOneUIComponents,
+} from "./registry/plugin-components";
+
 // ─── Gallery ─────────────────────────────────────────────────────────────────
 export { GalleryView, GalleryCard } from "./components/gallery";
 

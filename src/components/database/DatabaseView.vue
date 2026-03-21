@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
-import { AlertCircle, Database, Loader2 } from "lucide-vue-next";
-import EmptyState from "../base/EmptyState.vue";
-import Drawer from "../overlay/Drawer.vue";
-import SidePanel from "../overlay/SidePanel.vue";
+import { AlertCircle, Database } from "lucide-vue-next";
 import TableToolbar from "../table/TableToolbar.vue";
-import DatabaseDetailWorkspace from "./DatabaseDetailWorkspace.vue";
+import DatabaseDetailPresenter from "./DatabaseDetailPresenter.vue";
 import DatabaseViewContent from "./DatabaseViewContent.vue";
+import DatabaseViewShell from "./DatabaseViewShell.vue";
 import type { EmptyStateAction } from "../base/EmptyState.vue";
 import { useDatabaseView } from "../../composables/useDatabaseView";
 import {
@@ -349,6 +347,19 @@ const detailPropertyItems = computed(() =>
 );
 const hasDetailDraftChanges = computed(() => Object.keys(detailDraftFields.value).length > 0);
 const visibleRecordFieldIds = computed(() => getVisibleFieldIds(resolvedSchema.value, resolvedRecords.value));
+const loadingStateTitle = "正在加载数据视图";
+const loadingStateDescription = "请稍候，页面级编排器正在准备当前视图。";
+const errorStateTitle = "数据视图加载失败";
+const emptyStateTitle = "暂无记录";
+const emptyStateDescription = computed(() => {
+  if (activeViewType.value === "detail") {
+    return "请选择一条记录，详情工作区会在这里打开。";
+  }
+  if (activeViewType.value === "timeline") {
+    return "当前时间线没有可渲染的起止日期。";
+  }
+  return "当前视图没有匹配的数据，或者被筛选条件过滤为空。";
+});
 
 const currentSort = computed(() => {
   const sort = activeView.value.sorts?.[0];
@@ -653,28 +664,20 @@ function handleDrawerWidthUpdate(width: number) {
 </script>
 
 <template>
-  <section class="of-database-view" data-role="database-view" v-bind="$attrs">
-    <div
-      v-if="renderState === 'loading'"
-      class="of-database-view__state of-database-view__state--loading"
-      data-role="loading-state"
-    >
-      <Loader2 class="of-database-view__spinner" :size="20" />
-      <div class="of-database-view__state-text">
-        <div class="of-database-view__state-title">正在加载数据视图</div>
-        <div class="of-database-view__state-description">请稍候，页面级编排器正在准备当前视图。</div>
-      </div>
-    </div>
-
-    <div v-else-if="renderState === 'error'" class="of-database-view__state" data-role="error-state">
-      <EmptyState
-        :icon="AlertCircle"
-        title="数据视图加载失败"
-        :description="effectiveError instanceof Error ? effectiveError.message : String(effectiveError)"
-      />
-    </div>
-
-    <template v-else>
+  <DatabaseViewShell
+    :state="renderState"
+    :loading-title="loadingStateTitle"
+    :loading-description="loadingStateDescription"
+    :error-title="errorStateTitle"
+    :error-description="effectiveError instanceof Error ? effectiveError.message : String(effectiveError)"
+    :error-icon="AlertCircle"
+    :empty-icon="Database"
+    :empty-title="emptyStateTitle"
+    :empty-description="emptyStateDescription"
+    :empty-action="detailEmptyAction"
+    v-bind="$attrs"
+  >
+    <template #toolbar>
       <TableToolbar
         v-if="showToolbar"
         class="of-database-view__toolbar"
@@ -707,24 +710,10 @@ function handleDrawerWidthUpdate(width: number) {
         @save-view="handleToolbarSaveView"
         @load-view="handleToolbarLoadView"
       />
+    </template>
 
-      <div v-if="renderState === 'empty'" class="of-database-view__state of-database-view__state--empty" data-role="empty-state">
-        <EmptyState
-          :icon="Database"
-          title="暂无记录"
-          :description="
-            activeViewType === 'detail'
-              ? '请选择一条记录，详情工作区会在这里打开。'
-              : activeViewType === 'timeline'
-                ? '当前时间线没有可渲染的起止日期。'
-                : '当前视图没有匹配的数据，或者被筛选条件过滤为空。'
-          "
-          :action="detailEmptyAction"
-        />
-      </div>
-
+    <template #content>
       <DatabaseViewContent
-        v-else
         :view-type="activeViewType"
         :records="renderedRecords"
         :schema="resolvedSchema"
@@ -753,23 +742,18 @@ function handleDrawerWidthUpdate(width: number) {
       />
     </template>
 
-    <SidePanel
-      v-if="showDetailWorkspace && resolvedDetailPresentation === 'side-panel'"
-      :model-value="showDetailWorkspace"
-      :title="detailWorkspaceTitle"
-      :width="sidePanelWidth"
-      :resizable="true"
-      mode="persistent"
-      @update:width="handleSidePanelWidthUpdate"
-      @update:model-value="handleDetailClose"
-    >
-      <DatabaseDetailWorkspace
+    <template #detail>
+      <DatabaseDetailPresenter
+        v-if="showDetailWorkspace"
+        :visible="showDetailWorkspace"
+        :title="detailWorkspaceTitle"
         :row-id="detailWorkspaceRow.id"
         :record-id="selectedRecord?.id ?? ''"
-        :title="detailWorkspaceTitle"
-        :description="detailWorkspaceDescription"
         :view-type="activeViewType"
+        :description="detailWorkspaceDescription"
         :presentation="resolvedDetailPresentation"
+        :side-panel-width="sidePanelWidth"
+        :drawer-width="drawerWidth"
         :can-switch-presentation="canSwitchDetailPresentation"
         :workspace-modes="workspaceModes"
         :property-items="detailPropertyItems"
@@ -779,111 +763,21 @@ function handleDrawerWidthUpdate(width: number) {
         @save="handleDetailWorkspaceSave"
         @delete="handleDetailDelete"
         @close="handleDetailClose"
+        @update:width="
+          resolvedDetailPresentation === 'side-panel'
+            ? handleSidePanelWidthUpdate($event)
+            : handleDrawerWidthUpdate($event)
+        "
         @update:presentation="setPreferredDetailPresentation"
       />
-    </SidePanel>
-
-    <Drawer
-      v-else-if="showDetailWorkspace"
-      :model-value="showDetailWorkspace"
-      :title="detailWorkspaceTitle"
-      :width="drawerWidth"
-      :resizable="resolvedDetailPresentation !== 'full-page'"
-      :fullscreen="resolvedDetailPresentation === 'full-page'"
-      :mask-closable="true"
-      @update:width="handleDrawerWidthUpdate"
-      @update:model-value="handleDetailClose"
-    >
-      <DatabaseDetailWorkspace
-        :row-id="detailWorkspaceRow.id"
-        :record-id="selectedRecord?.id ?? ''"
-        :title="detailWorkspaceTitle"
-        :description="detailWorkspaceDescription"
-        :view-type="activeViewType"
-        :presentation="resolvedDetailPresentation"
-        :can-switch-presentation="canSwitchDetailPresentation"
-        :workspace-modes="workspaceModes"
-        :property-items="detailPropertyItems"
-        :readonly="readonly"
-        :has-draft-changes="hasDetailDraftChanges"
-        @commit="handleDetailWorkspaceCommit"
-        @save="handleDetailWorkspaceSave"
-        @delete="handleDetailDelete"
-        @close="handleDetailClose"
-        @update:presentation="setPreferredDetailPresentation"
-      />
-    </Drawer>
-  </section>
+    </template>
+  </DatabaseViewShell>
 </template>
 
 <style scoped>
-.of-database-view {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-  min-height: 100%;
-}
-
 .of-database-view__toolbar {
   position: sticky;
   top: 0;
   z-index: 2;
-}
-
-.of-database-view__content {
-  min-width: 0;
-}
-
-.of-database-view__view {
-  min-width: 0;
-}
-
-.of-database-view__detail-anchor {
-  min-height: 1px;
-}
-
-.of-database-view__state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 360px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  border-radius: var(--of-radius-xl);
-  background: var(--of-surface-elevated, var(--of-color-white));
-}
-
-.of-database-view__state--loading {
-  gap: 14px;
-  color: var(--of-text-secondary, var(--of-color-text-secondary));
-}
-
-.of-database-view__state-text {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.of-database-view__state-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--of-text-primary, var(--of-color-text));
-}
-
-.of-database-view__state-description {
-  font-size: 13px;
-  color: var(--of-text-secondary, var(--of-color-text-secondary));
-}
-
-.of-database-view__spinner {
-  animation: of-database-view-spin 0.9s linear infinite;
-  color: var(--of-accent-default, #334155);
-  flex-shrink: 0;
-}
-
-@keyframes of-database-view-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
