@@ -35,6 +35,11 @@
 
 ## Release & Verification
 
+### 0.8.1 发布补齐与留痕
+
+- `docs/plans/2026-03-22-release-0.8.1-proof.md`
+- `docs/CHANGELOG-v0.8.1.md`
+
 ### 0.8.0 产品力提升与交付闭环
 
 - `docs/plans/2026-03-21-oneui-productivity-upgrade-plan.md`
