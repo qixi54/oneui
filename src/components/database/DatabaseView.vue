@@ -2,17 +2,12 @@
 import { computed, ref, toRef, watch } from "vue";
 import { AlertCircle, Database, Loader2 } from "lucide-vue-next";
 import EmptyState from "../base/EmptyState.vue";
-import FieldCell from "../table/FieldCell.vue";
-import DetailLayout from "../detail/DetailLayout.vue";
 import Drawer from "../overlay/Drawer.vue";
 import SidePanel from "../overlay/SidePanel.vue";
 import TableToolbar from "../table/TableToolbar.vue";
-import DataTable from "../table/DataTable.vue";
-import KanbanBoard from "../kanban/KanbanBoard.vue";
-import GalleryView from "../gallery/GalleryView.vue";
-import GanttTimeline from "../timeline/GanttTimeline.vue";
+import DatabaseDetailWorkspace from "./DatabaseDetailWorkspace.vue";
+import DatabaseViewContent from "./DatabaseViewContent.vue";
 import type { EmptyStateAction } from "../base/EmptyState.vue";
-import type { FieldDef as CellFieldDef } from "../table/FieldCell.vue";
 import { useDatabaseView } from "../../composables/useDatabaseView";
 import {
   DATABASE_DETAIL_VIEW_ID as DETAIL_VIEW_ID,
@@ -33,12 +28,30 @@ import type { FilterCondition as ToolbarFilterCondition, FilterLogic } from "../
 import type {
   CellValue,
   DataRecord,
-  FieldDef as SchemaFieldDef,
   TableColumn,
-  TableSchema,
-  ViewConfig,
 } from "../../types";
 import { buildGanttItems } from "../../types";
+import {
+  buildDatabaseViewTabs,
+  buildDetailColumns,
+  buildDetailFieldDefs,
+  buildDetailPropertyItems,
+  buildDetailWorkspaceDescription,
+  buildDetailWorkspaceTitle,
+  buildEmptyFilter,
+  buildFallbackView,
+  buildRenderedRecords,
+  buildTableColumns,
+  buildVirtualDetailView,
+  buildWorkspaceModes,
+  cloneView,
+  convertToolbarFiltersToViewFilters,
+  convertViewFiltersToToolbarFilters,
+  getVisibleFieldIds,
+  partitionDetailColumns,
+  resolveDetailPresentation,
+  toDetailRow,
+} from "./databaseViewUtils";
 
 const props = withDefaults(defineProps<DatabaseViewProps>(), {
   tableId: "database-view",
@@ -101,340 +114,6 @@ const emit = defineEmits<{
 
 defineOptions({ name: "DatabaseView", inheritAttrs: false });
 
-function cloneView(view: ViewConfig): ViewConfig {
-  return {
-    ...view,
-    visibleFields: [...view.visibleFields],
-    sorts: view.sorts?.map((item) => ({ ...item })),
-    groups: view.groups?.map((item) => ({ ...item })),
-    filters: view.filters?.map((item) => ({ ...item })),
-    aggregations: view.aggregations?.map((item) => ({ ...item })),
-    fixedColumns: view.fixedColumns ? [...view.fixedColumns] : undefined,
-    galleryCardFields: view.galleryCardFields ? [...view.galleryCardFields] : undefined,
-  };
-}
-
-function inferFieldIdsFromRecords(records: DataRecord[]): string[] {
-  const first = records[0];
-  return first ? Object.keys(first.fields) : [];
-}
-
-function getViewTypeIcon(viewType: ViewConfig["viewType"]): string {
-  switch (viewType) {
-    case "kanban":
-      return "columns-3";
-    case "gallery":
-      return "image";
-    case "timeline":
-      return "calendar-range";
-    case "detail":
-      return "file-text";
-    case "table":
-    default:
-      return "table-2";
-  }
-}
-
-function buildFallbackView(schema?: TableSchema | null, records: DataRecord[] = []): ViewConfig {
-  const visibleFields = getVisibleFieldIds(schema, records);
-
-  return {
-    viewId: "table",
-    viewType: "table",
-    name: schema?.name || "表格",
-    visibleFields,
-    sorts: [],
-    groups: [],
-    filters: [],
-    fixedColumns: [],
-  };
-}
-
-function buildVirtualDetailView(schema?: TableSchema | null, records: DataRecord[] = []): ViewConfig {
-  const visibleFields = getVisibleFieldIds(schema, records);
-
-  return {
-    viewId: DETAIL_VIEW_ID,
-    viewType: "detail",
-    name: "详情",
-    visibleFields,
-    sorts: [],
-    groups: [],
-    filters: [],
-    fixedColumns: [],
-  };
-}
-
-function getFieldLabel(fieldId: string, schema?: TableSchema | null): string {
-  return schema?.fields.find((field) => field.id === fieldId)?.name ?? fieldId;
-}
-
-function resolveColumnType(field?: SchemaFieldDef): TableColumn["type"] {
-  switch (field?.type) {
-    case "number":
-    case "currency":
-    case "progress":
-      return "number";
-    case "date":
-    case "datetime":
-      return "date";
-    case "select":
-    case "multi_select":
-      return "status";
-    default:
-      return "string";
-  }
-}
-
-function resolveCellFieldType(field?: SchemaFieldDef): CellFieldDef["type"] {
-  switch (field?.type) {
-    case "number":
-      return "number";
-    case "select":
-      return "select";
-    case "multi_select":
-      return "multiselect";
-    case "date":
-      return "date";
-    case "datetime":
-      return "datetime";
-    case "checkbox":
-      return "checkbox";
-    case "url":
-      return "url";
-    case "email":
-      return "email";
-    case "phone":
-      return "phone";
-    case "rating":
-      return "rating";
-    case "attachment":
-      return "attachment";
-    case "relation":
-      return "relation";
-    case "formula":
-      return "text";
-    case "currency":
-      return "currency";
-    case "richtext":
-      return "richtext";
-    case "auto_number":
-      return "auto_number";
-    case "creator":
-      return "creator";
-    case "progress":
-      return "progress";
-    case "text":
-    default:
-      return "text";
-  }
-}
-
-function buildTableColumns(view: ViewConfig, schema?: TableSchema | null, records: DataRecord[] = []) {
-  const orderedFieldIds =
-    (view.visibleFields?.length ?? 0) > 0
-      ? view.visibleFields
-      : getVisibleFieldIds(schema, records);
-
-  return orderedFieldIds.map((fieldId) => {
-    const field = schema?.fields?.find((item) => item.id === fieldId);
-    return {
-      key: fieldId,
-      label: getFieldLabel(fieldId, schema),
-      type: resolveColumnType(field),
-      hidden: field?.hidden ?? false,
-      width: field?.width,
-    } satisfies TableColumn;
-  });
-}
-
-function buildDetailColumns(schema?: TableSchema | null, records: DataRecord[] = []) {
-  const orderedFieldIds = getVisibleFieldIds(schema, records);
-
-  return orderedFieldIds.map((fieldId) => {
-    const field = schema?.fields?.find((item) => item.id === fieldId);
-    return {
-      key: fieldId,
-      label: getFieldLabel(fieldId, schema),
-      type: resolveColumnType(field),
-      hidden: field?.hidden ?? false,
-      width: field?.width,
-    } satisfies TableColumn;
-  });
-}
-
-function buildDetailFieldDefs(schema?: TableSchema | null, records: DataRecord[] = []) {
-  const orderedFieldIds = getVisibleFieldIds(schema, records);
-
-  return orderedFieldIds.map((fieldId) => {
-    const field = schema?.fields?.find((item) => item.id === fieldId);
-    return {
-      id: fieldId,
-      type: resolveCellFieldType(field),
-      label: getFieldLabel(fieldId, schema),
-    } satisfies CellFieldDef;
-  });
-}
-
-function normalizeCellValue(value: CellValue): string {
-  if (value == null) return "";
-  if (Array.isArray(value)) return value.map((item) => String(item)).join(", ");
-  return String(value);
-}
-
-function compareCellValues(a: CellValue, b: CellValue): number {
-  if (a == null && b == null) return 0;
-  if (a == null) return -1;
-  if (b == null) return 1;
-
-  const aNumber = Number(a);
-  const bNumber = Number(b);
-  const aNumeric = Number.isFinite(aNumber) && `${a}`.trim() !== "";
-  const bNumeric = Number.isFinite(bNumber) && `${b}`.trim() !== "";
-  if (aNumeric && bNumeric) return aNumber - bNumber;
-
-  const aTime = Date.parse(String(a));
-  const bTime = Date.parse(String(b));
-  if (Number.isFinite(aTime) && Number.isFinite(bTime)) return aTime - bTime;
-
-  return normalizeCellValue(a).localeCompare(normalizeCellValue(b), "zh-Hans-CN");
-}
-
-function evaluateFilterCondition(value: CellValue, condition: ToolbarFilterCondition): boolean {
-  const rawValue = normalizeCellValue(value).trim();
-  const expected = (condition.value ?? "").trim();
-  const lowerValue = rawValue.toLowerCase();
-  const lowerExpected = expected.toLowerCase();
-
-  switch (condition.operator) {
-    case "equals":
-      return lowerValue === lowerExpected;
-    case "not_equals":
-      return lowerValue !== lowerExpected;
-    case "contains":
-      return lowerValue.includes(lowerExpected);
-    case "not_contains":
-      return !lowerValue.includes(lowerExpected);
-    case "starts_with":
-      return lowerValue.startsWith(lowerExpected);
-    case "ends_with":
-      return lowerValue.endsWith(lowerExpected);
-    case "gt":
-      return compareCellValues(value, expected) > 0;
-    case "gte":
-      return compareCellValues(value, expected) >= 0;
-    case "lt":
-      return compareCellValues(value, expected) < 0;
-    case "lte":
-      return compareCellValues(value, expected) <= 0;
-    case "is_empty":
-      return rawValue === "";
-    case "is_not_empty":
-      return rawValue !== "";
-    default:
-      return true;
-  }
-}
-
-function buildEmptyFilter(fieldId: string): ToolbarFilterCondition {
-  return {
-    id: `f_${Math.random().toString(36).slice(2, 8)}`,
-    field: fieldId,
-    operator: "contains",
-    value: "",
-  };
-}
-
-type SchemaFilterCondition = NonNullable<ViewConfig["filters"]>[number];
-
-function convertViewFiltersToToolbarFilters(filters: ViewConfig["filters"] = []): ToolbarFilterCondition[] {
-  return filters.map((filter, index) => ({
-    id: `f_${filter.fieldId}_${index}`,
-    field: filter.fieldId,
-    operator: (() => {
-      switch (filter.operator) {
-        case "eq":
-          return "equals";
-        case "neq":
-          return "not_equals";
-        case "gt":
-          return "gt";
-        case "lt":
-          return "lt";
-        case "is_empty":
-          return "is_empty";
-        case "is_not_empty":
-          return "is_not_empty";
-        case "contains":
-        default:
-          return "contains";
-      }
-    })(),
-    value: filter.value == null ? "" : String(filter.value),
-  }));
-}
-
-function convertToolbarFiltersToViewFilters(
-  filters: ToolbarFilterCondition[],
-): NonNullable<ViewConfig["filters"]> {
-  return filters
-    .filter((filter) => filter.field)
-    .map((filter): SchemaFilterCondition => {
-      let operator: SchemaFilterCondition["operator"];
-      switch (filter.operator) {
-        case "equals":
-          operator = "eq";
-          break;
-        case "not_equals":
-          operator = "neq";
-          break;
-        case "gt":
-        case "gte":
-          operator = "gt";
-          break;
-        case "lt":
-        case "lte":
-          operator = "lt";
-          break;
-        case "is_empty":
-          operator = "is_empty";
-          break;
-        case "is_not_empty":
-          operator = "is_not_empty";
-          break;
-        case "contains":
-        case "not_contains":
-        case "starts_with":
-        case "ends_with":
-        default:
-          operator = "contains";
-          break;
-      }
-
-      return {
-        fieldId: filter.field,
-        operator,
-        value: filter.value == null ? "" : filter.value,
-      };
-    });
-}
-
-function getVisibleFieldIds(schema?: TableSchema | null, records: DataRecord[] = []): string[] {
-  const schemaFieldIds = schema?.fields?.filter((field) => !field.hidden).map((field) => field.id);
-  if (schemaFieldIds?.length) return schemaFieldIds;
-  return inferFieldIdsFromRecords(records);
-}
-
-function toDetailRow(record: DataRecord | null): Record<string, unknown> & { id: string } {
-  if (!record) {
-    return { id: "__detail-empty__" };
-  }
-  return {
-    id: record.id,
-    ...record.fields,
-  };
-}
-
 function buildDetailEmptyAction(fallbackViewId: string | null): EmptyStateAction | undefined {
   if (fallbackViewId) {
     return {
@@ -461,7 +140,7 @@ const viewSource = computed(() => {
     source.unshift(buildFallbackView(props.schema, props.records ?? []));
   }
   if (!hasDetailView) {
-    source.push(buildVirtualDetailView(props.schema, props.records ?? []));
+    source.push(buildVirtualDetailView(DETAIL_VIEW_ID, props.schema, props.records ?? []));
   }
   return source;
 });
@@ -631,30 +310,13 @@ watch(
   { immediate: true },
 );
 
-const resolvedViewTabs = computed<DatabaseViewViewTab[]>(() => {
-  const sourceTabs =
-    props.viewTabs && props.viewTabs.length > 0
-      ? props.viewTabs.map((tab) => ({ ...tab }))
-      : databaseView.viewList.value.map((view) => ({
-          value: view.id,
-          label: view.name,
-          icon: getViewTypeIcon(view.type),
-        }));
-
-  const tabs: DatabaseViewViewTab[] = [];
-  const seen = new Set<string>();
-  for (const tab of sourceTabs) {
-    if (seen.has(tab.value)) continue;
-    seen.add(tab.value);
-    tabs.push(tab);
-  }
-
-  if (!seen.has(DETAIL_VIEW_ID)) {
-    tabs.push({ value: DETAIL_VIEW_ID, label: "详情", icon: getViewTypeIcon("detail") });
-  }
-
-  return tabs;
-});
+const resolvedViewTabs = computed<DatabaseViewViewTab[]>(() =>
+  buildDatabaseViewTabs({
+    providedTabs: props.viewTabs,
+    viewList: databaseView.viewList.value,
+    detailViewId: DETAIL_VIEW_ID,
+  }),
+);
 
 const savedViews = computed(() =>
   databaseView.viewList.value.map((view) => ({
@@ -671,36 +333,20 @@ const detailWorkspaceRow = computed(() => ({
   ...detailRow.value,
   ...detailDraftFields.value,
 }));
-const detailWorkspaceTitle = computed(
-  () =>
-    normalizeCellValue(
-      selectedRecord.value?.fields?.title ??
-        selectedRecord.value?.fields?.name ??
-        selectedRecord.value?.fields?.subject ??
-        selectedRecord.value?.id ??
-        "记录详情",
-    ) || "记录详情",
+const detailWorkspaceTitle = computed(() => buildDetailWorkspaceTitle(selectedRecord.value));
+const detailColumnPartitions = computed(() => partitionDetailColumns(detailColumns.value, detailFieldDefs.value));
+const detailPropertyColumns = computed(() => detailColumnPartitions.value.propertyColumns);
+const detailContentColumns = computed(() => detailColumnPartitions.value.contentColumns);
+const detailWorkspaceDescription = computed(() =>
+  buildDetailWorkspaceDescription(detailContentColumns.value, detailWorkspaceRow.value),
 );
-const detailContentFieldIds = computed(
-  () => new Set(detailFieldDefs.value.filter((field) => field.type === "richtext").map((field) => field.id)),
+const detailPropertyItems = computed(() =>
+  buildDetailPropertyItems({
+    columns: detailPropertyColumns.value,
+    fieldDefs: detailFieldDefs.value,
+    row: detailWorkspaceRow.value,
+  }),
 );
-const detailPropertyColumns = computed(() =>
-  detailColumns.value.filter((column) => !detailContentFieldIds.value.has(column.key)),
-);
-const detailContentColumns = computed(() =>
-  detailColumns.value.filter((column) => detailContentFieldIds.value.has(column.key)),
-);
-const detailWorkspaceDescription = computed(() => {
-  const blocks = detailContentColumns.value
-    .map((column) => {
-      const value = getDetailCellValue(column.key);
-      const text = normalizeCellValue(value).trim();
-      if (!text) return "";
-      return `## ${column.label}\n\n${text}`;
-    })
-    .filter((block) => block.length > 0);
-  return blocks.join("\n\n");
-});
 const hasDetailDraftChanges = computed(() => Object.keys(detailDraftFields.value).length > 0);
 const visibleRecordFieldIds = computed(() => getVisibleFieldIds(resolvedSchema.value, resolvedRecords.value));
 
@@ -723,67 +369,29 @@ const showGroup = computed(() => props.showGroup !== false);
 const showColumns = computed(() => props.showColumns !== false);
 const showSearch = computed(() => props.showSearch !== false);
 const showDetailWorkspace = computed(() => detailWorkspaceActive.value && Boolean(selectedRecord.value));
-const resolvedDetailPresentation = computed<DatabaseViewResolvedDetailPresentation>(() => {
-  if (props.detailPresentation !== "auto") {
-    return props.detailPresentation;
-  }
-  if (preferredDetailPresentation.value) {
-    if (preferredDetailPresentation.value === "side-panel" && isMobileViewport.value) {
-      return "sheet";
-    }
-    return preferredDetailPresentation.value;
-  }
-  return isMobileViewport.value ? "sheet" : "side-panel";
-});
-const workspaceModes = computed<Array<{ value: DatabaseViewResolvedDetailPresentation; label: string }>>(() => {
-  const modes: Array<{ value: DatabaseViewResolvedDetailPresentation; label: string }> = [];
-  if (!isMobileViewport.value) {
-    modes.push({ value: "side-panel", label: "侧栏" });
-  }
-  modes.push({ value: "sheet", label: "抽屉" });
-  modes.push({ value: "full-page", label: "全屏" });
-  return modes;
-});
+const resolvedDetailPresentation = computed<DatabaseViewResolvedDetailPresentation>(() =>
+  resolveDetailPresentation({
+    requested: props.detailPresentation,
+    preferred: preferredDetailPresentation.value,
+    isMobileViewport: isMobileViewport.value,
+  }),
+);
+const workspaceModes = computed(() => buildWorkspaceModes(isMobileViewport.value));
 const canSwitchDetailPresentation = computed(() => props.detailPresentation === "auto");
 
 const effectiveLoading = computed(() => props.loading ?? databaseView.loading.value);
 const effectiveError = computed(() => props.error ?? databaseView.error.value);
 
-const renderedRecords = computed(() => {
-  let rows = [...resolvedRecords.value];
-
-  if (searchKeyword.value.trim()) {
-    const keyword = searchKeyword.value.trim().toLowerCase();
-    rows = rows.filter((record) =>
-      visibleRecordFieldIds.value.some((fieldId) =>
-        normalizeCellValue(record.fields[fieldId as keyof DataRecord["fields"]]).toLowerCase().includes(keyword),
-      ),
-    );
-  }
-
-  if (filterConditions.value.length > 0) {
-    rows = rows.filter((record) => {
-      const results = filterConditions.value.map((condition) => {
-        const value = record.fields[condition.field as keyof DataRecord["fields"]];
-        return evaluateFilterCondition(value as CellValue, condition);
-      });
-      return filterLogic.value === "and" ? results.every(Boolean) : results.some(Boolean);
-    });
-  }
-
-  const sort = currentSort.value;
-  if (sort.field && sort.order) {
-    rows.sort((a, b) => {
-      const cmp = compareCellValues(
-        a.fields[sort.field as keyof DataRecord["fields"]],
-        b.fields[sort.field as keyof DataRecord["fields"]],
-      );
-      return sort.order === "desc" ? -cmp : cmp;
-    });
-  }
-
-  return rows;
-});
+const renderedRecords = computed(() =>
+  buildRenderedRecords({
+    records: resolvedRecords.value,
+    searchKeyword: searchKeyword.value,
+    visibleFieldIds: visibleRecordFieldIds.value,
+    filterConditions: filterConditions.value,
+    filterLogic: filterLogic.value,
+    sort: currentSort.value,
+  }),
+);
 
 const resolvedTimelineItems = computed(() =>
   buildGanttItems(renderedRecords.value, {
@@ -980,9 +588,17 @@ function handleRowClick(payload: unknown) {
   emit("row-click", payload);
 }
 
-function handleCardClick(payload: { id?: string } | Record<string, unknown>) {
+function handleContentRowClick(payload: unknown) {
+  if (activeViewType.value === "timeline") {
+    handleTimelineRowClick(payload as { id?: string; sourceRecordId?: string });
+    return;
+  }
+  handleRowClick(payload);
+}
+
+function handleCardClick(payload: unknown) {
   emit("card-click", payload);
-  openRecord(findRecordById((payload as { id?: string }).id));
+  openRecord(findRecordById((payload as { id?: string } | null | undefined)?.id));
 }
 
 function handleTimelineRowClick(payload: { id?: string; sourceRecordId?: string }) {
@@ -1010,23 +626,6 @@ function handleDetailDelete(rowId: string) {
   detailWorkspaceActive.value = false;
   detailDraftFields.value = {};
   databaseView.clearSelectedRecord();
-}
-
-function getDetailFieldDef(fieldId: string): CellFieldDef {
-  return (
-    detailFieldDefs.value.find((field) => field.id === fieldId) ?? {
-      id: fieldId,
-      type: "text" as const,
-      label: fieldId,
-    }
-  );
-}
-
-function getDetailCellValue(fieldId: string): CellValue {
-  if (Object.prototype.hasOwnProperty.call(detailDraftFields.value, fieldId)) {
-    return detailDraftFields.value[fieldId] as CellValue;
-  }
-  return detailRow.value[fieldId as keyof typeof detailRow.value] as CellValue;
 }
 
 function handleDetailWorkspaceCommit(_rowId: string, fieldId: string, value: unknown) {
@@ -1124,65 +723,34 @@ function handleDrawerWidthUpdate(width: number) {
         />
       </div>
 
-      <div v-else class="of-database-view__content" :data-view="activeViewType">
-        <DataTable
-          v-if="activeViewType === 'table'"
-          class="of-database-view__view of-database-view__view--table"
-          :records="renderedRecords"
-          :schema="resolvedSchema ?? undefined"
-          :view="activeView"
-          :columns="toolbarColumns"
-          :readonly="readonly"
-          :enable-field-management="ui?.enableFieldManagement ?? false"
-          @cell-edit="handleCellEdit"
-          @schema-add-field="(fieldType) => forwardSchemaEvent({ type: 'schema-add-field', fieldType })"
-          @schema-rename-field="
-            ({ fieldId, newName }) => forwardSchemaEvent({ type: 'schema-rename-field', fieldId, newName })
-          "
-          @schema-change-field-type="
-            ({ fieldId, newType }) => forwardSchemaEvent({ type: 'schema-change-field-type', fieldId, newType })
-          "
-          @schema-hide-field="(fieldId) => forwardSchemaEvent({ type: 'schema-hide-field', fieldId })"
-          @schema-delete-field="(fieldId) => forwardSchemaEvent({ type: 'schema-delete-field', fieldId })"
-          @schema-duplicate-field="(fieldId) => forwardSchemaEvent({ type: 'schema-duplicate-field', fieldId })"
-          @row-click="handleRowClick"
-          @row-click-record="handleRowSelect"
-        />
-
-        <KanbanBoard
-          v-else-if="activeViewType === 'kanban'"
-          class="of-database-view__view of-database-view__view--kanban"
-          :records="renderedRecords"
-          :schema="resolvedSchema ?? undefined"
-          :view="activeView"
-          @card-click="handleCardClick"
-          @update:columns="() => undefined"
-          @add-column="() => emit('add-column')"
-        />
-
-        <GalleryView
-          v-else-if="activeViewType === 'gallery'"
-          class="of-database-view__view of-database-view__view--gallery"
-          :records="renderedRecords"
-          :schema="resolvedSchema ?? undefined"
-          :view="activeView"
-          @card-click="handleCardClick"
-          @add="() => emit('add')"
-        />
-
-        <GanttTimeline
-          v-else-if="activeViewType === 'timeline'"
-          class="of-database-view__view of-database-view__view--timeline"
-          :records="renderedRecords"
-          :schema="resolvedSchema ?? undefined"
-          :view-config="activeView"
-          @row-click="handleTimelineRowClick"
-          @record-change="handleRecordChange"
-          @update:records="handleTimelineRecordsUpdate"
-        />
-
-        <div v-else class="of-database-view__detail-anchor" />
-      </div>
+      <DatabaseViewContent
+        v-else
+        :view-type="activeViewType"
+        :records="renderedRecords"
+        :schema="resolvedSchema"
+        :view="activeView"
+        :columns="toolbarColumns"
+        :readonly="readonly"
+        :enable-field-management="ui?.enableFieldManagement ?? false"
+        @cell-edit="handleCellEdit"
+        @schema-add-field="(fieldType) => forwardSchemaEvent({ type: 'schema-add-field', fieldType })"
+        @schema-rename-field="
+          ({ fieldId, newName }) => forwardSchemaEvent({ type: 'schema-rename-field', fieldId, newName })
+        "
+        @schema-change-field-type="
+          ({ fieldId, newType }) => forwardSchemaEvent({ type: 'schema-change-field-type', fieldId, newType })
+        "
+        @schema-hide-field="(fieldId) => forwardSchemaEvent({ type: 'schema-hide-field', fieldId })"
+        @schema-delete-field="(fieldId) => forwardSchemaEvent({ type: 'schema-delete-field', fieldId })"
+        @schema-duplicate-field="(fieldId) => forwardSchemaEvent({ type: 'schema-duplicate-field', fieldId })"
+        @row-click="handleContentRowClick"
+        @row-click-record="handleRowSelect"
+        @card-click="handleCardClick"
+        @add="emit('add')"
+        @add-column="emit('add-column')"
+        @record-change="handleRecordChange"
+        @update:records="handleTimelineRecordsUpdate"
+      />
     </template>
 
     <SidePanel
@@ -1195,88 +763,24 @@ function handleDrawerWidthUpdate(width: number) {
       @update:width="handleSidePanelWidthUpdate"
       @update:model-value="handleDetailClose"
     >
-      <DetailLayout
+      <DatabaseDetailWorkspace
+        :row-id="detailWorkspaceRow.id"
+        :record-id="selectedRecord?.id ?? ''"
         :title="detailWorkspaceTitle"
-        :comments="[]"
-        :description-content="detailWorkspaceDescription"
-        :description-editable="false"
-      >
-        <template #meta>
-          <div
-            v-if="canSwitchDetailPresentation"
-            class="of-database-view__workspace-modes"
-            data-role="workspace-mode-switch"
-          >
-            <button
-              v-for="workspaceMode in workspaceModes"
-              :key="workspaceMode.value"
-              type="button"
-              class="of-database-view__workspace-mode-btn"
-              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === workspaceMode.value }"
-              :data-mode="workspaceMode.value"
-              @click="setPreferredDetailPresentation(workspaceMode.value)"
-            >
-              {{ workspaceMode.label }}
-            </button>
-          </div>
-          <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
-          <span class="of-database-view__workspace-chip">{{ activeViewType }}</span>
-          <span class="of-database-view__workspace-chip">{{ resolvedDetailPresentation }}</span>
-        </template>
-
-        <template #props>
-          <div class="of-database-view__detail-workspace" :data-record-id="selectedRecord?.id ?? ''">
-            <section class="of-database-view__detail-workspace-properties">
-              <div
-                v-for="column in detailPropertyColumns"
-                :key="column.key"
-                class="of-database-view__detail-workspace-field"
-              >
-                <span class="of-database-view__detail-workspace-label">{{ column.label }}</span>
-                <div class="of-database-view__detail-workspace-value">
-                  <FieldCell
-                    v-if="detailFieldDefs.length > 0"
-                    :row-id="detailWorkspaceRow.id"
-                    :field="getDetailFieldDef(column.key)"
-                    :value="getDetailCellValue(column.key)"
-                    :readonly="readonly"
-                    @commit="handleDetailWorkspaceCommit"
-                  />
-                  <span v-else class="of-database-view__detail-workspace-fallback">
-                    {{ getDetailCellValue(column.key) ?? "—" }}
-                  </span>
-                </div>
-              </div>
-            </section>
-          </div>
-        </template>
-
-        <template #footer>
-          <button
-            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--delete"
-            type="button"
-            @click="handleDetailDelete(selectedRecord?.id ?? detailWorkspaceRow.id)"
-          >
-            删除
-          </button>
-          <div class="of-database-view__detail-workspace-footer-spacer" />
-          <button
-            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--cancel"
-            type="button"
-            @click="handleDetailClose"
-          >
-            取消
-          </button>
-          <button
-            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--save"
-            type="button"
-            :disabled="readonly || !hasDetailDraftChanges"
-            @click="handleDetailWorkspaceSave"
-          >
-            保存
-          </button>
-        </template>
-      </DetailLayout>
+        :description="detailWorkspaceDescription"
+        :view-type="activeViewType"
+        :presentation="resolvedDetailPresentation"
+        :can-switch-presentation="canSwitchDetailPresentation"
+        :workspace-modes="workspaceModes"
+        :property-items="detailPropertyItems"
+        :readonly="readonly"
+        :has-draft-changes="hasDetailDraftChanges"
+        @commit="handleDetailWorkspaceCommit"
+        @save="handleDetailWorkspaceSave"
+        @delete="handleDetailDelete"
+        @close="handleDetailClose"
+        @update:presentation="setPreferredDetailPresentation"
+      />
     </SidePanel>
 
     <Drawer
@@ -1290,88 +794,24 @@ function handleDrawerWidthUpdate(width: number) {
       @update:width="handleDrawerWidthUpdate"
       @update:model-value="handleDetailClose"
     >
-      <DetailLayout
+      <DatabaseDetailWorkspace
+        :row-id="detailWorkspaceRow.id"
+        :record-id="selectedRecord?.id ?? ''"
         :title="detailWorkspaceTitle"
-        :comments="[]"
-        :description-content="detailWorkspaceDescription"
-        :description-editable="false"
-      >
-        <template #meta>
-          <div
-            v-if="canSwitchDetailPresentation"
-            class="of-database-view__workspace-modes"
-            data-role="workspace-mode-switch"
-          >
-            <button
-              v-for="workspaceMode in workspaceModes"
-              :key="workspaceMode.value"
-              type="button"
-              class="of-database-view__workspace-mode-btn"
-              :class="{ 'of-database-view__workspace-mode-btn--active': resolvedDetailPresentation === workspaceMode.value }"
-              :data-mode="workspaceMode.value"
-              @click="setPreferredDetailPresentation(workspaceMode.value)"
-            >
-              {{ workspaceMode.label }}
-            </button>
-          </div>
-          <span class="of-database-view__workspace-chip">{{ selectedRecord?.id ?? "record" }}</span>
-          <span class="of-database-view__workspace-chip">{{ activeViewType }}</span>
-          <span class="of-database-view__workspace-chip">{{ resolvedDetailPresentation }}</span>
-        </template>
-
-        <template #props>
-          <div class="of-database-view__detail-workspace" :data-record-id="selectedRecord?.id ?? ''">
-            <section class="of-database-view__detail-workspace-properties">
-              <div
-                v-for="column in detailPropertyColumns"
-                :key="column.key"
-                class="of-database-view__detail-workspace-field"
-              >
-                <span class="of-database-view__detail-workspace-label">{{ column.label }}</span>
-                <div class="of-database-view__detail-workspace-value">
-                  <FieldCell
-                    v-if="detailFieldDefs.length > 0"
-                    :row-id="detailWorkspaceRow.id"
-                    :field="getDetailFieldDef(column.key)"
-                    :value="getDetailCellValue(column.key)"
-                    :readonly="readonly"
-                    @commit="handleDetailWorkspaceCommit"
-                  />
-                  <span v-else class="of-database-view__detail-workspace-fallback">
-                    {{ getDetailCellValue(column.key) ?? "—" }}
-                  </span>
-                </div>
-              </div>
-            </section>
-          </div>
-        </template>
-
-        <template #footer>
-          <button
-            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--delete"
-            type="button"
-            @click="handleDetailDelete(selectedRecord?.id ?? detailWorkspaceRow.id)"
-          >
-            删除
-          </button>
-          <div class="of-database-view__detail-workspace-footer-spacer" />
-          <button
-            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--cancel"
-            type="button"
-            @click="handleDetailClose"
-          >
-            取消
-          </button>
-          <button
-            class="of-database-view__detail-workspace-btn of-database-view__detail-workspace-btn--save"
-            type="button"
-            :disabled="readonly || !hasDetailDraftChanges"
-            @click="handleDetailWorkspaceSave"
-          >
-            保存
-          </button>
-        </template>
-      </DetailLayout>
+        :description="detailWorkspaceDescription"
+        :view-type="activeViewType"
+        :presentation="resolvedDetailPresentation"
+        :can-switch-presentation="canSwitchDetailPresentation"
+        :workspace-modes="workspaceModes"
+        :property-items="detailPropertyItems"
+        :readonly="readonly"
+        :has-draft-changes="hasDetailDraftChanges"
+        @commit="handleDetailWorkspaceCommit"
+        @save="handleDetailWorkspaceSave"
+        @delete="handleDetailDelete"
+        @close="handleDetailClose"
+        @update:presentation="setPreferredDetailPresentation"
+      />
     </Drawer>
   </section>
 </template>
@@ -1401,173 +841,6 @@ function handleDrawerWidthUpdate(width: number) {
 
 .of-database-view__detail-anchor {
   min-height: 1px;
-}
-
-.of-database-view__detail-workspace {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 0;
-}
-
-.of-database-view__detail-workspace-header {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.of-database-view__workspace-modes {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px;
-  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
-  border-radius: var(--of-radius-pill, 999px);
-  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
-}
-
-.of-database-view__workspace-mode-btn {
-  border: none;
-  background: transparent;
-  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
-  border-radius: var(--of-radius-pill, 999px);
-  padding: 6px 10px;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.of-database-view__workspace-mode-btn--active {
-  background: var(--of-row-action-surface, var(--of-surface-selected, var(--of-color-gray-100)));
-  color: var(--of-text-primary, var(--of-color-text, #111827));
-}
-
-.of-database-view__detail-workspace-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.of-database-view__detail-workspace-kicker {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
-}
-
-.of-database-view__detail-workspace-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--of-text-primary, var(--of-color-text, #111827));
-}
-
-.of-database-view__detail-workspace-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
-}
-
-.of-database-view__detail-workspace-id,
-.of-database-view__detail-workspace-mode {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
-}
-
-.of-database-view__detail-workspace-body {
-  display: grid;
-  gap: 20px;
-  min-height: 0;
-}
-
-.of-database-view__detail-workspace-properties,
-.of-database-view__detail-workspace-content {
-  display: grid;
-  gap: 12px;
-}
-
-.of-database-view__detail-workspace-field,
-.of-database-view__detail-workspace-content-block {
-  display: grid;
-  gap: 6px;
-  padding: 14px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  border-radius: var(--of-radius-xl, 12px);
-  background: var(--of-surface-elevated, var(--of-color-white, #ffffff));
-}
-
-.of-database-view__detail-workspace-label,
-.of-database-view__detail-workspace-content-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
-}
-
-.of-database-view__detail-workspace-value,
-.of-database-view__detail-workspace-fallback {
-  min-width: 0;
-  color: var(--of-text-primary, var(--of-color-text, #111827));
-}
-
-.of-database-view__detail-workspace-fallback {
-  line-height: 1.6;
-}
-
-.of-database-view__detail-workspace-markdown :deep(p:last-child) {
-  margin-bottom: 0;
-}
-
-.of-database-view__detail-workspace-footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding-top: 4px;
-}
-
-.of-database-view__detail-workspace-footer-spacer {
-  flex: 1;
-}
-
-.of-database-view__detail-workspace-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid transparent;
-  border-radius: var(--of-radius-lg, 8px);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.of-database-view__detail-workspace-btn--delete {
-  border-color: var(--of-border-subtle, var(--of-color-danger-border, #fecaca));
-  background: var(--of-surface-selected, var(--of-color-danger-bg, #fef2f2));
-  color: var(--of-color-danger, #b91c1c);
-}
-
-.of-database-view__detail-workspace-btn--cancel {
-  border-color: var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  background: var(--of-surface-panel, var(--of-color-gray-50, #f9fafb));
-  color: var(--of-text-primary, var(--of-color-text, #111827));
-}
-
-.of-database-view__detail-workspace-btn--save {
-  border-color: var(--of-border-strong, rgba(15, 23, 42, 0.14));
-  background: var(--of-accent-default, #334155);
-  color: var(--of-text-inverse, #fff);
-}
-
-.of-database-view__detail-workspace-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .of-database-view__state {
