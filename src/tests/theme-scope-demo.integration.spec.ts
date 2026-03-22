@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
-import ThemeScopeDemo from "../dev/ThemeScopeDemo.vue";
+import ThemeScopeDemo from "../dev/examples/ThemeScopeDemo.vue";
 
 describe("ThemeScopeDemo", () => {
   it("should render scoped theme scene sections and reflect theme props", () => {

@@ -418,12 +418,12 @@ import { ThemeScope } from '@oneflowui/ui'
 </template>
 ```
 
-The repository's `DatabaseEnterpriseDemo` is the dev/examples-level reference for this kind of scene template. It shows the "ThemeScope + page shell + business content area" composition pattern that you can copy into your own project and turn into a real enterprise page.
+The repository's `src/dev/examples/DatabaseEnterpriseDemo.vue` is the dev/examples-level reference for this kind of scene template. It shows the "ThemeScopeScene + DatabaseView + middleware" composition pattern that you can copy into your own project and turn into a real enterprise page.
 
 ### Dev Examples / Enterprise Demo
 
-`DatabaseEnterpriseDemo` is a dev/examples-level consumption pattern used to show a more complete enterprise-style page composition. It is documentation and development sample material, not an npm-exported component, and it does not change the public export surface of `@oneflowui/ui`.
-The repository also ships `DatabasePresetDemo` as a shorter official preset-bundle example, focused on direct `createDatabaseViewPresetBundle` / `actions.middleware` consumption.
+`src/dev/examples/DatabaseEnterpriseDemo.vue` is a dev/examples-level consumption pattern used to show a more complete enterprise-style page composition. It is documentation and development sample material, not an npm-exported component, and it does not change the public export surface of `@oneflowui/ui`.
+The repository also ships `src/dev/examples/DatabasePresetDemo.vue` as a shorter official preset-bundle example, focused on direct `createDatabaseViewPresetBundle` / `actions.middleware` consumption.
 
 If your business app needs something similar, copy the composition idea from the example and wire it to your own data source and action contract instead of depending on a separate production export.
 

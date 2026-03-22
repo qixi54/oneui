@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import DatabaseViewDemo from "./DatabaseViewDemo.vue";
-import ThemeScopeDemo from "./ThemeScopeDemo.vue";
+import { DatabaseViewDemo, ThemeScopeDemo } from "./examples";
 import {
   // Base
   ViewTab,

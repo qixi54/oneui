@@ -389,12 +389,12 @@ import { ThemeScope } from '@oneflowui/ui'
 </template>
 ```
 
-仓库里的 `DatabaseEnterpriseDemo` 就是这一类场景组件的 dev/examples 级参考实现。它展示的是“ThemeScopeScene + DatabaseView + middleware”的组合方式，便于复制到自家项目里改造成真正的企业页。
+仓库里的 `src/dev/examples/DatabaseEnterpriseDemo.vue` 就是这一类场景组件的 dev/examples 级参考实现。它展示的是“ThemeScopeScene + DatabaseView + middleware”的组合方式，便于复制到自家项目里改造成真正的企业页。
 
 ### Dev Examples / Enterprise Demo
 
-`DatabaseEnterpriseDemo` 是 dev/examples 级的消费范式，用来展示更完整的企业版页面组合方式。它属于开发示例和文档参考，不是 npm 包对外导出的组件，不会改变 `@oneflowui/ui` 的公开导出面。
-仓库同时提供 `DatabasePresetDemo` 作为更短的 preset bundle 官方示例，重点展示 `createDatabaseViewPresetBundle` / `actions.middleware` 的直接消费方式。
+`src/dev/examples/DatabaseEnterpriseDemo.vue` 是 dev/examples 级的消费范式，用来展示更完整的企业版页面组合方式。它属于开发示例和文档参考，不是 npm 包对外导出的组件，不会改变 `@oneflowui/ui` 的公开导出面。
+仓库同时提供 `src/dev/examples/DatabasePresetDemo.vue` 作为更短的 preset bundle 官方示例，重点展示 `createDatabaseViewPresetBundle` / `actions.middleware` 的直接消费方式。
 
 如果你在业务工程里需要类似的页面，建议直接复制示例里的组合思路，再按自己的数据源和动作契约接入，而不是依赖一个额外的生产级导出入口。
 

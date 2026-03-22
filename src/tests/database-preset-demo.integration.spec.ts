@@ -2,7 +2,7 @@ import { defineComponent } from "vue";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
-import DatabasePresetDemo from "../dev/DatabasePresetDemo.vue";
+import DatabasePresetDemo from "../dev/examples/DatabasePresetDemo.vue";
 
 function stubComponent(name: string) {
   return defineComponent({
