@@ -136,6 +136,7 @@ const databaseView = useDatabaseView<DataRecord>({
   pageSize: props.pageSize,
   autoLoad: props.autoLoad,
   actions: {
+    middleware: props.actions?.middleware,
     onCellEdit: async (payload) => {
       emit("cell-edit", payload);
       await props.actions?.onCellEdit?.(payload);

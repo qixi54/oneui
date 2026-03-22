@@ -43,6 +43,41 @@ export interface DatabaseViewProvider<T extends DataRecord = DataRecord> {
   onRefresh?: (params: DatabaseViewFetchParams) => Promise<void> | void;
 }
 
+export interface DatabaseViewActionContext<T extends DataRecord = DataRecord> {
+  action:
+    | "cell-edit"
+    | "select-record"
+    | "schema-event"
+    | "save-view"
+    | "delete-view"
+    | "refresh";
+  payload: unknown;
+  tableId: string;
+  mode: DatabaseViewMode;
+  view: ViewConfig;
+  activeViewId: string;
+  selectedRecordId: string | null;
+  selectedRecord: T | null;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+}
+
+export interface DatabaseViewActionErrorContext<T extends DataRecord = DataRecord>
+  extends DatabaseViewActionContext<T> {
+  error: unknown;
+}
+
+export interface DatabaseViewActionMiddleware<T extends DataRecord = DataRecord> {
+  before?: (context: DatabaseViewActionContext<T>) => Promise<void> | void;
+  after?: (context: DatabaseViewActionContext<T>) => Promise<void> | void;
+  error?: (context: DatabaseViewActionErrorContext<T>) => Promise<void> | void;
+}
+
+export type DatabaseViewActionMiddlewareList<T extends DataRecord = DataRecord> =
+  | DatabaseViewActionMiddleware<T>
+  | readonly DatabaseViewActionMiddleware<T>[];
+
 export type DatabaseSchemaEvent =
   | { type: "schema-add-field"; fieldType: string }
   | { type: "schema-rename-field"; fieldId: string; newName: string }
@@ -54,6 +89,7 @@ export type DatabaseSchemaEvent =
 export type DatabaseViewSchemaEvent = DatabaseSchemaEvent;
 
 export interface DatabaseViewActions<T extends DataRecord = DataRecord> {
+  middleware?: DatabaseViewActionMiddlewareList<T>;
   onCellEdit?: (payload: { rowId: string; fieldId: string; value: unknown }) => Promise<void> | void;
   onSelectRecord?: (record: T | null) => Promise<void> | void;
   onSchemaEvent?: (event: DatabaseSchemaEvent) => Promise<void> | void;

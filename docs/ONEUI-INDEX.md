@@ -41,6 +41,10 @@
 - `docs/plans/2026-03-23-release-0.8.4-proof.md`
 - `docs/CHANGELOG-v0.8.4.md`
 
+### 并发增强验证（middleware / theme-scope / virtualization）
+
+- `docs/plans/2026-03-22-oneui-parallel-enhancements-verification.md`
+
 ### 0.8.3 建议补齐（Ops Console）
 
 - `docs/plans/2026-03-23-release-0.8.3-verification.md`

@@ -37,7 +37,7 @@ import {
 } from "./dataTableUtils";
 import type { RowActionItem } from "./TableDataRow.vue";
 import { useInlineEdit } from "@/composables/useInlineEdit";
-import { useVirtualList } from "@/composables/useVirtualList";
+import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
 import { useTable } from "@/composables/useTable";
 import { useTableGroup, type GroupHeaderItem } from "@/composables/useTableGroup";
 import { useTableData } from "@/composables/useTableData";
@@ -184,6 +184,7 @@ const { isMobile } = useBreakpoint();
 const scrollContainerRef = ref<HTMLElement | null>(null);
 const tableContainerRef = ref<HTMLElement | null>(null);
 const fixedContainerRef = ref<HTMLElement | null>(null);
+const virtualizationState = createVirtualListState();
 const {
   containerDensity,
   densityMetrics,
@@ -195,6 +196,7 @@ const {
   density,
   containerResponsive: computed(() => props.containerResponsive ?? true),
   isMobile,
+  onContainerWidthChange: virtualizationState.invalidate,
 });
 type RowWithRecord = T & { __record?: DataRecord };
 const {
@@ -386,6 +388,7 @@ const { visibleItems, totalHeight, offsetY, scrollToIndex, observeRow } = useVir
   overscan: 5,
   containerRef: scrollContainerRef,
   invalidateKey: containerDensity,
+  state: virtualizationState,
   measureRow: true,
 });
 

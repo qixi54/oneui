@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ref, nextTick } from "vue";
-import { useVirtualList } from "../composables/useVirtualList";
+import { createVirtualListState, useVirtualList } from "../composables/useVirtualList";
 
 function createMockContainer(clientHeight: number): HTMLElement {
   const el = document.createElement("div");
@@ -132,5 +132,42 @@ describe("useVirtualList", () => {
 
     // scrollTop = 10 * 40 = 400
     expect(container.scrollTop).toBe(400);
+  });
+
+  it("共享 virtual state 时可以跨实例保留滚动位置并响应容器重绑", async () => {
+    const items = ref(Array.from({ length: 100 }, (_, i) => ({ id: i })));
+    const state = createVirtualListState();
+
+    const firstContainer = createMockContainer(200);
+    const firstContainerRef = ref<HTMLElement | null>(null);
+    const firstList = useVirtualList({
+      items,
+      itemHeight: 40,
+      containerRef: firstContainerRef,
+      state,
+    });
+
+    firstContainerRef.value = firstContainer;
+    await nextTick();
+
+    firstList.scrollToIndex(10);
+    expect(firstContainer.scrollTop).toBe(400);
+    expect(state.scrollTop.value).toBe(400);
+
+    const secondContainer = createMockContainer(120);
+    const secondContainerRef = ref<HTMLElement | null>(null);
+    const secondList = useVirtualList({
+      items,
+      itemHeight: 40,
+      containerRef: secondContainerRef,
+      state,
+    });
+
+    secondContainerRef.value = secondContainer;
+    await nextTick();
+
+    expect(secondContainer.scrollTop).toBe(400);
+    expect(state.containerHeight.value).toBe(120);
+    expect(secondList.visibleItems.value.some((item) => item.index === 10)).toBe(true);
   });
 });

@@ -7,13 +7,17 @@ export function useDataTableLayout(params: {
   density: Ref<Density>;
   containerResponsive: Ref<boolean>;
   isMobile: Ref<boolean>;
+  onContainerWidthChange?: (width: number) => void;
 }) {
-  const { tableContainerRef, density, containerResponsive, isMobile } = params;
+  const { tableContainerRef, density, containerResponsive, isMobile, onContainerWidthChange } = params;
   const tableContainerWidth = ref(0);
   let tableResizeObserver: ResizeObserver | null = null;
 
   function syncTableContainerWidth() {
-    tableContainerWidth.value = tableContainerRef.value?.clientWidth ?? 0;
+    const nextWidth = tableContainerRef.value?.clientWidth ?? 0;
+    if (nextWidth === tableContainerWidth.value) return;
+    tableContainerWidth.value = nextWidth;
+    onContainerWidthChange?.(nextWidth);
   }
 
   onMounted(() => {
@@ -22,7 +26,10 @@ export function useDataTableLayout(params: {
     tableResizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      tableContainerWidth.value = entry.contentRect.width;
+      const nextWidth = entry.contentRect.width;
+      if (nextWidth === tableContainerWidth.value) return;
+      tableContainerWidth.value = nextWidth;
+      onContainerWidthChange?.(nextWidth);
     });
     tableResizeObserver.observe(tableContainerRef.value);
   });

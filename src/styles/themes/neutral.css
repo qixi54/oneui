@@ -1,5 +1,7 @@
 :root,
-:root[data-of-theme="neutral"] {
+:root[data-of-theme="neutral"],
+:where([data-of-theme="neutral"]),
+:where([data-of-theme-scope="neutral"]) {
   --of-surface-canvas: #f6f7f9;
   --of-surface-elevated: #ffffff;
   --of-surface-panel: #fbfcfd;

@@ -237,7 +237,7 @@ export type {
   ToastItem as ToastItemData,
   UseToastOptions,
 } from "./composables/useToast";
-export type { UseVirtualListOptions } from "./composables/useVirtualList";
+export type { UseVirtualListOptions, VirtualListState } from "./composables/useVirtualList";
 export type { EditingCell } from "./composables/useInlineEdit";
 export type { UseColumnResizeOptions } from "./composables/useColumnResize";
 export type { UseFixedColumnsOptions } from "./composables/useFixedColumns";
@@ -281,7 +281,7 @@ export { useTableFilter } from "./composables/useTableFilter";
 export { useTable } from "./composables/useTable";
 export { useMarkdown } from "./composables/useMarkdown";
 export { useToast } from "./composables/useToast";
-export { useVirtualList } from "./composables/useVirtualList";
+export { createVirtualListState, useVirtualList } from "./composables/useVirtualList";
 export { useInlineEdit } from "./composables/useInlineEdit";
 export { useColumnResize } from "./composables/useColumnResize";
 export { useFixedColumns } from "./composables/useFixedColumns";
@@ -312,6 +312,10 @@ export type {
 
 export { useDatabaseView } from "./composables/useDatabaseView";
 export type {
+  DatabaseViewActionContext,
+  DatabaseViewActionErrorContext,
+  DatabaseViewActionMiddleware,
+  DatabaseViewActionMiddlewareList,
   DatabaseViewMode,
   DatabaseViewFetchParams,
   DatabaseViewFetchResult,

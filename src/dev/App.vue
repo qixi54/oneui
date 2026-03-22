@@ -136,6 +136,9 @@ import {
 
 const toast = useToast();
 const themeMode = ref<"neutral" | "ops-console">("neutral");
+const scopedThemeMode = computed(() =>
+  themeMode.value === "neutral" ? "ops-console" : "neutral",
+);
 
 const commandWorkspace = ref<OpsCommandWorkspace>({
   title: "待命",
@@ -1867,6 +1870,32 @@ function onCtxSelect(key: string) {
             <span class="ops-command-chip__hint ops-mono">{{ cmd.hint }}</span>
             <span class="ops-command-chip__shortcut">{{ cmd.shortcut }}</span>
           </button>
+        </div>
+      </section>
+
+      <section class="dev-section">
+        <h2>局部主题作用域</h2>
+        <p class="dev-desc">
+          外层继续跟随全局 Theme，但这个 wrapper 会用 `data-of-theme-scope` 注入另一套 token，
+          用来验证局部区域可以和根节点主题并存。
+        </p>
+        <div
+          class="theme-scope-preview"
+          :data-of-theme-scope="scopedThemeMode"
+          :data-of-theme="scopedThemeMode"
+        >
+          <div class="theme-scope-preview__surface">
+            <div class="theme-scope-preview__kicker">Scoped Theme</div>
+            <h3 class="theme-scope-preview__title">{{ scopedThemeMode }}</h3>
+            <p class="theme-scope-preview__copy">
+              全局：{{ themeMode }} / 局部：{{ scopedThemeMode }}
+            </p>
+            <div class="theme-scope-preview__chips">
+              <span class="theme-scope-preview__chip">surface</span>
+              <span class="theme-scope-preview__chip">accent</span>
+              <span class="theme-scope-preview__chip">border</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -5494,6 +5523,68 @@ body {
 }
 .dev-btn--error:hover:not(:disabled) {
   background: var(--of-color-error);
+}
+
+.theme-scope-preview {
+  padding: 1px;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--of-accent-default) 42%, transparent),
+    color-mix(in oklab, var(--of-border-strong) 30%, transparent)
+  );
+}
+
+.theme-scope-preview__surface {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 17px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background:
+    radial-gradient(circle at top right, color-mix(in oklab, var(--of-accent-soft) 68%, transparent), transparent 46%),
+    var(--of-surface-elevated, var(--of-color-bg-elevated));
+  box-shadow: var(--of-elevation-card, var(--of-shadow-card));
+}
+
+.theme-scope-preview__kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+}
+
+.theme-scope-preview__title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--of-text-primary, var(--of-color-text-primary));
+}
+
+.theme-scope-preview__copy {
+  margin: 0;
+  max-width: 520px;
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
+  line-height: 1.6;
+}
+
+.theme-scope-preview__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.theme-scope-preview__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-muted, var(--of-color-bg-hover));
+  color: var(--of-text-primary, var(--of-color-text-primary));
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .dev-header__theme {

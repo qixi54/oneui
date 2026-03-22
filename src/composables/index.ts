@@ -28,8 +28,8 @@ export type { UseMarkdownOptions } from "./useMarkdown";
 export { useInlineEdit } from "./useInlineEdit";
 export type { EditingCell } from "./useInlineEdit";
 
-export { useVirtualList } from "./useVirtualList";
-export type { UseVirtualListOptions, VirtualItem } from "./useVirtualList";
+export { createVirtualListState, useVirtualList } from "./useVirtualList";
+export type { UseVirtualListOptions, VirtualItem, VirtualListState } from "./useVirtualList";
 
 export { useToast } from "./useToast";
 export type { UseToastOptions, ToastType, ToastItem } from "./useToast";
@@ -100,6 +100,10 @@ export type {
 
 export { useDatabaseView } from "./useDatabaseView";
 export type {
+  DatabaseViewActionContext,
+  DatabaseViewActionErrorContext,
+  DatabaseViewActionMiddleware,
+  DatabaseViewActionMiddlewareList,
   DatabaseViewMode,
   DatabaseViewFetchParams,
   DatabaseViewFetchResult,

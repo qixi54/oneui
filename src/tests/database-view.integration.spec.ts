@@ -352,8 +352,94 @@ describe("DatabaseView 页面级集成", () => {
       fieldId: "status",
       newName: "阶段",
     });
+    await flushPromises();
     expect(onSelectRecord).toHaveBeenCalledWith(expect.objectContaining({ id: "R-2" }));
     expect(databaseView.selectedRecordId.value).toBe("R-2");
+  });
+
+  it("useDatabaseView middleware 应该按 before/after 顺序拦截成功路径", async () => {
+    const sequence: string[] = [];
+    const onCellEdit = vi.fn();
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records: ref(buildRecords()),
+      views: ref(buildViews()),
+      actions: {
+        middleware: [
+          {
+            before: (context) => {
+              sequence.push(`before:${context.action}`);
+            },
+            after: (context) => {
+              sequence.push(`after:${context.action}`);
+            },
+          },
+        ],
+        onCellEdit,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+    sequence.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "middleware",
+    });
+
+    expect(sequence).toEqual(["before:cell-edit", "after:cell-edit"]);
+    expect(onCellEdit).toHaveBeenCalledWith({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "middleware",
+    });
+    expect(databaseView.error.value).toBeNull();
+  });
+
+  it("useDatabaseView middleware 应该在错误路径收到 error 回调", async () => {
+    const sequence: string[] = [];
+    const onCellEdit = vi.fn().mockRejectedValue(new Error("boom"));
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records: ref(buildRecords()),
+      views: ref(buildViews()),
+      actions: {
+        middleware: [
+          {
+            before: (context) => {
+              sequence.push(`before:${context.action}`);
+            },
+            after: () => {
+              sequence.push("after:cell-edit");
+            },
+            error: (context) => {
+              sequence.push(`error:${context.action}:${context.error instanceof Error ? context.error.message : String(context.error)}`);
+            },
+          },
+        ],
+        onCellEdit,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+    sequence.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "middleware-error",
+    });
+
+    expect(sequence).toEqual(["before:cell-edit", "error:cell-edit:boom"]);
+    expect(onCellEdit).toHaveBeenCalledTimes(1);
+    expect(databaseView.error.value?.message).toBe("boom");
   });
 
   it("useDatabaseView 应该同步 selectedRecord，并支持 detail workspace 打开/关闭", async () => {
@@ -376,16 +462,19 @@ describe("DatabaseView 页面级集成", () => {
     expect(databaseView.selectedRecord.value?.fields.title).toBe("第二条记录");
 
     databaseView.setSelectedRecord("R-1");
+    await flushPromises();
     expect(databaseView.selectedRecordId.value).toBe("R-1");
     expect(databaseView.selectedRecord.value?.fields.title).toBe("DatabaseView 主页");
     expect(onSelectRecord).toHaveBeenLastCalledWith(expect.objectContaining({ id: "R-1" }));
 
     databaseView.clearSelectedRecord();
+    await flushPromises();
     expect(databaseView.selectedRecordId.value).toBeNull();
     expect(databaseView.selectedRecord.value).toBeNull();
     expect(onSelectRecord).toHaveBeenLastCalledWith(null);
 
     databaseView.setSelectedRecord("R-2");
+    await flushPromises();
     expect(databaseView.selectedRecordId.value).toBe("R-2");
 
     records.value = [
@@ -496,6 +585,7 @@ describe("DatabaseView 页面级集成", () => {
     const onViewChange = vi.fn();
     const onCellEdit = vi.fn();
     const onSchemaEvent = vi.fn();
+    const sequence: string[] = [];
     const wrapper = mount(DatabaseView, {
       props: {
         tableId: "tbl-1",
@@ -507,6 +597,20 @@ describe("DatabaseView 页面级集成", () => {
           onViewChange,
           onCellEdit,
           onSchemaEvent,
+          middleware: [
+            {
+              before: (context) => {
+                if (context.action === "cell-edit") {
+                  sequence.push(`before:${context.action}`);
+                }
+              },
+              after: (context) => {
+                if (context.action === "cell-edit") {
+                  sequence.push(`after:${context.action}`);
+                }
+              },
+            },
+          ],
         },
       },
       global: {
@@ -523,6 +627,8 @@ describe("DatabaseView 页面级集成", () => {
     });
 
     await nextTick();
+    await flushPromises();
+    sequence.length = 0;
     expect(wrapper.find('[data-view="table"]').exists()).toBe(true);
 
     await wrapper.get('[data-role="switch-kanban"]').trigger("click");
@@ -550,6 +656,7 @@ describe("DatabaseView 页面级集成", () => {
 
     await wrapper.get('[data-role="emit-cell-edit"]').trigger("click");
     await nextTick();
+    expect(sequence).toEqual(["before:cell-edit", "after:cell-edit"]);
     expect(wrapper.emitted("cell-edit")?.at(-1)?.[0]).toEqual({
       rowId: "R-1",
       fieldId: "title",

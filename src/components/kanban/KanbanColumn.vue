@@ -2,7 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { Plus } from "lucide-vue-next";
 import { VueDraggable } from "vue-draggable-plus";
-import { useVirtualList } from "@/composables/useVirtualList";
+import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
 import KanbanCard from "./KanbanCard.vue";
 import type { KanbanColumnData, Task, ColorMap } from "../../types";
 import { DEFAULT_STATUS_MAP, mergeColorMap } from "../../composables/useBadge";
@@ -55,6 +55,7 @@ watch(localTasks, (val) => {
 
 const useVirtual = computed(() => localTasks.value.length > 50);
 const cardContainerRef = ref<HTMLElement | null>(null);
+const virtualizationState = createVirtualListState();
 const {
   visibleItems: visibleCards,
   totalHeight: cardsTotalHeight,
@@ -64,6 +65,7 @@ const {
   itemHeight: 120,
   overscan: 3,
   containerRef: cardContainerRef,
+  state: virtualizationState,
 });
 
 // 列头圆点颜色：优先用 column.color，否则从 statusColorMap 里按列 id/title 查找 dot 颜色

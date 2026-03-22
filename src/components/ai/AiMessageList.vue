@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from "vue";
-import { useVirtualList } from "@/composables/useVirtualList";
+import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
 import AiMessageBubble from "./AiMessageBubble.vue";
 import UserMessageBubble from "./UserMessageBubble.vue";
 import AiThinking from "./AiThinking.vue";
@@ -23,6 +23,7 @@ const props = defineProps<{
 }>();
 
 const listRef = ref<HTMLElement | null>(null);
+const virtualizationState = createVirtualListState();
 
 const estimateHeight = (index: number): number => {
   const msg = props.messages[index];
@@ -43,6 +44,7 @@ const {
   itemHeight: estimateHeight,
   overscan: 3,
   containerRef: listRef,
+  state: virtualizationState,
 });
 
 function scrollToBottom() {

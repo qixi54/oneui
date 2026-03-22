@@ -1,6 +1,10 @@
 import { computed, ref, shallowRef, watch, type Ref } from "vue";
 import type { DataRecord, SortConfig, TableSchema, ViewConfig } from "../types";
 import type {
+  DatabaseViewActionContext,
+  DatabaseViewActionErrorContext,
+  DatabaseViewActionMiddleware,
+  DatabaseViewActionMiddlewareList,
   DatabaseSchemaEvent,
   DatabaseViewDetailOptions,
   DatabaseViewFetchParams,
@@ -12,6 +16,10 @@ import type {
 } from "../contracts/database";
 
 export type {
+  DatabaseViewActionContext,
+  DatabaseViewActionErrorContext,
+  DatabaseViewActionMiddleware,
+  DatabaseViewActionMiddlewareList,
   DatabaseViewMode,
   DatabaseViewFetchParams,
   DatabaseViewFetchResult,
@@ -169,6 +177,17 @@ function hasView(views: ViewConfig[], viewId: string): boolean {
   return views.some((view) => view.viewId === viewId);
 }
 
+function normalizeActionMiddleware<T extends DataRecord>(
+  middleware?: DatabaseViewActionMiddlewareList<T>,
+): DatabaseViewActionMiddleware<T>[] {
+  if (!middleware) return [];
+  return Array.isArray(middleware)
+    ? middleware.filter(
+        (item): item is DatabaseViewActionMiddleware<T> => Boolean(item),
+      )
+    : [middleware as DatabaseViewActionMiddleware<T>];
+}
+
 export function useDatabaseView<T extends DataRecord = DataRecord>(
   options: UseDatabaseViewOptions<T>,
 ): UseDatabaseViewResult<T> {
@@ -212,6 +231,8 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
     return [buildFallbackView(inputSchema.value, options.defaultView)];
   });
 
+  const actionMiddlewares = normalizeActionMiddleware(options.actions?.middleware);
+
   const views = computed<ViewConfig[]>(() =>
     mergeViewLayers(baseViews.value, remoteViews.value, localViews.value, hiddenViewIds.value),
   );
@@ -252,6 +273,72 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
 
   function setError(e: unknown) {
     error.value = e instanceof Error ? e : new Error(String(e));
+  }
+
+  function buildActionContext(
+    action: DatabaseViewActionContext<T>["action"],
+    payload: unknown,
+  ): DatabaseViewActionContext<T> {
+    return {
+      action,
+      payload,
+      tableId: options.tableId,
+      mode: mode.value,
+      view: activeView.value,
+      activeViewId: activeViewId.value,
+      selectedRecordId: selectedRecordId.value,
+      selectedRecord: selectedRecord.value,
+      page: page.value,
+      pageSize: pageSize.value,
+      totalCount: totalCount.value,
+    };
+  }
+
+  async function invokeActionMiddlewares(
+    phase: "before" | "after",
+    context: DatabaseViewActionContext<T>,
+  ): Promise<void> {
+    const middlewares = phase === "before" ? actionMiddlewares : [...actionMiddlewares].reverse();
+    for (const middleware of middlewares) {
+      const hook = middleware[phase];
+      if (!hook) continue;
+      await hook(context);
+    }
+  }
+
+  async function invokeActionErrorMiddlewares(
+    context: DatabaseViewActionContext<T>,
+    actionError: unknown,
+  ): Promise<void> {
+    const errorContext: DatabaseViewActionErrorContext<T> = {
+      ...context,
+      error: actionError,
+    };
+    for (const middleware of [...actionMiddlewares].reverse()) {
+      if (!middleware.error) continue;
+      await middleware.error(errorContext);
+    }
+  }
+
+  async function runActionWithMiddleware(
+    action: DatabaseViewActionContext<T>["action"],
+    payload: unknown,
+    handler?: () => Promise<void> | void,
+  ): Promise<void> {
+    const context = buildActionContext(action, payload);
+    try {
+      await invokeActionMiddlewares("before", context);
+      await handler?.();
+      await invokeActionMiddlewares("after", context);
+    } catch (e) {
+      try {
+        await invokeActionErrorMiddlewares(context, e);
+      } catch (middlewareError) {
+        setError(middlewareError);
+        return;
+      }
+      setError(e);
+    }
   }
 
   function getRecordIndex(recordId: string): number {
@@ -371,75 +458,63 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
       selectedRecordId: selectedRecordId.value,
     };
 
-    error.value = null;
+    await runActionWithMiddleware("refresh", fetchParams, async () => {
+      error.value = null;
 
-    if (options.actions?.onRefresh) {
-      try {
+      if (options.actions?.onRefresh) {
         await options.actions.onRefresh();
-      } catch (e) {
-        setError(e);
-        return;
       }
-    }
 
-    if (options.provider?.onRefresh) {
-      try {
+      if (options.provider?.onRefresh) {
         await options.provider.onRefresh(fetchParams);
-      } catch (e) {
-        setError(e);
+      }
+
+      if (!isProviderMode.value || !options.provider?.onFetch) {
+        records.value = inputRecords.value;
+        totalCount.value = records.value.length;
+        normalizeSelectedRecordId();
+        normalizeActiveViewId();
+        providerLoaded.value = false;
         return;
       }
-    }
 
-    if (!isProviderMode.value || !options.provider?.onFetch) {
-      records.value = inputRecords.value;
-      totalCount.value = records.value.length;
-      normalizeSelectedRecordId();
-      normalizeActiveViewId();
-      providerLoaded.value = false;
-      return;
-    }
+      const currentSeq = requestSeq.value + 1;
+      requestSeq.value = currentSeq;
+      loading.value = true;
+      try {
+        const result = await options.provider.onFetch(fetchParams);
+        if (requestSeq.value !== currentSeq) return;
 
-    const currentSeq = requestSeq.value + 1;
-    requestSeq.value = currentSeq;
-    loading.value = true;
-    try {
-      const result = await options.provider.onFetch(fetchParams);
-      if (requestSeq.value !== currentSeq) return;
+        const nextRecords = normalizeRecords((result.records ?? result.data) as readonly T[] | T[] | undefined);
+        records.value = nextRecords;
+        totalCount.value = result.total ?? nextRecords.length;
 
-      const nextRecords = normalizeRecords((result.records ?? result.data) as readonly T[] | T[] | undefined);
-      records.value = nextRecords;
-      totalCount.value = result.total ?? nextRecords.length;
+        if (result.schema !== undefined) {
+          providerSchema.value = cloneSchema(result.schema);
+        }
+        if (result.views !== undefined && result.views !== null) {
+          remoteViews.value = normalizeViews(result.views);
+        }
+        if (result.activeViewId) {
+          activeViewId.value = result.activeViewId;
+        }
+        if (result.selectedRecordId !== undefined) {
+          autoFillSelection.value = false;
+          selectedRecordId.value = result.selectedRecordId;
+          if (result.selectedRecordId === null) {
+            detailOpen.value = false;
+          }
+        }
 
-      if (result.schema !== undefined) {
-        providerSchema.value = cloneSchema(result.schema);
-      }
-      if (result.views !== undefined && result.views !== null) {
-        remoteViews.value = normalizeViews(result.views);
-      }
-      if (result.activeViewId) {
-        activeViewId.value = result.activeViewId;
-      }
-      if (result.selectedRecordId !== undefined) {
-        autoFillSelection.value = false;
-        selectedRecordId.value = result.selectedRecordId;
-        if (result.selectedRecordId === null) {
-          detailOpen.value = false;
+        providerLoaded.value = true;
+        normalizeActiveViewId();
+        normalizeSelectedRecordId();
+      } finally {
+        if (requestSeq.value === currentSeq) {
+          loading.value = false;
         }
       }
-
-      providerLoaded.value = true;
-      normalizeActiveViewId();
-      normalizeSelectedRecordId();
-    } catch (e) {
-      if (requestSeq.value === currentSeq) {
-        setError(e);
-      }
-    } finally {
-      if (requestSeq.value === currentSeq) {
-        loading.value = false;
-      }
-    }
+    });
   }
 
   function switchView(viewId: string): void {
@@ -463,12 +538,10 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
       viewId: current.viewId,
     });
 
-    upsertLocalView(updated);
-    try {
+    await runActionWithMiddleware("save-view", updated, async () => {
+      upsertLocalView(updated);
       await options.actions?.onSaveView?.(updated);
-    } catch (e) {
-      setError(e);
-    }
+    });
   }
 
   async function createView(name: string, baseConfig?: Partial<ViewConfig>): Promise<string> {
@@ -479,14 +552,12 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
       viewId,
       name,
     });
-    upsertLocalView(view);
-    activeViewId.value = viewId;
-    page.value = 1;
-    try {
+    await runActionWithMiddleware("save-view", view, async () => {
+      upsertLocalView(view);
+      activeViewId.value = viewId;
+      page.value = 1;
       await options.actions?.onSaveView?.(view);
-    } catch (e) {
-      setError(e);
-    }
+    });
     return viewId;
   }
 
@@ -495,22 +566,20 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
 
     const wasActive = activeViewId.value === viewId;
     const isBaseView = baseViews.value.some((view) => view.viewId === viewId);
-    if (isBaseView) {
-      hideView(viewId);
-    } else {
-      removeLocalView(viewId);
-    }
+    await runActionWithMiddleware("delete-view", viewId, async () => {
+      if (isBaseView) {
+        hideView(viewId);
+      } else {
+        removeLocalView(viewId);
+      }
 
-    if (wasActive) {
-      activeViewId.value = views.value.find((view) => view.viewId !== viewId)?.viewId ?? "";
-      normalizeActiveViewId();
-    }
+      if (wasActive) {
+        activeViewId.value = views.value.find((view) => view.viewId !== viewId)?.viewId ?? "";
+        normalizeActiveViewId();
+      }
 
-    try {
       await options.actions?.onDeleteView?.(viewId);
-    } catch (e) {
-      setError(e);
-    }
+    });
   }
 
   async function duplicateView(sourceViewId: string, newName: string): Promise<string> {
@@ -557,19 +626,11 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
   }
 
   async function emitCellEdit(payload: { rowId: string; fieldId: string; value: unknown }): Promise<void> {
-    try {
-      await options.actions?.onCellEdit?.(payload);
-    } catch (e) {
-      setError(e);
-    }
+    await runActionWithMiddleware("cell-edit", payload, () => options.actions?.onCellEdit?.(payload));
   }
 
   async function emitSchemaEvent(event: DatabaseSchemaEvent): Promise<void> {
-    try {
-      await options.actions?.onSchemaEvent?.(event);
-    } catch (e) {
-      setError(e);
-    }
+    await runActionWithMiddleware("schema-event", event, () => options.actions?.onSchemaEvent?.(event));
   }
 
   function setRecords(next: readonly T[] | T[]): void {
@@ -601,7 +662,9 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
   watch(
     selectedRecord,
     () => {
-      void options.actions?.onSelectRecord?.(selectedRecord.value);
+      void runActionWithMiddleware("select-record", selectedRecord.value, () =>
+        options.actions?.onSelectRecord?.(selectedRecord.value),
+      );
     },
     { immediate: true, deep: false, flush: "sync" },
   );
