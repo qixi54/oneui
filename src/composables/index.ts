@@ -99,6 +99,10 @@ export type {
 } from "./useViewPersistence";
 
 export { useDatabaseView } from "./useDatabaseView";
+export {
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewToastMiddleware,
+} from "./useDatabaseViewMiddleware";
 export type {
   DatabaseViewActionContext,
   DatabaseViewActionErrorContext,
@@ -115,6 +119,11 @@ export type {
   UseDatabaseViewOptions,
   UseDatabaseViewResult,
 } from "./useDatabaseView";
+export type {
+  DatabaseViewAnalyticsEvent,
+  DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewToastMiddlewareOptions,
+} from "./useDatabaseViewMiddleware";
 
 export { useDatabaseViewport, useDatabaseWorkspaceState } from "./useDatabaseWorkspace";
 

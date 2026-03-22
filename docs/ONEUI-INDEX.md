@@ -44,6 +44,8 @@
 ### 并发增强验证（middleware / theme-scope / virtualization）
 
 - `docs/plans/2026-03-22-oneui-parallel-enhancements-verification.md`
+- `README.md` / `README.en.md` 中的 `data-of-theme-scope` 局部主题示例
+- `src/dev/App.vue` 中的 scoped theme preview demo
 
 ### 0.8.3 建议补齐（Ops Console）
 
@@ -2635,6 +2637,8 @@ interface UseTypewriterOptions {
 
 **用途**: 虚拟列表 composable，支持固定和动态行高，使用 ResizeObserver 感知容器变化，用于 AiMessageList 和 KanbanColumn。
 
+`createVirtualListState()` 可在多个虚拟列表实例之间共享滚动位置、容器尺寸和失效触发；`VirtualListState` 也通过包入口对外暴露，便于外部按需复用统一状态。
+
 **函数签名**:
 ```ts
 function useVirtualList<T>(options: UseVirtualListOptions<T>): {
@@ -2650,19 +2654,31 @@ interface UseVirtualListOptions<T> {
   itemHeight: number | ((index: number) => number)    // 固定高度或动态高度函数
   overscan?: number                                    // 上下多渲染的缓冲行数，默认 5
   containerRef: Ref<HTMLElement | null>                // 滚动容器的 ref
+  state?: VirtualListState                              // 可选共享状态，支持跨实例保留滚动位置
 }
 
 type VirtualItem<T> = { data: T; index: number }
+
+interface VirtualListState {
+  scrollTop: Ref<number>
+  containerHeight: Ref<number>
+  invalidateVersion: Ref<number>
+  setScrollTop(scrollTop: number): void
+  setContainerHeight(containerHeight: number): void
+  invalidate(): void
+}
 ```
 
 **示例**:
 ```ts
 const containerRef = ref<HTMLElement | null>(null)
+const virtualListState = createVirtualListState()
 const { visibleItems, totalHeight, offsetY } = useVirtualList({
   items: messages,
   itemHeight: 60,     // 固定高度
   overscan: 3,
   containerRef,
+  state: virtualListState,
 })
 ```
 

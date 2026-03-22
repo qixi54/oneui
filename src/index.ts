@@ -311,6 +311,10 @@ export type {
 } from "./composables/useViewPersistence";
 
 export { useDatabaseView } from "./composables/useDatabaseView";
+export {
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewToastMiddleware,
+} from "./composables/useDatabaseViewMiddleware";
 export type {
   DatabaseViewActionContext,
   DatabaseViewActionErrorContext,
@@ -325,6 +329,11 @@ export type {
   UseDatabaseViewOptions,
   UseDatabaseViewResult,
 } from "./composables/useDatabaseView";
+export type {
+  DatabaseViewAnalyticsEvent,
+  DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewToastMiddlewareOptions,
+} from "./composables/useDatabaseViewMiddleware";
 export { useDatabaseViewport, useDatabaseWorkspaceState } from "./composables/useDatabaseWorkspace";
 
 export { useSearch } from "./composables/useSearch";

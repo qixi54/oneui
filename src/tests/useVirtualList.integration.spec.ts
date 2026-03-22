@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { ref, nextTick } from "vue";
 import { createVirtualListState, useVirtualList } from "../composables/useVirtualList";
+import { createVirtualListState as createVirtualListStateFromRoot, useVirtualList as useVirtualListFromRoot } from "../index";
+import type { VirtualListState } from "../index";
 
 function createMockContainer(clientHeight: number): HTMLElement {
   const el = document.createElement("div");
@@ -169,5 +171,28 @@ describe("useVirtualList", () => {
     expect(secondContainer.scrollTop).toBe(400);
     expect(state.containerHeight.value).toBe(120);
     expect(secondList.visibleItems.value.some((item) => item.index === 10)).toBe(true);
+  });
+
+  it("包入口对外暴露 createVirtualListState 和 VirtualListState", async () => {
+    const items = ref(Array.from({ length: 20 }, (_, i) => ({ id: i })));
+    const state: VirtualListState = createVirtualListStateFromRoot();
+    const containerRef = ref<HTMLElement | null>(null);
+    const container = createMockContainer(120);
+
+    const { scrollToIndex, visibleItems } = useVirtualListFromRoot({
+      items,
+      itemHeight: 40,
+      containerRef,
+      state,
+    });
+
+    containerRef.value = container;
+    await nextTick();
+
+    scrollToIndex(3);
+
+    expect(container.scrollTop).toBe(120);
+    expect(state.scrollTop.value).toBe(120);
+    expect(visibleItems.value.some((item) => item.index === 3)).toBe(true);
   });
 });

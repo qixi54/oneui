@@ -139,6 +139,11 @@ const themeMode = ref<"neutral" | "ops-console">("neutral");
 const scopedThemeMode = computed(() =>
   themeMode.value === "neutral" ? "ops-console" : "neutral",
 );
+const scopedThemeSnippet = computed(
+  () => `<aside data-of-theme="${scopedThemeMode.value}" data-of-theme-scope="${scopedThemeMode.value}">
+  <!-- local subtree inherits scoped theme tokens -->
+</aside>`,
+);
 
 const commandWorkspace = ref<OpsCommandWorkspace>({
   title: "待命",
@@ -1895,6 +1900,7 @@ function onCtxSelect(key: string) {
               <span class="theme-scope-preview__chip">accent</span>
               <span class="theme-scope-preview__chip">border</span>
             </div>
+            <pre class="theme-scope-preview__code">{{ scopedThemeSnippet }}</pre>
           </div>
         </div>
       </section>
@@ -5573,6 +5579,18 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.theme-scope-preview__code {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-color-bg-code);
+  color: var(--of-color-gray-100);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
 }
 
 .theme-scope-preview__chip {

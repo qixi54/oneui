@@ -120,6 +120,41 @@ document.documentElement.dataset.ofTheme = 'ops-console'
 2. 业务系统通过主题皮肤注入品牌感或中控台气质
 3. 后续可继续扩展更多主题，而不需要修改组件 API
 
+### 局部主题作用域
+
+如果同一页面里需要并存两种视觉语境，可以在局部 wrapper 上使用 `data-of-theme-scope`。
+这个属性会让 wrapper 及其子树继承对应主题 token，而不影响外层全局主题。
+
+```vue
+<template>
+  <div>
+    <section class="page-shell">
+      <DataTable :rows="rows" :columns="columns" />
+    </section>
+
+    <aside class="ops-preview" data-of-theme-scope="ops-console">
+      <div class="ops-preview__panel">
+        <h3>局部 ops-console 预览</h3>
+        <p>这里会继承 ops-console 的 token，而外层仍然保持全局 neutral。</p>
+      </div>
+    </aside>
+  </div>
+</template>
+```
+
+可选值与全局主题保持一致，当前支持：
+
+- `neutral`
+- `ops-console`
+
+在需要更明确的表达时，也可以同时保留 `data-of-theme` 作为显式声明：
+
+```vue
+<aside data-of-theme="ops-console" data-of-theme-scope="ops-console">
+  ...
+</aside>
+```
+
 ---
 
 ## 页面级方案

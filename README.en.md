@@ -129,6 +129,41 @@ document.documentElement.dataset.ofTheme = 'ops-console'
 
 This structure is meant to keep the component layer reusable while letting product-specific styling live above it.
 
+### Local Theme Scope
+
+When a single page needs two visual contexts at once, put `data-of-theme-scope` on a local wrapper.
+The wrapper subtree will inherit the matching theme tokens without changing the global `documentElement` theme.
+
+```vue
+<template>
+  <div>
+    <section class="page-shell">
+      <DataTable :rows="rows" :columns="columns" />
+    </section>
+
+    <aside class="ops-preview" data-of-theme-scope="ops-console">
+      <div class="ops-preview__panel">
+        <h3>Scoped ops-console preview</h3>
+        <p>This subtree inherits ops-console tokens while the outer page stays neutral.</p>
+      </div>
+    </aside>
+  </div>
+</template>
+```
+
+Supported values currently match the global theme list:
+
+- `neutral`
+- `ops-console`
+
+If you want the wrapper intent to be explicit, you can also keep `data-of-theme` alongside the scope attribute:
+
+```vue
+<aside data-of-theme="ops-console" data-of-theme-scope="ops-console">
+  ...
+</aside>
+```
+
 ---
 
 ## Usage Examples
