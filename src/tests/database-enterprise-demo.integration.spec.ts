@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { defineComponent } from "vue";
 import { describe, expect, it } from "vitest";
-import DatabaseEnterpriseDemo from "../dev/examples/DatabaseEnterpriseDemo.vue";
+import DatabaseEnterpriseDemo from "../dev/examples/database/DatabaseEnterpriseDemo.vue";
 import type { DataRecord, TableSchema, ViewConfig } from "../index";
 
 const DatabaseViewStub = defineComponent({

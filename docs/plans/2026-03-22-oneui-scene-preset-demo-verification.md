@@ -22,10 +22,11 @@
   - `src/index.ts`
 - dev/examples
   - `src/dev/App.vue`
-  - `src/dev/examples/ThemeScopeDemo.vue`
-  - `src/dev/examples/DatabaseEnterpriseDemo.vue`
-  - `src/dev/examples/DatabasePresetDemo.vue`
-  - `src/dev/examples/DatabaseViewDemo.vue`
+  - `src/dev/examples/theme/ThemeScopeDemo.vue`
+  - `src/dev/examples/database/DatabaseEnterpriseDemo.vue`
+  - `src/dev/examples/database/DatabasePresetDemo.vue`
+  - `src/dev/examples/database/DatabaseViewDemo.vue`
+  - `src/dev/examples/registry.ts`
 - 文档
   - `README.md`
   - `README.en.md`

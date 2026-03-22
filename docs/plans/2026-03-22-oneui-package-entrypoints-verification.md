@@ -21,7 +21,7 @@
 - `vite.config.ts`
 - `src/theme.ts`
 - `src/tests/package-entrypoints.integration.spec.ts`
-- `src/dev/examples/DatabaseViewDemo.vue`
+- `src/dev/examples/database/DatabaseViewDemo.vue`
 - `src/dev/App.vue`
 - `README.md`
 - `README.en.md`

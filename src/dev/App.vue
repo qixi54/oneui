@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import { DatabaseViewDemo, ThemeScopeDemo } from "./examples";
+import { createDevExamplesRegistry } from "./examples/registry";
 import {
   // Base
   ViewTab,
@@ -205,6 +205,18 @@ watch(themeMode, applyThemeMode, { immediate: true });
 onMounted(() => applyThemeMode(themeMode.value));
 
 const activeSection = ref<OpsAppSection>("base");
+
+const devExamples = createDevExamplesRegistry({
+  themeMode,
+  scopedThemeMode,
+  scopedThemeSnippet,
+});
+const shellExamples = computed(() => devExamples.filter((example) => example.section === "shell"));
+const sectionExamples = computed(() =>
+  devExamples.filter(
+    (example) => example.section === "section" && example.when === activeSection.value,
+  ),
+);
 
 const commandDeck = createOpsCommands({
   themeMode,
@@ -1264,10 +1276,11 @@ function onCtxSelect(key: string) {
         </div>
       </section>
 
-      <ThemeScopeDemo
-        :global-theme="themeMode"
-        :scoped-theme="scopedThemeMode"
-        :snippet="scopedThemeSnippet"
+      <component
+        :is="example.component"
+        v-for="example in shellExamples"
+        :key="example.id"
+        v-bind="example.props ? example.props() : {}"
       />
 
       <!-- ══════════════════════════════════════════════════════
@@ -2112,7 +2125,12 @@ const myStatusMap: ColorMap = {
            页面级方案
       ════════════════════════════════════════════════════════ -->
       <template v-if="activeSection === 'database-view'">
-        <DatabaseViewDemo />
+        <component
+          :is="example.component"
+          v-for="example in sectionExamples"
+          :key="example.id"
+          v-bind="example.props ? example.props() : {}"
+        />
       </template>
 
       <!-- ══════════════════════════════════════════════════════

@@ -62,8 +62,10 @@ describe("theme scope", () => {
     const componentIndex = readSource("../components/common/index.ts");
     const rootIndex = readSource("../index.ts");
     const devApp = readSource("../dev/App.vue");
-    const themeScopeDemo = readSource("../dev/examples/ThemeScopeDemo.vue");
-    const enterpriseDemo = readSource("../dev/examples/DatabaseEnterpriseDemo.vue");
+    const examplesIndex = readSource("../dev/examples/index.ts");
+    const examplesRegistry = readSource("../dev/examples/registry.ts");
+    const themeScopeDemo = readSource("../dev/examples/theme/ThemeScopeDemo.vue");
+    const enterpriseDemo = readSource("../dev/examples/database/DatabaseEnterpriseDemo.vue");
     const readme = readSource("../../README.md");
     const readmeEn = readSource("../../README.en.md");
     const docsIndex = readSource("../../docs/ONEUI-INDEX.md");
@@ -78,7 +80,11 @@ describe("theme scope", () => {
     expect(componentIndex).toContain("ThemeScopeScene");
     expect(rootIndex).toContain("ThemeScope");
     expect(rootIndex).toContain("ThemeScopeScene");
-    expect(devApp).toContain("<ThemeScopeDemo");
+    expect(devApp).toContain("createDevExamplesRegistry");
+    expect(examplesIndex).toContain('export * from "./theme"');
+    expect(examplesIndex).toContain('export * from "./database"');
+    expect(examplesRegistry).toContain("theme-scope-demo");
+    expect(examplesRegistry).toContain("database-view-demo");
     expect(themeScopeDemo).toContain("<ThemeScope");
     expect(themeScopeDemo).toContain("Scoped Component Tree");
     expect(themeScopeDemo).toContain("ThemeScopeScene");
@@ -96,6 +102,8 @@ describe("theme scope", () => {
     expect(readmeEn).toContain("DatabasePresetDemo");
     expect(docsIndex).toContain("ThemeScope");
     expect(docsIndex).toContain("ThemeScopeDemo.vue");
+    expect(docsIndex).toContain("src/dev/examples/theme");
+    expect(docsIndex).toContain("src/dev/examples/database");
     expect(docsIndex).toContain("ThemeScopeScene");
     expect(docsIndex).toContain("DatabasePresetDemo.vue");
     expect(docsIndex).toContain("composeDatabaseViewMiddlewares");

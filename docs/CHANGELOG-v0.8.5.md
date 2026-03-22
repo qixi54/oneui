@@ -40,7 +40,7 @@
 6. `scripts/consumer-smoke-entrypoints.sh`
    - 新增外部 consumer smoke 脚本，用双宿主矩阵验证根入口、子路径导出与主题入口。
 
-7. `src/dev/examples/DatabaseViewDemo.vue`
+7. `src/dev/examples/database/DatabaseViewDemo.vue`
    - 将页面级 database demo 从 `App.vue` 中独立出来，进一步降低 dev shell 膨胀。
 
 8. `README.md`, `README.en.md`, `docs/ONEUI-INDEX.md`

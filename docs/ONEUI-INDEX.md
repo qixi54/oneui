@@ -57,15 +57,16 @@
 - `docs/plans/2026-03-22-oneui-next-parallel-verification.md`
 - `docs/CHANGELOG-v0.8.4.md` 中的局部主题增强说明（non-breaking）
 
-### ThemeScope 场景模板 / dev examples
+### ThemeScope / Database 场景模板 / dev examples
 
 - `docs/plans/2026-03-22-oneui-scene-preset-demo-verification.md`
 - `src/components/common/ThemeScopeScene.vue`：轻量可复用的场景壳层组件
 - `README.md` / `README.en.md` 中的 `ThemeScope` 场景模板说明
-- `src/dev/examples/ThemeScopeDemo.vue`：轻量 ThemeScope 场景参考实现
-- `src/dev/examples/DatabaseEnterpriseDemo.vue`：企业级场景模板参考实现
-- `src/dev/examples/DatabasePresetDemo.vue`：preset bundle 官方消费示例
-- `src/dev/examples/DatabaseViewDemo.vue`：页面级 demo 容器与入口导航
+- `src/dev/examples/theme/ThemeScopeDemo.vue`：轻量 ThemeScope 场景参考实现
+- `src/dev/examples/database/DatabaseEnterpriseDemo.vue`：企业级场景模板参考实现
+- `src/dev/examples/database/DatabasePresetDemo.vue`：preset bundle 官方消费示例
+- `src/dev/examples/database/DatabaseViewDemo.vue`：页面级 demo 容器与入口导航
+- `src/dev/examples/registry.ts`：示例注册表，驱动 `App.vue` 的挂载
 - 说明：上述 dev/examples 级内容不属于 npm 导出面，仅作开发与文档参考
 
 ### ThemeScope + middleware composer 预发布验证
