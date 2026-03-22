@@ -52,12 +52,12 @@ const render = () => {
       type: "category",
       data: props.xAxisData,
       axisLabel: { color: resolveColor("var(--of-text-tertiary)") },
-      axisLine: { lineStyle: { color: resolveColor("var(--of-border-subtle)") } },
+      axisLine: { lineStyle: { color: resolveColor("var(--of-border-workspace)") } },
     },
     yAxis: {
       type: "value",
       axisLabel: { color: resolveColor("var(--of-text-tertiary)") },
-      splitLine: { lineStyle: { color: resolveColor("var(--of-border-subtle)") } },
+      splitLine: { lineStyle: { color: resolveColor("var(--of-border-divider)") } },
     },
     series: [
       {

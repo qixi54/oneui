@@ -73,7 +73,7 @@ const render = () => {
         data: props.data,
         label: { formatter: "{b}: {d}%" },
         itemStyle: {
-          borderColor: resolveColor("var(--of-surface-elevated)"),
+          borderColor: resolveColor("var(--of-surface-workspace-raised)"),
           borderWidth: 2,
         },
       },

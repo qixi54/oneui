@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
 import { AlertCircle, Database } from "lucide-vue-next";
-import DatabaseDetailPresenter from "./DatabaseDetailPresenter.vue";
+import DatabaseViewDetailHost from "./DatabaseViewDetailHost.vue";
 import DatabaseViewContent from "./DatabaseViewContent.vue";
 import DatabaseViewShell from "./DatabaseViewShell.vue";
 import DatabaseViewToolbar from "./DatabaseViewToolbar.vue";
@@ -742,7 +742,7 @@ function handleDrawerWidthUpdate(width: number) {
     </template>
 
     <template #detail>
-      <DatabaseDetailPresenter
+      <DatabaseViewDetailHost
         v-if="showDetailWorkspace"
         :visible="showDetailWorkspace"
         :title="detailWorkspaceTitle"
@@ -762,11 +762,8 @@ function handleDrawerWidthUpdate(width: number) {
         @save="handleDetailWorkspaceSave"
         @delete="handleDetailDelete"
         @close="handleDetailClose"
-        @update:width="
-          resolvedDetailPresentation === 'side-panel'
-            ? handleSidePanelWidthUpdate($event)
-            : handleDrawerWidthUpdate($event)
-        "
+        @update:side-panel-width="handleSidePanelWidthUpdate"
+        @update:drawer-width="handleDrawerWidthUpdate"
         @update:presentation="setPreferredDetailPresentation"
       />
     </template>

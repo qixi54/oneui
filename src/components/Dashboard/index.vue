@@ -183,8 +183,8 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   flex-direction: column;
   gap: 16px;
   container-type: inline-size;
-  background: var(--of-surface-workspace, var(--of-surface-elevated, var(--of-color-bg-elevated)));
-  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-100)));
+  background: var(--of-surface-workspace);
+  border: 1px solid var(--of-border-workspace);
   border-radius: var(--of-radius-2xl, var(--of-radius-xl));
   padding: 16px;
   box-sizing: border-box;
@@ -200,7 +200,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: var(--of-text-primary, var(--of-color-text));
+  color: var(--of-text-primary);
 }
 
 .of-dashboard__grid {
@@ -212,10 +212,10 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 
 .of-dashboard__item {
   min-height: 220px;
-  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-100)));
+  border: 1px solid var(--of-border-workspace);
   border-radius: var(--of-radius-xl);
-  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
-  box-shadow: var(--of-card-shadow, var(--of-shadow-card));
+  background: var(--of-surface-workspace-raised);
+  box-shadow: var(--of-elevation-card);
   padding: 14px;
   transition:
     transform 160ms ease,
@@ -226,9 +226,9 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 
 .of-dashboard__item:hover {
   transform: translateY(-1px);
-  border-color: var(--of-row-action-border, var(--of-border-strong, var(--of-color-gray-300)));
-  box-shadow: var(--of-card-shadow-hover, var(--of-shadow-card-hover));
-  background: var(--of-surface-workspace-strong, var(--of-surface-elevated, var(--of-color-bg-elevated)));
+  border-color: var(--of-border-strong);
+  box-shadow: var(--of-elevation-card-hover);
+  background: var(--of-surface-workspace-strong);
 }
 
 @media (max-width: 960px) {

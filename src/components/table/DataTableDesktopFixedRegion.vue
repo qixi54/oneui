@@ -99,8 +99,8 @@ function slotPayload() {
   left: 0;
   z-index: 10;
   overflow-y: auto;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
+  border-right: 1px solid var(--of-border-workspace, var(--of-border-subtle, var(--of-color-gray-200)));
   scrollbar-width: none;
 }
 
@@ -109,7 +109,7 @@ function slotPayload() {
 }
 
 .of-data-table-fixed-region.of-fixed-shadow {
-  box-shadow: var(--of-shadow-fixed-col);
+  box-shadow: var(--of-elevation-fixed-col, var(--of-shadow-fixed-col));
   clip-path: inset(0 -12px 0 0);
 }
 </style>

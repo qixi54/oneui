@@ -41,10 +41,10 @@ const emit = defineEmits<{
   gap: 12px;
   padding: 10px 14px;
   border-bottom: 1px solid
-    var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
+    var(--of-border-workspace, var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200))));
   background: var(
     --of-surface-workspace-strong,
-    var(--of-surface-selected, var(--of-color-gray-100))
+    var(--of-surface-selected, var(--of-color-bg-active, var(--of-color-gray-100)))
   );
 }
 
@@ -63,14 +63,17 @@ const emit = defineEmits<{
   height: 22px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--of-status-active-bg, var(--of-surface-elevated, #fff));
-  color: var(--of-status-active, var(--of-row-action-text, var(--of-text-primary, #111827)));
+  background: var(--of-status-active-bg, var(--of-surface-elevated, var(--of-color-bg-elevated, #fff)));
+  color: var(
+    --of-status-active,
+    var(--of-row-action-text, var(--of-text-primary, var(--of-color-text-primary, #111827)))
+  );
   font-size: 12px;
   font-weight: 700;
 }
 
 .of-data-table-selection-bar__text {
-  color: var(--of-text-secondary, var(--of-color-gray-600));
+  color: var(--of-text-secondary, var(--of-color-text-secondary, var(--of-color-gray-600)));
   font-size: 13px;
   font-weight: 500;
 }
@@ -89,10 +92,10 @@ const emit = defineEmits<{
   justify-content: center;
   min-height: 30px;
   padding: 6px 12px;
-  border: 1px solid var(--of-row-action-border, var(--of-border-subtle, var(--of-color-gray-200)));
+  border: 1px solid var(--of-row-action-border, var(--of-border-default, var(--of-border-subtle, var(--of-color-gray-200))));
   border-radius: 999px;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  color: var(--of-row-action-text, var(--of-text-primary, var(--of-color-gray-800)));
+  color: var(--of-row-action-text, var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-800))));
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -101,7 +104,7 @@ const emit = defineEmits<{
 
 .of-data-table-selection-bar__btn:hover:not(:disabled),
 .of-data-table-selection-bar__btn:focus-visible:not(:disabled) {
-  background: var(--of-row-action-hover, var(--of-surface-selected, var(--of-color-gray-100)));
+  background: var(--of-row-action-hover, var(--of-surface-selected, var(--of-color-bg-active, var(--of-color-gray-100))));
 }
 
 .of-data-table-selection-bar__btn--danger {

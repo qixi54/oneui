@@ -198,8 +198,8 @@ function onResizeStart(e: MouseEvent, colKey: string) {
 .of-table-header {
   display: flex;
   align-items: center;
-  background: var(--of-surface-panel, var(--of-color-gray-50));
-  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-panel, var(--of-color-bg-hover, var(--of-color-gray-50)));
+  border-bottom: 1px solid var(--of-border-divider, var(--of-border-subtle, var(--of-color-gray-200)));
   padding: 0;
   user-select: none;
 }
@@ -211,7 +211,7 @@ function onResizeStart(e: MouseEvent, colKey: string) {
   gap: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--of-text-secondary, var(--of-color-gray-500));
+  color: var(--of-text-secondary, var(--of-color-text-secondary, var(--of-color-gray-500)));
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
@@ -219,16 +219,16 @@ function onResizeStart(e: MouseEvent, colKey: string) {
 }
 
 .of-th--active {
-  color: var(--of-text-primary, var(--of-color-gray-700));
+  color: var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-700)));
 }
 
 .of-th:hover {
-  color: var(--of-text-primary, var(--of-color-gray-700));
+  color: var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-700)));
 }
 
 .of-th:focus-visible,
 .of-th-add:focus-visible {
-  outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
+  outline: 2px solid var(--of-border-active, var(--of-border-strong, var(--of-color-gray-300)));
   outline-offset: -2px;
 }
 
@@ -257,11 +257,11 @@ function onResizeStart(e: MouseEvent, colKey: string) {
 }
 
 .of-sort-icon-active {
-  color: var(--of-text-secondary, var(--of-color-gray-500));
+  color: var(--of-text-secondary, var(--of-color-text-secondary, var(--of-color-gray-500)));
 }
 
 .of-sort-icon-idle {
-  color: var(--of-text-tertiary, var(--of-color-gray-300));
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary, var(--of-color-gray-300)));
   opacity: 0;
 }
 
@@ -273,7 +273,7 @@ function onResizeStart(e: MouseEvent, colKey: string) {
   width: 14px;
   height: 14px;
   cursor: pointer;
-  accent-color: var(--of-text-secondary, var(--of-color-gray-500));
+  accent-color: var(--of-text-secondary, var(--of-color-text-secondary, var(--of-color-gray-500)));
 }
 
 .of-sr-only {
@@ -300,20 +300,20 @@ function onResizeStart(e: MouseEvent, colKey: string) {
 }
 
 .of-th-resizer:hover {
-  background: var(--of-border-strong, var(--of-color-gray-300));
+  background: var(--of-border-active, var(--of-border-strong, var(--of-color-gray-300)));
 }
 
 .of-th-add {
   flex-shrink: 0;
   flex-grow: 0;
   justify-content: center;
-  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary, var(--of-color-gray-400)));
   cursor: pointer;
-  border-left: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  border-left: 1px solid var(--of-border-divider, var(--of-border-subtle, var(--of-color-gray-200)));
 }
 
 .of-th-add:hover {
-  color: var(--of-text-primary, var(--of-color-gray-700));
-  background: var(--of-surface-muted, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-700)));
+  background: var(--of-surface-muted, var(--of-color-bg-hover, var(--of-color-gray-100)));
 }
 </style>

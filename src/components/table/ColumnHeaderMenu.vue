@@ -206,9 +206,9 @@ const menuStyle = computed(() => {
   position: fixed;
   min-width: 220px;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  border: 1px solid var(--of-border-default, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
   border-radius: var(--of-radius-lg, 8px);
-  box-shadow: var(--of-shadow-dropdown);
+  box-shadow: var(--of-elevation-dropdown, var(--of-shadow-dropdown));
   padding: 4px 0;
   z-index: 1003;
 }
@@ -220,7 +220,7 @@ const menuStyle = computed(() => {
 .of-col-menu__rename-input {
   width: 100%;
   border: none;
-  border-bottom: 2px solid var(--of-border-strong, var(--of-color-gray-300, #d1d5db));
+  border-bottom: 2px solid var(--of-border-active, var(--of-border-strong, var(--of-color-gray-300, #d1d5db)));
   background: transparent;
   padding: 6px 4px;
   font-size: 13px;
@@ -231,12 +231,12 @@ const menuStyle = computed(() => {
 }
 
 .of-col-menu__rename-input:focus {
-  border-bottom-color: var(--of-border-strong, var(--of-color-gray-400, #9ca3af));
+  border-bottom-color: var(--of-border-active, var(--of-border-strong, var(--of-color-gray-400, #9ca3af)));
 }
 
 .of-col-menu__divider {
   height: 1px;
-  background: var(--of-border-subtle, var(--of-color-gray-100, #f3f4f6));
+  background: var(--of-border-divider, var(--of-border-subtle, var(--of-color-gray-100, #f3f4f6)));
   margin: 4px 0;
 }
 
@@ -249,20 +249,20 @@ const menuStyle = computed(() => {
   border: none;
   background: transparent;
   font-size: 13px;
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
+  color: var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-700, #374151)));
   cursor: pointer;
   text-align: left;
   font-family: inherit;
 }
 
 .of-col-menu__item:hover {
-  background: var(--of-surface-muted, var(--of-color-gray-50, #f9fafb));
+  background: var(--of-surface-muted, var(--of-color-bg-hover, var(--of-color-gray-50, #f9fafb)));
 }
 
 .of-col-menu__item-value {
   margin-left: auto;
   font-size: 12px;
-  color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
+  color: var(--of-text-tertiary, var(--of-color-text-tertiary, var(--of-color-gray-400, #9ca3af)));
 }
 
 .of-col-menu__item--danger {

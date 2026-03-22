@@ -33,13 +33,13 @@ const emit = defineEmits<{
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
-  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  background: var(--of-surface-selected, var(--of-color-bg-active, #f3f4f6));
+  border-top: 1px solid var(--of-border-divider, var(--of-border-subtle, #e5e7eb));
   font-size: 13px;
 }
 
 .of-data-table-draft-count {
-  color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #4b5563));
   font-weight: 500;
   flex: 1;
 }
@@ -55,11 +55,11 @@ const emit = defineEmits<{
 
 .of-data-table-draft-btn--commit {
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
+  color: var(--of-text-primary, var(--of-color-text-primary, #374151));
 }
 
 .of-data-table-draft-btn--discard {
-  background: var(--of-surface-muted, var(--of-color-gray-200, #e5e7eb));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
+  background: var(--of-surface-muted, var(--of-color-bg-hover, #e5e7eb));
+  color: var(--of-text-primary, var(--of-color-text-primary, #374151));
 }
 </style>
