@@ -1276,12 +1276,19 @@ function onCtxSelect(key: string) {
         </div>
       </section>
 
-      <component
-        :is="example.component"
+      <div
         v-for="example in shellExamples"
         :key="example.id"
-        v-bind="example.props ? example.props() : {}"
-      />
+        class="dev-example-host"
+        :data-dev-example="example.id"
+        :data-dev-group="example.group"
+        :aria-label="`${example.title}: ${example.summary}`"
+      >
+        <component
+          :is="example.component"
+          v-bind="example.props ? example.props() : {}"
+        />
+      </div>
 
       <!-- ══════════════════════════════════════════════════════
            基础组件
@@ -2126,9 +2133,13 @@ const myStatusMap: ColorMap = {
       ════════════════════════════════════════════════════════ -->
       <template v-if="activeSection === 'database-view'">
         <component
-          :is="example.component"
           v-for="example in sectionExamples"
           :key="example.id"
+          :is="example.component"
+          class="dev-example-host"
+          :data-dev-example="example.id"
+          :data-dev-group="example.group"
+          :aria-label="`${example.title}: ${example.summary}`"
           v-bind="example.props ? example.props() : {}"
         />
       </template>

@@ -85,6 +85,11 @@ describe("theme scope", () => {
     expect(examplesIndex).toContain('export * from "./database"');
     expect(examplesRegistry).toContain("theme-scope-demo");
     expect(examplesRegistry).toContain("database-view-demo");
+    expect(examplesRegistry).toContain('group: "theme"');
+    expect(examplesRegistry).toContain('group: "database"');
+    expect(examplesRegistry).toContain("order: 10");
+    expect(examplesRegistry).toContain("order: 100");
+    expect(examplesRegistry).toContain("sortDevExamples");
     expect(themeScopeDemo).toContain("<ThemeScope");
     expect(themeScopeDemo).toContain("Scoped Component Tree");
     expect(themeScopeDemo).toContain("ThemeScopeScene");
