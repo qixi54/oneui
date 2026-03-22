@@ -35,6 +35,13 @@
 
 ## Release & Verification
 
+### 0.8.6 发布补齐（Examples Structure & Metadata Registry）
+
+- `docs/plans/2026-03-22-release-0.8.6-evidence-index.md`
+- `docs/plans/2026-03-22-release-0.8.6-verification.md`
+- `docs/plans/2026-03-22-release-0.8.6-proof.md`
+- `docs/CHANGELOG-v0.8.6.md`
+
 ### 0.8.5 发布补齐（Package Entrypoints）
 
 - `docs/plans/2026-03-22-release-0.8.5-evidence-index.md`
