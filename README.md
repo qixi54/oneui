@@ -215,13 +215,14 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 如果你需要核对当前可追溯的发布材料，优先看这几份文档：
 
-- 当前版本证据索引：[`docs/plans/2026-03-23-release-0.8.4-evidence-index.md`](docs/plans/2026-03-23-release-0.8.4-evidence-index.md)
-- 发布 proof：[`docs/plans/2026-03-23-release-0.8.4-proof.md`](docs/plans/2026-03-23-release-0.8.4-proof.md)
-- 验收结果：[`docs/plans/2026-03-23-release-0.8.4-verification.md`](docs/plans/2026-03-23-release-0.8.4-verification.md)
+- 当前版本证据索引：[`docs/plans/2026-03-22-release-0.8.5-evidence-index.md`](docs/plans/2026-03-22-release-0.8.5-evidence-index.md)
+- 发布 proof：[`docs/plans/2026-03-22-release-0.8.5-proof.md`](docs/plans/2026-03-22-release-0.8.5-proof.md)
+- 验收结果：[`docs/plans/2026-03-22-release-0.8.5-verification.md`](docs/plans/2026-03-22-release-0.8.5-verification.md)
 - 预发布验证：[`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
-- 版本日志：[`docs/CHANGELOG-v0.8.4.md`](docs/CHANGELOG-v0.8.4.md)
+- 子路径入口治理：[`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
+- 版本日志：[`docs/CHANGELOG-v0.8.5.md`](docs/CHANGELOG-v0.8.5.md)
 
-当前 npm 公开版本为 `0.8.4`，对应的发布、pack、dry-run 和双宿主 smoke 都有独立留痕。
+当前 npm 公开版本为 `0.8.5`，对应的发布、pack、dry-run 和双宿主 smoke 都有独立留痕。
 
 ---
 

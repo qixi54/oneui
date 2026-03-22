@@ -35,6 +35,13 @@
 
 ## Release & Verification
 
+### 0.8.5 发布补齐（Package Entrypoints）
+
+- `docs/plans/2026-03-22-release-0.8.5-evidence-index.md`
+- `docs/plans/2026-03-22-release-0.8.5-verification.md`
+- `docs/plans/2026-03-22-release-0.8.5-proof.md`
+- `docs/CHANGELOG-v0.8.5.md`
+
 ### 0.8.4 发布补齐（DataTable 交互闭环）
 
 - `docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`

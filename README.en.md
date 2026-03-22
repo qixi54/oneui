@@ -224,13 +224,14 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 If you need to review the current traceable release materials, start with these docs:
 
-- Current evidence index: [`docs/plans/2026-03-23-release-0.8.4-evidence-index.md`](docs/plans/2026-03-23-release-0.8.4-evidence-index.md)
-- Release proof: [`docs/plans/2026-03-23-release-0.8.4-proof.md`](docs/plans/2026-03-23-release-0.8.4-proof.md)
-- Verification result: [`docs/plans/2026-03-23-release-0.8.4-verification.md`](docs/plans/2026-03-23-release-0.8.4-verification.md)
+- Current evidence index: [`docs/plans/2026-03-22-release-0.8.5-evidence-index.md`](docs/plans/2026-03-22-release-0.8.5-evidence-index.md)
+- Release proof: [`docs/plans/2026-03-22-release-0.8.5-proof.md`](docs/plans/2026-03-22-release-0.8.5-proof.md)
+- Verification result: [`docs/plans/2026-03-22-release-0.8.5-verification.md`](docs/plans/2026-03-22-release-0.8.5-verification.md)
 - Pre-release smoke: [`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
-- Changelog: [`docs/CHANGELOG-v0.8.4.md`](docs/CHANGELOG-v0.8.4.md)
+- Package entrypoints verification: [`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
+- Changelog: [`docs/CHANGELOG-v0.8.5.md`](docs/CHANGELOG-v0.8.5.md)
 
-The current public npm version is `0.8.4`, and the publish, pack, dry-run, and dual-host smoke checks all have separate evidence.
+The current public npm version is `0.8.5`, and publish, pack, dry-run, and dual-host smoke checks all have separate evidence.
 
 ---
 
