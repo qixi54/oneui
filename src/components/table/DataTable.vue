@@ -16,9 +16,9 @@ import TableHeaderRow from "./TableHeaderRow.vue";
 import TableDataRow from "./TableDataRow.vue";
 import TableGroupRow from "./TableGroupRow.vue";
 import NewRowBtn from "./NewRowBtn.vue";
-import DataTableSelectionBar from "./DataTableSelectionBar.vue";
 import DataTableDraftToolbar from "./DataTableDraftToolbar.vue";
 import DataTableMobilePanel from "./DataTableMobilePanel.vue";
+import DataTableDesktopFrame from "./DataTableDesktopFrame.vue";
 import FieldCell, {
   type FieldDef as CellFieldDef,
   type CellValue,
@@ -655,6 +655,18 @@ function onScrollRegionScroll(e: Event) {
   scrollLeft.value = target.scrollLeft;
 }
 
+function setDesktopFixedRegionRef(element: HTMLElement | null) {
+  fixedContainerRef.value = element;
+}
+
+function setDesktopScrollRegionRef(element: HTMLElement | null) {
+  scrollContainerRef.value = element;
+}
+
+function setDesktopStandardScrollRef(element: HTMLElement | null) {
+  scrollContainerRef.value = element;
+}
+
 // ── Row Prop Builders ──────────────────────────────────────────────────────
 
 function groupRowProps(item: GroupHeaderItem) {
@@ -720,7 +732,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 </script>
 
 <template>
-  <!-- Mobile mode -->
   <template v-if="isMobile">
     <DataTableMobilePanel
       :rows="sortedData as TableRowRecord[]"
@@ -747,7 +758,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
     </DataTableMobilePanel>
   </template>
 
-  <!-- Desktop/Tablet mode -->
   <div
     v-else
     ref="tableContainerRef"
@@ -758,145 +768,64 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
     tabindex="0"
     @keydown="enableKeyboard ? handleKeyDown($event) : undefined"
   >
-    <DataTableSelectionBar
-      v-if="hasSelectionBar"
+    <DataTableDesktopFrame
+      :has-fixed-columns="hasFixedColumns"
+      :show-selection-bar="hasSelectionBar"
       :selection-count="selectedRows.size"
-      :items="resolvedBulkActionItems"
-      @action="handleBulkAction"
-    />
-
-    <!-- Fixed columns mode -->
-    <template v-if="hasFixedColumns">
-      <div class="of-data-table-body" style="position: relative">
-        <!-- Fixed region -->
-        <div
-          ref="fixedContainerRef"
-          class="of-data-table-fixed-region"
-          :class="{ 'of-fixed-shadow': showFixedShadow }"
-          :style="{ width: fixedWidth + 'px' }"
-          @scroll="handleFixedScroll"
-        >
-          <!-- Fixed header -->
-          <TableHeaderRow
-            :columns="fixedCols"
-            :selectable="effectiveSelectable"
-            :sort-key="sort.field ?? ''"
-            :sort-order="sort.order ?? 'asc'"
-            :all-selected="isAllSelected"
-            :indeterminate="indeterminate"
+      :selection-items="resolvedBulkActionItems"
+      :fixed-width="fixedWidth"
+      :show-fixed-shadow="showFixedShadow"
+      :columns="effectiveColumns"
+      :fixed-columns="fixedCols"
+      :scrollable-columns="scrollableCols"
+      :selectable="effectiveSelectable"
+      :show-row-actions="showRowActions"
+      :use-virtual="useVirtual"
+      :total-height="totalHeight"
+      :offset-y="offsetY"
+      :set-fixed-region-ref="setDesktopFixedRegionRef"
+      :set-scroll-region-ref="setDesktopScrollRegionRef"
+      :set-standard-scroll-ref="setDesktopStandardScrollRef"
+      @selection-action="handleBulkAction"
+      @fixed-scroll="handleFixedScroll"
+      @scroll="onScrollRegionScroll"
+    >
+      <template #fixed-header>
+        <TableHeaderRow
+          :columns="fixedCols"
+          :selectable="effectiveSelectable"
+          :sort-key="sort.field ?? ''"
+          :sort-order="sort.order ?? 'asc'"
+          :all-selected="isAllSelected"
+          :indeterminate="indeterminate"
           :enable-resize="enableResize"
           :enable-field-menu="enableFieldManagement"
           :enable-add-field="enableFieldManagement"
           :density="containerDensity"
-            @sort="toggleSort"
-            @select-all="handleSelectAll"
-            @resize-start="onResizeStart"
-            @resize-dblclick="onAutoFitColumn"
-            @header-contextmenu="onHeaderContextMenu"
-            @header-dblclick="onHeaderDblClick"
-            @add-field="onAddField"
-          />
-          <!-- Fixed rows -->
-          <div class="of-data-table-fixed-body">
-            <!-- Virtual scroll: use totalHeight placeholder + offsetY transform -->
-            <template v-if="useVirtual">
-              <div :style="{ height: totalHeight + 'px', position: 'relative' }">
-                <div :style="{ transform: `translateY(${offsetY}px)` }">
-                  <template v-for="{ data: item, index: vIdx } in visibleItems" :key="item.id">
-                    <TableGroupRow
-                      v-if="isGroupHeader(item)"
-                      :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
-                      v-bind="groupRowProps(item as GroupHeaderItem)"
-                      @toggle="toggleGroup(groupToggleKey(item as GroupHeaderItem))"
-                    />
-                    <div
-                      v-else
-                      :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
-                      class="of-table-row"
-                      role="row"
-                      tabindex="0"
-                      :style="dataRowStyle()"
-                      :class="{
-                        'of-table-row--selected': selectedRows.has(getRowId(item as T)),
-                        'of-table-row--hover': isRowHovered(getRowId(item as T)),
-                      }"
-                      @mouseenter="syncHover(getRowId(item as T))"
-                      @mouseleave="syncHover(null)"
-                      @focusin="syncHover(getRowId(item as T))"
-                      @focusout="syncHover(null)"
-                      @click="handleRowClick(item as T)"
-                      @keydown="handleRowKeyDown($event, item as T)"
-                      >
-                      <div
-                        v-if="effectiveSelectable"
-                        class="of-td of-td-checkbox"
-                        role="gridcell"
-                        @click.stop
-                      >
-                        <label class="of-checkbox-label" :for="`fixed-row-select-${getRowId(item as T)}`">
-                          <input
-                            :id="`fixed-row-select-${getRowId(item as T)}`"
-                            type="checkbox"
-                            class="of-checkbox"
-                            :checked="selectedRows.has(getRowId(item as T))"
-                            @change="handleSelect(getRowId(item as T))"
-                          />
-                          <span class="of-sr-only">选择当前行</span>
-                        </label>
-                      </div>
-                      <div
-                        v-for="col in fixedCols"
-                        :key="col.key"
-                        class="of-td"
-                        role="gridcell"
-                        :style="bodyCellStyle(col)"
-                      >
-                        <slot name="cell" :row="item" :col="col">
-                          <FieldCell
-                            v-if="fieldDefs?.length"
-                            :row-id="getRowId(item as T)"
-                            :field="getFieldDef(col.key)"
-                            :value="getRowValue(item as T, col.key)"
-                            @commit="onCellCommit"
-                          />
-                          <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
-                        </slot>
-                      </div>
-                      <div
-                        v-if="showRowActions"
-                        class="of-table-row__actions"
-                        aria-label="行快捷操作"
-                        @click.stop
-                      >
-                        <template v-for="action in buildRowActionItems(item as T)" :key="action.key">
-                          <button
-                            type="button"
-                            class="of-table-row__action-btn"
-                            :class="{
-                              'of-table-row__action-btn--danger': action.variant === 'danger',
-                            }"
-                            :disabled="action.disabled"
-                            @click.stop="handleRowActionClick(item as T, action.key)"
-                          >
-                            <span>{{ action.label }}</span>
-                          </button>
-                        </template>
-                      </div>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </template>
-            <!-- Normal render: full list -->
-            <template v-else>
-              <template v-for="item in groupedItems" :key="item.id">
+          @sort="toggleSort"
+          @select-all="handleSelectAll"
+          @resize-start="onResizeStart"
+          @resize-dblclick="onAutoFitColumn"
+          @header-contextmenu="onHeaderContextMenu"
+          @header-dblclick="onHeaderDblClick"
+          @add-field="onAddField"
+        />
+      </template>
+
+      <template #fixed-body>
+        <template v-if="useVirtual">
+          <div :style="{ height: totalHeight + 'px', position: 'relative' }">
+            <div :style="{ transform: `translateY(${offsetY}px)` }">
+              <template v-for="{ data: item, index: vIdx } in visibleItems" :key="item.id">
                 <TableGroupRow
                   v-if="isGroupHeader(item)"
+                  :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
                   v-bind="groupRowProps(item as GroupHeaderItem)"
                   @toggle="toggleGroup(groupToggleKey(item as GroupHeaderItem))"
                 />
                 <div
                   v-else
+                  :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
                   class="of-table-row"
                   role="row"
                   tabindex="0"
@@ -911,16 +840,16 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                   @focusout="syncHover(null)"
                   @click="handleRowClick(item as T)"
                   @keydown="handleRowKeyDown($event, item as T)"
-                  >
+                >
                   <div
                     v-if="effectiveSelectable"
                     class="of-td of-td-checkbox"
                     role="gridcell"
                     @click.stop
                   >
-                    <label class="of-checkbox-label" :for="`row-select-${getRowId(item as T)}`">
+                    <label class="of-checkbox-label" :for="`fixed-row-select-${getRowId(item as T)}`">
                       <input
-                        :id="`row-select-${getRowId(item as T)}`"
+                        :id="`fixed-row-select-${getRowId(item as T)}`"
                         type="checkbox"
                         class="of-checkbox"
                         :checked="selectedRows.has(getRowId(item as T))"
@@ -967,84 +896,115 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                   </div>
                 </div>
               </template>
-            </template>
+            </div>
           </div>
-        </div>
-
-        <!-- Scrollable region -->
-        <div
-          ref="scrollContainerRef"
-          class="of-data-table-scroll-region"
-          :style="{ marginLeft: fixedWidth + 'px' }"
-          @scroll="onScrollRegionScroll"
-        >
-          <!-- Scrollable header -->
-          <TableHeaderRow
-            :columns="scrollableCols"
-            :selectable="false"
-            :sort-key="sort.field ?? ''"
-            :sort-order="sort.order ?? 'asc'"
-            :enable-resize="enableResize"
-            :enable-field-menu="enableFieldManagement"
-            :enable-add-field="enableFieldManagement"
-            :density="containerDensity"
-            @sort="toggleSort"
-            @resize-start="onResizeStart"
-            @resize-dblclick="onAutoFitColumn"
-            @header-contextmenu="onHeaderContextMenu"
-            @header-dblclick="onHeaderDblClick"
-            @add-field="onAddField"
-          />
-          <!-- Scrollable rows -->
-          <div class="of-data-table-scroll-body">
-            <!-- Virtual scroll: use totalHeight placeholder + offsetY transform -->
-            <template v-if="useVirtual">
-              <div :style="{ height: totalHeight + 'px', position: 'relative' }">
-                <div :style="{ transform: `translateY(${offsetY}px)` }">
-                  <template v-for="{ data: item } in visibleItems" :key="item.id">
-                    <div v-if="isGroupHeader(item)" :style="groupSpacerStyle()" />
-                    <div
-                      v-else
-                      class="of-table-row"
-                      role="row"
-                      tabindex="0"
-                      :class="{
-                        'of-table-row--selected': selectedRows.has(getRowId(item as T)),
-                        'of-table-row--hover': isRowHovered(getRowId(item as T)),
-                      }"
-                      @mouseenter="syncHover(getRowId(item as T))"
-                      @mouseleave="syncHover(null)"
-                      @focusin="syncHover(getRowId(item as T))"
-                      @focusout="syncHover(null)"
-                      @click="handleRowClick(item as T)"
-                      @keydown="handleRowKeyDown($event, item as T)"
-                    >
-                      <div
-                        v-for="col in scrollableCols"
-                        :key="col.key"
-                        class="of-td"
-                        role="gridcell"
-                        :style="bodyCellStyle(col)"
-                      >
-                        <slot name="cell" :row="item" :col="col">
-                          <FieldCell
-                            v-if="fieldDefs?.length"
-                            :row-id="getRowId(item as T)"
-                            :field="getFieldDef(col.key)"
-                            :value="getRowValue(item as T, col.key)"
-                            @commit="onCellCommit"
-                          />
-                          <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
-                        </slot>
-                      </div>
-                    </div>
-                  </template>
-                </div>
+        </template>
+        <template v-else>
+          <template v-for="item in groupedItems" :key="item.id">
+            <TableGroupRow
+              v-if="isGroupHeader(item)"
+              v-bind="groupRowProps(item as GroupHeaderItem)"
+              @toggle="toggleGroup(groupToggleKey(item as GroupHeaderItem))"
+            />
+            <div
+              v-else
+              class="of-table-row"
+              role="row"
+              tabindex="0"
+              :style="dataRowStyle()"
+              :class="{
+                'of-table-row--selected': selectedRows.has(getRowId(item as T)),
+                'of-table-row--hover': isRowHovered(getRowId(item as T)),
+              }"
+              @mouseenter="syncHover(getRowId(item as T))"
+              @mouseleave="syncHover(null)"
+              @focusin="syncHover(getRowId(item as T))"
+              @focusout="syncHover(null)"
+              @click="handleRowClick(item as T)"
+              @keydown="handleRowKeyDown($event, item as T)"
+            >
+              <div
+                v-if="effectiveSelectable"
+                class="of-td of-td-checkbox"
+                role="gridcell"
+                @click.stop
+              >
+                <label class="of-checkbox-label" :for="`row-select-${getRowId(item as T)}`">
+                  <input
+                    :id="`row-select-${getRowId(item as T)}`"
+                    type="checkbox"
+                    class="of-checkbox"
+                    :checked="selectedRows.has(getRowId(item as T))"
+                    @change="handleSelect(getRowId(item as T))"
+                  />
+                  <span class="of-sr-only">选择当前行</span>
+                </label>
               </div>
-            </template>
-            <!-- Normal render: full list -->
-            <template v-else>
-              <template v-for="item in groupedItems" :key="item.id">
+              <div
+                v-for="col in fixedCols"
+                :key="col.key"
+                class="of-td"
+                role="gridcell"
+                :style="bodyCellStyle(col)"
+              >
+                <slot name="cell" :row="item" :col="col">
+                  <FieldCell
+                    v-if="fieldDefs?.length"
+                    :row-id="getRowId(item as T)"
+                    :field="getFieldDef(col.key)"
+                    :value="getRowValue(item as T, col.key)"
+                    @commit="onCellCommit"
+                  />
+                  <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
+                </slot>
+              </div>
+              <div
+                v-if="showRowActions"
+                class="of-table-row__actions"
+                aria-label="行快捷操作"
+                @click.stop
+              >
+                <template v-for="action in buildRowActionItems(item as T)" :key="action.key">
+                  <button
+                    type="button"
+                    class="of-table-row__action-btn"
+                    :class="{ 'of-table-row__action-btn--danger': action.variant === 'danger' }"
+                    :disabled="action.disabled"
+                    @click.stop="handleRowActionClick(item as T, action.key)"
+                  >
+                    <span>{{ action.label }}</span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </template>
+        </template>
+      </template>
+
+      <template #scroll-header>
+        <TableHeaderRow
+          :columns="scrollableCols"
+          :selectable="false"
+          :sort-key="sort.field ?? ''"
+          :sort-order="sort.order ?? 'asc'"
+          :enable-resize="enableResize"
+          :enable-field-menu="enableFieldManagement"
+          :enable-add-field="enableFieldManagement"
+          :density="containerDensity"
+          @sort="toggleSort"
+          @resize-start="onResizeStart"
+          @resize-dblclick="onAutoFitColumn"
+          @header-contextmenu="onHeaderContextMenu"
+          @header-dblclick="onHeaderDblClick"
+          @add-field="onAddField"
+        />
+      </template>
+
+      <template #scroll-body>
+        <template v-if="useVirtual">
+          <div :style="{ height: totalHeight + 'px', position: 'relative' }">
+            <div :style="{ transform: `translateY(${offsetY}px)` }">
+              <template v-for="{ data: item } in visibleItems" :key="item.id">
                 <div v-if="isGroupHeader(item)" :style="groupSpacerStyle()" />
                 <div
                   v-else
@@ -1082,47 +1042,85 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                   </div>
                 </div>
               </template>
-            </template>
+            </div>
           </div>
-        </div>
-      </div>
-    </template>
+        </template>
+        <template v-else>
+          <template v-for="item in groupedItems" :key="item.id">
+            <div v-if="isGroupHeader(item)" :style="groupSpacerStyle()" />
+            <div
+              v-else
+              class="of-table-row"
+              role="row"
+              tabindex="0"
+              :class="{
+                'of-table-row--selected': selectedRows.has(getRowId(item as T)),
+                'of-table-row--hover': isRowHovered(getRowId(item as T)),
+              }"
+              @mouseenter="syncHover(getRowId(item as T))"
+              @mouseleave="syncHover(null)"
+              @focusin="syncHover(getRowId(item as T))"
+              @focusout="syncHover(null)"
+              @click="handleRowClick(item as T)"
+              @keydown="handleRowKeyDown($event, item as T)"
+            >
+              <div
+                v-for="col in scrollableCols"
+                :key="col.key"
+                class="of-td"
+                role="gridcell"
+                :style="bodyCellStyle(col)"
+              >
+                <slot name="cell" :row="item" :col="col">
+                  <FieldCell
+                    v-if="fieldDefs?.length"
+                    :row-id="getRowId(item as T)"
+                    :field="getFieldDef(col.key)"
+                    :value="getRowValue(item as T, col.key)"
+                    @commit="onCellCommit"
+                  />
+                  <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
+                </slot>
+              </div>
+            </div>
+          </template>
+        </template>
+      </template>
 
-    <!-- Standard mode (no fixed columns) -->
-    <template v-else>
-          <TableHeaderRow
-            :columns="effectiveColumns"
-            :selectable="effectiveSelectable"
-            :sort-key="sort.field ?? ''"
-            :sort-order="sort.order ?? 'asc'"
-            :all-selected="isAllSelected"
-            :indeterminate="indeterminate"
-            :enable-resize="enableResize"
-            :enable-field-menu="enableFieldManagement"
-            :enable-add-field="enableFieldManagement"
-            :density="containerDensity"
-            @sort="toggleSort"
-            @select-all="handleSelectAll"
-            @resize-start="onResizeStart"
-        @resize-dblclick="onAutoFitColumn"
-        @header-contextmenu="onHeaderContextMenu"
-        @header-dblclick="onHeaderDblClick"
-        @add-field="onAddField"
-      />
+      <template #standard-header>
+        <TableHeaderRow
+          :columns="effectiveColumns"
+          :selectable="effectiveSelectable"
+          :sort-key="sort.field ?? ''"
+          :sort-order="sort.order ?? 'asc'"
+          :all-selected="isAllSelected"
+          :indeterminate="indeterminate"
+          :enable-resize="enableResize"
+          :enable-field-menu="enableFieldManagement"
+          :enable-add-field="enableFieldManagement"
+          :density="containerDensity"
+          @sort="toggleSort"
+          @select-all="handleSelectAll"
+          @resize-start="onResizeStart"
+          @resize-dblclick="onAutoFitColumn"
+          @header-contextmenu="onHeaderContextMenu"
+          @header-dblclick="onHeaderDblClick"
+          @add-field="onAddField"
+        />
+      </template>
 
-      <div ref="scrollContainerRef" class="of-data-table-scroll-container">
-        <!-- Virtual scroll mode -->
+      <template #standard-body>
         <template v-if="useVirtual">
           <div :style="{ height: totalHeight + 'px', position: 'relative' }">
             <div :style="{ transform: `translateY(${offsetY}px)` }">
-                  <template v-for="{ data: item, index: vIdx } in visibleItems" :key="item.id">
-                    <TableGroupRow
-                      v-if="isGroupHeader(item)"
-                      :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
-                      v-bind="groupRowProps(item as GroupHeaderItem)"
-                      @toggle="toggleGroup(groupToggleKey(item as GroupHeaderItem))"
-                    />
-                    <TableDataRow
+              <template v-for="{ data: item, index: vIdx } in visibleItems" :key="item.id">
+                <TableGroupRow
+                  v-if="isGroupHeader(item)"
+                  :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
+                  v-bind="groupRowProps(item as GroupHeaderItem)"
+                  @toggle="toggleGroup(groupToggleKey(item as GroupHeaderItem))"
+                />
+                <TableDataRow
                   v-else
                   :ref="(el) => trackObservedRow(el as Element | ComponentPublicInstance | null, vIdx)"
                   v-bind="dataRowProps(item as T)"
@@ -1162,8 +1160,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
             </div>
           </div>
         </template>
-
-        <!-- Normal render mode -->
         <template v-else>
           <template v-for="item in groupedItems" :key="item.id">
             <TableGroupRow
@@ -1186,39 +1182,37 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
               @drop="onDrop($event, item as T)"
               @dragend="handleDragEnd"
             >
-                  <template #cell="{ row: slotRow, col }">
-                    <slot name="cell" :row="slotRow" :col="col">
-                      <FieldCell
-                        v-if="fieldDefs?.length"
-                        :row-id="getRowId(slotRow as T)"
-                        :field="getFieldDef(col.key)"
-                        :value="slotRow[col.key] as CellValue"
-                        :class="{
-                          'of-cell--active': isActiveCell(getRowId(slotRow as T), col.key),
-                          'of-cell--selected': isCellSelected(getRowId(slotRow as T), col.key),
-                        }"
-                        @commit="onCellCommit"
-                        @click.stop="enableKeyboard && setActiveCell(getRowId(slotRow as T), col.key)"
-                      />
-                      <span v-else class="of-td-text">
-                        {{ getRowValue(slotRow as Record<string, unknown>, col.key) ?? "-" }}
-                      </span>
-                    </slot>
-                  </template>
-                </TableDataRow>
+              <template #cell="{ row: slotRow, col }">
+                <slot name="cell" :row="slotRow" :col="col">
+                  <FieldCell
+                    v-if="fieldDefs?.length"
+                    :row-id="getRowId(slotRow as T)"
+                    :field="getFieldDef(col.key)"
+                    :value="slotRow[col.key] as CellValue"
+                    :class="{
+                      'of-cell--active': isActiveCell(getRowId(slotRow as T), col.key),
+                      'of-cell--selected': isCellSelected(getRowId(slotRow as T), col.key),
+                    }"
+                    @commit="onCellCommit"
+                    @click.stop="enableKeyboard && setActiveCell(getRowId(slotRow as T), col.key)"
+                  />
+                  <span v-else class="of-td-text">
+                    {{ getRowValue(slotRow as Record<string, unknown>, col.key) ?? "-" }}
+                  </span>
+                </slot>
+              </template>
+            </TableDataRow>
           </template>
         </template>
-      </div>
-    </template>
+      </template>
+    </DataTableDesktopFrame>
 
-    <!-- Column resize indicator line -->
     <div
       v-if="showResizeIndicator"
       class="of-resize-indicator"
       :style="{ left: resizeIndicatorX + 'px' }"
     />
 
-    <!-- Draft rows batch toolbar -->
     <DataTableDraftToolbar
       v-if="hasDrafts"
       :draft-count="drafts.size"
@@ -1228,7 +1222,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 
     <NewRowBtn v-if="effectiveAddable" @click="handleAddRow" />
 
-    <!-- 列头菜单 -->
     <ColumnHeaderMenu
       v-if="enableFieldManagement"
       :visible="headerMenuState.visible"
@@ -1246,7 +1239,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
       @duplicate="onSchemaDuplicate"
     />
 
-    <!-- 添加字段选择器 -->
     <Teleport to="body">
       <div v-if="showAddFieldPicker" class="of-add-field-overlay">
         <button
@@ -1280,11 +1272,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   outline-offset: -2px;
 }
 
-.of-data-table-scroll-container {
-  max-height: 600px;
-  overflow-y: auto;
-}
-
 .of-data-table--compact :deep(.of-table-group-row) {
   height: var(--of-data-table-group-row-height);
 }
@@ -1312,57 +1299,11 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   gap: 8px;
 }
 
-.of-checkbox-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.of-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
 /* Active cell focus ring */
 :deep(.of-cell--active) {
   outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
   outline-offset: -1px;
   border-radius: 3px;
-}
-
-@media (max-width: 768px) {
-  .of-data-table-scroll-container {
-    max-height: 100dvh;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-.of-data-table-body {
-  display: flex;
-  overflow: hidden;
-}
-
-.of-data-table-fixed-region {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  overflow-y: auto;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  scrollbar-width: none;
-}
-
-.of-data-table-fixed-region::-webkit-scrollbar {
-  display: none;
 }
 
 .of-data-table--compact :deep(.of-mobile-list) {
@@ -1422,87 +1363,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   padding: 10px 14px;
 }
 
-.of-data-table-scroll-region {
-  flex: 1;
-  overflow: auto;
-}
-
-.of-table-row--hover {
-  background: var(--of-surface-muted, var(--of-color-gray-50));
-}
-
-.of-table-row {
-  position: relative;
-}
-
-.of-table-row__actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-left: auto;
-  min-width: 116px;
-  padding: 0 10px 0 8px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-}
-
-.of-table-row:hover .of-table-row__actions,
-.of-table-row:focus-within .of-table-row__actions,
-.of-table-row--selected .of-table-row__actions,
-.of-table-row--hover .of-table-row__actions {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.of-table-row__action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  border-radius: 999px;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  color: var(--of-text-secondary, var(--of-color-gray-600));
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: var(--of-transition-fast);
-}
-
-.of-table-row__action-btn:hover:not(:disabled),
-.of-table-row__action-btn:focus-visible:not(:disabled) {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
-  color: var(--of-text-primary, var(--of-color-gray-800));
-  border-color: var(--of-border-strong, var(--of-color-gray-300));
-}
-
-.of-table-row__action-btn--danger {
-  color: var(--of-error-text, var(--of-color-error-600));
-}
-
-.of-table-row__action-btn--danger:hover:not(:disabled),
-.of-table-row__action-btn--danger:focus-visible:not(:disabled) {
-  background: var(--of-surface-muted, var(--of-color-gray-50));
-  border-color: var(--of-border-subtle, var(--of-color-gray-200));
-}
-
-.of-table-row__action-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.of-data-table--container-tight .of-table-row__actions {
-  min-width: 92px;
-  padding-right: 6px;
-}
-
-.of-data-table--container-tight .of-table-row__action-btn {
-  padding: 4px 8px;
-}
-
 /* Drag state */
 :deep([draggable="true"]) {
   cursor: grab;
@@ -1521,12 +1381,6 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   background: var(--of-border-strong, var(--of-color-gray-300, #d1d5db));
   z-index: 10;
   pointer-events: none;
-}
-
-/* Fixed column scroll shadow */
-.of-data-table-fixed-region.of-fixed-shadow {
-  box-shadow: var(--of-shadow-fixed-col);
-  clip-path: inset(0 -12px 0 0);
 }
 
 /* Row drag visual feedback */
