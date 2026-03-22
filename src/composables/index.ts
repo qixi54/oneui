@@ -102,6 +102,9 @@ export { useDatabaseView } from "./useDatabaseView";
 export {
   composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewPresetInputs,
+  createDatabaseViewPresetBundle,
+  createDatabaseViewPresetMiddleware,
   createDatabaseViewToastMiddleware,
   createDatabaseViewOptimisticMiddleware,
 } from "./useDatabaseViewMiddleware";
@@ -124,6 +127,9 @@ export type {
 export type {
   DatabaseViewAnalyticsEvent,
   DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewPresetMiddlewareOptions,
+  DatabaseViewPresetBundle,
+  DatabaseViewPresetBundleOptions,
   DatabaseViewMiddlewareInput,
   DatabaseViewOptimisticMiddlewareOptions,
   DatabaseViewToastMiddlewareOptions,

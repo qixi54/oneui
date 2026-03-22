@@ -145,7 +145,7 @@ import '@oneflowui/ui/theme'
 
 ```vue
 <script setup lang="ts">
-import { ThemeScope } from '@oneflowui/ui'
+import { DataTable, ThemeScope } from '@oneflowui/ui'
 </script>
 
 <template>
@@ -287,6 +287,8 @@ type DatabaseViewActions = {
 import {
   composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewPresetBundle,
+  createDatabaseViewPresetMiddleware,
   createDatabaseViewOptimisticMiddleware,
   createDatabaseViewToastMiddleware,
   useDatabaseView,
@@ -314,6 +316,76 @@ const view = useDatabaseView({
   },
 })
 ```
+
+如果你更想要一个“一键拿到可直接消费的 middleware”的入口，可以优先用官方 preset 工厂：
+
+```ts
+const presetBundle = createDatabaseViewPresetBundle({
+  toast: {
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  },
+  analytics: {
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  },
+  optimistic: {
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  },
+})
+
+const view = useDatabaseView({
+  tableId: 'tbl-1',
+  actions: {
+    middleware: presetBundle.middleware,
+    onCellEdit: saveCellEdit,
+  },
+})
+```
+
+`createDatabaseViewPresetBundle` 会把常用 preset 先组装好，再暴露给业务方按需复用；`createDatabaseViewPresetMiddleware` 则适合直接塞进 `actions.middleware`，用于最小接入，例如：
+
+```ts
+const middleware = createDatabaseViewPresetMiddleware({
+  toast: {
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  },
+  analytics: {
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  },
+  optimistic: {
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  },
+})
+```
+
+### ThemeScope 场景模板
+
+如果你想把 `ThemeScope` 从“局部 wrapper”升级成“业务场景模板”，可以直接把它当成页面壳层来组织区域结构。这个模板适合企业后台、运营控制台、任务看板这类页面：外层固定视觉语境，内层再放业务卡片、数据表、统计块和侧边说明。
+
+```vue
+<script setup lang="ts">
+import { ThemeScope } from '@oneflowui/ui'
+</script>
+
+<template>
+  <ThemeScope theme="ops-console" tag="section" class="enterprise-scene">
+    <header class="enterprise-scene__header">
+      <h3>Enterprise Scene</h3>
+      <p>主题、布局和业务内容一起作为模板复用。</p>
+    </header>
+
+    <div class="enterprise-scene__body">
+      <div class="enterprise-scene__summary">...</div>
+      <DataTable :rows="rows" :columns="columns" />
+    </div>
+  </ThemeScope>
+</template>
+```
+
+仓库里的 `DatabaseEnterpriseDemo` 就是这一类场景模板的 dev/examples 级参考实现。它展示的是“ThemeScope + 页面壳 + 业务数据区”的组合方式，便于复制到自家项目里改造成真正的企业页。
 
 ### Dev Examples / Enterprise Demo
 

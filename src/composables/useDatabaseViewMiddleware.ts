@@ -35,6 +35,29 @@ export interface DatabaseViewOptimisticMiddlewareOptions<T extends DataRecord = 
   shouldApply?: (context: DatabaseViewActionContext<T>) => boolean;
 }
 
+export interface DatabaseViewPresetMiddlewareOptions<T extends DataRecord = DataRecord> {
+  toast?: DatabaseViewToastMiddlewareOptions<T> | false;
+  analytics?: DatabaseViewAnalyticsMiddlewareOptions<T> | false;
+  optimistic?: DatabaseViewOptimisticMiddlewareOptions<T> | false;
+  extra?: readonly DatabaseViewMiddlewareInput<T>[];
+}
+
+export interface DatabaseViewPresetBundleOptions<T extends DataRecord = DataRecord> {
+  middlewares?: DatabaseViewMiddlewareInput<T>[];
+  toast?: DatabaseViewToastMiddlewareOptions<T>;
+  analytics?: DatabaseViewAnalyticsMiddlewareOptions<T>;
+  optimistic?: DatabaseViewOptimisticMiddlewareOptions<T>;
+}
+
+export interface DatabaseViewPresetBundle<T extends DataRecord = DataRecord> {
+  middleware: DatabaseViewActionMiddleware<T>;
+  presets: {
+    toast?: DatabaseViewActionMiddleware<T>;
+    analytics?: DatabaseViewActionMiddleware<T>;
+    optimistic?: DatabaseViewActionMiddleware<T>;
+  };
+}
+
 export type DatabaseViewMiddlewareInput<T extends DataRecord = DataRecord> =
   | DatabaseViewActionMiddleware<T>
   | readonly DatabaseViewMiddlewareInput<T>[]
@@ -127,6 +150,26 @@ export function createDatabaseViewOptimisticMiddleware<T extends DataRecord = Da
   };
 }
 
+export function createDatabaseViewPresetBundle<T extends DataRecord = DataRecord>(
+  options: DatabaseViewPresetBundleOptions<T> = {},
+): DatabaseViewPresetBundle<T> {
+  const presets: DatabaseViewPresetBundle<T>["presets"] = {
+    toast: options.toast ? createDatabaseViewToastMiddleware(options.toast) : undefined,
+    analytics: options.analytics ? createDatabaseViewAnalyticsMiddleware(options.analytics) : undefined,
+    optimistic: options.optimistic ? createDatabaseViewOptimisticMiddleware(options.optimistic) : undefined,
+  };
+
+  return {
+    middleware: composeDatabaseViewMiddlewares(
+      ...(options.middlewares ?? []),
+      presets.analytics,
+      presets.toast,
+      presets.optimistic,
+    ),
+    presets,
+  };
+}
+
 function flattenMiddlewareInputs<T extends DataRecord>(
   inputs: readonly DatabaseViewMiddlewareInput<T>[],
 ): DatabaseViewActionMiddleware<T>[] {
@@ -191,4 +234,31 @@ export function composeDatabaseViewMiddlewares<T extends DataRecord = DataRecord
       }
     },
   };
+}
+
+export function createDatabaseViewPresetInputs<T extends DataRecord = DataRecord>(
+  options: DatabaseViewPresetMiddlewareOptions<T>,
+): DatabaseViewMiddlewareInput<T>[] {
+  const inputs: DatabaseViewMiddlewareInput<T>[] = [];
+
+  if (options.toast) {
+    inputs.push(createDatabaseViewToastMiddleware(options.toast));
+  }
+  if (options.analytics) {
+    inputs.push(createDatabaseViewAnalyticsMiddleware(options.analytics));
+  }
+  if (options.optimistic) {
+    inputs.push(createDatabaseViewOptimisticMiddleware(options.optimistic));
+  }
+  if (options.extra?.length) {
+    inputs.push(options.extra);
+  }
+
+  return inputs;
+}
+
+export function createDatabaseViewPresetMiddleware<T extends DataRecord = DataRecord>(
+  options: DatabaseViewPresetBundleOptions<T> = {},
+): DatabaseViewActionMiddleware<T> {
+  return createDatabaseViewPresetBundle(options).middleware;
 }

@@ -154,7 +154,7 @@ When a single page needs two visual contexts at once, prefer the `ThemeScope` co
 
 ```vue
 <script setup lang="ts">
-import { ThemeScope } from '@oneflowui/ui'
+import { DataTable, ThemeScope } from '@oneflowui/ui'
 </script>
 
 <template>
@@ -316,6 +316,8 @@ You can compose reusable `DatabaseView` middleware presets for toast, analytics,
 import {
   composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewPresetBundle,
+  createDatabaseViewPresetMiddleware,
   createDatabaseViewOptimisticMiddleware,
   createDatabaseViewToastMiddleware,
   useDatabaseView,
@@ -343,6 +345,76 @@ const view = useDatabaseView({
   },
 })
 ```
+
+If you prefer a single factory that returns a ready-to-use middleware, use the official preset bundle helper:
+
+```ts
+const presetBundle = createDatabaseViewPresetBundle({
+  toast: {
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  },
+  analytics: {
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  },
+  optimistic: {
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  },
+})
+
+const view = useDatabaseView({
+  tableId: 'tbl-1',
+  actions: {
+    middleware: presetBundle.middleware,
+    onCellEdit: saveCellEdit,
+  },
+})
+```
+
+`createDatabaseViewPresetMiddleware` is the one-liner version when you only need the final middleware object:
+
+```ts
+const middleware = createDatabaseViewPresetMiddleware({
+  toast: {
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  },
+  analytics: {
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  },
+  optimistic: {
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  },
+})
+```
+
+### ThemeScope Scene Template
+
+If you want to evolve `ThemeScope` from a local wrapper into a business scene template, use it as the page shell that organizes the region structure. This fits enterprise dashboards, ops consoles, and task boards: the outer shell fixes the visual context while the inner area hosts cards, tables, metrics, and side notes.
+
+```vue
+<script setup lang="ts">
+import { ThemeScope } from '@oneflowui/ui'
+</script>
+
+<template>
+  <ThemeScope theme="ops-console" tag="section" class="enterprise-scene">
+    <header class="enterprise-scene__header">
+      <h3>Enterprise Scene</h3>
+      <p>Theme, layout, and business content are reused together as one template.</p>
+    </header>
+
+    <div class="enterprise-scene__body">
+      <div class="enterprise-scene__summary">...</div>
+      <DataTable :rows="rows" :columns="columns" />
+    </div>
+  </ThemeScope>
+</template>
+```
+
+The repository's `DatabaseEnterpriseDemo` is the dev/examples-level reference for this kind of scene template. It shows the "ThemeScope + page shell + business content area" composition pattern that you can copy into your own project and turn into a real enterprise page.
 
 ### Dev Examples / Enterprise Demo
 

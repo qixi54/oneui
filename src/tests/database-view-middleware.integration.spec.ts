@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewPresetBundle,
+  createDatabaseViewPresetMiddleware,
   createDatabaseViewOptimisticMiddleware,
   createDatabaseViewToastMiddleware,
   useDatabaseView,
@@ -217,6 +219,119 @@ describe("DatabaseView middleware presets", () => {
       "revert:cell-edit",
       "error:单元格更新已完成失败",
     ]);
+  });
+
+  it("createDatabaseViewPresetBundle 和 createDatabaseViewPresetMiddleware 应该提供更易消费的一键入口", async () => {
+    const trace: string[] = [];
+    const events: DatabaseViewAnalyticsEvent[] = [];
+    const options = {
+      middlewares: [
+        {
+          before: (context) => {
+            if (context.action === "cell-edit") {
+              trace.push(`base-before:${context.action}`);
+            }
+          },
+          after: (context) => {
+            if (context.action === "cell-edit") {
+              trace.push(`base-after:${context.action}`);
+            }
+          },
+        },
+      ],
+      toast: {
+        onSuccess: (message, context) => {
+          if (context.action === "cell-edit") {
+            trace.push(`toast-success:${message}:${context.action}`);
+          }
+        },
+        onError: (message, context) => {
+          if (context.action === "cell-edit") {
+            trace.push(`toast-error:${message}:${context.action}`);
+          }
+        },
+      },
+      analytics: {
+        onEvent: (event) => {
+          if (event.action === "cell-edit") {
+            events.push(event);
+            trace.push(`analytics:${event.phase}:${event.action}`);
+          }
+        },
+      },
+      optimistic: {
+        apply: (context) => {
+          trace.push(`optimistic-apply:${context.action}`);
+        },
+        revert: (context) => {
+          trace.push(`optimistic-revert:${context.action}`);
+        },
+      },
+    } satisfies Parameters<typeof createDatabaseViewPresetBundle>[0];
+
+    const bundle = createDatabaseViewPresetBundle(options);
+    const middleware = createDatabaseViewPresetMiddleware(options);
+
+    expect(bundle.presets.toast).toBeDefined();
+    expect(bundle.presets.analytics).toBeDefined();
+    expect(bundle.presets.optimistic).toBeDefined();
+
+    const onCellEdit = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("boom"));
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records: ref(buildRecords()),
+      views: ref(buildViews()),
+      actions: {
+        middleware,
+        onCellEdit,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+    trace.length = 0;
+    events.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "preset",
+    });
+
+    expect(trace).toEqual([
+      "base-before:cell-edit",
+      "analytics:before:cell-edit",
+      "optimistic-apply:cell-edit",
+      "toast-success:单元格更新已完成:cell-edit",
+      "analytics:after:cell-edit",
+      "base-after:cell-edit",
+    ]);
+    expect(events.map((event) => event.phase)).toEqual(["before", "after"]);
+
+    trace.length = 0;
+    events.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "preset-error",
+    });
+
+    expect(trace).toEqual([
+      "base-before:cell-edit",
+      "analytics:before:cell-edit",
+      "optimistic-apply:cell-edit",
+      "optimistic-revert:cell-edit",
+      "toast-error:单元格更新已完成失败:cell-edit",
+      "analytics:error:cell-edit",
+    ]);
+    expect(events.map((event) => event.phase)).toEqual(["before", "error"]);
+    expect(databaseView.error.value?.message).toBe("boom");
   });
 
   it("createDatabaseViewOptimisticMiddleware 应该保留成功后的 optimistic 结果，并在失败时回滚", async () => {

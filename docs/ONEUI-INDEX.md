@@ -57,6 +57,13 @@
 - `docs/plans/2026-03-22-oneui-next-parallel-verification.md`
 - `docs/CHANGELOG-v0.8.4.md` 中的局部主题增强说明（non-breaking）
 
+### ThemeScope 场景模板 / dev examples
+
+- `README.md` / `README.en.md` 中的 `ThemeScope` 场景模板说明
+- `src/dev/DatabaseEnterpriseDemo.vue`：企业级场景模板参考实现
+- `src/dev/DatabaseViewDemo.vue`：页面级 demo 容器与入口导航
+- 说明：上述 dev/examples 级内容不属于 npm 导出面，仅作开发与文档参考
+
 ### ThemeScope + middleware composer 预发布验证
 
 - `docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`
