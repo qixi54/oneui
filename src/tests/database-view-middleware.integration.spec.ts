@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { describe, expect, it, vi } from "vitest";
 import {
   createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewOptimisticMiddleware,
   createDatabaseViewToastMiddleware,
   useDatabaseView,
 } from "../composables";
@@ -128,5 +129,85 @@ describe("DatabaseView middleware presets", () => {
       action: "cell-edit",
       error: expect.any(Error),
     });
+  });
+
+  it("createDatabaseViewOptimisticMiddleware 应该保留成功后的 optimistic 结果，并在失败时回滚", async () => {
+    const records = ref(buildRecords());
+    const snapshots = new Map<string, string>();
+    const apply = vi.fn((context) => {
+      const payload = context.payload as { rowId: string; fieldId: string; value: string };
+      const current = records.value.find((record) => record.id === payload.rowId);
+      if (!current) return;
+      snapshots.set(payload.rowId, String(current.fields[payload.fieldId]));
+      records.value = records.value.map((record) =>
+        record.id === payload.rowId
+          ? {
+              ...record,
+              fields: {
+                ...record.fields,
+                [payload.fieldId]: payload.value,
+              },
+            }
+          : record,
+      );
+    });
+    const revert = vi.fn((context) => {
+      const payload = context.payload as { rowId: string; fieldId: string };
+      const previous = snapshots.get(payload.rowId);
+      if (previous === undefined) return;
+      records.value = records.value.map((record) =>
+        record.id === payload.rowId
+          ? {
+              ...record,
+              fields: {
+                ...record.fields,
+                [payload.fieldId]: previous,
+              },
+            }
+          : record,
+      );
+    });
+    const onCellEdit = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("boom"));
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records,
+      views: ref(buildViews()),
+      actions: {
+        middleware: createDatabaseViewOptimisticMiddleware({
+          apply,
+          revert,
+        }),
+        onCellEdit,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "optimistic",
+    });
+
+    expect(apply).toHaveBeenCalledTimes(1);
+    expect(revert).not.toHaveBeenCalled();
+    expect(records.value[0]?.fields.title).toBe("optimistic");
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "rollback",
+    });
+
+    expect(apply).toHaveBeenCalledTimes(2);
+    expect(revert).toHaveBeenCalledTimes(1);
+    expect(records.value[0]?.fields.title).toBe("optimistic");
+    expect(databaseView.error.value?.message).toBe("boom");
   });
 });

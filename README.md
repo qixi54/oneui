@@ -155,6 +155,30 @@ document.documentElement.dataset.ofTheme = 'ops-console'
 </aside>
 ```
 
+### 组件级示例
+
+更贴近业务消费的写法，是直接把一个组件子树包进 scoped wrapper。外层页面继续沿用全局主题，局部区域则切到适合命令台或运营视角的 token。
+
+```vue
+<template>
+  <section class="task-surface" data-of-theme-scope="ops-console">
+    <header class="task-surface__header">
+      <h3>任务总览</h3>
+      <p>仅这块区域使用 ops-console token。</p>
+    </header>
+
+    <div class="task-surface__metrics">
+      <StatisticCard icon="check-circle" :value="18" label="已完成" />
+      <StatisticCard icon="clock" :value="6" label="进行中" />
+    </div>
+
+    <DataTable :rows="rows" :columns="columns" />
+  </section>
+</template>
+```
+
+这种写法是非 breaking 的：组件 API 不需要变，`data-of-theme-scope` 只是给局部 wrapper 增加一层 token 作用域。
+
 ---
 
 ## 页面级方案

@@ -102,6 +102,7 @@ export { useDatabaseView } from "./useDatabaseView";
 export {
   createDatabaseViewAnalyticsMiddleware,
   createDatabaseViewToastMiddleware,
+  createDatabaseViewOptimisticMiddleware,
 } from "./useDatabaseViewMiddleware";
 export type {
   DatabaseViewActionContext,
@@ -122,6 +123,7 @@ export type {
 export type {
   DatabaseViewAnalyticsEvent,
   DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewOptimisticMiddlewareOptions,
   DatabaseViewToastMiddlewareOptions,
 } from "./useDatabaseViewMiddleware";
 

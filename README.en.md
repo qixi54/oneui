@@ -164,6 +164,30 @@ If you want the wrapper intent to be explicit, you can also keep `data-of-theme`
 </aside>
 ```
 
+### Component-Level Example
+
+A more realistic consumer pattern is to wrap an actual component subtree. The page keeps its global theme, while the local region switches to tokens that fit an ops or command-console context.
+
+```vue
+<template>
+  <section class="task-surface" data-of-theme-scope="ops-console">
+    <header class="task-surface__header">
+      <h3>Task Overview</h3>
+      <p>Only this region uses ops-console tokens.</p>
+    </header>
+
+    <div class="task-surface__metrics">
+      <StatisticCard icon="check-circle" :value="18" label="Done" />
+      <StatisticCard icon="clock" :value="6" label="In progress" />
+    </div>
+
+    <DataTable :rows="rows" :columns="columns" />
+  </section>
+</template>
+```
+
+This is non-breaking: no component API changes are required, and `data-of-theme-scope` only adds a local token boundary on the wrapper.
+
 ---
 
 ## Usage Examples

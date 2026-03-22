@@ -1905,6 +1905,55 @@ function onCtxSelect(key: string) {
         </div>
       </section>
 
+      <section class="dev-section">
+        <h2>组件级主题包装</h2>
+        <p class="dev-desc">
+          更接近业务消费的写法，是把真实组件子树直接包进 scoped wrapper。
+          这不会改变组件 API，只会让局部区域继承另一套 token。
+        </p>
+        <section class="theme-scope-preview theme-scope-preview--component" data-of-theme-scope="ops-console">
+          <div class="theme-scope-preview__surface theme-scope-preview__surface--component">
+            <div class="theme-scope-preview__kicker">Scoped Component Tree</div>
+            <div class="theme-scope-preview__header">
+              <div>
+                <h3 class="theme-scope-preview__title">任务总览</h3>
+                <p class="theme-scope-preview__copy">
+                  这个区域里的组件将继承 ops-console token，适合命令台、运营面板或嵌入式业务工作区。
+                </p>
+              </div>
+              <span class="theme-scope-preview__chip">data-of-theme-scope="ops-console"</span>
+            </div>
+            <div class="theme-scope-preview__metrics">
+              <div class="theme-scope-preview__metric">
+                <span class="theme-scope-preview__metric-value">18</span>
+                <span class="theme-scope-preview__metric-label">已完成</span>
+              </div>
+              <div class="theme-scope-preview__metric">
+                <span class="theme-scope-preview__metric-value">6</span>
+                <span class="theme-scope-preview__metric-label">进行中</span>
+              </div>
+            </div>
+            <div class="theme-scope-preview__table">
+              <div class="theme-scope-preview__table-row theme-scope-preview__table-row--head">
+                <span>任务</span>
+                <span>状态</span>
+                <span>优先级</span>
+              </div>
+              <div class="theme-scope-preview__table-row">
+                <span>补齐主题文案</span>
+                <span>进行中</span>
+                <span>P1</span>
+              </div>
+              <div class="theme-scope-preview__table-row">
+                <span>加 wrapper 示例</span>
+                <span>已完成</span>
+                <span>P2</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
       <!-- ══════════════════════════════════════════════════════
            基础组件
       ════════════════════════════════════════════════════════ -->
@@ -5551,6 +5600,67 @@ body {
     radial-gradient(circle at top right, color-mix(in oklab, var(--of-accent-soft) 68%, transparent), transparent 46%),
     var(--of-surface-elevated, var(--of-color-bg-elevated));
   box-shadow: var(--of-elevation-card, var(--of-shadow-card));
+}
+
+.theme-scope-preview__surface--component {
+  gap: 14px;
+}
+
+.theme-scope-preview__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.theme-scope-preview__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.theme-scope-preview__metric {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-muted, var(--of-color-bg-hover));
+}
+
+.theme-scope-preview__metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--of-text-primary, var(--of-color-text-primary));
+}
+
+.theme-scope-preview__metric-label {
+  font-size: 12px;
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
+}
+
+.theme-scope-preview__table {
+  display: grid;
+  gap: 8px;
+}
+
+.theme-scope-preview__table-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 0.8fr;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  color: var(--of-text-primary, var(--of-color-text-primary));
+  font-size: 13px;
+}
+
+.theme-scope-preview__table-row--head {
+  background: var(--of-surface-muted, var(--of-color-bg-hover));
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
+  font-weight: 700;
 }
 
 .theme-scope-preview__kicker {

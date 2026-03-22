@@ -46,6 +46,7 @@
 - `docs/plans/2026-03-22-oneui-parallel-enhancements-verification.md`
 - `README.md` / `README.en.md` 中的 `data-of-theme-scope` 局部主题示例
 - `src/dev/App.vue` 中的 scoped theme preview demo
+- `docs/CHANGELOG-v0.8.4.md` 中的局部主题增强说明（non-breaking）
 
 ### 0.8.3 建议补齐（Ops Console）
 

@@ -12,6 +12,15 @@
 
 `0.8.4` 将 0.8.3 的中控台骨架继续收口到“交互闭环可用”：修复了表格内单元格编辑态链路，并将命令中心能力独立为可测试、可复用的 registry 模块。同时补齐验收与双宿主消费端构建证据，形成可追溯交付。
 
+## 局部主题增强说明
+
+本次继续补齐 `data-of-theme-scope` 的对外可用性，属于非 breaking 增强：
+
+1. 仍然保留原有 `document.documentElement.dataset.ofTheme` 全局切换方式。
+2. 新增局部 wrapper 级作用域示例，允许同一页面中并存 `neutral` 与 `ops-console` 视觉语境。
+3. 没有修改组件公开 API，也没有调整 `DatabaseView` action middleware 或 virtualization 行为。
+4. 仅补充文档、dev demo 和最小测试，便于使用方直接复制 wrapper 用法。
+
 ## 变更清单
 
 1. `src/components/table/DataTable.vue`
@@ -42,6 +51,8 @@
 
 7. `src/styles/variables.css`, `src/styles/themes/neutral.css`, `src/styles/themes/ops-console.css`
    - 增加/补齐与 0.8.3 相关的 shell token 与视觉 token，减少命令中枢与内容区视觉割裂。
+8. `README.md`, `README.en.md`, `docs/ONEUI-INDEX.md`
+   - 补充 `data-of-theme-scope` 的局部 wrapper 示例、组件级 wrapper 示例与索引入口。
 
 ## 发布范围与质量
 

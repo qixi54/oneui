@@ -314,6 +314,7 @@ export { useDatabaseView } from "./composables/useDatabaseView";
 export {
   createDatabaseViewAnalyticsMiddleware,
   createDatabaseViewToastMiddleware,
+  createDatabaseViewOptimisticMiddleware,
 } from "./composables/useDatabaseViewMiddleware";
 export type {
   DatabaseViewActionContext,
@@ -332,6 +333,7 @@ export type {
 export type {
   DatabaseViewAnalyticsEvent,
   DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewOptimisticMiddlewareOptions,
   DatabaseViewToastMiddlewareOptions,
 } from "./composables/useDatabaseViewMiddleware";
 export { useDatabaseViewport, useDatabaseWorkspaceState } from "./composables/useDatabaseWorkspace";
