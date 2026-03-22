@@ -312,6 +312,12 @@ const view = useDatabaseView({
 })
 ```
 
+### Dev Examples / Enterprise Demo
+
+`DatabaseEnterpriseDemo` is a dev/examples-level consumption pattern used to show a more complete enterprise-style page composition. It is documentation and development sample material, not an npm-exported component, and it does not change the public export surface of `@oneflowui/ui`.
+
+If your business app needs something similar, copy the composition idea from the example and wire it to your own data source and action contract instead of depending on a separate production export.
+
 ### Combined Consumption Example
 
 If you want to use theme scoping, database action middleware, and virtual list state caching in the same business surface, keep them inside one wrapper component. This is the closest pattern to a real app page and the easiest one to copy.

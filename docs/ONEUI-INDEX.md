@@ -48,6 +48,10 @@
 - `docs/plans/2026-03-22-oneui-next-parallel-verification.md`
 - `docs/CHANGELOG-v0.8.4.md` 中的局部主题增强说明（non-breaking）
 
+### ThemeScope + middleware composer 预发布验证
+
+- `docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`
+
 ### 0.8.3 建议补齐（Ops Console）
 
 - `docs/plans/2026-03-23-release-0.8.3-verification.md`
