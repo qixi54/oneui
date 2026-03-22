@@ -29,6 +29,12 @@ export interface DatabaseViewAnalyticsMiddlewareOptions<T extends DataRecord = D
   onEvent: (event: DatabaseViewAnalyticsEvent<T>) => void;
 }
 
+export interface DatabaseViewOptimisticMiddlewareOptions<T extends DataRecord = DataRecord> {
+  apply: (context: DatabaseViewActionContext<T>) => void | Promise<void>;
+  revert: (context: DatabaseViewActionErrorContext<T>) => void | Promise<void>;
+  shouldApply?: (context: DatabaseViewActionContext<T>) => boolean;
+}
+
 function resolveDefaultSuccessMessage<T extends DataRecord>(context: DatabaseViewActionContext<T>): string {
   switch (context.action) {
     case "cell-edit":
@@ -92,6 +98,25 @@ export function createDatabaseViewAnalyticsMiddleware<T extends DataRecord = Dat
     },
     error(context) {
       emit("error", context, context.error);
+    },
+  };
+}
+
+export function createDatabaseViewOptimisticMiddleware<T extends DataRecord = DataRecord>(
+  options: DatabaseViewOptimisticMiddlewareOptions<T>,
+): DatabaseViewActionMiddleware<T> {
+  const shouldApply =
+    options.shouldApply ??
+    ((context: DatabaseViewActionContext<T>) => context.action === "cell-edit");
+
+  return {
+    async before(context) {
+      if (!shouldApply(context)) return;
+      await options.apply(context);
+    },
+    async error(context) {
+      if (!shouldApply(context)) return;
+      await options.revert(context);
     },
   };
 }
