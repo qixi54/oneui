@@ -17,6 +17,8 @@
   --of-text-secondary: #35506d;
   --of-text-tertiary: #59728c;
   --of-text-strong: #071523;
+  --of-color-surface-2: #f0f7ff;
+  --of-surface-hover: rgba(255, 255, 255, 0.72);
   --of-link-default: #0f4c81;
   --of-link-hover: #0a2f52;
   --of-link-visited: #2d6f9f;
@@ -35,6 +37,20 @@
   --of-chart-series-3: #4f90be;
   --of-chart-series-4: #78acd1;
   --of-chart-series-5: #a9cbe4;
+
+  --of-shell-panel: linear-gradient(160deg, rgba(244, 250, 255, 0.92) 0%, rgba(235, 244, 251, 0.94) 100%);
+  --of-shell-glow: 0 12px 38px rgba(12, 39, 76, 0.14);
+  --of-shell-border: rgba(15, 76, 129, 0.2);
+  --of-shell-row-border: rgba(15, 76, 129, 0.16);
+  --of-shell-ops-accent: var(--of-accent-default);
+  --of-shell-ops-accent-soft: var(--of-accent-soft);
+  --of-shell-panel-bg: var(--of-shell-panel);
+  --of-shell-status-bg: color-mix(in oklab, var(--of-accent-soft) 38%, var(--of-surface-hover));
+  --of-shell-command-tone-strength: 8%;
+  --of-shell-command-tone-info-bg: color-mix(in oklab, var(--of-shell-ops-accent) var(--of-shell-command-tone-strength), transparent);
+  --of-shell-command-tone-success-bg: color-mix(in oklab, var(--of-color-success) var(--of-shell-command-tone-strength), transparent);
+  --of-shell-command-tone-warning-bg: color-mix(in oklab, var(--of-color-warning) var(--of-shell-command-tone-strength), transparent);
+  --of-shell-command-tone-error-bg: color-mix(in oklab, var(--of-color-error) var(--of-shell-command-tone-strength), transparent);
 
   --of-card-shadow: 0 18px 36px rgba(12, 38, 64, 0.1);
   --of-card-shadow-hover: 0 22px 44px rgba(12, 38, 64, 0.16);

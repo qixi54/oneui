@@ -35,6 +35,18 @@
 
 ## Release & Verification
 
+### 0.8.4 发布补齐（DataTable 交互闭环）
+
+- `docs/plans/2026-03-23-release-0.8.4-verification.md`
+- `docs/plans/2026-03-23-release-0.8.4-proof.md`
+- `docs/CHANGELOG-v0.8.4.md`
+
+### 0.8.3 建议补齐（Ops Console）
+
+- `docs/plans/2026-03-23-release-0.8.3-verification.md`
+- `docs/plans/2026-03-23-release-0.8.3-proof.md`
+- `docs/CHANGELOG-v0.8.3.md`
+
 ### 0.8.1 发布补齐与留痕
 
 - `docs/plans/2026-03-22-release-0.8.1-proof.md`

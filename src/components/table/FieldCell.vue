@@ -45,27 +45,36 @@ const props = withDefaults(
     field: FieldDef;
     value?: CellValue;
     readonly?: boolean;
+    editing?: boolean;
   }>(),
   {
     value: undefined,
     readonly: false,
+    editing: undefined,
   },
 );
 
 const emit = defineEmits<{
   commit: [rowId: string, fieldId: string, value: CellValue];
   cancel: [];
+  "request-cancel": [];
   tabNext: [];
+  "request-edit": [rowId: string, fieldId: string];
 }>();
 
 const { isEditing, activate, commit: commitEdit, cancel } = useInlineEdit();
 
-const editing = computed(() => isEditing(props.rowId, props.field.id));
+const localEditing = computed(() => isEditing(props.rowId, props.field.id));
+const isEffectivelyEditing = computed(() => props.editing ?? localEditing.value);
 const isReadonly = computed(() => props.readonly || props.field.readonly);
 const isActionable = computed(() => !isReadonly.value);
 
 function handleClick() {
   if (isReadonly.value) return;
+  if (props.editing !== undefined) {
+    emit("request-edit", props.rowId, props.field.id);
+    return;
+  }
   activate(props.rowId, props.field.id);
 }
 
@@ -75,7 +84,10 @@ function handleCommit(value: CellValue) {
 }
 
 function handleCancel() {
-  cancel();
+  if (props.editing === undefined) {
+    cancel();
+  }
+  emit("request-cancel");
   emit("cancel");
 }
 
@@ -121,21 +133,21 @@ const displayValue = computed(() => {
 
 <template>
   <component
-    :is="isReadonly || editing ? 'div' : 'button'"
+    :is="isReadonly || isEffectivelyEditing ? 'div' : 'button'"
     class="of-field-cell"
     :class="{
-      'of-field-cell--editing': editing,
+      'of-field-cell--editing': isEffectivelyEditing,
       'of-field-cell--readonly': isReadonly,
       'of-field-cell--actionable': isActionable,
     }"
-    :type="isReadonly || editing ? undefined : 'button'"
+    :type="isReadonly || isEffectivelyEditing ? undefined : 'button'"
     :aria-label="`${field.label}字段`"
     :title="isReadonly ? undefined : `点击编辑 ${field.label}`"
     @click="handleClick"
     @keydown.enter.prevent="handleClick"
     @keydown.space.prevent="handleClick"
   >
-    <template v-if="editing">
+    <template v-if="isEffectivelyEditing">
       <Suspense>
         <component
           :is="currentEditor"

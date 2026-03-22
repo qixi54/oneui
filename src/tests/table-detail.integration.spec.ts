@@ -81,6 +81,62 @@ describe("Table + Detail 集成", () => {
     expect(onClick.mock.calls[0][0]).toMatchObject({ id: "T-1", title: "完善集成测试" });
   });
 
+  it("DataTable 行快捷动作「详情」会触发 row-click", async () => {
+    const onRowClick = vi.fn();
+    const wrapper = mount(DataTable, {
+      props: {
+        tasks,
+        columns: [
+          { key: "title", label: "标题" },
+          { key: "status", label: "状态" },
+        ],
+        fieldDefs: [
+          { id: "title", type: "text", label: "标题" },
+          { id: "status", type: "select", label: "状态", options: [] },
+        ] as FieldDef[],
+        onRowClick,
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    const firstRow = wrapper.findAll(".of-table-row").at(0);
+    expect(firstRow).toBeTruthy();
+    const detailButton = firstRow!.findAll(".of-table-row__action-btn").find((btn) => btn.text() === "详情");
+    expect(detailButton).toBeTruthy();
+    await detailButton!.trigger("click");
+
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick.mock.calls[0]?.[0]).toMatchObject({ id: "T-1", title: "完善集成测试" });
+  });
+
+  it("DataTable 行快捷动作「编辑」会驱动字段进入编辑态", async () => {
+    const wrapper = mount(DataTable, {
+      props: {
+        tasks,
+        columns: [
+          { key: "title", label: "标题" },
+          { key: "status", label: "状态" },
+        ],
+        fieldDefs: [
+          { id: "title", type: "text", label: "标题" },
+          { id: "status", type: "select", label: "状态", options: [] },
+        ] as FieldDef[],
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    const firstRow = wrapper.findAll(".of-table-row").at(0);
+    expect(firstRow).toBeTruthy();
+    const editButton = firstRow!.findAll(".of-table-row__action-btn").find((btn) => btn.text() === "编辑");
+    expect(editButton).toBeTruthy();
+    await editButton!.trigger("click");
+
+    await wrapper.vm.$nextTick();
+    expect(firstRow!.find(".of-field-cell--editing").exists()).toBe(true);
+  });
+
   it("DataTable 的 cell slot 可以覆盖默认单元格渲染", async () => {
     const originalWidth = window.innerWidth;
     setViewportWidth(1280);

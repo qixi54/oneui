@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import {
   // Base
   ViewTab,
@@ -126,9 +126,49 @@ import type { ButtonOption } from "../components/base";
 import type { ChatMessage } from "../composables/useAiChat";
 import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
 import { DEFAULT_TABLE_SCHEMA, isSelectField } from "../types";
+import {
+  type OpsCommand,
+  type OpsCommandWorkspace,
+  type OpsCommandAction,
+  type OpsAppSection,
+  createOpsCommands,
+} from "./opsCommandRegistry";
 
 const toast = useToast();
 const themeMode = ref<"neutral" | "ops-console">("neutral");
+
+const commandWorkspace = ref<OpsCommandWorkspace>({
+  title: "待命",
+  subtitle: "点击命令面板即可在当前页直接打开任务/日志/配置工作流。",
+  context: "Command Center 空闲",
+  mode: "drawer",
+  details: [],
+  points: [],
+  actions: [],
+});
+const commandDrawerOpen = ref(false);
+const commandSidePanelOpen = ref(false);
+const activeCommandId = ref("none");
+
+function closeCommandWorkspace() {
+  commandDrawerOpen.value = false;
+  commandSidePanelOpen.value = false;
+}
+
+function openCommandWorkspace(next: OpsCommandWorkspace) {
+  commandWorkspace.value = next;
+  if (next.mode === "drawer") {
+    commandDrawerOpen.value = true;
+    commandSidePanelOpen.value = false;
+  } else {
+    commandSidePanelOpen.value = true;
+    commandDrawerOpen.value = false;
+  }
+}
+
+function runWorkspaceAction(action: OpsCommandAction) {
+  action.handler();
+}
 
 const themeSwatches = {
   canvas: "var(--of-surface-canvas)",
@@ -159,9 +199,66 @@ function applyThemeMode(nextTheme: "neutral" | "ops-console") {
 watch(themeMode, applyThemeMode, { immediate: true });
 onMounted(() => applyThemeMode(themeMode.value));
 
+const activeSection = ref<OpsAppSection>("base");
+
+const commandDeck = createOpsCommands({
+  themeMode,
+  activeSection,
+  openCommandWorkspace,
+  closeCommandWorkspace,
+  toast,
+});
+
+function executeCommand(command: OpsCommand) {
+  activeCommandId.value = command.id;
+  command.action();
+}
+
+const commandShortcuts: Record<string, OpsCommand["id"]> = {
+  n: "new-task",
+  l: "open-log",
+  ",": "open-config",
+  d: "open-dashboard",
+};
+
+const commandById = new Map<string, OpsCommand>(
+  commandDeck.map((command) => [command.id, command]),
+);
+
+function runShortcut(evt: KeyboardEvent) {
+  if (evt.key === "Escape") {
+    if (commandDrawerOpen.value || commandSidePanelOpen.value) {
+      evt.preventDefault();
+      closeCommandWorkspace();
+    }
+    return;
+  }
+  const isModifierPressed = evt.metaKey || evt.ctrlKey;
+  if (!isModifierPressed) return;
+  const target = evt.target;
+  if (target instanceof HTMLElement) {
+    const tag = target.tagName.toLowerCase();
+    if (tag === "input" || tag === "textarea" || target.isContentEditable) {
+      return;
+    }
+  }
+  const targetCommandId = commandShortcuts[evt.key.toLowerCase()];
+  const command = targetCommandId ? commandById.get(targetCommandId) : undefined;
+  if (!command) return;
+  evt.preventDefault();
+  executeCommand(command);
+}
+
+onMounted(() => {
+  document.addEventListener("keydown", runShortcut);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", runShortcut);
+});
+
 // ── 导航 ──
-const activeSection = ref("base");
-const sections = [
+const sections: Array<{ key: OpsAppSection; label: string }> = [
   { key: "base", label: "基础组件" },
   { key: "badge", label: "徽章系统" },
   { key: "layout", label: "应用布局" },
@@ -1651,6 +1748,70 @@ function onCtxSelect(key: string) {
     <!-- Toast 容器 -->
     <ToastContainer />
 
+    <Drawer
+      v-model="commandDrawerOpen"
+      :title="`[Ops 命令] ${commandWorkspace.title}`"
+      :width="430"
+    >
+      <div class="ops-command-workspace">
+        <p class="ops-command-workspace__subtitle">{{ commandWorkspace.subtitle }}</p>
+        <p class="ops-command-workspace__context">{{ commandWorkspace.context }}</p>
+        <div v-if="commandWorkspace.details.length" class="ops-command-workspace__kv">
+          <div v-for="item in commandWorkspace.details" :key="item.label" class="ops-command-workspace__kv-item">
+            <span class="ops-command-workspace__kv-label">{{ item.label }}</span>
+            <span class="ops-command-workspace__kv-value">{{ item.value }}</span>
+          </div>
+        </div>
+        <ul v-if="commandWorkspace.points.length" class="ops-command-workspace__points">
+          <li v-for="point in commandWorkspace.points" :key="point">{{ point }}</li>
+        </ul>
+        <div v-if="commandWorkspace.actions.length" class="ops-command-workspace__actions">
+          <button
+            v-for="action in commandWorkspace.actions"
+            :key="action.key"
+            type="button"
+            class="dev-btn dev-btn--sm"
+            :class="`dev-btn--${action.tone}`"
+            @click="runWorkspaceAction(action)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
+      </div>
+    </Drawer>
+
+    <SidePanel
+      v-model="commandSidePanelOpen"
+      :title="`[Ops 命令] ${commandWorkspace.title}`"
+      :width="420"
+    >
+      <div class="ops-command-workspace">
+        <p class="ops-command-workspace__subtitle">{{ commandWorkspace.subtitle }}</p>
+        <p class="ops-command-workspace__context">{{ commandWorkspace.context }}</p>
+        <div v-if="commandWorkspace.details.length" class="ops-command-workspace__kv">
+          <div v-for="item in commandWorkspace.details" :key="item.label" class="ops-command-workspace__kv-item">
+            <span class="ops-command-workspace__kv-label">{{ item.label }}</span>
+            <span class="ops-command-workspace__kv-value">{{ item.value }}</span>
+          </div>
+        </div>
+        <ul v-if="commandWorkspace.points.length" class="ops-command-workspace__points">
+          <li v-for="point in commandWorkspace.points" :key="point">{{ point }}</li>
+        </ul>
+        <div v-if="commandWorkspace.actions.length" class="ops-command-workspace__actions">
+          <button
+            v-for="action in commandWorkspace.actions"
+            :key="action.key"
+            type="button"
+            class="dev-btn dev-btn--sm"
+            :class="`dev-btn--${action.tone}`"
+            @click="runWorkspaceAction(action)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
+      </div>
+    </SidePanel>
+
     <!-- 顶部导航 -->
     <header class="dev-header">
       <div class="dev-header__logo">⚡ OneflowUI Dev</div>
@@ -1674,7 +1835,41 @@ function onCtxSelect(key: string) {
       </nav>
     </header>
 
-    <main class="dev-main">
+    <main class="dev-main ops-main-shell">
+      <section class="dev-section ops-command-panel">
+        <div class="ops-command-panel__header">
+          <div>
+            <div class="ops-command-panel__kicker">Ops Console</div>
+            <h2 class="ops-command-panel__title">全局命令中枢</h2>
+            <div class="ops-command-panel__desc">
+              一键触发高频动作，降低界面跳转成本
+            </div>
+          </div>
+          <span class="ops-command-panel__status">
+            当前活动：{{ activeSection }} | 最近命令：{{ activeCommandId }}
+          </span>
+        </div>
+        <div class="ops-command-panel__grid">
+          <button
+            v-for="cmd in commandDeck"
+            :key="cmd.id"
+            class="ops-command-chip"
+            :class="[
+              `ops-command-chip--${cmd.tone}`,
+              {
+                'ops-command-chip--active': activeCommandId === cmd.id,
+              },
+            ]"
+            type="button"
+            @click="executeCommand(cmd)"
+          >
+            <span class="ops-command-chip__label">{{ cmd.label }}</span>
+            <span class="ops-command-chip__hint ops-mono">{{ cmd.hint }}</span>
+            <span class="ops-command-chip__shortcut">{{ cmd.shortcut }}</span>
+          </button>
+        </div>
+      </section>
+
       <!-- ══════════════════════════════════════════════════════
            基础组件
       ════════════════════════════════════════════════════════ -->
@@ -5026,6 +5221,207 @@ body {
   width: 100%;
 }
 
+.ops-main-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ops-command-panel {
+  background: var(--of-shell-panel-bg, var(--of-shell-panel));
+  border: var(--of-shell-panel-border);
+  border-radius: var(--of-shell-panel-radius);
+  padding: var(--of-shell-panel-padding-y) var(--of-shell-panel-padding-x);
+  box-shadow: var(--of-shell-panel-shadow, var(--of-shell-glow));
+  transition: var(--of-shell-command-transition);
+}
+
+.ops-command-panel:hover {
+  box-shadow: var(--of-shell-panel-shadow-hover, var(--of-card-shadow-hover));
+}
+
+.ops-command-panel__header {
+  display: flex;
+  gap: var(--of-shell-panel-gap);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ops-command-panel__kicker {
+  letter-spacing: var(--of-shell-panel-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--of-shell-panel-kicker-color);
+  font-size: var(--of-shell-panel-kicker-size);
+  font-weight: var(--of-shell-panel-kicker-size-weight, var(--of-font-weight-semibold));
+}
+
+.ops-command-panel__title {
+  margin: 0;
+  color: var(--of-color-text-primary);
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-semibold);
+}
+
+.ops-command-panel__desc {
+  margin-top: var(--of-spacing-1);
+  font-size: var(--of-font-size-sm);
+  color: var(--of-color-text-secondary);
+}
+
+.ops-command-panel__status {
+  font-size: var(--of-shell-status-size);
+  color: var(--of-shell-status-color);
+  border: var(--of-shell-status-border);
+  border-radius: var(--of-radius-full);
+  padding: var(--of-spacing-1) calc(var(--of-spacing-1) + var(--of-spacing-2));
+  background: var(--of-shell-status-bg);
+}
+
+.ops-command-panel__grid {
+  margin-top: var(--of-shell-command-gap);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--of-shell-command-grid-min), 1fr));
+  gap: var(--of-shell-command-gap);
+}
+
+.ops-command-chip {
+  border: var(--of-shell-command-border);
+  background: var(--of-shell-command-bg);
+  border-radius: var(--of-shell-command-radius);
+  padding: var(--of-shell-command-padding);
+  text-align: left;
+  color: var(--of-text-primary);
+  cursor: pointer;
+  transition: var(--of-shell-command-transition);
+}
+
+.ops-command-chip:hover {
+  transform: translateY(var(--of-shell-command-hover-lift));
+}
+
+.ops-command-chip__label {
+  font-weight: var(--of-shell-command-label-weight);
+  font-size: var(--of-shell-command-label-size);
+  display: block;
+}
+
+.ops-command-chip__hint {
+  margin-top: var(--of-spacing-1);
+  display: block;
+  font-size: var(--of-shell-command-hint-size);
+  color: var(--of-text-secondary);
+  line-height: var(--of-shell-command-hint-line-height);
+}
+
+.ops-command-chip__shortcut {
+  margin-top: var(--of-spacing-2);
+  display: inline-flex;
+  border: var(--of-shell-command-shortcut-border);
+  border-radius: var(--of-radius-full);
+  padding: var(--of-shell-command-shortcut-padding);
+  font-size: var(--of-shell-command-shortcut-size);
+  color: var(--of-shell-command-shortcut-color);
+  background: var(--of-shell-command-shortcut-bg);
+  line-height: var(--of-shell-command-shortcut-line-height);
+  letter-spacing: var(--of-shell-number-letter-spacing);
+}
+
+.ops-command-chip--info {
+  background: var(--of-shell-command-tone-info-bg);
+}
+
+.ops-command-chip--success {
+  background: var(--of-shell-command-tone-success-bg);
+}
+
+.ops-command-chip--warning {
+  background: var(--of-shell-command-tone-warning-bg);
+}
+
+.ops-command-chip--error {
+  background: var(--of-shell-command-tone-error-bg);
+}
+
+.ops-command-chip--active {
+  box-shadow: inset 0 0 0 2px var(--of-accent-strong);
+  transform: translateY(var(--of-shell-command-hover-lift));
+}
+
+.ops-command-workspace {
+  padding: var(--of-spacing-2);
+  color: var(--of-text-primary);
+}
+
+.ops-command-workspace__subtitle {
+  margin: 0 0 var(--of-spacing-2);
+  font-size: var(--of-font-size-sm);
+  color: var(--of-text-secondary);
+  line-height: 1.45;
+}
+
+.ops-command-workspace__context {
+  margin: 0 0 var(--of-spacing-3);
+  padding: 6px 10px;
+  border-radius: var(--of-radius-full);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--of-font-size-xs);
+  background: var(--of-surface-hover);
+  color: var(--of-text-tertiary);
+  border: 1px solid var(--of-border-subtle);
+}
+
+.ops-command-workspace__kv {
+  margin: 0 0 var(--of-spacing-3);
+  display: grid;
+  gap: 8px;
+}
+
+.ops-command-workspace__kv-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--of-font-size-sm);
+  color: var(--of-text-secondary);
+}
+
+.ops-command-workspace__kv-label {
+  color: var(--of-text-tertiary);
+  min-width: 0;
+}
+
+.ops-command-workspace__kv-value {
+  color: var(--of-text-primary);
+  text-align: right;
+  font-family: var(--of-shell-number-font, var(--of-font-mono, ui-monospace, SFMono-Regular));
+  white-space: nowrap;
+}
+
+.ops-command-workspace__points {
+  margin: 0 0 var(--of-spacing-3);
+  padding-left: var(--of-spacing-4);
+  color: var(--of-text-secondary);
+  display: grid;
+  gap: 8px;
+  font-size: var(--of-font-size-xs);
+  line-height: 1.5;
+}
+
+.ops-command-workspace__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dev-btn--sm {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.ops-mono {
+  font-family: var(--of-shell-number-font);
+}
+
 .dev-section {
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-border-color);
@@ -5148,7 +5544,7 @@ body {
 .database-shell {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
 }
 
 .database-shell__bar {
@@ -5156,17 +5552,17 @@ body {
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--of-border-color);
-  border-radius: 10px;
-  background: linear-gradient(180deg, var(--of-color-bg-elevated), var(--of-color-bg-hover));
+  gap: var(--of-spacing-3);
+  padding: var(--of-spacing-4);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-panel-radius);
+  background: var(--of-shell-database-bar-bg);
 }
 
 .database-shell__label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: var(--of-shell-database-label-size);
+  font-weight: var(--of-shell-database-label-weight);
+  letter-spacing: var(--of-shell-database-label-tracking);
   text-transform: uppercase;
   color: var(--of-color-text-tertiary);
 }
@@ -5176,14 +5572,14 @@ body {
 }
 
 .database-shell__code {
-  margin: 12px 0 0;
-  padding: 14px 16px;
-  border: 1px solid var(--of-border-color);
-  border-radius: 10px;
+  margin: var(--of-spacing-3) 0 0;
+  padding: var(--of-spacing-3) var(--of-spacing-4);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-panel-radius);
   background: var(--of-color-bg-code);
-  color: var(--of-color-gray-200);
-  font-size: 12px;
-  line-height: 1.7;
+  color: var(--of-shell-database-code-color, var(--of-shell-command-shortcut-color));
+  font-size: var(--of-shell-database-code-size);
+  line-height: var(--of-shell-database-code-line-height);
   overflow-x: auto;
   white-space: pre;
 }
@@ -5191,55 +5587,55 @@ body {
 .database-shell__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 16px;
+  gap: var(--of-spacing-4);
   align-items: start;
 }
 
 .database-shell__main {
   min-width: 0;
-  min-height: 360px;
+  min-height: var(--of-shell-database-main-min-height);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--of-border-color);
-  border-radius: 10px;
-  background: var(--of-color-bg-canvas);
+  gap: var(--of-spacing-3);
+  padding: var(--of-spacing-4);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-main-radius);
+  background: var(--of-shell-database-main-bg);
 }
 
 .database-shell__aside {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
 }
 
 .database-shell__workspace {
-  margin-top: 16px;
-  padding: 16px;
-  border: 1px solid var(--of-border-color);
-  border-radius: 10px;
-  background: var(--of-color-bg-elevated);
+  margin-top: var(--of-spacing-4);
+  padding: var(--of-spacing-4);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-panel-radius);
+  background: var(--of-shell-database-panel-bg);
 }
 
 .database-shell__workspace-head {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--of-shell-panel-gap);
   align-items: flex-start;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: var(--of-spacing-3);
 }
 
 .database-shell__workspace-desc {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: var(--of-spacing-1);
+  font-size: var(--of-shell-database-label-size);
   color: var(--of-color-text-secondary);
 }
 
 .database-shell__workspace-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .database-shell__workspace-body {
@@ -5247,97 +5643,97 @@ body {
 }
 
 .database-shell__aside-card {
-  padding: 16px;
-  border: 1px solid var(--of-border-color);
-  border-radius: 10px;
-  background: var(--of-color-bg-elevated);
+  padding: var(--of-spacing-4);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-panel-radius);
+  background: var(--of-shell-database-panel-bg);
 }
 
 .database-shell__aside-title {
-  margin-bottom: 12px;
-  font-size: 13px;
-  font-weight: 600;
+  margin-bottom: var(--of-spacing-3);
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-text-primary);
 }
 
 .database-shell__list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--of-spacing-1);
   margin: 0;
-  padding-left: 18px;
+  padding-left: var(--of-spacing-4);
   color: var(--of-color-text-secondary);
-  font-size: 13px;
+  font-size: var(--of-font-size-sm);
   line-height: 1.6;
 }
 
 .database-shell__log {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .database-shell__card-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--of-spacing-3);
 }
 
 .database-shell__card-item {
-  padding: 10px 12px;
-  border: 1px solid var(--of-color-gray-100);
-  border-radius: 8px;
-  background: var(--of-color-bg-canvas);
+  padding: var(--of-spacing-2) var(--of-spacing-3);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-main-radius);
+  background: var(--of-shell-database-card-bg);
 }
 
 .database-shell__card-item-title {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-text-primary);
 }
 
 .database-shell__card-item-desc {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: var(--of-spacing-1);
+  font-size: var(--of-font-size-xs);
   line-height: 1.5;
   color: var(--of-color-text-secondary);
 }
 
 .database-shell__log-item {
-  padding: 8px 10px;
-  border: 1px solid var(--of-color-gray-100);
-  border-radius: 8px;
-  background: var(--of-color-bg-canvas);
+  padding: var(--of-spacing-2) var(--of-spacing-3);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-main-radius);
+  background: var(--of-shell-database-card-bg);
   color: var(--of-color-text-secondary);
-  font-size: 12px;
+  font-size: var(--of-font-size-xs);
   line-height: 1.5;
 }
 
 .database-shell__view-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .database-shell__badge {
   display: inline-flex;
   align-items: center;
   padding: 4px 8px;
-  border-radius: 9999px;
-  background: var(--of-surface-selected);
+  border-radius: var(--of-radius-full);
+  background: var(--of-shell-database-badge-bg);
   color: var(--of-accent-default);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
 }
 
 .database-shell__state {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   min-height: 160px;
-  padding: 20px;
-  border: 1px dashed var(--of-border-color);
-  border-radius: 10px;
+  padding: var(--of-spacing-5);
+  border: var(--of-shell-database-state-border);
+  border-radius: var(--of-shell-database-main-radius);
   background: var(--of-color-bg-hover);
 }
 
@@ -5358,15 +5754,15 @@ body {
 }
 
 .database-shell__state-title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-text-primary);
 }
 
 .database-shell__state-desc {
-  margin-top: 4px;
+  margin-top: var(--of-spacing-1);
   color: var(--of-color-text-secondary);
-  font-size: 12px;
+  font-size: var(--of-font-size-xs);
   line-height: 1.6;
 }
 

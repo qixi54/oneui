@@ -587,6 +587,17 @@ function onCellCommit(rowId: string, fieldId: string, value: unknown) {
   emit("cell-edit", { rowId, fieldId, value });
 }
 
+function onCellRequestEdit(rowId: string, fieldId: string) {
+  inlineEdit.activate(rowId, fieldId);
+  if (props.enableKeyboard) {
+    setActiveCell(rowId, fieldId);
+  }
+}
+
+function onCellRequestCancel() {
+  inlineEdit.cancel();
+}
+
 function handleRowClick(row: T) {
   const result = handleDetailSheetRowClick({
     row: row as RowWithRecord,
@@ -706,6 +717,14 @@ function isActiveCell(rowId: string, colKey: string): boolean {
 
 function isCellSelected(rowId: string, colKey: string): boolean {
   return selectedRange.value.some((c) => c.rowId === rowId && c.colKey === colKey);
+}
+
+function isCellEditing(rowId: string, colKey: string): boolean {
+  return (
+    editingCell.value !== null &&
+    editingCell.value.rowId === rowId &&
+    editingCell.value.fieldId === colKey
+  );
 }
 
 function dragRowClasses(item: T): Record<string, boolean> {
@@ -871,7 +890,10 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         :row-id="getRowId(item as T)"
                         :field="getFieldDef(col.key)"
                         :value="getRowValue(item as T, col.key)"
+                        :editing="isCellEditing(getRowId(item as T), col.key)"
                         @commit="onCellCommit"
+                        @request-edit="onCellRequestEdit"
+                        @request-cancel="onCellRequestCancel"
                       />
                       <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
                     </slot>
@@ -953,7 +975,10 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :row-id="getRowId(item as T)"
                     :field="getFieldDef(col.key)"
                     :value="getRowValue(item as T, col.key)"
+                    :editing="isCellEditing(getRowId(item as T), col.key)"
                     @commit="onCellCommit"
+                    @request-edit="onCellRequestEdit"
+                    @request-cancel="onCellRequestCancel"
                   />
                   <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
                 </slot>
@@ -1035,7 +1060,10 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         :row-id="getRowId(item as T)"
                         :field="getFieldDef(col.key)"
                         :value="getRowValue(item as T, col.key)"
+                        :editing="isCellEditing(getRowId(item as T), col.key)"
                         @commit="onCellCommit"
+                        @request-edit="onCellRequestEdit"
+                        @request-cancel="onCellRequestCancel"
                       />
                       <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
                     </slot>
@@ -1077,7 +1105,10 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :row-id="getRowId(item as T)"
                     :field="getFieldDef(col.key)"
                     :value="getRowValue(item as T, col.key)"
+                    :editing="isCellEditing(getRowId(item as T), col.key)"
                     @commit="onCellCommit"
+                    @request-edit="onCellRequestEdit"
+                    @request-cancel="onCellRequestCancel"
                   />
                   <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
                 </slot>
@@ -1143,11 +1174,14 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         :row-id="getRowId(slotRow as T)"
                         :field="getFieldDef(col.key)"
                         :value="slotRow[col.key] as CellValue"
+                        :editing="isCellEditing(getRowId(slotRow as T), col.key)"
                         :class="{
                           'of-cell--active': isActiveCell(getRowId(slotRow as T), col.key),
                           'of-cell--selected': isCellSelected(getRowId(slotRow as T), col.key),
                         }"
                         @commit="onCellCommit"
+                        @request-edit="onCellRequestEdit"
+                        @request-cancel="onCellRequestCancel"
                         @click.stop="enableKeyboard && setActiveCell(getRowId(slotRow as T), col.key)"
                       />
                       <span v-else class="of-td-text">
@@ -1189,11 +1223,14 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :row-id="getRowId(slotRow as T)"
                     :field="getFieldDef(col.key)"
                     :value="slotRow[col.key] as CellValue"
+                    :editing="isCellEditing(getRowId(slotRow as T), col.key)"
                     :class="{
                       'of-cell--active': isActiveCell(getRowId(slotRow as T), col.key),
                       'of-cell--selected': isCellSelected(getRowId(slotRow as T), col.key),
                     }"
                     @commit="onCellCommit"
+                    @request-edit="onCellRequestEdit"
+                    @request-cancel="onCellRequestCancel"
                     @click.stop="enableKeyboard && setActiveCell(getRowId(slotRow as T), col.key)"
                   />
                   <span v-else class="of-td-text">

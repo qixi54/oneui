@@ -37,6 +37,20 @@
   --of-chart-series-4: #b0bfd0;
   --of-chart-series-5: #d0d9e4;
 
+  --of-shell-glow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --of-shell-border: rgba(15, 23, 42, 0.12);
+  --of-shell-row-border: rgba(15, 23, 42, 0.14);
+  --of-shell-ops-accent: var(--of-accent-default);
+  --of-shell-ops-accent-soft: var(--of-accent-soft);
+  --of-shell-panel: linear-gradient(160deg, var(--of-surface-panel) 0%, var(--of-surface-muted) 100%);
+  --of-shell-panel-bg: var(--of-shell-panel);
+  --of-shell-status-bg: var(--of-color-white-alpha-10);
+  --of-shell-command-tone-strength: 7%;
+  --of-shell-command-tone-info-bg: color-mix(in oklab, var(--of-accent-default) var(--of-shell-command-tone-strength), transparent);
+  --of-shell-command-tone-success-bg: color-mix(in oklab, var(--of-color-success) var(--of-shell-command-tone-strength), transparent);
+  --of-shell-command-tone-warning-bg: color-mix(in oklab, var(--of-color-warning) var(--of-shell-command-tone-strength), transparent);
+  --of-shell-command-tone-error-bg: color-mix(in oklab, var(--of-color-error) var(--of-shell-command-tone-strength), transparent);
+
   --of-card-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
   --of-card-shadow-hover: 0 16px 32px rgba(15, 23, 42, 0.08);
 }
