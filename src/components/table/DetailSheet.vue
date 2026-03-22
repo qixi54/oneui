@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed, defineComponent, h, ref, Teleport, Transition } from "vue";
 import FieldCell from "./FieldCell.vue";
 import type { CellValue, FieldDef as CellFieldDef } from "./FieldCell.vue";
 import type { TableColumn } from "../../types";
@@ -30,6 +30,71 @@ const emit = defineEmits<{
 }>();
 
 const { renderMarkdown } = useMarkdown({ showCopyButton: true });
+
+const DetailSheetShell = defineComponent({
+  name: "DetailSheetShell",
+  props: {
+    embedded: {
+      type: Boolean,
+      default: false,
+    },
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+    fullPage: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    cancel: () => true,
+  },
+  setup(shellProps, { emit: shellEmit, slots }) {
+    return () => {
+      if (shellProps.embedded) {
+        if (!shellProps.visible) return null;
+        return h(
+          "div",
+          { class: ["of-detail-sheet-shell", "of-detail-sheet-shell--embedded"] },
+          slots.default?.(),
+        );
+      }
+
+      return h(
+        Teleport,
+        { to: "body" },
+        h(
+          Transition,
+          { name: "of-sheet" },
+          {
+            default: () =>
+              shellProps.visible
+                ? h(
+                    "div",
+                    {
+                      class: [
+                        "of-detail-sheet-overlay",
+                        { "of-detail-sheet-overlay--full-page": shellProps.fullPage },
+                      ],
+                    },
+                    [
+                      h("button", {
+                        type: "button",
+                        class: "of-detail-sheet-overlay__hitarea",
+                        "aria-label": "关闭详情",
+                        onClick: () => shellEmit("cancel"),
+                      }),
+                      ...(slots.default?.() ?? []),
+                    ],
+                  )
+                : null,
+          },
+        ),
+      );
+    };
+  },
+});
 
 const pendingChanges = ref<Record<string, unknown>>({});
 const hasChanges = computed(() => Object.keys(pendingChanges.value).length > 0);
@@ -99,89 +164,12 @@ function handleDelete() {
 </script>
 
 <template>
-  <Teleport v-if="!embedded" to="body">
-    <Transition name="of-sheet">
-      <div
-        v-if="isVisible"
-        class="of-detail-sheet-overlay"
-        :class="{ 'of-detail-sheet-overlay--full-page': fullPage }"
-      >
-        <button
-          type="button"
-          class="of-detail-sheet-overlay__hitarea"
-          aria-label="关闭详情"
-          @click="handleCancel"
-        />
-        <div class="of-detail-sheet" :class="{ 'of-detail-sheet--full-page': fullPage }">
-          <div class="of-detail-sheet__header">
-            <button class="of-detail-sheet__close" @click="handleCancel">✕</button>
-            <h3 class="of-detail-sheet__title">记录详情</h3>
-            <div class="of-detail-sheet__header-spacer" />
-          </div>
-
-          <div
-            class="of-detail-sheet__body"
-            :class="{ 'of-detail-sheet__body--full-page': fullPage }"
-          >
-            <div class="of-detail-sheet__properties">
-              <div v-for="col in propertyColumns" :key="col.key" class="of-detail-sheet__field">
-                <span class="of-detail-sheet__label">{{ col.label }}</span>
-                <div class="of-detail-sheet__cell">
-                  <FieldCell
-                    v-if="fieldDefs?.length"
-                    :row-id="row.id"
-                    :field="getFieldDef(col.key)"
-                    :value="getCellValue(col)"
-                    :readonly="readonly"
-                    @commit="onCellCommit"
-                  />
-                  <span v-else class="of-detail-sheet__value">
-                    {{ getCellValue(col) ?? "—" }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="contentColumns.length > 0" class="of-detail-sheet__content">
-              <div
-                v-for="col in contentColumns"
-                :key="col.key"
-                class="of-detail-sheet__content-block"
-              >
-                <span class="of-detail-sheet__content-label">{{ col.label }}</span>
-                <!-- eslint-disable vue/no-v-html -->
-                <!-- Markdown is rendered from the shared sanitizer pipeline in useMarkdown. -->
-                <div
-                  class="of-detail-sheet__markdown of-markdown"
-                  v-html="getRenderedContent(col)"
-                />
-                <!-- eslint-enable vue/no-v-html -->
-              </div>
-            </div>
-          </div>
-
-          <div class="of-detail-sheet__footer">
-            <button class="of-detail-sheet__btn of-detail-sheet__btn--delete" @click="handleDelete">
-              删除
-            </button>
-            <div class="of-detail-sheet__footer-spacer" />
-            <button class="of-detail-sheet__btn of-detail-sheet__btn--cancel" @click="handleCancel">
-              取消
-            </button>
-            <button
-              class="of-detail-sheet__btn of-detail-sheet__btn--save"
-              :disabled="!hasChanges"
-              @click="handleSave"
-            >
-              保存
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
-
-  <div v-else-if="isVisible" class="of-detail-sheet-shell of-detail-sheet-shell--embedded">
+  <DetailSheetShell
+    :embedded="embedded"
+    :visible="isVisible"
+    :full-page="fullPage"
+    @cancel="handleCancel"
+  >
     <div class="of-detail-sheet" :class="{ 'of-detail-sheet--full-page': fullPage }">
       <div class="of-detail-sheet__header">
         <button class="of-detail-sheet__close" @click="handleCancel">✕</button>
@@ -237,7 +225,7 @@ function handleDelete() {
         </button>
       </div>
     </div>
-  </div>
+  </DetailSheetShell>
 </template>
 
 <style scoped>

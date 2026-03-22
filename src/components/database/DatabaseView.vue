@@ -5,20 +5,14 @@ import DatabaseViewDetailHost from "./DatabaseViewDetailHost.vue";
 import DatabaseViewContent from "./DatabaseViewContent.vue";
 import DatabaseViewShell from "./DatabaseViewShell.vue";
 import DatabaseViewToolbar from "./DatabaseViewToolbar.vue";
-import type { EmptyStateAction } from "../base/EmptyState.vue";
 import { useDatabaseView } from "../../composables/useDatabaseView";
 import {
   DATABASE_DETAIL_VIEW_ID as DETAIL_VIEW_ID,
-  DEFAULT_DRAWER_WIDTH,
-  DEFAULT_SIDE_PANEL_WIDTH,
-  clampWorkspaceWidth,
   readWorkspacePreferences,
-  useDatabaseViewport,
-  useDatabaseWorkspaceState,
 } from "../../composables/useDatabaseWorkspace";
+import { useDatabaseDetailWorkspace } from "../../composables/useDatabaseDetailWorkspace";
 import type {
   DatabaseViewProps,
-  DatabaseViewResolvedDetailPresentation,
   DatabaseViewSchemaEvent,
   DatabaseViewViewTab,
 } from "../../contracts/database";
@@ -31,24 +25,15 @@ import type {
 import { buildGanttItems } from "../../types";
 import {
   buildDatabaseViewTabs,
-  buildDetailColumns,
-  buildDetailFieldDefs,
-  buildDetailPropertyItems,
-  buildDetailWorkspaceDescription,
-  buildDetailWorkspaceTitle,
   buildEmptyFilter,
   buildFallbackView,
   buildRenderedRecords,
   buildTableColumns,
   buildVirtualDetailView,
-  buildWorkspaceModes,
   cloneView,
   convertToolbarFiltersToViewFilters,
   convertViewFiltersToToolbarFilters,
   getVisibleFieldIds,
-  partitionDetailColumns,
-  resolveDetailPresentation,
-  toDetailRow,
 } from "./databaseViewUtils";
 
 const props = withDefaults(defineProps<DatabaseViewProps>(), {
@@ -112,18 +97,7 @@ const emit = defineEmits<{
 
 defineOptions({ name: "DatabaseView", inheritAttrs: false });
 
-function buildDetailEmptyAction(fallbackViewId: string | null): EmptyStateAction | undefined {
-  if (fallbackViewId) {
-    return {
-      label: "返回列表",
-      onClick: () => handleViewSwitch(fallbackViewId),
-    };
-  }
-  return undefined;
-}
-
 const initialWorkspacePreferences = readWorkspacePreferences(props.tableId);
-const { isMobileViewport } = useDatabaseViewport();
 const schemaSource = computed(() => props.schema ?? null);
 const recordSource = computed(() => props.records ?? []);
 const viewSource = computed(() => {
@@ -210,28 +184,78 @@ const activeSelectedRecordId = computed(() => databaseView.selectedRecordId.valu
 const resolvedSchema = computed(() => databaseView.schema.value ?? schemaSource.value);
 const resolvedRecords = computed<DataRecord[]>(() => [...databaseView.records.value]);
 const activeViewType = computed(() => activeView.value.viewType || "table");
-const detailDraftFields = ref<Record<string, unknown>>({});
-const {
-  preferredDetailPresentation,
-  sidePanelWidth,
-  drawerWidth,
-  searchKeyword,
-} = useDatabaseWorkspaceState({
+const filterLogic = ref<FilterLogic>("and");
+const toolbarFilters = ref<ToolbarFilterCondition[]>([]);
+
+watch(
+  activeView,
+  (view) => {
+    toolbarFilters.value = convertViewFiltersToToolbarFilters(view.filters ?? []);
+  },
+  { immediate: true },
+);
+
+const resolvedViewTabs = computed<DatabaseViewViewTab[]>(() =>
+  buildDatabaseViewTabs({
+    providedTabs: props.viewTabs,
+    viewList: databaseView.viewList.value,
+    detailViewId: DETAIL_VIEW_ID,
+  }),
+);
+
+const detailWorkspace = useDatabaseDetailWorkspace({
   tableId: toRef(props, "tableId"),
-  activeViewId: databaseView.activeViewId,
+  activeViewId,
+  currentViewId: toRef(props, "currentViewId"),
+  selectedRecordId: toRef(props, "selectedRecordId"),
+  selectedRecord,
+  resolvedSchema,
+  resolvedRecords,
+  viewTabs: resolvedViewTabs,
+  detailPresentation: toRef(props, "detailPresentation"),
   initialSearchKeyword: props.searchKeyword || initialWorkspacePreferences.searchKeyword || "",
   initialDetailPresentation: initialWorkspacePreferences.detailPresentation ?? null,
   initialSidePanelWidth: initialWorkspacePreferences.sidePanelWidth,
   initialDrawerWidth: initialWorkspacePreferences.drawerWidth,
-});
-const filterLogic = ref<FilterLogic>("and");
-const toolbarFilters = ref<ToolbarFilterCondition[]>([]);
-const detailWorkspaceActive = ref(
-  props.currentViewId === DETAIL_VIEW_ID ||
+  initialWorkspaceActive:
+    props.currentViewId === DETAIL_VIEW_ID ||
     props.initialViewId === DETAIL_VIEW_ID ||
     props.selectedRecordId != null ||
     props.initialSelectedRecordId != null,
-);
+  onSelectRecord: (record) => {
+    databaseView.setSelectedRecord(record);
+  },
+  onClearSelectedRecord: () => {
+    databaseView.clearSelectedRecord();
+  },
+  onSetRecords: (next) => {
+    setRecords(next);
+  },
+  onCellEdit: (payload) => {
+    handleCellEdit(payload);
+  },
+  onSwitchView: (viewId) => {
+    handleViewSwitch(viewId);
+  },
+});
+
+const {
+  searchKeyword,
+  sidePanelWidth,
+  drawerWidth,
+  detailWorkspaceRow,
+  detailWorkspaceTitle,
+  detailWorkspaceDescription,
+  detailPropertyItems,
+  hasDetailDraftChanges,
+  showDetailWorkspace,
+  resolvedDetailPresentation,
+  workspaceModes,
+  canSwitchDetailPresentation,
+  detailEmptyAction,
+  setPreferredDetailPresentation,
+  activateDetailWorkspace,
+} = detailWorkspace;
 
 watch(
   () => props.searchKeyword,
@@ -247,21 +271,13 @@ watch(searchKeyword, (keyword) => {
 });
 
 watch(
-  activeView,
-  (view) => {
-    toolbarFilters.value = convertViewFiltersToToolbarFilters(view.filters ?? []);
-  },
-  { immediate: true },
-);
-
-watch(
   () => props.currentViewId,
   (next) => {
     if (!next || next === activeViewId.value) return;
-    databaseView.setActiveViewId(next);
     if (next === DETAIL_VIEW_ID) {
-      detailWorkspaceActive.value = true;
+      activateDetailWorkspace();
     }
+    databaseView.setActiveViewId(next);
   },
   { immediate: true },
 );
@@ -271,13 +287,10 @@ watch(
   (next) => {
     if (next === undefined) return;
     if (!next) {
-      detailWorkspaceActive.value = false;
-      detailDraftFields.value = {};
-      databaseView.clearSelectedRecord();
+      handleDetailClose();
       return;
     }
-    detailWorkspaceActive.value = true;
-    detailDraftFields.value = {};
+    activateDetailWorkspace();
     databaseView.setSelectedRecord(next);
   },
   { immediate: true },
@@ -288,10 +301,13 @@ watch(
   (next, prev) => {
     emit("update:currentViewId", next);
     if (next === DETAIL_VIEW_ID) {
-      detailWorkspaceActive.value = true;
+      activateDetailWorkspace();
     }
     if (prev !== undefined && next !== prev) {
-      props.actions?.onViewChange?.({ tableId: props.tableId, view: cloneView(activeView.value) });
+      props.actions?.onViewChange?.({
+        tableId: props.tableId,
+        view: cloneView(activeView.value),
+      });
     }
   },
   { immediate: true },
@@ -308,14 +324,6 @@ watch(
   { immediate: true },
 );
 
-const resolvedViewTabs = computed<DatabaseViewViewTab[]>(() =>
-  buildDatabaseViewTabs({
-    providedTabs: props.viewTabs,
-    viewList: databaseView.viewList.value,
-    detailViewId: DETAIL_VIEW_ID,
-  }),
-);
-
 const savedViews = computed(() =>
   databaseView.viewList.value.map((view) => ({
     id: view.id,
@@ -324,28 +332,6 @@ const savedViews = computed(() =>
 );
 
 const toolbarColumns = computed(() => buildTableColumns(activeView.value, resolvedSchema.value, resolvedRecords.value));
-const detailColumns = computed(() => buildDetailColumns(resolvedSchema.value, resolvedRecords.value));
-const detailFieldDefs = computed(() => buildDetailFieldDefs(resolvedSchema.value, resolvedRecords.value));
-const detailRow = computed(() => toDetailRow(selectedRecord.value));
-const detailWorkspaceRow = computed(() => ({
-  ...detailRow.value,
-  ...detailDraftFields.value,
-}));
-const detailWorkspaceTitle = computed(() => buildDetailWorkspaceTitle(selectedRecord.value));
-const detailColumnPartitions = computed(() => partitionDetailColumns(detailColumns.value, detailFieldDefs.value));
-const detailPropertyColumns = computed(() => detailColumnPartitions.value.propertyColumns);
-const detailContentColumns = computed(() => detailColumnPartitions.value.contentColumns);
-const detailWorkspaceDescription = computed(() =>
-  buildDetailWorkspaceDescription(detailContentColumns.value, detailWorkspaceRow.value),
-);
-const detailPropertyItems = computed(() =>
-  buildDetailPropertyItems({
-    columns: detailPropertyColumns.value,
-    fieldDefs: detailFieldDefs.value,
-    row: detailWorkspaceRow.value,
-  }),
-);
-const hasDetailDraftChanges = computed(() => Object.keys(detailDraftFields.value).length > 0);
 const visibleRecordFieldIds = computed(() => getVisibleFieldIds(resolvedSchema.value, resolvedRecords.value));
 const loadingStateTitle = "正在加载数据视图";
 const loadingStateDescription = "请稍候，页面级编排器正在准备当前视图。";
@@ -379,16 +365,6 @@ const showSort = computed(() => props.showSort !== false);
 const showGroup = computed(() => props.showGroup !== false);
 const showColumns = computed(() => props.showColumns !== false);
 const showSearch = computed(() => props.showSearch !== false);
-const showDetailWorkspace = computed(() => detailWorkspaceActive.value && Boolean(selectedRecord.value));
-const resolvedDetailPresentation = computed<DatabaseViewResolvedDetailPresentation>(() =>
-  resolveDetailPresentation({
-    requested: props.detailPresentation,
-    preferred: preferredDetailPresentation.value,
-    isMobileViewport: isMobileViewport.value,
-  }),
-);
-const workspaceModes = computed(() => buildWorkspaceModes(isMobileViewport.value));
-const canSwitchDetailPresentation = computed(() => props.detailPresentation === "auto");
 
 const effectiveLoading = computed(() => props.loading ?? databaseView.loading.value);
 const effectiveError = computed(() => props.error ?? databaseView.error.value);
@@ -427,47 +403,15 @@ const renderState = computed<"loading" | "error" | "empty" | "normal">(() => {
   return renderedRecords.value.length > 0 ? "normal" : "empty";
 });
 
-const detailEmptyAction = computed<EmptyStateAction | undefined>(() => {
-  if (activeViewType.value !== "detail") return undefined;
-
-  const firstRecord = resolvedRecords.value[0];
-  if (firstRecord) {
-    return {
-      label: "打开第一条记录",
-      onClick: () => openRecord(firstRecord),
-    };
-  }
-
-  const fallbackViewId = resolvedViewTabs.value.find((tab) => tab.value !== DETAIL_VIEW_ID)?.value ?? null;
-  return buildDetailEmptyAction(fallbackViewId);
-});
-
 function setRecords(next: DataRecord[]) {
   databaseView.setRecords(next);
   emit("update:records", next);
 }
 
-function openRecord(record: DataRecord | null) {
-  if (!record) return;
-  detailWorkspaceActive.value = true;
-  detailDraftFields.value = {};
-  databaseView.setSelectedRecord(record);
-}
-
-function setPreferredDetailPresentation(mode: DatabaseViewResolvedDetailPresentation) {
-  if (!canSwitchDetailPresentation.value) return;
-  preferredDetailPresentation.value = mode;
-}
-
-function findRecordById(recordId: string | undefined | null) {
-  if (!recordId) return null;
-  return resolvedRecords.value.find((record) => record.id === recordId) ?? null;
-}
-
 function handleViewSwitch(viewId: string) {
   if (!databaseView.viewList.value.some((view) => view.id === viewId)) return;
   if (viewId === DETAIL_VIEW_ID) {
-    detailWorkspaceActive.value = true;
+    activateDetailWorkspace();
   }
   databaseView.switchView(viewId);
 }
@@ -479,7 +423,7 @@ function handleToolbarUpdateCurrentView(viewId: string) {
 function handleToolbarLoadView(viewId: string) {
   if (!databaseView.viewList.value.some((view) => view.id === viewId)) return;
   if (viewId === DETAIL_VIEW_ID) {
-    detailWorkspaceActive.value = true;
+    activateDetailWorkspace();
   }
   databaseView.switchView(viewId);
   emit("load-view", viewId);
@@ -556,7 +500,6 @@ function handleToolbarGroup(field: string | null) {
 
 function handleSearchKeywordUpdate(keyword: string) {
   searchKeyword.value = keyword;
-  emit("update:searchKeyword", keyword);
 }
 
 function forwardSchemaEvent(event: DatabaseViewSchemaEvent) {
@@ -592,7 +535,7 @@ function handleTimelineRecordsUpdate(records: DataRecord[]) {
 }
 
 function handleRowSelect(record: DataRecord) {
-  openRecord(record);
+  detailWorkspace.handleRowSelect(record);
 }
 
 function handleRowClick(payload: unknown) {
@@ -609,57 +552,36 @@ function handleContentRowClick(payload: unknown) {
 
 function handleCardClick(payload: unknown) {
   emit("card-click", payload);
-  openRecord(findRecordById((payload as { id?: string } | null | undefined)?.id));
+  detailWorkspace.handleCardClick(payload as { id?: string } | Record<string, unknown> | null | undefined);
 }
 
 function handleTimelineRowClick(payload: { id?: string; sourceRecordId?: string }) {
   emit("row-click", payload);
-  openRecord(findRecordById(payload.sourceRecordId ?? payload.id));
+  detailWorkspace.handleTimelineRowClick(payload);
 }
 
 function handleDetailClose() {
-  detailWorkspaceActive.value = false;
-  detailDraftFields.value = {};
-  databaseView.clearSelectedRecord();
-}
-
-function handleDetailSave(payload: { rowId: string; fields: Record<string, unknown> }) {
-  for (const [fieldId, value] of Object.entries(payload.fields)) {
-    handleCellEdit({ rowId: payload.rowId, fieldId, value });
-  }
-  detailDraftFields.value = {};
-  handleDetailClose();
+  detailWorkspace.handleDetailClose();
 }
 
 function handleDetailDelete(rowId: string) {
-  const next = resolvedRecords.value.filter((record) => record.id !== rowId);
-  setRecords(next);
-  detailWorkspaceActive.value = false;
-  detailDraftFields.value = {};
-  databaseView.clearSelectedRecord();
+  detailWorkspace.handleDetailDelete(rowId);
 }
 
 function handleDetailWorkspaceCommit(_rowId: string, fieldId: string, value: unknown) {
-  detailDraftFields.value = {
-    ...detailDraftFields.value,
-    [fieldId]: value,
-  };
+  detailWorkspace.handleDetailWorkspaceCommit(_rowId, fieldId, value);
 }
 
 function handleDetailWorkspaceSave() {
-  if (!selectedRecord.value) return;
-  handleDetailSave({
-    rowId: selectedRecord.value.id,
-    fields: { ...detailDraftFields.value },
-  });
+  detailWorkspace.handleDetailWorkspaceSave();
 }
 
 function handleSidePanelWidthUpdate(width: number) {
-  sidePanelWidth.value = clampWorkspaceWidth(width, DEFAULT_SIDE_PANEL_WIDTH);
+  detailWorkspace.handleSidePanelWidthUpdate(width);
 }
 
 function handleDrawerWidthUpdate(width: number) {
-  drawerWidth.value = clampWorkspaceWidth(width, DEFAULT_DRAWER_WIDTH);
+  detailWorkspace.handleDrawerWidthUpdate(width);
 }
 </script>
 

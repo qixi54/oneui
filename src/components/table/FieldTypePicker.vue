@@ -141,41 +141,68 @@ function handleSelect(type: FieldType) {
 
 <style scoped>
 .of-field-type-picker {
+  --of-field-type-picker-surface: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
+  --of-field-type-picker-border: var(--of-border-subtle, var(--of-border, #e2e8f0));
+  --of-field-type-picker-border-hover: var(--of-border-strong, var(--of-color-gray-300));
+  --of-field-type-picker-border-focus: var(--of-color-primary, var(--of-border-strong, #3b82f6));
+  --of-field-type-picker-hover-surface: var(--of-surface-muted, var(--of-color-bg-hover));
+  --of-field-type-picker-selected-surface: var(--of-surface-selected, var(--of-color-gray-100));
+  --of-field-type-picker-selected-text: var(--of-text-primary, var(--of-color-gray-700));
+  --of-field-type-picker-text-primary: var(--of-text-primary, var(--of-color-text));
+  --of-field-type-picker-text-secondary: var(--of-text-secondary, var(--of-color-text-tertiary));
+  --of-field-type-picker-text-tertiary: var(--of-text-tertiary, var(--of-color-text-tertiary));
+  --of-field-type-picker-search-surface: var(--of-surface-muted, var(--of-color-gray-50));
+  --of-field-type-picker-search-border: var(--of-border-subtle, var(--of-color-gray-200));
+  --of-field-type-picker-search-border-focus: var(--of-field-type-picker-border-focus);
+  --of-field-type-picker-focus-ring: rgba(59, 130, 246, 0.16);
   width: 220px;
   max-height: 320px;
   display: flex;
   flex-direction: column;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
-  border: 1px solid var(--of-border-subtle, var(--of-border, #e2e8f0));
+  background: var(--of-field-type-picker-surface);
+  border: 1px solid var(--of-field-type-picker-border);
   border-radius: var(--of-radius-lg, 8px);
   box-shadow: var(--of-shadow-popover);
   overflow: hidden;
 }
 
+.of-field-type-picker:focus-within {
+  border-color: var(--of-field-type-picker-border-focus);
+  box-shadow:
+    var(--of-shadow-popover),
+    0 0 0 3px var(--of-field-type-picker-focus-ring);
+}
+
 .of-field-type-picker__search {
   padding: 8px;
-  border-bottom: 1px solid var(--of-border-subtle, var(--of-border, #e2e8f0));
+  border-bottom: 1px solid var(--of-field-type-picker-search-border);
   flex-shrink: 0;
 }
 
 .of-field-type-picker__search-input {
   width: 100%;
   padding: 6px 8px;
-  border: 1px solid var(--of-border-subtle, var(--of-border, #e2e8f0));
+  border: 1px solid var(--of-field-type-picker-search-border);
   border-radius: 4px;
   font-size: 12px;
   outline: none;
-  background: var(--of-surface-muted, var(--of-color-gray-50));
-  color: var(--of-text-primary, var(--of-color-text));
+  background: var(--of-field-type-picker-search-surface);
+  color: var(--of-field-type-picker-text-primary);
   box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .of-field-type-picker__search-input:focus {
-  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  border-color: var(--of-field-type-picker-search-border-focus);
+  box-shadow: 0 0 0 3px var(--of-field-type-picker-focus-ring);
+  background: var(--of-field-type-picker-surface);
 }
 
 .of-field-type-picker__search-input::placeholder {
-  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+  color: var(--of-field-type-picker-text-tertiary);
 }
 
 .of-field-type-picker__list {
@@ -189,7 +216,7 @@ function handleSelect(type: FieldType) {
 
 .of-field-type-picker__group-label {
   font-size: 11px;
-  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+  color: var(--of-field-type-picker-text-tertiary);
   padding: 6px 8px 2px;
   font-weight: 500;
   user-select: none;
@@ -206,22 +233,26 @@ function handleSelect(type: FieldType) {
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  color: var(--of-text-primary, var(--of-color-gray-700));
+  color: var(--of-field-type-picker-text-primary);
   text-align: left;
-  transition: background 0.15s;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .of-field-type-picker__item:hover {
-  background: var(--of-surface-muted, var(--of-color-bg-hover));
+  background: var(--of-field-type-picker-hover-surface);
 }
 
 .of-field-type-picker__item--active {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
-  color: var(--of-text-primary, var(--of-color-gray-700));
+  background: var(--of-field-type-picker-selected-surface);
+  color: var(--of-field-type-picker-selected-text);
+  box-shadow: inset 0 0 0 1px var(--of-field-type-picker-border);
 }
 
 .of-field-type-picker__item--active:hover {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
+  background: var(--of-field-type-picker-selected-surface);
 }
 
 .of-field-type-picker__icon {

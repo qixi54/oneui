@@ -273,32 +273,49 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 
 <style scoped>
 .of-table-row {
+  --of-table-row-surface: transparent;
+  --of-table-row-hover-surface: var(--of-surface-muted, var(--of-color-gray-50));
+  --of-table-row-selected-surface: var(--of-surface-selected, var(--of-color-gray-100));
+  --of-table-row-border: var(--of-border-subtle, var(--of-color-gray-100));
+  --of-table-row-focus-ring: var(--of-border-strong, var(--of-color-gray-300));
+  --of-table-row-text-primary: var(--of-text-primary, var(--of-color-gray-700));
+  --of-table-row-text-secondary: var(--of-text-secondary, var(--of-color-gray-500));
+  --of-table-row-text-tertiary: var(--of-text-tertiary, var(--of-color-gray-300));
+  --of-table-row-action-surface: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  --of-table-row-action-hover-surface: var(--of-surface-selected, var(--of-color-gray-100));
+  --of-table-row-action-border: var(--of-border-subtle, var(--of-color-gray-200));
+  --of-table-row-action-border-hover: var(--of-border-strong, var(--of-color-gray-300));
+  --of-table-row-action-text: var(--of-text-secondary, var(--of-color-gray-600));
+  --of-table-row-action-text-hover: var(--of-text-primary, var(--of-color-gray-800));
+  --of-table-row-action-danger-text: var(--of-error-text, var(--of-color-error-600));
+  --of-table-row-action-danger-hover-surface: var(--of-surface-muted, var(--of-color-gray-50));
   display: flex;
   align-items: center;
   position: relative;
-  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
+  background: var(--of-table-row-surface);
+  border-bottom: 1px solid var(--of-table-row-border);
   cursor: pointer;
   transition: var(--of-transition-fast);
 }
 
 .of-table-row:hover {
-  background: var(--of-surface-muted, var(--of-color-gray-50));
+  background: var(--of-table-row-hover-surface);
 }
 
 .of-table-row:focus-visible {
-  outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
+  outline: 2px solid var(--of-table-row-focus-ring);
   outline-offset: -2px;
 }
 
 .of-table-row--selected {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
+  background: var(--of-table-row-selected-surface);
 }
 
 .of-td {
   display: flex;
   align-items: center;
   font-size: 13px;
-  color: var(--of-text-primary, var(--of-color-gray-700));
+  color: var(--of-table-row-text-primary);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -313,7 +330,7 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
   width: 14px;
   height: 14px;
   cursor: pointer;
-  accent-color: var(--of-text-secondary, var(--of-color-gray-500));
+  accent-color: var(--of-table-row-text-secondary);
   flex-shrink: 0;
 }
 
@@ -347,12 +364,12 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 
 .of-badge--role {
   background: var(--of-surface-muted, var(--of-color-gray-100));
-  color: var(--of-text-secondary, var(--of-color-gray-600));
+  color: var(--of-table-row-text-secondary);
 }
 
 .of-td-id {
   font-size: 12px;
-  color: var(--of-text-secondary, var(--of-color-gray-500));
+  color: var(--of-table-row-text-secondary);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -361,7 +378,7 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 
 .of-td-title {
   font-size: 13px;
-  color: var(--of-text-primary, var(--of-color-gray-900));
+  color: var(--of-table-row-text-primary);
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -370,14 +387,14 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 
 .of-td-text {
   font-size: 13px;
-  color: var(--of-text-secondary, var(--of-color-gray-500));
+  color: var(--of-table-row-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .of-td-empty {
-  color: var(--of-text-tertiary, var(--of-color-gray-300));
+  color: var(--of-table-row-text-tertiary);
   font-size: 13px;
 }
 
@@ -406,10 +423,10 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
   align-items: center;
   gap: 4px;
   padding: 5px 10px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  border: 1px solid var(--of-table-row-action-border);
   border-radius: 999px;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  color: var(--of-text-secondary, var(--of-color-gray-600));
+  background: var(--of-table-row-action-surface);
+  color: var(--of-table-row-action-text);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
@@ -419,19 +436,19 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 
 .of-table-row__action-btn:hover:not(:disabled),
 .of-table-row__action-btn:focus-visible:not(:disabled) {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
-  color: var(--of-text-primary, var(--of-color-gray-800));
-  border-color: var(--of-border-strong, var(--of-color-gray-300));
+  background: var(--of-table-row-action-hover-surface);
+  color: var(--of-table-row-action-text-hover);
+  border-color: var(--of-table-row-action-border-hover);
 }
 
 .of-table-row__action-btn--danger {
-  color: var(--of-error-text, var(--of-color-error-600));
+  color: var(--of-table-row-action-danger-text);
 }
 
 .of-table-row__action-btn--danger:hover:not(:disabled),
 .of-table-row__action-btn--danger:focus-visible:not(:disabled) {
-  background: var(--of-surface-muted, var(--of-color-gray-50));
-  border-color: var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-table-row-action-danger-hover-surface);
+  border-color: var(--of-table-row-action-border);
 }
 
 .of-table-row__action-btn:disabled {

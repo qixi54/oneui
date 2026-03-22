@@ -103,15 +103,24 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 
 <style scoped>
 .of-table-group-row {
+  --of-table-group-row-surface: var(--of-surface-panel, var(--of-color-gray-50));
+  --of-table-group-row-hover-surface: var(--of-surface-muted, var(--of-color-gray-100));
+  --of-table-group-row-border: var(--of-border-subtle, var(--of-color-gray-200));
+  --of-table-group-row-focus-ring: var(--of-border-strong, var(--of-color-gray-300));
+  --of-table-group-row-text-primary: var(--of-text-primary, var(--of-color-text-primary));
+  --of-table-group-row-text-secondary: var(--of-text-secondary, var(--of-color-text-tertiary));
+  --of-table-group-row-text-tertiary: var(--of-text-tertiary, var(--of-color-gray-400));
+  --of-table-group-row-badge-surface: var(--of-surface-elevated, var(--of-color-bg-elevated));
+  --of-table-group-row-badge-border: var(--of-border-subtle, var(--of-color-gray-200));
   display: flex;
   align-items: center;
   height: 36px;
-  background: var(--of-surface-panel, var(--of-color-gray-50));
-  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-table-group-row-surface);
+  border-bottom: 1px solid var(--of-table-group-row-border);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  color: var(--of-text-primary, var(--of-color-text-primary));
+  color: var(--of-table-group-row-text-primary);
   box-sizing: border-box;
   user-select: none;
 }
@@ -127,11 +136,11 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 }
 
 .of-table-group-row:hover {
-  background: var(--of-surface-muted, var(--of-color-gray-100));
+  background: var(--of-table-group-row-hover-surface);
 }
 
 .of-table-group-row:focus-visible {
-  outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
+  outline: 2px solid var(--of-table-group-row-focus-ring);
   outline-offset: -2px;
 }
 
@@ -142,7 +151,7 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 
 .of-table-group-row__chevron {
   font-size: var(--of-font-size-xs);
-  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+  color: var(--of-table-group-row-text-tertiary);
   width: 14px;
   text-align: center;
   flex-shrink: 0;
@@ -166,6 +175,8 @@ function handleToggleKeyDown(event: KeyboardEvent) {
   font-weight: 500;
   white-space: nowrap;
   line-height: 1.4;
+  background: var(--of-table-group-row-badge-surface);
+  border: 1px solid var(--of-table-group-row-badge-border);
 }
 
 .of-table-group-row__badge-dot {
@@ -179,7 +190,7 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 .of-table-group-row__label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--of-text-primary, var(--of-color-text-primary));
+  color: var(--of-table-group-row-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -187,14 +198,14 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 
 .of-table-group-row__count {
   font-size: 12px;
-  color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+  color: var(--of-table-group-row-text-secondary);
   font-weight: 400;
   white-space: nowrap;
 }
 
 .of-table-group-row__agg {
   font-size: 11px;
-  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  color: var(--of-table-group-row-text-tertiary);
   font-weight: 400;
   white-space: nowrap;
   margin-left: 4px;
