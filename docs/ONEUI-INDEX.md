@@ -37,6 +37,8 @@
 
 ### 0.8.4 发布补齐（DataTable 交互闭环）
 
+- `docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`
+- `docs/plans/2026-03-23-release-0.8.4-evidence-index.md`
 - `docs/plans/2026-03-23-release-0.8.4-verification.md`
 - `docs/plans/2026-03-23-release-0.8.4-proof.md`
 - `docs/CHANGELOG-v0.8.4.md`
@@ -51,6 +53,13 @@
 ### ThemeScope + middleware composer 预发布验证
 
 - `docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`
+
+### 包入口治理（subpath exports / theme entry）
+
+- `@oneflowui/ui/composables`：更明确的 composables 消费边界
+- `@oneflowui/ui/theme`：仅注入 token / theme / markdown 样式，不顺带注册插件
+- `package.json` 中的 `sideEffects` 明确保留 `theme.js` 与 `plugin.js` 的样式副作用
+- `docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`
 
 ### 0.8.3 建议补齐（Ops Console）
 

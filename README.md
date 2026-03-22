@@ -88,6 +88,19 @@ app.use(OneflowUI)
 app.mount('#app')
 ```
 
+如果需要更细粒度的导入边界，可以直接使用稳定子路径入口：
+
+```ts
+import { useVirtualListStateCache } from '@oneflowui/ui/composables'
+import type { DataRecord } from '@oneflowui/ui/types'
+```
+
+推荐约定：
+- 组件与公共能力优先从 `@oneflowui/ui` 根入口导入。
+- composables 和纯类型如果希望导入意图更清晰，可分别从 `@oneflowui/ui/composables` 与 `@oneflowui/ui/types` 导入。
+- 如果只想注入 token 和主题层，不想顺带注册插件，可改用 `@oneflowui/ui/theme`。
+- 样式全量入口仍保留 `@oneflowui/ui/styles`，兼容现有消费方式。
+
 ### 按需引入
 
 ```ts
@@ -112,6 +125,12 @@ import '@oneflowui/ui/styles'
 document.documentElement.dataset.ofTheme = 'neutral'
 // 或
 document.documentElement.dataset.ofTheme = 'ops-console'
+```
+
+如果你希望把“样式注入”和“组件插件注册”拆开，推荐改用更明确的主题入口：
+
+```ts
+import '@oneflowui/ui/theme'
 ```
 
 这套结构的目标是：
@@ -191,6 +210,18 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
   state: virtualListState,
 })
 ```
+
+## 发布与验收
+
+如果你需要核对当前可追溯的发布材料，优先看这几份文档：
+
+- 当前版本证据索引：[`docs/plans/2026-03-23-release-0.8.4-evidence-index.md`](docs/plans/2026-03-23-release-0.8.4-evidence-index.md)
+- 发布 proof：[`docs/plans/2026-03-23-release-0.8.4-proof.md`](docs/plans/2026-03-23-release-0.8.4-proof.md)
+- 验收结果：[`docs/plans/2026-03-23-release-0.8.4-verification.md`](docs/plans/2026-03-23-release-0.8.4-verification.md)
+- 预发布验证：[`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
+- 版本日志：[`docs/CHANGELOG-v0.8.4.md`](docs/CHANGELOG-v0.8.4.md)
+
+当前 npm 公开版本为 `0.8.4`，对应的发布、pack、dry-run 和双宿主 smoke 都有独立留痕。
 
 ---
 

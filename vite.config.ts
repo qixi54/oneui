@@ -42,7 +42,9 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
+        composables: resolve(__dirname, 'src/composables/index.ts'),
         plugin: resolve(__dirname, 'src/plugin.ts'),
+        theme: resolve(__dirname, 'src/theme.ts'),
       },
       formats: ['es'],
     },

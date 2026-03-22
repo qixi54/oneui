@@ -11,9 +11,21 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./composables": {
+      "types": "./dist/composables/index.d.ts",
+      "import": "./dist/composables.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
     "./plugin": {
       "types": "./dist/plugin.d.ts",
       "import": "./dist/plugin.js"
+    },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.js"
     },
     "./styles": "./dist/style.css",
     "./*": {
@@ -22,7 +34,9 @@
     }
   },
   "sideEffects": [
-    "*.css"
+    "**/*.css",
+    "./dist/plugin.js",
+    "./dist/theme.js"
   ],
   "files": [
     "dist"

@@ -61,3 +61,10 @@
 3. 包装与预发布：`npm pack` + `npm publish --dry-run` + `tar` 清单计数。
 4. 外部消费验证：Vite 5.4.0 与 Vite 8.0.1，均使用本地 tarball 作为 `@oneflowui/ui` 依赖。
 5. 当前发布状态：已在 `registry.npmjs.org` 真实发布，`npm view @oneflowui/ui@0.8.4` 返回 `0.8.4`。
+
+## 证据索引
+
+1. 发布 proof：[`docs/plans/2026-03-23-release-0.8.4-proof.md`](docs/plans/2026-03-23-release-0.8.4-proof.md)
+2. 验收结果：[`docs/plans/2026-03-23-release-0.8.4-verification.md`](docs/plans/2026-03-23-release-0.8.4-verification.md)
+3. 预发布 smoke：[`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
+4. 证据索引：[`docs/plans/2026-03-23-release-0.8.4-evidence-index.md`](docs/plans/2026-03-23-release-0.8.4-evidence-index.md)

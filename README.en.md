@@ -110,6 +110,19 @@ import '@oneflowui/ui/styles'
 
 Note: starting from `0.5.4`, the plugin entry is separated from the root entry. Use `@oneflowui/ui/plugin` for `app.use(...)`, and keep named imports on `@oneflowui/ui`.
 
+If you want a stricter import boundary, stable subpath exports are also available:
+
+```ts
+import { useVirtualListStateCache } from '@oneflowui/ui/composables'
+import type { DataRecord } from '@oneflowui/ui/types'
+```
+
+Recommended convention:
+- Import components and common capabilities from the root `@oneflowui/ui` entry.
+- Import composables and pure types from `@oneflowui/ui/composables` and `@oneflowui/ui/types` when you want a clearer dependency boundary.
+- If you only want tokens and theme layers without plugin registration, use `@oneflowui/ui/theme`.
+- Keep `@oneflowui/ui/styles` as the full legacy-compatible style entry.
+
 ### Theme Layers
 
 OneUI now ships with a neutral default theme and an optional product skin without changing component logic.
@@ -125,6 +138,12 @@ import '@oneflowui/ui/styles'
 document.documentElement.dataset.ofTheme = 'neutral'
 // or
 document.documentElement.dataset.ofTheme = 'ops-console'
+```
+
+If you want to decouple “style injection” from “plugin registration”, prefer the dedicated theme entry:
+
+```ts
+import '@oneflowui/ui/theme'
 ```
 
 This structure is meant to keep the component layer reusable while letting product-specific styling live above it.
@@ -200,6 +219,18 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
   state: virtualListState,
 })
 ```
+
+## Release & Verification
+
+If you need to review the current traceable release materials, start with these docs:
+
+- Current evidence index: [`docs/plans/2026-03-23-release-0.8.4-evidence-index.md`](docs/plans/2026-03-23-release-0.8.4-evidence-index.md)
+- Release proof: [`docs/plans/2026-03-23-release-0.8.4-proof.md`](docs/plans/2026-03-23-release-0.8.4-proof.md)
+- Verification result: [`docs/plans/2026-03-23-release-0.8.4-verification.md`](docs/plans/2026-03-23-release-0.8.4-verification.md)
+- Pre-release smoke: [`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
+- Changelog: [`docs/CHANGELOG-v0.8.4.md`](docs/CHANGELOG-v0.8.4.md)
+
+The current public npm version is `0.8.4`, and the publish, pack, dry-run, and dual-host smoke checks all have separate evidence.
 
 ---
 
