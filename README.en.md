@@ -129,25 +129,22 @@ document.documentElement.dataset.ofTheme = 'ops-console'
 
 This structure is meant to keep the component layer reusable while letting product-specific styling live above it.
 
-### Local Theme Scope
+### ThemeScope Wrapper
 
-When a single page needs two visual contexts at once, put `data-of-theme-scope` on a local wrapper.
-The wrapper subtree will inherit the matching theme tokens without changing the global `documentElement` theme.
+When a single page needs two visual contexts at once, prefer the `ThemeScope` component. It automatically writes `data-of-theme` and `data-of-theme-scope` on the wrapper, so consumers do not need to hand-write attributes.
 
 ```vue
-<template>
-  <div>
-    <section class="page-shell">
-      <DataTable :rows="rows" :columns="columns" />
-    </section>
+<script setup lang="ts">
+import { ThemeScope } from '@oneflowui/ui'
+</script>
 
-    <aside class="ops-preview" data-of-theme-scope="ops-console">
-      <div class="ops-preview__panel">
-        <h3>Scoped ops-console preview</h3>
-        <p>This subtree inherits ops-console tokens while the outer page stays neutral.</p>
-      </div>
-    </aside>
-  </div>
+<template>
+  <ThemeScope theme="ops-console" tag="section" class="ops-preview">
+    <div class="ops-preview__panel">
+      <h3>Scoped ops-console preview</h3>
+      <p>This subtree inherits ops-console tokens while the outer page stays neutral.</p>
+    </div>
+  </ThemeScope>
 </template>
 ```
 
@@ -156,21 +153,19 @@ Supported values currently match the global theme list:
 - `neutral`
 - `ops-console`
 
-If you want the wrapper intent to be explicit, you can also keep `data-of-theme` alongside the scope attribute:
-
-```vue
-<aside data-of-theme="ops-console" data-of-theme-scope="ops-console">
-  ...
-</aside>
-```
+Direct `data-of-theme-scope` usage is still compatible for older code, but new consumers should use `ThemeScope`.
 
 ### Component-Level Example
 
 A more realistic consumer pattern is to wrap an actual component subtree. The page keeps its global theme, while the local region switches to tokens that fit an ops or command-console context.
 
 ```vue
+<script setup lang="ts">
+import { DataTable, StatisticCard, ThemeScope } from '@oneflowui/ui'
+</script>
+
 <template>
-  <section class="task-surface" data-of-theme-scope="ops-console">
+  <ThemeScope theme="ops-console" tag="section" class="task-surface">
     <header class="task-surface__header">
       <h3>Task Overview</h3>
       <p>Only this region uses ops-console tokens.</p>
@@ -182,11 +177,29 @@ A more realistic consumer pattern is to wrap an actual component subtree. The pa
     </div>
 
     <DataTable :rows="rows" :columns="columns" />
-  </section>
+  </ThemeScope>
 </template>
 ```
 
-This is non-breaking: no component API changes are required, and `data-of-theme-scope` only adds a local token boundary on the wrapper.
+This is non-breaking: no component API changes are required, and `ThemeScope` only adds a local token boundary on the wrapper.
+
+### Virtual List State Cache
+
+If a virtual list remounts often and you want to keep `scrollTop`, `containerHeight`, and `invalidateVersion`, reuse the same state by key.
+`createVirtualListState()` is still available, while `useVirtualListStateCache()` is the helper for sharing one state across remounts.
+
+```ts
+import { useVirtualList, useVirtualListStateCache } from '@oneflowui/ui'
+
+const virtualListState = useVirtualListStateCache('ai-message-list')
+
+const { visibleItems, totalHeight, offsetY } = useVirtualList({
+  items: messages,
+  itemHeight: 60,
+  containerRef,
+  state: virtualListState,
+})
+```
 
 ---
 
@@ -261,6 +274,42 @@ import { useToast } from '@oneflowui/ui'
 const toast = useToast()
 toast.success('Saved successfully')
 toast.error('Operation failed')
+```
+
+### DatabaseView middleware presets
+
+You can compose reusable `DatabaseView` middleware presets for toast, analytics, and optimistic updates:
+
+```ts
+import {
+  composeDatabaseViewMiddlewares,
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewOptimisticMiddleware,
+  createDatabaseViewToastMiddleware,
+  useDatabaseView,
+} from '@oneflowui/ui'
+
+const middleware = composeDatabaseViewMiddlewares(
+  createDatabaseViewToastMiddleware({
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  }),
+  createDatabaseViewAnalyticsMiddleware({
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  }),
+  createDatabaseViewOptimisticMiddleware({
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  }),
+)
+
+const view = useDatabaseView({
+  tableId: 'tbl-1',
+  actions: {
+    middleware,
+    onCellEdit: saveCellEdit,
+  },
+})
 ```
 
 ---

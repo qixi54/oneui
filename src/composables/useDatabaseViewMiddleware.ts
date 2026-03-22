@@ -35,6 +35,12 @@ export interface DatabaseViewOptimisticMiddlewareOptions<T extends DataRecord = 
   shouldApply?: (context: DatabaseViewActionContext<T>) => boolean;
 }
 
+export type DatabaseViewMiddlewareInput<T extends DataRecord = DataRecord> =
+  | DatabaseViewActionMiddleware<T>
+  | readonly DatabaseViewMiddlewareInput<T>[]
+  | null
+  | undefined;
+
 function resolveDefaultSuccessMessage<T extends DataRecord>(context: DatabaseViewActionContext<T>): string {
   switch (context.action) {
     case "cell-edit":
@@ -117,6 +123,72 @@ export function createDatabaseViewOptimisticMiddleware<T extends DataRecord = Da
     async error(context) {
       if (!shouldApply(context)) return;
       await options.revert(context);
+    },
+  };
+}
+
+function flattenMiddlewareInputs<T extends DataRecord>(
+  inputs: readonly DatabaseViewMiddlewareInput<T>[],
+): DatabaseViewActionMiddleware<T>[] {
+  const result: DatabaseViewActionMiddleware<T>[] = [];
+  for (const input of inputs) {
+    if (!input) continue;
+    if (Array.isArray(input)) {
+      result.push(...flattenMiddlewareInputs(input as readonly DatabaseViewMiddlewareInput<T>[]));
+      continue;
+    }
+    result.push(input as DatabaseViewActionMiddleware<T>);
+  }
+  return result;
+}
+
+export function composeDatabaseViewMiddlewares<T extends DataRecord = DataRecord>(
+  ...inputs: DatabaseViewMiddlewareInput<T>[]
+): DatabaseViewActionMiddleware<T> {
+  const middlewares = flattenMiddlewareInputs(inputs);
+  const progress = new WeakMap<DatabaseViewActionContext<T>, number>();
+
+  return {
+    async before(context) {
+      let count = 0;
+      try {
+        for (const middleware of middlewares) {
+          if (!middleware.before) {
+            count += 1;
+            continue;
+          }
+          await middleware.before(context);
+          count += 1;
+        }
+        progress.set(context, count);
+      } catch (error) {
+        progress.set(context, count);
+        throw error;
+      }
+    },
+    async after(context) {
+      const count = progress.get(context) ?? middlewares.length;
+      try {
+        for (let index = count - 1; index >= 0; index -= 1) {
+          const middleware = middlewares[index];
+          if (!middleware?.after) continue;
+          await middleware.after(context);
+        }
+      } finally {
+        progress.delete(context);
+      }
+    },
+    async error(context) {
+      const count = progress.get(context) ?? middlewares.length;
+      try {
+        for (let index = count - 1; index >= 0; index -= 1) {
+          const middleware = middlewares[index];
+          if (!middleware?.error) continue;
+          await middleware.error(context);
+        }
+      } finally {
+        progress.delete(context);
+      }
     },
   };
 }

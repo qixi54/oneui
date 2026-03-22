@@ -28,7 +28,7 @@ export type { UseMarkdownOptions } from "./useMarkdown";
 export { useInlineEdit } from "./useInlineEdit";
 export type { EditingCell } from "./useInlineEdit";
 
-export { createVirtualListState, useVirtualList } from "./useVirtualList";
+export { createVirtualListState, useVirtualList, useVirtualListStateCache } from "./useVirtualList";
 export type { UseVirtualListOptions, VirtualItem, VirtualListState } from "./useVirtualList";
 
 export { useToast } from "./useToast";
@@ -100,6 +100,7 @@ export type {
 
 export { useDatabaseView } from "./useDatabaseView";
 export {
+  composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
   createDatabaseViewToastMiddleware,
   createDatabaseViewOptimisticMiddleware,
@@ -123,6 +124,7 @@ export type {
 export type {
   DatabaseViewAnalyticsEvent,
   DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewMiddlewareInput,
   DatabaseViewOptimisticMiddlewareOptions,
   DatabaseViewToastMiddlewareOptions,
 } from "./useDatabaseViewMiddleware";

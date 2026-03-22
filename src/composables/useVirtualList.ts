@@ -38,6 +38,13 @@ type VisibleRange = {
   end: number;
 };
 
+const VIRTUAL_LIST_STATE_PERSISTENCE = Symbol("oneui.virtual-list-state-persistent");
+const virtualListStateCache = new Map<string, VirtualListState>();
+
+type VirtualListStateWithMeta = VirtualListState & {
+  [VIRTUAL_LIST_STATE_PERSISTENCE]?: boolean;
+};
+
 export function createVirtualListState(): VirtualListState {
   const scrollTop = ref(0);
   const containerHeight = ref(0);
@@ -57,6 +64,32 @@ export function createVirtualListState(): VirtualListState {
       invalidateVersion.value += 1;
     },
   };
+}
+
+function markVirtualListStatePersistent(state: VirtualListState): VirtualListState {
+  (state as VirtualListStateWithMeta)[VIRTUAL_LIST_STATE_PERSISTENCE] = true;
+  return state;
+}
+
+function isVirtualListStatePersistent(state: VirtualListState): boolean {
+  return Boolean((state as VirtualListStateWithMeta)[VIRTUAL_LIST_STATE_PERSISTENCE]);
+}
+
+function normalizeVirtualListStateCacheKey(cacheKey: string): string {
+  const trimmed = cacheKey.trim();
+  return trimmed.length > 0 ? trimmed : "default";
+}
+
+export function useVirtualListStateCache(cacheKey = "default"): VirtualListState {
+  const normalizedKey = normalizeVirtualListStateCacheKey(cacheKey);
+  const cachedState = virtualListStateCache.get(normalizedKey);
+  if (cachedState) {
+    return cachedState;
+  }
+
+  const nextState = markVirtualListStatePersistent(createVirtualListState());
+  virtualListStateCache.set(normalizedKey, nextState);
+  return nextState;
 }
 
 export function useVirtualList<T>(options: UseVirtualListOptions<T>): {
@@ -240,7 +273,9 @@ export function useVirtualList<T>(options: UseVirtualListOptions<T>): {
 
   function syncContainerMetrics(container: HTMLElement | null) {
     if (!container) {
-      containerHeight.value = 0;
+      if (!isVirtualListStatePersistent(state)) {
+        containerHeight.value = 0;
+      }
       return;
     }
 

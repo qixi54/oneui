@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { ref, nextTick } from "vue";
-import { createVirtualListState, useVirtualList } from "../composables/useVirtualList";
-import { createVirtualListState as createVirtualListStateFromRoot, useVirtualList as useVirtualListFromRoot } from "../index";
+import { effectScope, nextTick, ref } from "vue";
+import {
+  createVirtualListState,
+  useVirtualList,
+  useVirtualListStateCache,
+} from "../composables/useVirtualList";
+import {
+  createVirtualListState as createVirtualListStateFromRoot,
+  useVirtualList as useVirtualListFromRoot,
+  useVirtualListStateCache as useVirtualListStateCacheFromRoot,
+} from "../index";
 import type { VirtualListState } from "../index";
 
 function createMockContainer(clientHeight: number): HTMLElement {
@@ -194,5 +202,71 @@ describe("useVirtualList", () => {
     expect(container.scrollTop).toBe(120);
     expect(state.scrollTop.value).toBe(120);
     expect(visibleItems.value.some((item) => item.index === 3)).toBe(true);
+  });
+
+  it("useVirtualListStateCache 能跨 remount 保留 scrollTop / containerHeight / invalidateVersion", async () => {
+    const items = ref(Array.from({ length: 80 }, (_, i) => ({ id: i })));
+    const cacheKey = "useVirtualListStateCache:remount-demo";
+    const stateFromBarrel = useVirtualListStateCache(cacheKey);
+    const stateFromRoot = useVirtualListStateCacheFromRoot(cacheKey);
+    const firstContainer = createMockContainer(160);
+    const firstContainerRef = ref<HTMLElement | null>(null);
+
+    const firstScope = effectScope();
+    const firstList = firstScope.run(() =>
+      useVirtualList({
+        items,
+        itemHeight: 40,
+        containerRef: firstContainerRef,
+        state: stateFromRoot,
+      }),
+    );
+
+    firstContainerRef.value = firstContainer;
+    await nextTick();
+
+    if (!firstList) {
+      throw new Error("first virtual list instance was not created");
+    }
+    const resolvedFirstList = firstList;
+    resolvedFirstList.scrollToIndex(12);
+    stateFromRoot.invalidate();
+    await nextTick();
+
+    expect(stateFromBarrel).toBe(stateFromRoot);
+    expect(stateFromRoot.scrollTop.value).toBe(480);
+    expect(stateFromRoot.containerHeight.value).toBe(160);
+    expect(stateFromRoot.invalidateVersion.value).toBe(1);
+
+    firstScope.stop();
+
+    const secondContainer = createMockContainer(120);
+    const secondContainerRef = ref<HTMLElement | null>(null);
+    const secondScope = effectScope();
+    const secondList = secondScope.run(() =>
+      useVirtualList({
+        items,
+        itemHeight: 40,
+        containerRef: secondContainerRef,
+        state: useVirtualListStateCache(cacheKey),
+      }),
+    );
+
+    expect(useVirtualListStateCache(cacheKey)).toBe(stateFromRoot);
+    expect(useVirtualListStateCache(cacheKey).scrollTop.value).toBe(480);
+    expect(useVirtualListStateCache(cacheKey).containerHeight.value).toBe(160);
+    expect(useVirtualListStateCache(cacheKey).invalidateVersion.value).toBe(1);
+
+    secondContainerRef.value = secondContainer;
+    await nextTick();
+
+    expect(secondContainer.scrollTop).toBe(480);
+    expect(useVirtualListStateCache(cacheKey).containerHeight.value).toBe(120);
+    if (!secondList) {
+      throw new Error("second virtual list instance was not created");
+    }
+    expect(secondList.visibleItems.value.some((item) => item.index === 12)).toBe(true);
+
+    secondScope.stop();
   });
 });

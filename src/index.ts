@@ -51,6 +51,9 @@ export type {
   PersonaCardProps,
 } from "./components/base";
 
+// ─── Common ─────────────────────────────────────────────────────────────────
+export { ThemeScope } from "./components/common";
+
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
 
@@ -281,7 +284,7 @@ export { useTableFilter } from "./composables/useTableFilter";
 export { useTable } from "./composables/useTable";
 export { useMarkdown } from "./composables/useMarkdown";
 export { useToast } from "./composables/useToast";
-export { createVirtualListState, useVirtualList } from "./composables/useVirtualList";
+export { createVirtualListState, useVirtualList, useVirtualListStateCache } from "./composables/useVirtualList";
 export { useInlineEdit } from "./composables/useInlineEdit";
 export { useColumnResize } from "./composables/useColumnResize";
 export { useFixedColumns } from "./composables/useFixedColumns";
@@ -312,6 +315,7 @@ export type {
 
 export { useDatabaseView } from "./composables/useDatabaseView";
 export {
+  composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
   createDatabaseViewToastMiddleware,
   createDatabaseViewOptimisticMiddleware,
@@ -333,6 +337,7 @@ export type {
 export type {
   DatabaseViewAnalyticsEvent,
   DatabaseViewAnalyticsMiddlewareOptions,
+  DatabaseViewMiddlewareInput,
   DatabaseViewOptimisticMiddlewareOptions,
   DatabaseViewToastMiddlewareOptions,
 } from "./composables/useDatabaseViewMiddleware";

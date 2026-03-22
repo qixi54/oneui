@@ -120,48 +120,43 @@ document.documentElement.dataset.ofTheme = 'ops-console'
 2. 业务系统通过主题皮肤注入品牌感或中控台气质
 3. 后续可继续扩展更多主题，而不需要修改组件 API
 
-### 局部主题作用域
+### ThemeScope 包装组件
 
-如果同一页面里需要并存两种视觉语境，可以在局部 wrapper 上使用 `data-of-theme-scope`。
-这个属性会让 wrapper 及其子树继承对应主题 token，而不影响外层全局主题。
+如果同一页面里需要并存两种视觉语境，优先使用 `ThemeScope`。这个组件会自动给 wrapper 注入 `data-of-theme` 和 `data-of-theme-scope`，业务方不需要手写属性。
 
 ```vue
-<template>
-  <div>
-    <section class="page-shell">
-      <DataTable :rows="rows" :columns="columns" />
-    </section>
+<script setup lang="ts">
+import { ThemeScope } from '@oneflowui/ui'
+</script>
 
-    <aside class="ops-preview" data-of-theme-scope="ops-console">
-      <div class="ops-preview__panel">
-        <h3>局部 ops-console 预览</h3>
-        <p>这里会继承 ops-console 的 token，而外层仍然保持全局 neutral。</p>
-      </div>
-    </aside>
-  </div>
+<template>
+  <ThemeScope theme="ops-console" tag="section" class="ops-preview">
+    <div class="ops-preview__panel">
+      <h3>局部 ops-console 预览</h3>
+      <p>这里会继承 ops-console 的 token，而外层仍然保持全局 neutral。</p>
+    </div>
+  </ThemeScope>
 </template>
 ```
 
-可选值与全局主题保持一致，当前支持：
+`ThemeScope` 当前支持的主题值与全局主题一致：
 
 - `neutral`
 - `ops-console`
 
-在需要更明确的表达时，也可以同时保留 `data-of-theme` 作为显式声明：
-
-```vue
-<aside data-of-theme="ops-console" data-of-theme-scope="ops-console">
-  ...
-</aside>
-```
+老代码里直接手写的 `data-of-theme-scope` 仍然兼容，但新代码优先使用组件入口。
 
 ### 组件级示例
 
-更贴近业务消费的写法，是直接把一个组件子树包进 scoped wrapper。外层页面继续沿用全局主题，局部区域则切到适合命令台或运营视角的 token。
+更贴近业务消费的写法，是把一个组件子树直接包进 `ThemeScope`。外层页面继续沿用全局主题，局部区域则切到适合命令台或运营视角的 token。
 
 ```vue
+<script setup lang="ts">
+import { DataTable, StatisticCard, ThemeScope } from '@oneflowui/ui'
+</script>
+
 <template>
-  <section class="task-surface" data-of-theme-scope="ops-console">
+  <ThemeScope theme="ops-console" tag="section" class="task-surface">
     <header class="task-surface__header">
       <h3>任务总览</h3>
       <p>仅这块区域使用 ops-console token。</p>
@@ -173,11 +168,29 @@ document.documentElement.dataset.ofTheme = 'ops-console'
     </div>
 
     <DataTable :rows="rows" :columns="columns" />
-  </section>
+  </ThemeScope>
 </template>
 ```
 
-这种写法是非 breaking 的：组件 API 不需要变，`data-of-theme-scope` 只是给局部 wrapper 增加一层 token 作用域。
+这是一种非 breaking 的增强：组件 API 不需要变，`ThemeScope` 只是在局部 wrapper 上增加一层 token 作用域。
+
+### 虚拟列表状态缓存
+
+如果虚拟列表会频繁 remount，但你希望保留 `scrollTop`、`containerHeight` 和 `invalidateVersion`，可以按 key 复用同一份状态。
+`createVirtualListState()` 仍然可用，而 `useVirtualListStateCache()` 适合把同一份状态挂在多个 remount 之间。
+
+```ts
+import { useVirtualList, useVirtualListStateCache } from '@oneflowui/ui'
+
+const virtualListState = useVirtualListStateCache('ai-message-list')
+
+const { visibleItems, totalHeight, offsetY } = useVirtualList({
+  items: messages,
+  itemHeight: 60,
+  containerRef,
+  state: virtualListState,
+})
+```
 
 ---
 
@@ -233,6 +246,42 @@ type DatabaseViewActions = {
 ```
 
 如果接入的是 `provider` 模式，建议把 `onFetch` / `onRefresh` 作为必配项；如果接入的是 `local` 模式，则重点只需要保证 `onUpdateRecord`、`onCreateRecord`、`onDeleteRecord` 和 `onSaveView` 这几类页面动作可回传。
+
+### Middleware presets
+
+如果页面想复用 toast、分析埋点或乐观更新逻辑，可以直接组合 `useDatabaseView` 提供的 middleware presets：
+
+```ts
+import {
+  composeDatabaseViewMiddlewares,
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewOptimisticMiddleware,
+  createDatabaseViewToastMiddleware,
+  useDatabaseView,
+} from '@oneflowui/ui'
+
+const middleware = composeDatabaseViewMiddlewares(
+  createDatabaseViewToastMiddleware({
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  }),
+  createDatabaseViewAnalyticsMiddleware({
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  }),
+  createDatabaseViewOptimisticMiddleware({
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  }),
+)
+
+const view = useDatabaseView({
+  tableId: 'tbl-1',
+  actions: {
+    middleware,
+    onCellEdit: saveCellEdit,
+  },
+})
+```
 
 ### Selected record / detail workspace
 

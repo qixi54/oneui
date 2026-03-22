@@ -64,6 +64,7 @@ import {
   FieldCell,
   ContextMenu,
   TableToolbar,
+  ThemeScope,
   // AI
   AiThinking,
   AiStreamingCursor,
@@ -140,9 +141,9 @@ const scopedThemeMode = computed(() =>
   themeMode.value === "neutral" ? "ops-console" : "neutral",
 );
 const scopedThemeSnippet = computed(
-  () => `<aside data-of-theme="${scopedThemeMode.value}" data-of-theme-scope="${scopedThemeMode.value}">
+  () => `<ThemeScope theme="${scopedThemeMode.value}" tag="section" class="task-surface">
   <!-- local subtree inherits scoped theme tokens -->
-</aside>`,
+</ThemeScope>`,
 );
 
 const commandWorkspace = ref<OpsCommandWorkspace>({
@@ -1881,13 +1882,13 @@ function onCtxSelect(key: string) {
       <section class="dev-section">
         <h2>局部主题作用域</h2>
         <p class="dev-desc">
-          外层继续跟随全局 Theme，但这个 wrapper 会用 `data-of-theme-scope` 注入另一套 token，
+          外层继续跟随全局 Theme，但这个 wrapper 会用 `ThemeScope` 注入另一套 token，
           用来验证局部区域可以和根节点主题并存。
         </p>
-        <div
+        <ThemeScope
+          :theme="scopedThemeMode"
+          tag="section"
           class="theme-scope-preview"
-          :data-of-theme-scope="scopedThemeMode"
-          :data-of-theme="scopedThemeMode"
         >
           <div class="theme-scope-preview__surface">
             <div class="theme-scope-preview__kicker">Scoped Theme</div>
@@ -1902,7 +1903,7 @@ function onCtxSelect(key: string) {
             </div>
             <pre class="theme-scope-preview__code">{{ scopedThemeSnippet }}</pre>
           </div>
-        </div>
+        </ThemeScope>
       </section>
 
       <section class="dev-section">
@@ -1911,7 +1912,11 @@ function onCtxSelect(key: string) {
           更接近业务消费的写法，是把真实组件子树直接包进 scoped wrapper。
           这不会改变组件 API，只会让局部区域继承另一套 token。
         </p>
-        <section class="theme-scope-preview theme-scope-preview--component" data-of-theme-scope="ops-console">
+        <ThemeScope
+          theme="ops-console"
+          tag="section"
+          class="theme-scope-preview theme-scope-preview--component"
+        >
           <div class="theme-scope-preview__surface theme-scope-preview__surface--component">
             <div class="theme-scope-preview__kicker">Scoped Component Tree</div>
             <div class="theme-scope-preview__header">
@@ -1951,7 +1956,7 @@ function onCtxSelect(key: string) {
               </div>
             </div>
           </div>
-        </section>
+        </ThemeScope>
       </section>
 
       <!-- ══════════════════════════════════════════════════════

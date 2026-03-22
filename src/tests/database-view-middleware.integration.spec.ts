@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { describe, expect, it, vi } from "vitest";
 import {
+  composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
   createDatabaseViewOptimisticMiddleware,
   createDatabaseViewToastMiddleware,
@@ -129,6 +130,93 @@ describe("DatabaseView middleware presets", () => {
       action: "cell-edit",
       error: expect.any(Error),
     });
+  });
+
+  it("composeDatabaseViewMiddlewares 应该稳定组合多个 preset，并按栈顺序回放", async () => {
+    const successEvents: string[] = [];
+    const errorEvents: string[] = [];
+    const onCellEdit = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("boom"));
+
+    const middleware = composeDatabaseViewMiddlewares(
+      createDatabaseViewAnalyticsMiddleware({
+        onEvent: (event) => {
+          if (event.action === "cell-edit") {
+            successEvents.push(`${event.phase}:${event.action}`);
+          }
+        },
+      }),
+      [
+        createDatabaseViewToastMiddleware({
+          onSuccess: (message, context) => {
+            if (context.action === "cell-edit") {
+              successEvents.push(`success:${message}`);
+            }
+          },
+          onError: (message, context) => {
+            if (context.action === "cell-edit") {
+              errorEvents.push(`error:${message}`);
+            }
+          },
+        }),
+        createDatabaseViewOptimisticMiddleware({
+          apply: (context) => {
+            if (context.action === "cell-edit") {
+              successEvents.push(`apply:${context.action}`);
+            }
+          },
+          revert: (context) => {
+            if (context.action === "cell-edit") {
+              errorEvents.push(`revert:${context.action}`);
+            }
+          },
+        }),
+      ],
+    );
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records: ref(buildRecords()),
+      views: ref(buildViews()),
+      actions: {
+        middleware,
+        onCellEdit,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+    successEvents.length = 0;
+    errorEvents.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "ok",
+    });
+
+    expect(successEvents).toEqual([
+      "before:cell-edit",
+      "apply:cell-edit",
+      "success:单元格更新已完成",
+      "after:cell-edit",
+    ]);
+
+    successEvents.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "fail",
+    });
+
+    expect(errorEvents).toEqual([
+      "revert:cell-edit",
+      "error:单元格更新已完成失败",
+    ]);
   });
 
   it("createDatabaseViewOptimisticMiddleware 应该保留成功后的 optimistic 结果，并在失败时回滚", async () => {
