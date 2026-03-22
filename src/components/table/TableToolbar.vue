@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick, type Component } from "vue";
+import { ref, computed, type Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
 import TableFilterPanel from "./TableFilterPanel.vue";
 import TableColumnManager from "./TableColumnManager.vue";
 import { ListFilter, ArrowUpDown, Layers, Columns3, Search } from "lucide-vue-next";
 import type { TableColumn } from "../../types";
 import type { FilterCondition, FilterLogic } from "../../composables/useTableFilter";
+import { useTableToolbarPanels } from "../../composables/useTableToolbarPanels";
 
 export interface ViewSwitcherTab {
   value: string;
@@ -92,78 +93,28 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
 const resolvedTabs = computed(() => props.viewTabs ?? DEFAULT_TABS);
 
 // ─── Panel Visibility ─────────────────────────────────────────────────────────
-const showFilterPanel = ref(false);
-const showSortPanel = ref(false);
-const showGroupPanel = ref(false);
-const showColumnPanel = ref(false);
-
-// ─── Button Refs ──────────────────────────────────────────────────────────────
 const filterBtnRef = ref<HTMLElement | null>(null);
 const sortBtnRef = ref<HTMLElement | null>(null);
 const groupBtnRef = ref<HTMLElement | null>(null);
 const columnBtnRef = ref<HTMLElement | null>(null);
 
-// ─── Dropdown Positioning ─────────────────────────────────────────────────────
-const filterDropdownStyle = ref<Record<string, string>>({});
-const sortDropdownStyle = ref<Record<string, string>>({});
-const groupDropdownStyle = ref<Record<string, string>>({});
-const columnDropdownStyle = ref<Record<string, string>>({});
-
-function calcDropdownStyle(el: HTMLElement | null): Record<string, string> {
-  if (!el) return {};
-  const rect = el.getBoundingClientRect();
-  return {
-    top: `${rect.bottom + 4}px`,
-    left: `${rect.left}px`,
-  };
-}
-
-function togglePanel(panel: "filter" | "sort" | "group" | "column") {
-  // Close other panels first
-  if (panel !== "filter") showFilterPanel.value = false;
-  if (panel !== "sort") showSortPanel.value = false;
-  if (panel !== "group") showGroupPanel.value = false;
-  if (panel !== "column") showColumnPanel.value = false;
-
-  const refs: Record<
-    string,
-    { show: typeof showFilterPanel; btnRef: typeof filterBtnRef; style: typeof filterDropdownStyle }
-  > = {
-    filter: { show: showFilterPanel, btnRef: filterBtnRef, style: filterDropdownStyle },
-    sort: { show: showSortPanel, btnRef: sortBtnRef, style: sortDropdownStyle },
-    group: { show: showGroupPanel, btnRef: groupBtnRef, style: groupDropdownStyle },
-    column: { show: showColumnPanel, btnRef: columnBtnRef, style: columnDropdownStyle },
-  };
-
-  const target = refs[panel];
-  target.show.value = !target.show.value;
-  if (target.show.value) {
-    nextTick(() => {
-      target.style.value = calcDropdownStyle(target.btnRef.value);
-    });
-  }
-}
-
-// ─── Click Outside ────────────────────────────────────────────────────────────
-function closeAllPanels() {
-  showFilterPanel.value = false;
-  showSortPanel.value = false;
-  showGroupPanel.value = false;
-  showColumnPanel.value = false;
-}
-
-function handleGlobalClick(e: MouseEvent) {
-  const target = e.target as HTMLElement;
-  if (
-    !target.closest(".of-table-toolbar__btn-group") &&
-    !target.closest(".of-table-toolbar__dropdown")
-  ) {
-    closeAllPanels();
-  }
-}
-
-onMounted(() => document.addEventListener("click", handleGlobalClick, true));
-onUnmounted(() => document.removeEventListener("click", handleGlobalClick, true));
+const {
+  showFilterPanel,
+  showSortPanel,
+  showGroupPanel,
+  showColumnPanel,
+  filterDropdownStyle,
+  sortDropdownStyle,
+  groupDropdownStyle,
+  columnDropdownStyle,
+  togglePanel,
+  closePanel,
+} = useTableToolbarPanels({
+  filter: filterBtnRef,
+  sort: sortBtnRef,
+  group: groupBtnRef,
+  column: columnBtnRef,
+});
 
 // ─── Computed Column Lists ────────────────────────────────────────────────────
 const sortableColumns = computed(() => props.columns.filter((c) => !c.hidden));
@@ -225,7 +176,7 @@ const groupableColumns = computed(() =>
             "
             @clear="emit('clear-filters')"
             @update:logic="(logic: FilterLogic) => emit('update:filterLogic', logic)"
-            @close="showFilterPanel = false"
+            @close="closePanel('filter')"
           />
         </div>
       </Teleport>
@@ -257,7 +208,7 @@ const groupableColumns = computed(() =>
               :class="{ active: currentSort?.field === col.key }"
               @click="
                 emit('sort', col.key);
-                showSortPanel = false;
+                closePanel('sort');
               "
             >
               <span>{{ col.label }}</span>
@@ -270,7 +221,7 @@ const groupableColumns = computed(() =>
               class="of-table-toolbar__clear-btn"
               @click="
                 emit('sort', '');
-                showSortPanel = false;
+                closePanel('sort');
               "
             >
               清除排序
@@ -306,7 +257,7 @@ const groupableColumns = computed(() =>
               :class="{ active: currentGroup === col.key }"
               @click="
                 emit('group', currentGroup === col.key ? null : col.key);
-                showGroupPanel = false;
+                closePanel('group');
               "
             >
               {{ col.label }}
@@ -316,7 +267,7 @@ const groupableColumns = computed(() =>
               class="of-table-toolbar__clear-btn"
               @click="
                 emit('group', null);
-                showGroupPanel = false;
+                closePanel('group');
               "
             >
               取消分组
@@ -343,7 +294,7 @@ const groupableColumns = computed(() =>
             :columns="columns"
             :visible="true"
             @update:columns="(cols: TableColumn[]) => emit('update:columns', cols)"
-            @close="showColumnPanel = false"
+            @close="closePanel('column')"
           />
         </div>
       </Teleport>

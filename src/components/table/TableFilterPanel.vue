@@ -156,10 +156,10 @@ function isNoValue(op: FilterOperator) {
 
 <style scoped>
 .of-filter-panel {
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated));
+  border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: var(--of-radius-xl);
-  box-shadow: var(--of-shadow-modal);
+  box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
   min-width: 420px;
   padding: 12px 16px;
   font-family: var(--of-font-sans);
@@ -240,7 +240,7 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-condition__logic-btn.active {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
+  background: var(--of-surface-selected, var(--of-color-primary-50));
   border-color: var(--of-border-strong, var(--of-color-gray-300));
   color: var(--of-text-primary, var(--of-color-gray-700));
   font-weight: 600;
@@ -298,7 +298,7 @@ function isNoValue(op: FilterOperator) {
   gap: 12px;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
+  border-top: 1px solid var(--of-border-workspace, var(--of-border-subtle));
 }
 
 .of-filter-panel__add-btn {
@@ -316,7 +316,7 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-panel__add-btn:hover {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
+  background: var(--of-surface-selected, var(--of-color-primary-50));
 }
 
 .of-filter-panel__clear {

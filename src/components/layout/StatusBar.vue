@@ -53,8 +53,8 @@ withDefaults(
   height: var(--of-statusbar-height);
   padding: 0 var(--of-spacing-4);
   gap: var(--of-spacing-4);
-  background: var(--of-surface-card);
-  border-top: 1px solid var(--of-border-workspace);
+  background: var(--of-surface-workspace, var(--of-surface-card));
+  border-top: 1px solid var(--of-workspace-border, var(--of-border-workspace));
   box-sizing: border-box;
 }
 
@@ -66,17 +66,17 @@ withDefaults(
 }
 
 .of-statusbar__sync-icon--ok {
-  color: var(--of-accent-default);
+  color: var(--of-row-action-text, var(--of-accent-default));
 }
 
 .of-statusbar__sync-icon--warn {
-  color: var(--of-text-tertiary);
+  color: var(--of-text-secondary, var(--of-text-tertiary));
 }
 
 .of-statusbar__sync-text {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-text-tertiary);
+  color: var(--of-text-secondary, var(--of-text-tertiary));
   line-height: 1;
 }
 
@@ -94,14 +94,14 @@ withDefaults(
 .of-statusbar__shortcuts {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-text-tertiary);
+  color: var(--of-text-secondary, var(--of-text-tertiary));
   line-height: 1;
 }
 
 .of-statusbar__version {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-text-tertiary);
+  color: var(--of-text-secondary, var(--of-text-tertiary));
   line-height: 1;
 }
 </style>

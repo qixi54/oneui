@@ -77,6 +77,7 @@ defineOptions({ name: "DatabaseViewShell", inheritAttrs: false });
   gap: 16px;
   min-width: 0;
   min-height: 100%;
+  background: var(--of-surface-workspace, var(--of-surface-elevated, var(--of-color-white)));
 }
 
 .of-database-view__state {
@@ -84,9 +85,12 @@ defineOptions({ name: "DatabaseViewShell", inheritAttrs: false });
   align-items: center;
   justify-content: center;
   min-height: 360px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
   border-radius: var(--of-radius-xl);
-  background: var(--of-surface-elevated, var(--of-color-white));
+  background: var(
+    --of-surface-workspace-raised,
+    var(--of-surface-elevated, var(--of-color-white))
+  );
 }
 
 .of-database-view__state--loading {
@@ -112,7 +116,7 @@ defineOptions({ name: "DatabaseViewShell", inheritAttrs: false });
 }
 
 .of-database-view__spinner {
-  color: var(--of-accent-default, #334155);
+  color: var(--of-row-action-text, var(--of-accent-default, #334155));
   flex-shrink: 0;
   animation: of-database-view-spin 0.9s linear infinite;
 }

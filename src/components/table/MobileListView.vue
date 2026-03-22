@@ -165,9 +165,10 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
   flex-direction: column;
   gap: 8px;
   padding: 12px 16px;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, #fff));
+  border: 1px solid var(--of-border-workspace, var(--of-border-subtle, #e5e7eb));
   border-radius: var(--of-radius-lg, 8px);
+  box-shadow: var(--of-elevation-card, none);
   cursor: pointer;
   transition:
     transform 0.15s ease,
@@ -236,9 +237,9 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
   align-items: center;
   justify-content: center;
   padding: 12px;
-  border: 1px dashed var(--of-border-subtle, var(--of-color-gray-300, #d1d5db));
+  border: 1px dashed var(--of-border-workspace, var(--of-border-subtle, #d1d5db));
   border-radius: var(--of-radius-lg, 8px);
-  background: transparent;
+  background: var(--of-surface-workspace, transparent);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   font-size: 14px;
   cursor: pointer;
@@ -246,6 +247,6 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
 }
 
 .of-mobile-add-btn:active {
-  background: var(--of-surface-muted, var(--of-color-gray-50, #f9fafb));
+  background: var(--of-surface-selected, var(--of-color-gray-50, #f9fafb));
 }
 </style>

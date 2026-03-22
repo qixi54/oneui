@@ -267,7 +267,8 @@ function handleDelete() {
   width: 100%;
   max-width: 600px;
   max-height: 90dvh;
-  background: var(--of-color-bg-elevated, #fff);
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, #fff));
+  box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
   border-radius: 16px 16px 0 0;
   display: flex;
   flex-direction: column;
@@ -304,7 +305,7 @@ function handleDelete() {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  border-bottom: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   gap: 12px;
 }
 
@@ -371,9 +372,10 @@ function handleDelete() {
   min-height: 44px;
   display: flex;
   align-items: center;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: 8px;
   padding: 4px 8px;
+  background: var(--of-surface-workspace, var(--of-surface-elevated));
 }
 
 .of-detail-sheet__value {
@@ -385,7 +387,7 @@ function handleDelete() {
 /* 内容区 */
 .of-detail-sheet__content {
   padding-top: 16px;
-  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  border-top: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   margin-top: 16px;
 }
 
@@ -455,7 +457,7 @@ function handleDelete() {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  border-top: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
@@ -474,7 +476,7 @@ function handleDelete() {
 }
 
 .of-detail-sheet__btn--save {
-  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
+  background: var(--of-surface-selected, var(--of-color-primary-50, #f3f4f6));
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
 }
 
@@ -484,7 +486,7 @@ function handleDelete() {
 }
 
 .of-detail-sheet__btn--cancel {
-  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
+  background: var(--of-surface-workspace, var(--of-surface-muted, #f3f4f6));
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
 }
 

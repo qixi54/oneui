@@ -102,10 +102,10 @@ function onDragEnd() {
 
 <style scoped>
 .of-col-manager {
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-workspace-raised, var(--of-surface-elevated));
+  border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: var(--of-radius-xl);
-  box-shadow: var(--of-shadow-modal);
+  box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
   min-width: 220px;
   padding: 12px 16px;
   font-family: var(--of-font-sans);
@@ -153,15 +153,15 @@ function onDragEnd() {
   font-size: 11px;
   font-family: var(--of-font-sans);
   color: var(--of-text-secondary, var(--of-color-gray-500));
-  background: var(--of-surface-muted, var(--of-color-gray-50));
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-workspace, var(--of-surface-muted));
+  border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: var(--of-radius-md);
   padding: 3px 8px;
   cursor: pointer;
 }
 
 .of-col-manager__action-btn:hover {
-  background: var(--of-surface-selected, var(--of-color-gray-100));
+  background: var(--of-surface-selected, var(--of-color-primary-50));
   color: var(--of-text-primary, var(--of-color-gray-700));
 }
 
@@ -170,7 +170,7 @@ function onDragEnd() {
   align-items: center;
   gap: 8px;
   padding: 5px 0;
-  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-50));
+  border-bottom: 1px solid var(--of-border-workspace, var(--of-border-subtle));
 }
 
 .of-col-manager__row:last-child {

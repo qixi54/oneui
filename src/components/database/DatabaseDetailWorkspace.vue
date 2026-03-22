@@ -144,7 +144,10 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   padding: 4px;
   border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
   border-radius: var(--of-radius-pill, 999px);
-  background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
+  background: var(
+    --of-surface-workspace-raised,
+    var(--of-surface-elevated, var(--of-color-bg-elevated))
+  );
 }
 
 .of-database-view__workspace-mode-btn {
@@ -159,7 +162,10 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 }
 
 .of-database-view__workspace-mode-btn--active {
-  background: var(--of-row-action-surface, var(--of-surface-selected, var(--of-color-gray-100)));
+  background: var(
+    --of-surface-workspace-strong,
+    var(--of-row-action-surface, var(--of-surface-selected, var(--of-color-gray-100)))
+  );
   color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
@@ -168,7 +174,10 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
+  background: var(
+    --of-surface-workspace-strong,
+    var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6))
+  );
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   font-size: 12px;
 }
@@ -182,9 +191,12 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   display: grid;
   gap: 6px;
   padding: 14px;
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
   border-radius: var(--of-radius-xl, 12px);
-  background: var(--of-surface-elevated, var(--of-color-white, #ffffff));
+  background: var(
+    --of-surface-workspace-raised,
+    var(--of-surface-elevated, var(--of-color-white, #ffffff))
+  );
 }
 
 .of-database-view__detail-workspace-label {
@@ -221,20 +233,26 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 }
 
 .of-database-view__detail-workspace-btn--delete {
-  border-color: var(--of-border-subtle, var(--of-color-danger-border, #fecaca));
-  background: var(--of-surface-selected, var(--of-color-danger-bg, #fef2f2));
-  color: var(--of-color-danger, #b91c1c);
+  border-color: var(--of-color-error, var(--of-color-danger-border, #fecaca));
+  background: var(
+    --of-surface-workspace-strong,
+    var(--of-surface-selected, var(--of-color-danger-bg, #fef2f2))
+  );
+  color: var(--of-color-error, var(--of-color-danger, #b91c1c));
 }
 
 .of-database-view__detail-workspace-btn--cancel {
-  border-color: var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  background: var(--of-surface-panel, var(--of-color-gray-50, #f9fafb));
+  border-color: var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
+  background: var(
+    --of-surface-workspace,
+    var(--of-surface-panel, var(--of-color-gray-50, #f9fafb))
+  );
   color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-database-view__detail-workspace-btn--save {
-  border-color: var(--of-border-strong, rgba(15, 23, 42, 0.14));
-  background: var(--of-accent-default, #334155);
+  border-color: var(--of-row-action-border, var(--of-workspace-border, rgba(15, 23, 42, 0.14)));
+  background: var(--of-row-action-text, var(--of-accent-default, #334155));
   color: var(--of-text-inverse, #fff);
 }
 
