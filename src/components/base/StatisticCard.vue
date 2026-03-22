@@ -77,9 +77,10 @@ const colorClass = computed(() => {
   align-items: center;
   gap: var(--of-spacing-4);
   padding: var(--of-spacing-4);
-  background: var(--of-surface-elevated, var(--of-color-bg-canvas));
-  border: 1px solid var(--of-border-subtle);
+  background: var(--of-surface-card);
+  border: 1px solid var(--of-border-workspace);
   border-radius: var(--of-radius-lg);
+  box-shadow: var(--of-elevation-card);
 }
 
 .of-statistic-card__icon-container {
@@ -106,14 +107,14 @@ const colorClass = computed(() => {
 .of-statistic-card__value {
   font-size: 18px;
   font-weight: 700;
-  color: var(--of-color-text);
+  color: var(--of-text-strong);
   margin: 0;
   padding: 0;
 }
 
 .of-statistic-card__label {
   font-size: 12px;
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary);
   margin: 0;
   padding: 0;
 }

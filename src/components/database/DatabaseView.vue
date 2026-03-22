@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
 import { AlertCircle, Database } from "lucide-vue-next";
-import TableToolbar from "../table/TableToolbar.vue";
 import DatabaseDetailPresenter from "./DatabaseDetailPresenter.vue";
 import DatabaseViewContent from "./DatabaseViewContent.vue";
 import DatabaseViewShell from "./DatabaseViewShell.vue";
+import DatabaseViewToolbar from "./DatabaseViewToolbar.vue";
 import type { EmptyStateAction } from "../base/EmptyState.vue";
 import { useDatabaseView } from "../../composables/useDatabaseView";
 import {
@@ -678,9 +678,8 @@ function handleDrawerWidthUpdate(width: number) {
     v-bind="$attrs"
   >
     <template #toolbar>
-      <TableToolbar
+      <DatabaseViewToolbar
         v-if="showToolbar"
-        class="of-database-view__toolbar"
         :current-view="activeViewId"
         :view-tabs="resolvedViewTabs"
         :columns="toolbarColumns"

@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background: var(--of-surface-canvas, var(--of-color-bg-canvas));
+  background: var(--of-surface-canvas);
 }
 
 .of-app-layout__navbar {
@@ -176,12 +176,12 @@ onBeforeUnmount(() => {
   border-radius: var(--of-radius-md);
   cursor: pointer;
   font-size: 18px;
-  color: var(--of-color-gray-600);
+  color: var(--of-text-secondary);
   flex-shrink: 0;
   transition: var(--of-transition-fast);
 }
 .of-app-layout__hamburger:hover {
-  background: var(--of-surface-muted, var(--of-color-gray-100));
+  background: var(--of-surface-muted);
 }
 
 /* 移动端 Drawer 侧边栏 */
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
 .of-drawer-overlay {
   position: fixed;
   inset: 0;
-  background: var(--of-color-black-alpha-50, rgba(0, 0, 0, 0.5));
+  background: var(--of-surface-overlay);
   z-index: 199;
 }
 

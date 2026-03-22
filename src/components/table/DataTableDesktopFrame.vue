@@ -1,5 +1,8 @@
 <script setup lang="ts" generic="T extends { id: string } & Record<string, unknown>">
-import { computed, type ComponentPublicInstance, type CSSProperties } from "vue";
+import { computed, type CSSProperties } from "vue";
+import DataTableDesktopFixedRegion from "./DataTableDesktopFixedRegion.vue";
+import DataTableDesktopScrollRegion from "./DataTableDesktopScrollRegion.vue";
+import DataTableDesktopStandardRegion from "./DataTableDesktopStandardRegion.vue";
 import DataTableSelectionBar from "./DataTableSelectionBar.vue";
 import type { ResolvedBulkActionItem } from "../../types/data-table";
 import type { TableColumn } from "../../types";
@@ -7,7 +10,6 @@ import type { TableColumn } from "../../types";
 type DesktopBranch = "fixed" | "standard";
 
 type DataTableDesktopFrameStyleSource = CSSProperties | undefined | (() => CSSProperties | undefined);
-type DataTableDesktopFrameElementRef = Element | ComponentPublicInstance | null;
 
 const props = withDefaults(
   defineProps<{
@@ -101,17 +103,6 @@ function resolveStyleSource(source: DataTableDesktopFrameStyleSource): CSSProper
   return source ?? {};
 }
 
-function resolveElementRef(source: DataTableDesktopFrameElementRef): HTMLElement | null {
-  if (source instanceof HTMLElement) {
-    return source;
-  }
-  if (source && "$el" in source) {
-    const element = source.$el;
-    return element instanceof HTMLElement ? element : null;
-  }
-  return null;
-}
-
 const resolvedShellStyle = computed<CSSProperties>(() => resolveStyleSource(props.shellStyle));
 const resolvedBodyStyle = computed<CSSProperties>(() => resolveStyleSource(props.resolveBodyStyle ?? props.bodyStyle));
 const resolvedFixedRegionStyle = computed<CSSProperties>(
@@ -159,18 +150,6 @@ function handleScroll(event: Event) {
   props.onScroll?.(event);
 }
 
-function bindFixedRegionRef(element: DataTableDesktopFrameElementRef) {
-  props.setFixedRegionRef?.(resolveElementRef(element));
-}
-
-function bindScrollRegionRef(element: DataTableDesktopFrameElementRef) {
-  props.setScrollRegionRef?.(resolveElementRef(element));
-}
-
-function bindStandardScrollRef(element: DataTableDesktopFrameElementRef) {
-  props.setStandardScrollRef?.(resolveElementRef(element));
-}
-
 function slotPayload(branch: DesktopBranch) {
   return {
     branch,
@@ -204,47 +183,77 @@ function slotPayload(branch: DesktopBranch) {
         :class="[resolveBranchClassValue('fixed'), resolveBodyClassValue('fixed')]"
         :style="[resolvedBodyStyle]"
       >
-        <div
-          :ref="bindFixedRegionRef"
-          class="of-data-table-fixed-region of-data-table-desktop-frame__fixed-region"
-          :class="[{ 'of-fixed-shadow': showFixedShadow }, resolveFixedRegionClassValue()]"
-          :style="[resolvedFixedRegionStyle, { width: `${fixedWidth}px` }]"
+        <DataTableDesktopFixedRegion
+          :fixed-width="fixedWidth"
+          :show-fixed-shadow="showFixedShadow"
+          :region-class="resolveFixedRegionClassValue()"
+          :region-style="resolvedFixedRegionStyle"
+          :columns="fixedColumns"
+          :all-columns="columns"
+          :selectable="selectable"
+          :show-row-actions="showRowActions"
+          :use-virtual="useVirtual"
+          :total-height="totalHeight"
+          :offset-y="offsetY"
+          :resolve-row-id="resolveRowId"
+          :set-region-ref="setFixedRegionRef"
           @scroll="handleFixedScroll"
         >
-          <slot name="fixed-header" v-bind="slotPayload('fixed')" />
-          <div class="of-data-table-fixed-body">
+          <template #header>
+            <slot name="fixed-header" v-bind="slotPayload('fixed')" />
+          </template>
+          <template #body>
             <slot name="fixed-body" v-bind="slotPayload('fixed')" />
-          </div>
-        </div>
+          </template>
+        </DataTableDesktopFixedRegion>
 
-        <div
-          :ref="bindScrollRegionRef"
-          class="of-data-table-scroll-region of-data-table-desktop-frame__scroll-region"
-          :class="[resolveBranchClassValue('fixed'), resolveScrollRegionClassValue()]"
-          :style="[resolvedScrollRegionStyle, { marginLeft: `${fixedWidth}px` }]"
+        <DataTableDesktopScrollRegion
+          :fixed-width="fixedWidth"
+          :region-class="[resolveBranchClassValue('fixed'), resolveScrollRegionClassValue()]"
+          :region-style="resolvedScrollRegionStyle"
+          :columns="scrollableColumns"
+          :all-columns="columns"
+          :selectable="selectable"
+          :show-row-actions="showRowActions"
+          :use-virtual="useVirtual"
+          :total-height="totalHeight"
+          :offset-y="offsetY"
+          :resolve-row-id="resolveRowId"
+          :set-region-ref="setScrollRegionRef"
           @scroll="handleScroll"
         >
-          <slot name="scroll-header" v-bind="slotPayload('fixed')" />
-          <div class="of-data-table-scroll-body">
+          <template #header>
+            <slot name="scroll-header" v-bind="slotPayload('fixed')" />
+          </template>
+          <template #body>
             <slot name="scroll-body" v-bind="slotPayload('fixed')" />
-          </div>
-        </div>
+          </template>
+        </DataTableDesktopScrollRegion>
       </div>
     </template>
 
     <template v-else>
-      <div
-        :ref="bindStandardScrollRef"
-        class="of-data-table-scroll-container of-data-table-desktop-frame__standard"
-        :class="[resolveBranchClassValue('standard'), resolveBodyClassValue('standard')]"
-        :style="[resolvedBodyStyle]"
+      <DataTableDesktopStandardRegion
+        :container-class="[resolveBranchClassValue('standard'), resolveBodyClassValue('standard')]"
+        :container-style="resolvedBodyStyle"
+        :columns="scrollableColumns"
+        :all-columns="columns"
+        :selectable="selectable"
+        :show-row-actions="showRowActions"
+        :use-virtual="useVirtual"
+        :total-height="totalHeight"
+        :offset-y="offsetY"
+        :resolve-row-id="resolveRowId"
+        :set-container-ref="setStandardScrollRef"
         @scroll="handleScroll"
       >
-        <slot name="standard-header" v-bind="slotPayload('standard')" />
-        <div class="of-data-table-desktop-frame__standard-body">
+        <template #header>
+          <slot name="standard-header" v-bind="slotPayload('standard')" />
+        </template>
+        <template #body>
           <slot name="standard-body" v-bind="slotPayload('standard')" />
-        </div>
-      </div>
+        </template>
+      </DataTableDesktopStandardRegion>
     </template>
 
     <slot name="footer" />
@@ -269,37 +278,6 @@ function slotPayload(branch: DesktopBranch) {
   min-width: 0;
   display: flex;
   overflow: hidden;
-}
-
-.of-data-table-desktop-frame__fixed-region {
-  min-width: 0;
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  overflow-y: auto;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  scrollbar-width: none;
-}
-
-.of-data-table-desktop-frame__fixed-region::-webkit-scrollbar {
-  display: none;
-}
-
-.of-data-table-desktop-frame__scroll-region {
-  min-width: 0;
-  flex: 1;
-  overflow: auto;
-}
-
-.of-data-table-desktop-frame__standard {
-  min-width: 0;
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.of-data-table-desktop-frame__standard-body {
-  min-width: 0;
 }
 
 .of-checkbox-label {
@@ -388,16 +366,4 @@ function slotPayload(branch: DesktopBranch) {
   opacity: 0.55;
 }
 
-.of-data-table-fixed-region.of-fixed-shadow {
-  box-shadow: var(--of-shadow-fixed-col);
-  clip-path: inset(0 -12px 0 0);
-}
-
-@media (max-width: 768px) {
-  .of-data-table-desktop-frame__standard {
-    max-height: 100dvh;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
 </style>

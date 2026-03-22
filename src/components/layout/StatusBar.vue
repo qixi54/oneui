@@ -53,8 +53,8 @@ withDefaults(
   height: var(--of-statusbar-height);
   padding: 0 var(--of-spacing-4);
   gap: var(--of-spacing-4);
-  background: var(--of-color-bg-elevated);
-  border-top: var(--of-border);
+  background: var(--of-surface-card);
+  border-top: 1px solid var(--of-border-workspace);
   box-sizing: border-box;
 }
 
@@ -101,7 +101,7 @@ withDefaults(
 .of-statusbar__version {
   font-family: var(--of-font-sans);
   font-size: 12px;
-  color: var(--of-border-subtle);
+  color: var(--of-text-tertiary);
   line-height: 1;
 }
 </style>

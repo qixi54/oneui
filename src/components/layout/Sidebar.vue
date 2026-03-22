@@ -113,8 +113,8 @@ function isExpanded(item: SidebarItem): boolean {
   flex-direction: column;
   width: var(--of-sidebar-width);
   height: 100%;
-  background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  border-right: 1px solid var(--of-border-subtle, var(--of-border-color));
+  background: var(--of-surface-card);
+  border-right: 1px solid var(--of-border-workspace);
   padding: var(--of-spacing-4) var(--of-spacing-3);
   gap: var(--of-spacing-2);
   overflow-y: auto;
@@ -147,7 +147,7 @@ function isExpanded(item: SidebarItem): boolean {
   font-family: var(--of-font-sans);
   font-size: 13px;
   font-weight: 400;
-  color: var(--of-text-secondary, var(--of-color-gray-600));
+  color: var(--of-text-secondary);
   line-height: 1.4;
   text-align: left;
   width: 100%;
@@ -161,7 +161,7 @@ function isExpanded(item: SidebarItem): boolean {
 }
 
 .of-sidebar__item:hover:not(.of-sidebar__item--active) {
-  background: var(--of-surface-muted, var(--of-color-gray-100));
+  background: var(--of-surface-muted);
 }
 
 .of-sidebar__item--active {
@@ -174,7 +174,7 @@ function isExpanded(item: SidebarItem): boolean {
 }
 
 .of-sidebar__item-icon {
-  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  color: var(--of-text-tertiary);
   flex-shrink: 0;
 }
 
@@ -193,8 +193,8 @@ function isExpanded(item: SidebarItem): boolean {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  background: var(--of-surface-muted, var(--of-color-gray-100));
-  color: var(--of-text-secondary, var(--of-color-gray-500));
+  background: var(--of-surface-muted);
+  color: var(--of-text-secondary);
   font-size: 11px;
   font-weight: 500;
   border-radius: var(--of-radius-full);
@@ -208,7 +208,7 @@ function isExpanded(item: SidebarItem): boolean {
 }
 
 .of-sidebar__item-chevron {
-  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  color: var(--of-text-tertiary);
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -222,7 +222,7 @@ function isExpanded(item: SidebarItem): boolean {
 .of-sidebar__footer {
   flex-shrink: 0;
   padding-top: var(--of-spacing-2);
-  border-top: 1px solid var(--of-border-subtle, var(--of-border-color));
+  border-top: 1px solid var(--of-border-workspace);
 }
 
 /* ── Density: compact ── */

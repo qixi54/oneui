@@ -36,6 +36,10 @@
   --of-surface-workspace: #ffffff;
   --of-surface-workspace-raised: #ffffff;
   --of-surface-workspace-strong: var(--of-color-primary-50);
+  --of-surface-card: var(--of-surface-elevated);
+  --of-surface-card-hover: var(--of-surface-selected);
+  --of-surface-divider: var(--of-surface-muted);
+  --of-surface-overlay: var(--of-color-overlay);
 
   /* ─── Semantic Text ─── */
   --of-text-primary: var(--of-color-gray-900);
@@ -44,6 +48,7 @@
   --of-text-strong: var(--of-color-gray-900);
   --of-text-inverse: var(--of-color-white);
   --of-text-muted: var(--of-color-gray-300);
+  --of-text-placeholder: var(--of-text-tertiary);
 
   /* ─── Semantic Borders ─── */
   --of-border-subtle: var(--of-color-gray-200);
@@ -51,6 +56,8 @@
   --of-border-workspace: var(--of-border-subtle);
   --of-border-active: var(--of-border-strong);
   --of-border-inverse: var(--of-color-white);
+  --of-border-default: var(--of-border-subtle);
+  --of-border-divider: var(--of-border-subtle);
 
   /* ─── Semantic Accent ─── */
   --of-accent-default: var(--of-color-primary-600);
@@ -72,6 +79,7 @@
   --of-elevation-popover: var(--of-shadow-popover);
   --of-elevation-fixed-col: var(--of-shadow-fixed-col);
   --of-elevation-overlay-lg: var(--of-shadow-overlay-lg);
+  --of-elevation-surface-card: var(--of-elevation-card);
 
   /* ─── Status Colors ─── */
   --of-color-success: #22c55e;

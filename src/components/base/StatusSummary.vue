@@ -30,7 +30,7 @@ const dotSize = computed(() => (props.size === "sm" ? "6px" : "7px"));
 const fontSize = computed(() => (props.size === "sm" ? "10px" : "11px"));
 
 function dotColor(item: StatusSummaryItem): string {
-  return item.color ?? "var(--of-border-subtle)";
+  return item.color ?? "var(--of-border-workspace)";
 }
 
 function countColor(item: StatusSummaryItem): string {
@@ -79,8 +79,8 @@ function countColor(item: StatusSummaryItem): string {
   flex-wrap: nowrap;
   gap: 14px;
   padding: 5px 13px;
-  background: var(--of-surface-elevated);
-  border-bottom: 1px solid var(--of-border-subtle);
+  background: var(--of-surface-card);
+  border-bottom: 1px solid var(--of-border-workspace);
   box-sizing: border-box;
   min-height: 0;
 }
@@ -114,7 +114,7 @@ function countColor(item: StatusSummaryItem): string {
   display: inline-block;
   width: 1px;
   height: 12px;
-  background: var(--of-border-subtle);
+  background: var(--of-border-workspace);
   flex-shrink: 0;
   align-self: center;
 }

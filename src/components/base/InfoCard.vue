@@ -100,12 +100,12 @@ function tagStyle(index: number): CSSProperties {
     {
       bg: "var(--of-surface-muted)",
       color: "var(--of-accent-default)",
-      border: "var(--of-border-subtle)",
+      border: "var(--of-border-workspace)",
     },
     {
       bg: "var(--of-surface-panel)",
       color: "var(--of-text-strong)",
-      border: "var(--of-border-subtle)",
+      border: "var(--of-border-workspace)",
     },
     {
       bg: "var(--of-surface-selected)",
@@ -115,12 +115,12 @@ function tagStyle(index: number): CSSProperties {
     {
       bg: "var(--of-surface-panel)",
       color: "var(--of-text-secondary)",
-      border: "var(--of-border-subtle)",
+      border: "var(--of-border-workspace)",
     },
     {
       bg: "var(--of-surface-muted)",
       color: "var(--of-text-tertiary)",
-      border: "var(--of-border-subtle)",
+      border: "var(--of-border-workspace)",
     },
   ];
   const t = PALETTES[index % PALETTES.length];
@@ -253,7 +253,7 @@ function handleKeydown(e: KeyboardEvent) {
 .of-info-card__title {
   font-size: 13px;
   line-height: 1.5;
-  color: var(--of-color-text-primary);
+  color: var(--of-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -261,7 +261,7 @@ function handleKeydown(e: KeyboardEvent) {
 
 .of-info-card__content {
   font-size: 12px;
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary);
   line-height: 1.6;
   word-break: break-word;
 }
@@ -283,7 +283,7 @@ function handleKeydown(e: KeyboardEvent) {
 
 .of-info-card__meta-text {
   font-size: 10px;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary);
   line-height: 1.2;
 }
 
@@ -318,10 +318,10 @@ function handleKeydown(e: KeyboardEvent) {
 /* ── Memo ─────────────────────────────────────────────────────────────────── */
 .of-info-card--memo {
   padding: 12px;
-  background: var(--of-surface-elevated);
+  background: var(--of-surface-card);
   border-radius: 8px;
   border-left: 4px solid var(--of-ic-border, var(--of-accent-default));
-  box-shadow: var(--of-shadow-card);
+  box-shadow: var(--of-elevation-card);
 }
 
 .of-info-card--memo .of-info-card__title {
@@ -329,15 +329,15 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 .of-info-card--memo:hover {
-  box-shadow: var(--of-shadow-card-hover);
+  box-shadow: var(--of-elevation-card-hover);
 }
 
 /* ── Notify ───────────────────────────────────────────────────────────────── */
 .of-info-card--notify {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--of-border-subtle);
+  border-bottom: 1px solid var(--of-border-workspace);
   border-radius: 0;
-  background: v-bind("unread ? 'var(--of-surface-selected)' : 'var(--of-surface-elevated)'");
+  background: v-bind("unread ? 'var(--of-surface-selected)' : 'var(--of-surface-card)'");
 }
 
 .of-info-card--notify:hover {
@@ -360,12 +360,12 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 .of-info-card--notify .of-info-card__content {
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary);
 }
 
 .of-info-card__notify-meta {
   font-size: 10px;
-  color: var(--of-color-text-tertiary);
+  color: var(--of-text-tertiary);
   line-height: 1.4;
   margin-top: 2px;
 }
@@ -373,10 +373,11 @@ function handleKeydown(e: KeyboardEvent) {
 /* ── History ──────────────────────────────────────────────────────────────── */
 .of-info-card--history {
   padding: 11px 14px;
-  background: var(--of-surface-elevated);
-  border: 1px solid var(--of-border-subtle);
+  background: var(--of-surface-card);
+  border: 1px solid var(--of-border-workspace);
   border-radius: 10px;
   border-left: 3px solid var(--of-ic-border, var(--of-accent-default));
+  box-shadow: var(--of-elevation-card);
 }
 
 .of-info-card--history:hover {
@@ -390,7 +391,7 @@ function handleKeydown(e: KeyboardEvent) {
 
 .of-info-card__subtitle {
   font-size: 12px;
-  color: var(--of-color-text-secondary);
+  color: var(--of-text-secondary);
   line-height: 1.5;
   word-break: break-word;
 }
