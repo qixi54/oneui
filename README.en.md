@@ -312,6 +312,79 @@ const view = useDatabaseView({
 })
 ```
 
+### Combined Consumption Example
+
+If you want to use theme scoping, database action middleware, and virtual list state caching in the same business surface, keep them inside one wrapper component. This is the closest pattern to a real app page and the easiest one to copy.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import {
+  ThemeScope,
+  composeDatabaseViewMiddlewares,
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewOptimisticMiddleware,
+  createDatabaseViewToastMiddleware,
+  useDatabaseView,
+  useVirtualList,
+  useVirtualListStateCache,
+} from '@oneflowui/ui'
+
+const containerRef = ref<HTMLElement | null>(null)
+const virtualListState = useVirtualListStateCache('task-feed')
+
+const middleware = composeDatabaseViewMiddlewares(
+  createDatabaseViewToastMiddleware({
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  }),
+  createDatabaseViewAnalyticsMiddleware({
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  }),
+  createDatabaseViewOptimisticMiddleware({
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  }),
+)
+
+const view = useDatabaseView({
+  tableId: 'tbl-1',
+  actions: {
+    middleware,
+    onCellEdit: saveCellEdit,
+  },
+})
+
+const { visibleItems } = useVirtualList({
+  items: view.records,
+  itemHeight: 60,
+  containerRef,
+  state: virtualListState,
+})
+
+const columns = [
+  { key: 'title', label: 'Task', width: 'fill' },
+  { key: 'status', label: 'Status', width: 120 },
+  { key: 'priority', label: 'Priority', width: 100 },
+]
+</script>
+
+<template>
+  <ThemeScope theme="ops-console" tag="section" class="task-surface">
+    <header class="task-surface__header">
+      <h3>Task Overview</h3>
+      <p>The outer shell uses scoped ops-console tokens while actions, list rendering, and cached state share the same component entry points.</p>
+    </header>
+
+    <div ref="containerRef" class="task-surface__list">
+      <DataTable :rows="visibleItems" :columns="columns" />
+    </div>
+  </ThemeScope>
+</template>
+```
+
+These capabilities can be used independently or combined like above; all of them are non-breaking additions and do not require consumer API changes.
+
 ---
 
 ## Local Development

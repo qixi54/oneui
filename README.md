@@ -283,6 +283,79 @@ const view = useDatabaseView({
 })
 ```
 
+### 组合消费示例
+
+如果你要在同一块业务区域里同时使用主题作用域、数据库动作中间件和虚拟列表状态缓存，可以把三者放进同一个组件壳层。这个写法更接近真实业务页，也最适合作为复制模板。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import {
+  ThemeScope,
+  composeDatabaseViewMiddlewares,
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewOptimisticMiddleware,
+  createDatabaseViewToastMiddleware,
+  useDatabaseView,
+  useVirtualList,
+  useVirtualListStateCache,
+} from '@oneflowui/ui'
+
+const containerRef = ref<HTMLElement | null>(null)
+const virtualListState = useVirtualListStateCache('task-feed')
+
+const middleware = composeDatabaseViewMiddlewares(
+  createDatabaseViewToastMiddleware({
+    onSuccess: (message) => toast.success(message),
+    onError: (message) => toast.error(message),
+  }),
+  createDatabaseViewAnalyticsMiddleware({
+    onEvent: (event) => console.log('[db-view]', event.phase, event.action),
+  }),
+  createDatabaseViewOptimisticMiddleware({
+    apply: ({ payload }) => updateLocalRecord(payload),
+    revert: ({ payload }) => revertLocalRecord(payload),
+  }),
+)
+
+const view = useDatabaseView({
+  tableId: 'tbl-1',
+  actions: {
+    middleware,
+    onCellEdit: saveCellEdit,
+  },
+})
+
+const { visibleItems } = useVirtualList({
+  items: view.records,
+  itemHeight: 60,
+  containerRef,
+  state: virtualListState,
+})
+
+const columns = [
+  { key: 'title', label: '任务', width: 'fill' },
+  { key: 'status', label: '状态', width: 120 },
+  { key: 'priority', label: '优先级', width: 100 },
+]
+</script>
+
+<template>
+  <ThemeScope theme="ops-console" tag="section" class="task-surface">
+    <header class="task-surface__header">
+      <h3>任务总览</h3>
+      <p>外层是局部 ops-console token，内部动作、列表和状态缓存都复用同一套组件入口。</p>
+    </header>
+
+    <div ref="containerRef" class="task-surface__list">
+      <DataTable :rows="visibleItems" :columns="columns" />
+    </div>
+  </ThemeScope>
+</template>
+```
+
+这三个能力可以独立使用，也可以像上面这样组合使用；它们都是非 breaking 增强，不要求业务方修改现有组件 API。
+
 ### Selected record / detail workspace
 
 当前 dev app 已经把“选中记录 -> detail workspace”这条链路接起来了：点击 table / kanban / gallery / timeline 中的条目，会把当前记录送入详情工作区，再由 `DetailLayout`、`PropPanel`、`CommentItem` 这组组件展示主内容、属性和活动记录。

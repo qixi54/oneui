@@ -3,7 +3,13 @@ import { mount } from "@vue/test-utils";
 import { defineComponent, nextTick, ref } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import DatabaseView from "../components/database/DatabaseView.vue";
-import { useDatabaseView } from "../composables/useDatabaseView";
+import {
+  composeDatabaseViewMiddlewares,
+  createDatabaseViewAnalyticsMiddleware,
+  createDatabaseViewOptimisticMiddleware,
+  createDatabaseViewToastMiddleware,
+  useDatabaseView,
+} from "../composables";
 import type { DataRecord, TableSchema, ViewConfig } from "../types";
 
 function buildSchema(): TableSchema {
@@ -439,6 +445,98 @@ describe("DatabaseView 页面级集成", () => {
 
     expect(sequence).toEqual(["before:cell-edit", "error:cell-edit:boom"]);
     expect(onCellEdit).toHaveBeenCalledTimes(1);
+    expect(databaseView.error.value?.message).toBe("boom");
+  });
+
+  it("useDatabaseView 可以组合 composeDatabaseViewMiddlewares，并在成功/错误链路上稳定回放", async () => {
+    const successEvents: string[] = [];
+    const errorEvents: string[] = [];
+    const onCellEdit = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("boom"));
+
+    const middleware = composeDatabaseViewMiddlewares(
+      createDatabaseViewAnalyticsMiddleware({
+        onEvent: (event) => {
+          if (event.action === "cell-edit") {
+            successEvents.push(`${event.phase}:${event.action}`);
+          }
+        },
+      }),
+      createDatabaseViewToastMiddleware({
+        onSuccess: (message, context) => {
+          if (context.action === "cell-edit") {
+            successEvents.push(`success:${message}`);
+          }
+        },
+        onError: (message, context) => {
+          if (context.action === "cell-edit") {
+            errorEvents.push(`error:${message}`);
+          }
+        },
+      }),
+      createDatabaseViewOptimisticMiddleware({
+        apply: (context) => {
+          if (context.action === "cell-edit") {
+            successEvents.push(`apply:${context.action}`);
+          }
+        },
+        revert: (context) => {
+          if (context.action === "cell-edit") {
+            errorEvents.push(`revert:${context.action}`);
+          }
+        },
+      }),
+    );
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records: ref(buildRecords()),
+      views: ref(buildViews()),
+      actions: {
+        middleware,
+        onCellEdit,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+    successEvents.length = 0;
+    errorEvents.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "ok",
+    });
+
+    expect(successEvents).toEqual([
+      "before:cell-edit",
+      "apply:cell-edit",
+      "success:单元格更新已完成",
+      "after:cell-edit",
+    ]);
+    expect(errorEvents).toEqual([]);
+
+    successEvents.length = 0;
+
+    await databaseView.emitCellEdit({
+      rowId: "R-1",
+      fieldId: "title",
+      value: "fail",
+    });
+
+    expect(errorEvents).toEqual([
+      "revert:cell-edit",
+      "error:单元格更新已完成失败",
+    ]);
+    expect(successEvents).toEqual([
+      "before:cell-edit",
+      "apply:cell-edit",
+      "error:cell-edit",
+    ]);
     expect(databaseView.error.value?.message).toBe("boom");
   });
 

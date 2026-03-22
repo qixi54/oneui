@@ -44,11 +44,8 @@
 ### 并发增强验证（middleware / theme-scope / virtualization）
 
 - `docs/plans/2026-03-22-oneui-parallel-enhancements-verification.md`
-- `README.md` / `README.en.md` 中的 `ThemeScope`、`composeDatabaseViewMiddlewares`、`useVirtualListStateCache` 示例
-- `src/components/common/ThemeScope.vue`
-- `src/dev/App.vue` 中的 scoped theme preview demo
-- `src/composables/useDatabaseViewMiddleware.ts` 中的 `composeDatabaseViewMiddlewares`
-- `src/composables/useVirtualList.ts` 中的 `useVirtualListStateCache`
+- `README.md` / `README.en.md` 中的 `ThemeScope`、`composeDatabaseViewMiddlewares`、`useVirtualListStateCache` 组合消费示例
+- `docs/plans/2026-03-22-oneui-next-parallel-verification.md`
 - `docs/CHANGELOG-v0.8.4.md` 中的局部主题增强说明（non-breaking）
 
 ### 0.8.3 建议补齐（Ops Console）

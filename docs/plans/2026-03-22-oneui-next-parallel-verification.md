@@ -18,6 +18,16 @@
 
 目标不是改现有契约，而是在不破坏现有 API 的前提下，把“组合能力”与“复制即用”体验补齐。
 
+## 本轮文档收口
+
+本轮对外说明已经补齐到 README / README.en / ONEUI-INDEX 三处主入口，组合示例以 `ThemeScope + composeDatabaseViewMiddlewares + useVirtualListStateCache` 为唯一官方样例，强调下面几点：
+
+1. `ThemeScope` 是推荐的局部主题包装入口，优先于业务方手写 `data-of-theme-scope`
+2. `composeDatabaseViewMiddlewares(...)` 用于把 toast / analytics / optimistic 逻辑聚合到单一 `middleware`
+3. `useVirtualListStateCache(...)` 用于在同一业务页的 remount 之间共享虚拟列表状态
+4. 这组三件套都是 non-breaking 增强，不改变现有组件公开 API
+5. 本轮仅补文档、索引和验证口径，不再扩展新的 runtime 写域
+
 ## 变更点
 
 1. `src/composables/useDatabaseViewMiddleware.ts`
@@ -39,6 +49,7 @@
    - `README.en.md`
    - `src/dev/App.vue`
    - `docs/ONEUI-INDEX.md`
+   - 本轮文档已补充组合消费官方示例与 non-breaking 说明
 
 5. 测试
    - `src/tests/database-view-middleware.integration.spec.ts`
@@ -64,3 +75,4 @@
 2. `composeDatabaseViewMiddlewares(...)` 能将 toast / analytics / optimistic preset 组合为单一 middleware
 3. `useVirtualListStateCache(...)` 能在相同 `cacheKey` 下跨 remount 保持虚拟列表状态
 4. 根入口与 composables 入口都能对外导出新增能力
+5. README / README.en / ONEUI-INDEX 已给出可复制的组合消费样例，且明确标注 non-breaking
