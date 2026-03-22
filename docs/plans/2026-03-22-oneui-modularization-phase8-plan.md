@@ -2,7 +2,7 @@
 生成时间: 2026-03-22 11:49:39
 参考文档: /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:666, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseViewDetailHost.vue:1, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/TableHeaderRow.vue:198, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/DataTableSelectionBar.vue:36, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/ColumnHeaderMenu.vue:205, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/DataTableDraftToolbar.vue:33, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/DataTableDesktopFixedRegion.vue:99, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/index.vue:180, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/charts/NumberCard.vue:45, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/charts/TableChart.vue:68, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/charts/BarChart.vue:52, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/charts/PieChart.vue:73, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/tests/table-detail.integration.spec.ts:1, /opt/Oneflow/flowlab/项目/oneui/code/develop/src/tests/database-view.integration.spec.ts:1
 角色定义: ARCH（架构师）
-文档生成目的: 冻结 OneUI 模块化第八阶段的并发优化范围、风险、验收与回滚口径，继续降低 DatabaseView 详情适配耦合并扩大 semantic token 在 table/dashboard 高频组件中的覆盖
+文档生成目的: 冻结 OneUI 模块化第八阶段的并发改写范围、风险、验收与回滚口径，继续降低 DatabaseView 详情适配耦合并扩大 semantic token 在 table/dashboard 高频组件中的覆盖
 生成模型: GPT-5 Codex
 ---
 
@@ -27,7 +27,7 @@ phase7 已经把 `DataTable` 桌面子区域、`DatabaseView` toolbar adapter �
 | `DatabaseView.vue` 仍直接承接 detail presenter 适配 | `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:744` | database 场景层虽然已拆 toolbar，但 detail 层仍有内联桥接逻辑 | P0 |
 | table 高频壳层仍混用旧 token fallback | `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/TableHeaderRow.vue:198`, `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/DataTableSelectionBar.vue:36`, `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/ColumnHeaderMenu.vue:205` | neutral 与 ops-console 的语义层已经存在，但 table 默认表现还不够统一 | P0 |
 | dashboard 高频容器和图表默认样式仍含旧 token 回退 | `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/index.vue:180`, `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/charts/NumberCard.vue:45`, `/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/Dashboard/charts/TableChart.vue:68` | dashboard 默认质感还没有完全融到中性主题层 | P1 |
-| 用户要求继续并发自代理推进 | 当前优化范围可自然拆成 database / table / dashboard 三个互斥写域 | 若不冻结写域，容易出现并发覆盖 | P0 |
+| 用户要求继续并发自代理推进 | 当前改写范围可自然拆成 database / table / dashboard 三个互斥写域 | 若不冻结写域，容易出现并发覆盖 | P0 |
 
 ### 2.2 本阶段需求
 
