@@ -58,7 +58,7 @@ describe("DatabaseEnterpriseDemo", () => {
       },
     });
 
-    expect(wrapper.text()).toContain("ThemeScope + DatabaseView + middleware presets");
+    expect(wrapper.text()).toContain("ThemeScopeScene + DatabaseView + middleware presets");
     expect(wrapper.text()).toContain("Failure mode: ready");
 
     const buttons = wrapper.findAll(".database-enterprise__control-row .dev-btn");

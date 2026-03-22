@@ -174,33 +174,37 @@ Supported values currently match the global theme list:
 
 Direct `data-of-theme-scope` usage is still compatible for older code, but new consumers should use `ThemeScope`.
 
-### Component-Level Example
+### ThemeScope Scene Component
 
-A more realistic consumer pattern is to wrap an actual component subtree. The page keeps its global theme, while the local region switches to tokens that fit an ops or command-console context.
+If you want to reuse "local theme + title + description + meta/footer slots" together, use `ThemeScopeScene`. It is a lightweight scene shell component that fits enterprise back offices, ops consoles, and task centers.
 
 ```vue
 <script setup lang="ts">
-import { DataTable, StatisticCard, ThemeScope } from '@oneflowui/ui'
+import { DataTable, ThemeScopeScene } from '@oneflowui/ui'
 </script>
 
 <template>
-  <ThemeScope theme="ops-console" tag="section" class="task-surface">
-    <header class="task-surface__header">
-      <h3>Task Overview</h3>
-      <p>Only this region uses ops-console tokens.</p>
-    </header>
-
-    <div class="task-surface__metrics">
-      <StatisticCard icon="check-circle" :value="18" label="Done" />
-      <StatisticCard icon="clock" :value="6" label="In progress" />
-    </div>
+  <ThemeScopeScene
+    theme="ops-console"
+    tag="section"
+    eyebrow="Enterprise Scene"
+    title="Task Overview"
+    description="This region automatically receives ops-console tokens."
+  >
+    <template #meta>
+      <span class="scene-chip">ThemeScopeScene</span>
+    </template>
 
     <DataTable :rows="rows" :columns="columns" />
-  </ThemeScope>
+
+    <template #footer>
+      <small>footer / notes / actions</small>
+    </template>
+  </ThemeScopeScene>
 </template>
 ```
 
-This is non-breaking: no component API changes are required, and `ThemeScope` only adds a local token boundary on the wrapper.
+`ThemeScopeScene` still reuses `ThemeScope` under the hood, so this is non-breaking. It just packages the common business shell into a reusable component.
 
 ### Virtual List State Cache
 
@@ -419,6 +423,7 @@ The repository's `DatabaseEnterpriseDemo` is the dev/examples-level reference fo
 ### Dev Examples / Enterprise Demo
 
 `DatabaseEnterpriseDemo` is a dev/examples-level consumption pattern used to show a more complete enterprise-style page composition. It is documentation and development sample material, not an npm-exported component, and it does not change the public export surface of `@oneflowui/ui`.
+The repository also ships `DatabasePresetDemo` as a shorter official preset-bundle example, focused on direct `createDatabaseViewPresetBundle` / `actions.middleware` consumption.
 
 If your business app needs something similar, copy the composition idea from the example and wire it to your own data source and action contract instead of depending on a separate production export.
 

@@ -59,8 +59,12 @@
 
 ### ThemeScope 场景模板 / dev examples
 
+- `docs/plans/2026-03-22-oneui-scene-preset-demo-verification.md`
+- `src/components/common/ThemeScopeScene.vue`：轻量可复用的场景壳层组件
 - `README.md` / `README.en.md` 中的 `ThemeScope` 场景模板说明
+- `src/dev/ThemeScopeDemo.vue`：轻量 ThemeScope 场景参考实现
 - `src/dev/DatabaseEnterpriseDemo.vue`：企业级场景模板参考实现
+- `src/dev/DatabasePresetDemo.vue`：preset bundle 官方消费示例
 - `src/dev/DatabaseViewDemo.vue`：页面级 demo 容器与入口导航
 - 说明：上述 dev/examples 级内容不属于 npm 导出面，仅作开发与文档参考
 

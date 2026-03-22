@@ -10,6 +10,7 @@ import {
   TableToolbar,
 } from "../index";
 import DatabaseEnterpriseDemo from "./DatabaseEnterpriseDemo.vue";
+import DatabasePresetDemo from "./DatabasePresetDemo.vue";
 import type {
   CommentData,
   DataRecord,
@@ -642,6 +643,8 @@ const view = useDatabaseView({
         :records="databaseDemoRecords"
         :views="databaseDemoViewPresets"
       />
+
+      <DatabasePresetDemo />
 
       <div class="database-shell">
         <div class="database-shell__bar">

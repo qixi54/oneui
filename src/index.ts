@@ -52,7 +52,7 @@ export type {
 } from "./components/base";
 
 // ─── Common ─────────────────────────────────────────────────────────────────
-export { ThemeScope } from "./components/common";
+export { ThemeScope, ThemeScopeScene } from "./components/common";
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";

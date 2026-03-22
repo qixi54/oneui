@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import {
   DatabaseView,
-  ThemeScope,
+  ThemeScopeScene,
   composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
   createDatabaseViewOptimisticMiddleware,
@@ -21,7 +21,7 @@ const props = defineProps<{
 const themeMode = ref<"neutral" | "ops-console">("ops-console");
 const failureMode = ref(false);
 const actionLog = ref<string[]>([
-  "ThemeScope + DatabaseView middleware demo ready",
+  "ThemeScopeScene + DatabaseView middleware demo ready",
   "Edit any cell to trigger optimistic apply / revert",
 ]);
 const enterpriseRecords = ref<DataRecord[]>([]);
@@ -61,7 +61,7 @@ function toggleFailureMode() {
 function resetLog() {
   actionLog.value = [
     "manual log reset",
-    "ThemeScope + DatabaseView middleware demo ready",
+    "ThemeScopeScene + DatabaseView middleware demo ready",
     "Edit any cell to trigger optimistic apply / revert",
   ];
   failureMode.value = false;
@@ -137,7 +137,18 @@ const actions = {
   },
 };
 
-const snippet = computed(() => `<ThemeScope theme="${themeMode.value}" tag="section" class="database-enterprise__scope">
+const snippet = computed(
+  () => `<ThemeScopeScene
+  theme="${themeMode.value}"
+  tag="section"
+  eyebrow="Enterprise composition demo"
+  title="ThemeScopeScene + DatabaseView"
+  description="局部主题作用域 + 页面壳 + 业务数据区"
+>
+  <template #meta>
+    <span class="database-enterprise__chip">Middleware: toast / analytics / optimistic</span>
+  </template>
+
   <DatabaseView
     table-id="enterprise-db"
     mode="local"
@@ -146,38 +157,31 @@ const snippet = computed(() => `<ThemeScope theme="${themeMode.value}" tag="sect
     :views="views"
     current-view-id="database-table"
     detail-presentation="side-panel"
-    :actions="{
-      middleware: composeDatabaseViewMiddlewares(
-        createDatabaseViewToastMiddleware({ ... }),
-        createDatabaseViewAnalyticsMiddleware({ ... }),
-        createDatabaseViewOptimisticMiddleware({ ... })
-      )
-    }"
+    :actions="{ middleware }"
   />
-</ThemeScope>`);
+</ThemeScopeScene>`,
+);
 </script>
 
 <template>
   <div class="database-enterprise">
-    <div class="database-enterprise__card">
-      <div class="database-enterprise__hero">
-        <div>
-          <div class="database-enterprise__eyebrow">Enterprise composition demo</div>
-          <h3>ThemeScope + DatabaseView + middleware presets</h3>
-          <p class="database-enterprise__desc">
-            这是更贴近企业项目的消费方式：外层用 ThemeScope 固定局部皮肤，DatabaseView 负责页面壳，
-            middleware 负责 toast、analytics 和 optimistic update。下面这个 demo 不接真实后端，
-            但编辑单元格时会真实驱动乐观更新和回滚链路。
-          </p>
-        </div>
+    <ThemeScopeScene
+      :theme="themeMode"
+      tag="section"
+      eyebrow="Enterprise composition demo"
+      title="ThemeScopeScene + DatabaseView + middleware presets"
+      description="更贴近企业项目的消费方式：ThemeScopeScene 固定局部皮肤，DatabaseView 负责页面壳，middleware 负责 toast、analytics 和 optimistic update。"
+      class="database-enterprise__card"
+    >
+      <template #meta>
         <div class="database-enterprise__chips">
           <span class="database-enterprise__chip">ThemeScope: {{ themeMode }}</span>
           <span class="database-enterprise__chip">Middleware: toast / analytics / optimistic</span>
           <span class="database-enterprise__chip">Failure mode: {{ failureMode ? "armed" : "ready" }}</span>
         </div>
-      </div>
+      </template>
 
-      <ThemeScope :theme="themeMode" tag="section" class="database-enterprise__scope">
+      <div class="database-enterprise__scope">
         <div class="database-enterprise__layout">
           <DatabaseView
             table-id="enterprise-db"
@@ -242,10 +246,12 @@ const snippet = computed(() => `<ThemeScope theme="${themeMode.value}" tag="sect
             </div>
           </aside>
         </div>
-      </ThemeScope>
+      </div>
 
-      <pre class="database-shell__code"><code>{{ snippet }}</code></pre>
-    </div>
+      <template #footer>
+        <pre class="database-shell__code"><code>{{ snippet }}</code></pre>
+      </template>
+    </ThemeScopeScene>
   </div>
 </template>
 

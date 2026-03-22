@@ -165,33 +165,37 @@ import { DataTable, ThemeScope } from '@oneflowui/ui'
 
 老代码里直接手写的 `data-of-theme-scope` 仍然兼容，但新代码优先使用组件入口。
 
-### 组件级示例
+### ThemeScope 场景组件
 
-更贴近业务消费的写法，是把一个组件子树直接包进 `ThemeScope`。外层页面继续沿用全局主题，局部区域则切到适合命令台或运营视角的 token。
+如果你想把“局部主题 + 标题 + 说明 + meta/footer 插槽”一起复用，直接用 `ThemeScopeScene`。它是一个轻量的场景壳层组件，适合企业后台、运营控制台、任务中心这类页面。
 
 ```vue
 <script setup lang="ts">
-import { DataTable, StatisticCard, ThemeScope } from '@oneflowui/ui'
+import { DataTable, ThemeScopeScene } from '@oneflowui/ui'
 </script>
 
 <template>
-  <ThemeScope theme="ops-console" tag="section" class="task-surface">
-    <header class="task-surface__header">
-      <h3>任务总览</h3>
-      <p>仅这块区域使用 ops-console token。</p>
-    </header>
-
-    <div class="task-surface__metrics">
-      <StatisticCard icon="check-circle" :value="18" label="已完成" />
-      <StatisticCard icon="clock" :value="6" label="进行中" />
-    </div>
+  <ThemeScopeScene
+    theme="ops-console"
+    tag="section"
+    eyebrow="Enterprise Scene"
+    title="任务总览"
+    description="这个区域会自动获得 ops-console token。"
+  >
+    <template #meta>
+      <span class="scene-chip">ThemeScopeScene</span>
+    </template>
 
     <DataTable :rows="rows" :columns="columns" />
-  </ThemeScope>
+
+    <template #footer>
+      <small>footer / notes / actions</small>
+    </template>
+  </ThemeScopeScene>
 </template>
 ```
 
-这是一种非 breaking 的增强：组件 API 不需要变，`ThemeScope` 只是在局部 wrapper 上增加一层 token 作用域。
+`ThemeScopeScene` 内部继续复用 `ThemeScope` 的 token 作用域，所以它仍然是 non-breaking 的增强，只是把常见业务壳层收成了一个可复用组件。
 
 ### 虚拟列表状态缓存
 
@@ -385,11 +389,12 @@ import { ThemeScope } from '@oneflowui/ui'
 </template>
 ```
 
-仓库里的 `DatabaseEnterpriseDemo` 就是这一类场景模板的 dev/examples 级参考实现。它展示的是“ThemeScope + 页面壳 + 业务数据区”的组合方式，便于复制到自家项目里改造成真正的企业页。
+仓库里的 `DatabaseEnterpriseDemo` 就是这一类场景组件的 dev/examples 级参考实现。它展示的是“ThemeScopeScene + DatabaseView + middleware”的组合方式，便于复制到自家项目里改造成真正的企业页。
 
 ### Dev Examples / Enterprise Demo
 
 `DatabaseEnterpriseDemo` 是 dev/examples 级的消费范式，用来展示更完整的企业版页面组合方式。它属于开发示例和文档参考，不是 npm 包对外导出的组件，不会改变 `@oneflowui/ui` 的公开导出面。
+仓库同时提供 `DatabasePresetDemo` 作为更短的 preset bundle 官方示例，重点展示 `createDatabaseViewPresetBundle` / `actions.middleware` 的直接消费方式。
 
 如果你在业务工程里需要类似的页面，建议直接复制示例里的组合思路，再按自己的数据源和动作契约接入，而不是依赖一个额外的生产级导出入口。
 

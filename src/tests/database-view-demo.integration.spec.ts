@@ -19,6 +19,7 @@ describe("DatabaseViewDemo", () => {
       global: {
         stubs: {
           DatabaseEnterpriseDemo: stubComponent("DatabaseEnterpriseDemo"),
+          DatabasePresetDemo: stubComponent("DatabasePresetDemo"),
           TableToolbar: stubComponent("TableToolbar"),
           DataTable: stubComponent("DataTable"),
           KanbanBoard: stubComponent("KanbanBoard"),
@@ -31,6 +32,7 @@ describe("DatabaseViewDemo", () => {
     });
 
     expect(wrapper.text()).toContain("DatabaseView 页面级方案证明");
+    expect(wrapper.find('[data-role="DatabasePresetDemo"]').exists()).toBe(true);
     expect(wrapper.text()).toContain("source mode");
     expect(wrapper.text()).toContain("page state");
     expect(wrapper.text()).toContain("current view");
