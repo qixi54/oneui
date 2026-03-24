@@ -317,7 +317,7 @@ function handleRowChange(payload: {
   background: var(--of-surface-panel, var(--of-color-gray-50));
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: var(--of-z-raised);
   width: fit-content;
   min-width: 100%;
 }
@@ -326,15 +326,15 @@ function handleRowChange(payload: {
   width: 240px;
   min-width: 240px;
   border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  padding: 8px 12px;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   font-family: var(--of-font-sans);
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-secondary, var(--of-color-gray-500));
   display: flex;
   align-items: center;
   position: sticky;
   left: 0;
-  z-index: 3;
+  z-index: var(--of-z-raised);
   background: var(--of-surface-panel, var(--of-color-gray-50));
 }
 
@@ -345,9 +345,9 @@ function handleRowChange(payload: {
 
 .gantt-timeline__header-cell {
   text-align: center;
-  padding: 6px 2px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-0_5);
   font-family: var(--of-font-sans);
-  font-size: 10px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
   white-space: nowrap;
@@ -357,7 +357,7 @@ function handleRowChange(payload: {
 
 .gantt-timeline__header-cell--today {
   color: var(--of-text-primary, var(--of-color-gray-700));
-  font-weight: 700;
+  font-weight: var(--of-font-weight-bold);
   background: var(--of-surface-selected, var(--of-color-gray-100));
 }
 
@@ -370,7 +370,7 @@ function handleRowChange(payload: {
   opacity: 0.6;
   pointer-events: none;
   transform: translateX(-50%);
-  z-index: 1;
+  z-index: var(--of-z-base);
 }
 
 .gantt-timeline__rows {
@@ -381,10 +381,10 @@ function handleRowChange(payload: {
 }
 
 .gantt-timeline__empty {
-  padding: 40px;
+  padding: var(--of-spacing-10);
   text-align: center;
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 </style>

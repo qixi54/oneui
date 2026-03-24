@@ -40,14 +40,14 @@ function handleClick(event: MouseEvent) {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
+  gap: var(--of-spacing-1_5);
+  padding: var(--of-spacing-1_25) var(--of-spacing-2_5);
   background: transparent;
   border: 1px solid var(--of-border-subtle);
   border-radius: var(--of-radius-md);
   cursor: pointer;
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   font-weight: 400;
   color: var(--of-text-secondary, var(--of-color-gray-600));
   line-height: 1;

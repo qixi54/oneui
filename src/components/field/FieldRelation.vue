@@ -94,16 +94,16 @@ function onKeydown(e: KeyboardEvent) {
 .of-field-relation {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   width: 100%;
-  padding: 4px;
+  padding: var(--of-spacing-1);
 }
 .of-field-relation-search {
   width: 100%;
-  padding: 4px 6px;
-  font-size: 13px;
+  padding: var(--of-spacing-1) var(--of-spacing-1_5);
+  font-size: var(--of-font-size-base);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   outline: none;
   background: var(--of-surface-elevated, transparent);
   color: var(--of-text-primary, var(--of-color-text, #1a1a1a));
@@ -114,30 +114,30 @@ function onKeydown(e: KeyboardEvent) {
 .of-field-relation-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 .of-field-relation-tag {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px 6px;
-  font-size: 12px;
+  gap: var(--of-spacing-0_5);
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
+  font-size: var(--of-font-size-sm);
   background: var(--of-surface-selected, var(--of-surface-muted));
   color: var(--of-text-primary, var(--of-text-strong));
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
 }
 .of-field-relation-tag-remove {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-text-tertiary, var(--of-text-secondary));
-  padding: 0 2px;
+  padding: 0 var(--of-spacing-0_5);
   line-height: 1;
 }
 .of-field-relation-hint {
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
-  padding: 2px 4px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1);
 }
 </style>

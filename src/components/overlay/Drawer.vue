@@ -195,12 +195,30 @@ function handleResizeStart(event: PointerEvent) {
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
+  width: 12px;
   height: 100%;
   border: none;
   padding: 0;
   background: transparent;
   cursor: ew-resize;
+  z-index: var(--of-z-raised);
+}
+
+.of-drawer__resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 2px;
+  height: 44px;
+  border-radius: var(--of-radius-full);
+  background: var(--of-color-gray-300);
+  transform: translateY(-50%);
+  transition: background-color 0.16s ease;
+}
+
+.of-drawer__resize-handle:hover::after {
+  background: var(--of-color-gray-300);
 }
 
 .of-drawer--fullscreen {
@@ -219,7 +237,7 @@ function handleResizeStart(event: PointerEvent) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   padding: var(--of-spacing-4, 16px) var(--of-spacing-5, 20px);
   border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   flex-shrink: 0;
@@ -232,8 +250,8 @@ function handleResizeStart(event: PointerEvent) {
 
 .of-drawer__title-text {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-semibold);
   line-height: 1.4;
   color: var(--of-text-primary, var(--of-color-text, #111827));
 }

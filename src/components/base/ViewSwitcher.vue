@@ -105,9 +105,9 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
 .one-view-switcher {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--of-spacing-4);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
   border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   box-sizing: border-box;
@@ -117,7 +117,7 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
   display: flex;
   align-items: center;
   height: 30px;
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   overflow: hidden;
 }
@@ -125,13 +125,13 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
 .one-view-switcher__tab {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 10px;
+  gap: var(--of-spacing-1);
+  padding: 0 var(--of-spacing-2_5);
   height: 100%;
   border: none;
   background: transparent;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   cursor: pointer;
   white-space: nowrap;
@@ -139,17 +139,17 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
 }
 
 .one-view-switcher__tab:first-child {
-  border-radius: 6px 0 0 6px;
+  border-radius: var(--of-radius-md) 0 0 var(--of-radius-md);
 }
 
 .one-view-switcher__tab:last-child {
-  border-radius: 0 6px 6px 0;
+  border-radius: 0 var(--of-radius-md) var(--of-radius-md) 0;
 }
 
 .one-view-switcher__tab--active {
   background: var(--of-surface-selected, #eceff3);
   color: var(--of-accent-strong, #0f172a);
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
 }
 
 .one-view-switcher__tab-icon {
@@ -167,14 +167,14 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
 .one-view-switcher__tool-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1) var(--of-spacing-2);
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   background: transparent;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   cursor: pointer;
   white-space: nowrap;
@@ -192,11 +192,11 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
 .one-view-switcher__search {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   width: 180px;
   height: 28px;
-  padding: 0 10px;
-  border-radius: 6px;
+  padding: 0 var(--of-spacing-2_5);
+  border-radius: var(--of-radius-md);
   background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
 }
 
@@ -211,7 +211,7 @@ const DEFAULT_TABS: ViewSwitcherTab[] = [
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   outline: none;
 }

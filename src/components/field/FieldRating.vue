@@ -38,11 +38,11 @@ function select(n: number) {
 .of-field-rating {
   display: flex;
   align-items: center;
-  padding: 2px 4px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1);
 }
 
 .of-field-rating__star {
-  font-size: 18px;
+  font-size: var(--of-font-size-xl);
   cursor: pointer;
   color: var(--of-text-tertiary, var(--of-color-gray-300, #ccc));
   transition: color 0.1s;

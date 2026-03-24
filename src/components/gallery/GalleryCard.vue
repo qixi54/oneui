@@ -135,18 +135,18 @@ const dotColor = computed(
 
 /* Body */
 .gallery-card__body {
-  padding: 14px 16px 16px;
+  padding: var(--of-spacing-3_5) var(--of-spacing-4) var(--of-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
   flex: 1;
 }
 
 /* Title */
 .gallery-card__title {
   font-family: var(--of-font-sans);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-900));
   line-height: 1.4;
   word-break: break-word;
@@ -155,9 +155,9 @@ const dotColor = computed(
 /* Description */
 .gallery-card__desc {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-500));
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -176,13 +176,13 @@ const dotColor = computed(
 .gallery-card__props {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .gallery-card__prop-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .gallery-card__prop-icon {
@@ -192,7 +192,7 @@ const dotColor = computed(
 
 .gallery-card__prop-key {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-500));
   white-space: nowrap;
 }
@@ -203,9 +203,9 @@ const dotColor = computed(
 
 .gallery-card__prop-value {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-primary, var(--of-color-gray-700));
-  font-weight: 500;
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   max-width: 100px;
   overflow: hidden;
@@ -222,10 +222,10 @@ const dotColor = computed(
 .gallery-card__task-id {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--of-spacing-1_25);
   font-family: var(--of-font-sans);
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-500));
 }
 
@@ -242,7 +242,7 @@ const dotColor = computed(
 
 .gallery-card__date {
   font-family: var(--of-font-sans);
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 </style>

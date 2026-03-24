@@ -161,7 +161,7 @@ function isNoValue(op: FilterOperator) {
   border-radius: var(--of-radius-xl);
   box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
   min-width: 420px;
-  padding: 12px 16px;
+  padding: var(--of-spacing-3) var(--of-spacing-4);
   font-family: var(--of-font-sans);
 }
 
@@ -169,12 +169,12 @@ function isNoValue(op: FilterOperator) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: var(--of-spacing-2_5);
 }
 
 .of-filter-panel__title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-800));
 }
 
@@ -183,7 +183,7 @@ function isNoValue(op: FilterOperator) {
   background: none;
   cursor: pointer;
   color: var(--of-text-tertiary, var(--of-color-gray-400));
-  padding: 2px;
+  padding: var(--of-spacing-0_5);
   border-radius: var(--of-radius-sm);
   display: flex;
   align-items: center;
@@ -195,26 +195,26 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-panel__empty {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   text-align: center;
-  padding: 12px 0;
+  padding: var(--of-spacing-3) 0;
 }
 
 .of-filter-panel__conditions {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .of-filter-condition {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .of-filter-condition__logic-label {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-500));
   width: 28px;
   text-align: center;
@@ -229,8 +229,8 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-condition__logic-btn {
-  font-size: 11px;
-  padding: 2px 6px;
+  font-size: var(--of-font-size-xs);
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-sm);
   background: none;
@@ -243,16 +243,16 @@ function isNoValue(op: FilterOperator) {
   background: var(--of-surface-selected, var(--of-color-primary-50));
   border-color: var(--of-border-strong, var(--of-color-gray-300));
   color: var(--of-text-primary, var(--of-color-gray-700));
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
 }
 
 .of-filter-condition__select,
 .of-filter-condition__input {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   font-family: var(--of-font-sans);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-md);
-  padding: 4px 8px;
+  padding: var(--of-spacing-1) var(--of-spacing-2);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   color: var(--of-text-primary, var(--of-color-gray-800));
   outline: none;
@@ -280,7 +280,7 @@ function isNoValue(op: FilterOperator) {
   background: none;
   cursor: pointer;
   color: var(--of-text-tertiary, var(--of-color-gray-400));
-  padding: 3px;
+  padding: var(--of-spacing-0_75);
   border-radius: var(--of-radius-sm);
   display: flex;
   align-items: center;
@@ -295,23 +295,23 @@ function isNoValue(op: FilterOperator) {
 .of-filter-panel__footer {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-  padding-top: 8px;
+  gap: var(--of-spacing-3);
+  margin-top: var(--of-spacing-2_5);
+  padding-top: var(--of-spacing-2);
   border-top: 1px solid var(--of-border-workspace, var(--of-border-subtle));
 }
 
 .of-filter-panel__add-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: var(--of-spacing-1);
+  font-size: var(--of-font-size-sm);
   font-family: var(--of-font-sans);
   color: var(--of-text-primary, var(--of-color-gray-700));
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: var(--of-spacing-1) var(--of-spacing-2);
   border-radius: var(--of-radius-md);
 }
 
@@ -320,7 +320,7 @@ function isNoValue(op: FilterOperator) {
 }
 
 .of-filter-panel__clear {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   background: none;
   border: none;

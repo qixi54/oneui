@@ -71,7 +71,7 @@ function toggleCollapse() {
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-lg);
-  padding: 20px;
+  padding: var(--of-spacing-5);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -82,7 +82,7 @@ function toggleCollapse() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--of-spacing-4);
 }
 
 .prop-panel__header--collapsible {
@@ -96,8 +96,8 @@ function toggleCollapse() {
 
 .prop-panel__title {
   font-family: var(--of-font-sans);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-gray-700);
   transition: var(--of-transition-fast);
 }
@@ -119,8 +119,8 @@ function toggleCollapse() {
 }
 
 .prop-panel__extra {
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: var(--of-spacing-3);
+  padding-top: var(--of-spacing-3);
   border-top: 1px solid var(--of-color-gray-100);
 }
 </style>

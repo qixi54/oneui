@@ -32,6 +32,7 @@ const props = withDefaults(
     maskClosable?: boolean;
     /** 是否垂直居中，默认 true */
     centered?: boolean;
+    bodyPaddingless?: boolean;
     /** z-index，默认 1000 */
     zIndex?: number;
   }>(),
@@ -41,6 +42,7 @@ const props = withDefaults(
     closable: true,
     maskClosable: true,
     centered: true,
+    bodyPaddingless: false,
     zIndex: 1000,
   },
 );
@@ -138,7 +140,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Body -->
-          <div class="of-modal__body">
+          <div class="of-modal__body" :class="{ 'of-modal__body--paddingless': bodyPaddingless }">
             <slot />
           </div>
 
@@ -202,8 +204,8 @@ onUnmounted(() => {
 }
 
 .of-modal__title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xl);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text, #111827));
   margin: 0;
   line-height: 1.4;
@@ -245,8 +247,12 @@ onUnmounted(() => {
   flex: 1;
   overflow-y: auto;
   color: var(--of-text-primary, var(--of-color-text, #111827));
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--of-font-size-md);
+  line-height: var(--of-line-height-relaxed);
+}
+
+.of-modal__body--paddingless {
+  padding: 0;
 }
 
 /* ── Footer ───────────────────────────────────────────────── */

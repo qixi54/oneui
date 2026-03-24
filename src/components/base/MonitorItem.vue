@@ -87,8 +87,8 @@ function handleClick() {
   display: grid;
   grid-template-columns: 120px 1fr 90px 48px 60px;
   align-items: center;
-  gap: 0 8px;
-  padding: 8px 14px;
+  gap: 0 var(--of-spacing-2);
+  padding: var(--of-spacing-2) var(--of-spacing-3_5);
   border-bottom: 1px solid var(--of-border-subtle);
   box-sizing: border-box;
   min-width: 0;
@@ -103,7 +103,7 @@ function handleClick() {
 }
 
 .of-monitor-item__subtitle {
-  font-size: 10px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, #aaa);
   white-space: nowrap;
   overflow: hidden;
@@ -112,8 +112,8 @@ function handleClick() {
 }
 
 .of-monitor-item__label {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -129,25 +129,25 @@ function handleClick() {
 .of-monitor-item__track {
   width: 100%;
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--of-radius-sm);
   overflow: hidden;
 }
 
 .of-monitor-item__fill {
   height: 100%;
-  border-radius: 2px;
+  border-radius: var(--of-radius-sm);
   transition: width 0.3s ease;
 }
 
 .of-monitor-item__percentage {
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-secondary, var(--of-color-text-secondary, #888));
   text-align: right;
   white-space: nowrap;
 }
 
 .of-monitor-item__count {
-  font-size: 10px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, var(--of-color-text-tertiary, #bbb));
   text-align: right;
   white-space: nowrap;

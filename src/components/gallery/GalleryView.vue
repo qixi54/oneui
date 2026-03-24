@@ -124,9 +124,9 @@ const resolvedItems = computed(() => {
 .gallery-view {
   display: grid;
   grid-template-columns: repeat(var(--gallery-columns, 4), minmax(var(--gallery-card-min-width, 220px), 1fr));
-  gap: 16px;
+  gap: var(--of-spacing-4);
   overflow-x: auto;
-  padding: 12px;
+  padding: var(--of-spacing-3);
   align-items: start;
   container-type: inline-size;
   background: var(--of-surface-workspace, var(--of-surface-elevated, var(--of-color-bg-elevated)));
@@ -147,7 +147,7 @@ const resolvedItems = computed(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   transition:
     transform 160ms ease,
     border-color 160ms ease,
@@ -174,8 +174,8 @@ const resolvedItems = computed(() => {
 
 .gallery-view__add-label {
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-row-action-text, var(--of-text-tertiary, var(--of-color-gray-400)));
-  font-weight: 500;
+  font-weight: var(--of-font-weight-medium);
 }
 </style>

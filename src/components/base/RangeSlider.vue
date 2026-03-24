@@ -64,9 +64,9 @@ const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
 .of-range-slider__label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 14px;
-  font-weight: 500;
+  gap: var(--of-spacing-1);
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-color-text);
 }
 
@@ -113,7 +113,7 @@ const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 .of-range-slider__description {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-500);
   margin: 0;
   padding: 0;

@@ -12,17 +12,21 @@ import {
 } from "../../composables/useDatabaseWorkspace";
 import { useDatabaseDetailWorkspace } from "../../composables/useDatabaseDetailWorkspace";
 import type {
+  DatabaseViewKanbanCardMoveEvent,
+  DatabaseViewKanbanQuickAddEvent,
   DatabaseViewProps,
   DatabaseViewSchemaEvent,
+  DatabaseViewSlots,
   DatabaseViewViewTab,
 } from "../../contracts/database";
 import type { FilterCondition as ToolbarFilterCondition, FilterLogic } from "../../composables/useTableFilter";
 import type {
+  KanbanColumnData,
   CellValue,
   DataRecord,
   TableColumn,
 } from "../../types";
-import { buildGanttItems } from "../../types";
+import { buildGanttItems, taskToDataRecord } from "../../types";
 import {
   buildDatabaseViewTabs,
   buildEmptyFilter,
@@ -40,6 +44,7 @@ const props = withDefaults(defineProps<DatabaseViewProps>(), {
   tableId: "database-view",
   mode: "local",
   detailPresentation: "auto",
+  detailSource: undefined,
   density: "standard",
   schema: null,
   records: () => [],
@@ -88,12 +93,16 @@ const emit = defineEmits<{
   add: [];
   "add-column": [];
   "record-change": [{ recordId: string; startDate?: string; endDate?: string }];
+  "kanban-quick-add": [DatabaseViewKanbanQuickAddEvent];
+  "kanban-card-move": [DatabaseViewKanbanCardMoveEvent];
   "load-view": [string];
   "save-view": [string];
   sort: [string];
   group: [string | null];
   refresh: [];
 }>();
+
+defineSlots<DatabaseViewSlots>();
 
 defineOptions({ name: "DatabaseView", inheritAttrs: false });
 
@@ -140,6 +149,15 @@ const databaseView = useDatabaseView<DataRecord>({
     onCellEdit: async (payload) => {
       emit("cell-edit", payload);
       await props.actions?.onCellEdit?.(payload);
+    },
+    onCreateRecord: async ({ record }) => {
+      await props.actions?.onCreateRecord?.({ tableId: props.tableId, record });
+    },
+    onUpdateRecord: async ({ recordId, patch, record }) => {
+      await props.actions?.onUpdateRecord?.({ tableId: props.tableId, recordId, patch, record });
+    },
+    onDeleteRecord: async ({ recordId }) => {
+      await props.actions?.onDeleteRecord?.({ tableId: props.tableId, recordId });
     },
     onSelectRecord: async (record) => {
       await props.actions?.onSelectRecord?.(record);
@@ -203,6 +221,7 @@ const resolvedViewTabs = computed<DatabaseViewViewTab[]>(() =>
     detailViewId: DETAIL_VIEW_ID,
   }),
 );
+const detailSource = computed(() => props.detailSource?.trim() || undefined);
 
 const detailWorkspace = useDatabaseDetailWorkspace({
   tableId: toRef(props, "tableId"),
@@ -535,6 +554,97 @@ function handleTimelineRecordsUpdate(records: DataRecord[]) {
   setRecords(records);
 }
 
+function handleKanbanQuickAdd(payload: DatabaseViewKanbanQuickAddEvent) {
+  emit("kanban-quick-add", payload);
+  void props.actions?.onKanbanQuickAdd?.({
+    tableId: props.tableId,
+    ...payload,
+  });
+}
+
+function handleKanbanCardMove(payload: DatabaseViewKanbanCardMoveEvent) {
+  emit("kanban-card-move", payload);
+  void props.actions?.onKanbanCardMove?.({
+    tableId: props.tableId,
+    ...payload,
+  });
+}
+
+function buildRecordPatch(nextRecord: DataRecord, currentRecord: DataRecord): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  const fieldKeys = new Set([
+    ...Object.keys(currentRecord.fields),
+    ...Object.keys(nextRecord.fields),
+  ]);
+  for (const key of fieldKeys) {
+    if (currentRecord.fields[key] !== nextRecord.fields[key]) {
+      patch[key] = nextRecord.fields[key];
+    }
+  }
+  return patch;
+}
+
+async function handleKanbanColumnsUpdate(columns: KanbanColumnData[]) {
+  const recordsById = new Map(resolvedRecords.value.map((record) => [record.id, record]));
+  const nextRecords = columns.flatMap((column) =>
+    column.tasks.map((task) => {
+      const nextTaskRecord = taskToDataRecord({
+        ...task,
+        status: column.id,
+      });
+      const currentRecord = recordsById.get(nextTaskRecord.id);
+      if (!currentRecord) return nextTaskRecord;
+      return {
+        ...currentRecord,
+        fields: {
+          ...currentRecord.fields,
+          ...nextTaskRecord.fields,
+        },
+        createdAt: currentRecord.createdAt ?? nextTaskRecord.createdAt,
+        updatedAt: currentRecord.updatedAt ?? nextTaskRecord.updatedAt,
+      };
+    }),
+  );
+  const nextRecordsById = new Map(nextRecords.map((record) => [record.id, record]));
+  const persistenceTasks: Promise<void>[] = [];
+
+  for (const record of nextRecords) {
+    const currentRecord = recordsById.get(record.id);
+    if (!currentRecord) {
+      if (props.actions?.onCreateRecord) {
+        persistenceTasks.push(
+          databaseView.emitCreateRecord({ record }),
+        );
+      }
+      continue;
+    }
+
+    const patch = buildRecordPatch(record, currentRecord);
+    if (Object.keys(patch).length > 0 && props.actions?.onUpdateRecord) {
+      persistenceTasks.push(
+        databaseView.emitUpdateRecord({
+          recordId: record.id,
+          patch,
+          record,
+        }),
+      );
+    }
+  }
+
+  for (const recordId of recordsById.keys()) {
+    if (!nextRecordsById.has(recordId) && props.actions?.onDeleteRecord) {
+      persistenceTasks.push(
+        databaseView.emitDeleteRecord({ recordId }),
+      );
+    }
+  }
+
+  setRecords(nextRecords);
+  if (persistenceTasks.length > 0) {
+    await Promise.all(persistenceTasks);
+  }
+}
+
 function handleRowSelect(record: DataRecord) {
   detailWorkspace.handleRowSelect(record);
 }
@@ -641,6 +751,9 @@ function handleDrawerWidthUpdate(width: number) {
         :schema="resolvedSchema"
         :view="activeView"
         :columns="toolbarColumns"
+        :priority-color-map="props.priorityColorMap"
+        :status-color-map="props.statusColorMap"
+        :kanban-appearance="props.kanbanAppearance"
         :readonly="readonly"
         :enable-field-management="ui?.enableFieldManagement ?? false"
         @cell-edit="handleCellEdit"
@@ -659,9 +772,28 @@ function handleDrawerWidthUpdate(width: number) {
         @card-click="handleCardClick"
         @add="emit('add')"
         @add-column="emit('add-column')"
+        @update:columns="handleKanbanColumnsUpdate"
         @record-change="handleRecordChange"
         @update:records="handleTimelineRecordsUpdate"
-      />
+        @kanban-quick-add="handleKanbanQuickAdd"
+        @kanban-card-move="handleKanbanCardMove"
+      >
+        <template v-if="$slots['kanban-column-header']" #kanban-column-header="slotProps">
+          <slot name="kanban-column-header" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots['kanban-card']" #kanban-card="slotProps">
+          <slot name="kanban-card" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots['kanban-card-title']" #kanban-card-title="slotProps">
+          <slot name="kanban-card-title" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots['kanban-card-meta']" #kanban-card-meta="slotProps">
+          <slot name="kanban-card-meta" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots['kanban-card-tags']" #kanban-card-tags="slotProps">
+          <slot name="kanban-card-tags" v-bind="slotProps" />
+        </template>
+      </DatabaseViewContent>
     </template>
 
     <template #detail>
@@ -674,6 +806,7 @@ function handleDrawerWidthUpdate(width: number) {
         :view-type="activeViewType"
         :description="detailWorkspaceDescription"
         :presentation="resolvedDetailPresentation"
+        :source="detailSource"
         :side-panel-width="sidePanelWidth"
         :drawer-width="drawerWidth"
         :can-switch-presentation="canSwitchDetailPresentation"
@@ -688,7 +821,23 @@ function handleDrawerWidthUpdate(width: number) {
         @update:side-panel-width="handleSidePanelWidthUpdate"
         @update:drawer-width="handleDrawerWidthUpdate"
         @update:presentation="setPreferredDetailPresentation"
-      />
+      >
+        <template v-if="$slots.header" #header="slotProps">
+          <slot name="header" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots.actions" #actions="slotProps">
+          <slot name="actions" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots.preview" #preview="slotProps">
+          <slot name="preview" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots.activity" #activity="slotProps">
+          <slot name="activity" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots.footer" #footer="slotProps">
+          <slot name="footer" v-bind="slotProps" />
+        </template>
+      </DatabaseViewDetailHost>
     </template>
   </DatabaseViewShell>
 </template>
@@ -697,6 +846,6 @@ function handleDrawerWidthUpdate(width: number) {
 .of-database-view__toolbar {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: var(--of-z-raised);
 }
 </style>

@@ -88,10 +88,10 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
   pointer-events: auto;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   max-width: 360px;
   min-width: 280px;
-  padding: 12px 16px;
+  padding: var(--of-spacing-3) var(--of-spacing-4);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
   border: 1px solid;
   border-left-width: 4px;
@@ -114,16 +114,16 @@ const ariaRole = computed(() => (props.toast.type === "error" ? "alertdialog" : 
 }
 
 .of-toast__title {
-  margin: 0 0 2px 0;
-  font-size: 14px;
-  font-weight: 600;
+  margin: 0 0 var(--of-spacing-0_5) 0;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   line-height: 1.4;
   color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
 }
 
 .of-toast__message {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   line-height: 1.4;
   color: var(--of-text-secondary, var(--of-color-text-secondary, #4b5563));
 }

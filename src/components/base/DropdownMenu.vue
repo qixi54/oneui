@@ -151,7 +151,7 @@ function closeMenu() {
 .of-dropdown-menu__backdrop {
   position: fixed;
   inset: 0;
-  z-index: 99;
+  z-index: var(--of-z-dropdown);
   padding: 0;
   border: 0;
   background: transparent;
@@ -164,13 +164,13 @@ function closeMenu() {
   position: absolute;
   top: 100%;
   right: 0;
-  z-index: 100;
+  z-index: var(--of-z-dropdown);
   min-width: 160px;
   background: var(--of-surface-elevated);
   border: 1px solid var(--of-border-subtle);
   border-radius: var(--of-radius-md);
   box-shadow: var(--of-shadow-panel);
-  margin-top: 4px;
+  margin-top: var(--of-spacing-1);
   overflow: hidden;
 }
 
@@ -179,11 +179,11 @@ function closeMenu() {
   align-items: center;
   gap: var(--of-spacing-2);
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   background: transparent;
   border: none;
   color: var(--of-color-text);
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   font-weight: 400;
   cursor: pointer;
   transition: var(--of-transition-fast);

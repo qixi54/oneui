@@ -38,14 +38,14 @@ const { toasts, remove } = useToast();
   position: fixed;
   top: 16px;
   right: 16px;
-  z-index: 9999;
+  z-index: var(--of-z-toast);
   pointer-events: none;
 }
 
 .of-toast-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   align-items: flex-end;
 }
 

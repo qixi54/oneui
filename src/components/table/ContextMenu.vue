@@ -123,17 +123,17 @@ onBeforeUnmount(() => {
 <style scoped>
 .of-context-menu {
   min-width: 160px;
-  padding: 4px 0;
+  padding: var(--of-spacing-1) 0;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   border: 1px solid var(--of-border-subtle, var(--of-border-color));
   border-radius: var(--of-radius-lg, 8px);
   box-shadow: var(--of-shadow-context-menu);
-  z-index: 9999;
+  z-index: var(--of-z-context-menu);
   user-select: none;
 }
 
 .of-context-menu__sep {
-  margin: 4px 0;
+  margin: var(--of-spacing-1) 0;
   border: 0;
   border-top: 1px solid var(--of-border-subtle, var(--of-color-border-light));
 }
@@ -142,12 +142,12 @@ onBeforeUnmount(() => {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2) var(--of-spacing-3_5);
   border: 0;
   background: transparent;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   line-height: 1.4;
   color: var(--of-text-primary, var(--of-color-text-primary));
   cursor: pointer;
@@ -179,6 +179,6 @@ onBeforeUnmount(() => {
 .of-context-menu__submenu-indicator {
   margin-left: auto;
   color: var(--of-text-tertiary, var(--of-color-text-tertiary));
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 </style>

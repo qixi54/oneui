@@ -62,7 +62,7 @@ function toggle() {
 .of-switch {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   padding: 0;
   border: none;
   background: transparent;
@@ -78,7 +78,7 @@ function toggle() {
   position: relative;
   display: inline-block;
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   background: var(--of-border-subtle);
   transition: background 0.2s;
 }
@@ -124,8 +124,8 @@ function toggle() {
 }
 
 .of-switch__label {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: var(--of-font-size-md);
+  line-height: var(--of-line-height-normal);
   color: var(--of-text-primary);
 }
 </style>

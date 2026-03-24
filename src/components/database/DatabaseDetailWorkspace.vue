@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import DetailLayout from "../detail/DetailLayout.vue";
+import { ContentBlock } from "../editor";
 import FieldCell from "../table/FieldCell.vue";
-import type { CellValue as FieldCellValue } from "../table/FieldCell.vue";
-import type { DatabaseViewResolvedDetailPresentation } from "../../contracts/database";
-import type { DatabaseDetailPropertyItem, DatabaseWorkspaceModeOption } from "./databaseViewUtils";
+import type { CellValue as FieldCellValue, FieldDef } from "../table/FieldCell.vue";
+import type {
+  DatabaseDetailWorkspaceModeOption,
+  DatabaseDetailWorkspacePropertyItem,
+  DatabaseDetailWorkspaceSlotContext,
+  DatabaseDetailWorkspaceSlots,
+  DatabaseViewDetailPresentation,
+} from "../../contracts/database";
 
 const props = withDefaults(
   defineProps<{
@@ -11,16 +18,18 @@ const props = withDefaults(
     title: string;
     description: string;
     recordId?: string;
+    source?: string;
     viewType: string;
-    presentation: DatabaseViewResolvedDetailPresentation;
+    presentation: Exclude<DatabaseViewDetailPresentation, "auto">;
     canSwitchPresentation?: boolean;
-    workspaceModes?: DatabaseWorkspaceModeOption[];
-    propertyItems?: DatabaseDetailPropertyItem[];
+    workspaceModes?: DatabaseDetailWorkspaceModeOption[];
+    propertyItems?: DatabaseDetailWorkspacePropertyItem[];
     readonly?: boolean;
     hasDraftChanges?: boolean;
   }>(),
   {
     recordId: "",
+    source: undefined,
     canSwitchPresentation: false,
     workspaceModes: () => [],
     propertyItems: () => [],
@@ -34,8 +43,25 @@ const emit = defineEmits<{
   save: [];
   delete: [rowId: string];
   close: [];
-  "update:presentation": [value: DatabaseViewResolvedDetailPresentation];
+  "update:presentation": [value: Exclude<DatabaseViewDetailPresentation, "auto">];
 }>();
+
+defineSlots<DatabaseDetailWorkspaceSlots>();
+
+const slotContext = computed<DatabaseDetailWorkspaceSlotContext>(() => ({
+  rowId: props.rowId,
+  recordId: props.recordId,
+  source: props.source,
+  title: props.title,
+  description: props.description,
+  viewType: props.viewType,
+  presentation: props.presentation,
+  canSwitchPresentation: props.canSwitchPresentation,
+  workspaceModes: props.workspaceModes,
+  propertyItems: props.propertyItems,
+  readonly: props.readonly,
+  hasDraftChanges: props.hasDraftChanges,
+}));
 
 function handleFieldCommit(rowId: string, fieldId: string, value: FieldCellValue) {
   emit("commit", rowId, fieldId, value);
@@ -45,6 +71,14 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 </script>
 
 <template>
+  <div v-if="$slots.header" class="of-database-view__detail-workspace-header">
+    <slot name="header" v-bind="slotContext" />
+  </div>
+
+  <div v-if="$slots.actions" class="of-database-view__detail-workspace-actions">
+    <slot name="actions" v-bind="slotContext" />
+  </div>
+
   <DetailLayout
     :title="props.title"
     :comments="[]"
@@ -74,6 +108,23 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
       <span class="of-database-view__workspace-chip">{{ props.presentation }}</span>
     </template>
 
+    <template #description>
+      <slot name="preview" v-bind="slotContext">
+        <div class="of-database-view__detail-workspace-preview">
+          <ContentBlock :content="props.description" :editable="false" />
+          <p v-if="!props.description" class="of-database-view__detail-workspace-empty">
+            暂无预览内容
+          </p>
+        </div>
+      </slot>
+    </template>
+
+    <template #comments>
+      <slot name="activity" v-bind="slotContext">
+        <p class="of-database-view__detail-workspace-empty">暂无活动记录</p>
+      </slot>
+    </template>
+
     <template #props>
       <div class="of-database-view__detail-workspace" :data-record-id="props.recordId">
         <section class="of-database-view__detail-workspace-properties">
@@ -87,8 +138,8 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
               <FieldCell
                 v-if="item.field"
                 :row-id="props.rowId"
-                :field="item.field"
-                :value="item.value"
+                :field="item.field as FieldDef"
+                :value="item.value as FieldCellValue"
                 :readonly="props.readonly"
                 @commit="handleFieldCommit"
               />
@@ -130,18 +181,42 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 </template>
 
 <style scoped>
+.of-database-view__detail-workspace-header,
+.of-database-view__detail-workspace-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--of-spacing-3);
+  margin-bottom: var(--of-spacing-3);
+}
+
+.of-database-view__detail-workspace-actions {
+  margin-bottom: var(--of-spacing-4);
+  flex-wrap: wrap;
+}
+
+.of-database-view__detail-workspace-preview {
+  display: grid;
+  gap: var(--of-spacing-2_5);
+}
+
+.of-database-view__detail-workspace-empty {
+  margin: 0;
+  color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
+  font-size: var(--of-font-size-base);
+}
+
 .of-database-view__detail-workspace {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
   min-height: 0;
 }
 
 .of-database-view__workspace-modes {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px;
+  gap: var(--of-spacing-1_5);
+  padding: var(--of-spacing-1);
   border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
   border-radius: var(--of-radius-pill, 999px);
   background: var(
@@ -155,8 +230,8 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   background: transparent;
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   border-radius: var(--of-radius-pill, 999px);
-  padding: 6px 10px;
-  font-size: 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
+  font-size: var(--of-font-size-sm);
   line-height: 1;
   cursor: pointer;
 }
@@ -172,25 +247,25 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 .of-database-view__workspace-chip {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
+  border-radius: var(--of-radius-full);
   background: var(
     --of-surface-workspace-strong,
     var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6))
   );
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-database-view__detail-workspace-properties {
   display: grid;
-  gap: 12px;
+  gap: var(--of-spacing-3);
 }
 
 .of-database-view__detail-workspace-field {
   display: grid;
-  gap: 6px;
-  padding: 14px;
+  gap: var(--of-spacing-1_5);
+  padding: var(--of-spacing-3_5);
   border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
   border-radius: var(--of-radius-xl, 12px);
   background: var(
@@ -200,8 +275,8 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 }
 
 .of-database-view__detail-workspace-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
 }
 
@@ -212,7 +287,7 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 }
 
 .of-database-view__detail-workspace-fallback {
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
 }
 
 .of-database-view__detail-workspace-footer-spacer {
@@ -224,11 +299,11 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   align-items: center;
   justify-content: center;
   min-height: 36px;
-  padding: 0 14px;
+  padding: 0 var(--of-spacing-3_5);
   border: 1px solid transparent;
   border-radius: var(--of-radius-lg, 8px);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   cursor: pointer;
 }
 

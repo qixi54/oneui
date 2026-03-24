@@ -1,9 +1,19 @@
 <script setup lang="ts">
+import { computed, useSlots } from "vue";
 import DataTable from "../table/DataTable.vue";
 import KanbanBoard from "../kanban/KanbanBoard.vue";
 import GalleryView from "../gallery/GalleryView.vue";
 import GanttTimeline from "../timeline/GanttTimeline.vue";
-import type { DataRecord, TableColumn, TableSchema, ViewConfig } from "../../types";
+import { taskToDataRecord } from "../../types";
+import type { DataRecord, TableColumn, TableSchema, ViewConfig, KanbanColumnData, ColorMap, Task } from "../../types";
+import type {
+  DatabaseViewKanbanAppearance,
+  DatabaseViewKanbanCardMoveEvent,
+  DatabaseViewKanbanCardSlotContext,
+  DatabaseViewKanbanColumnHeaderSlotContext,
+  DatabaseViewKanbanQuickAddEvent,
+  DatabaseViewKanbanSlots,
+} from "../../contracts/database";
 
 const props = withDefaults(
   defineProps<{
@@ -12,11 +22,17 @@ const props = withDefaults(
     schema?: TableSchema | null;
     view: ViewConfig;
     columns: TableColumn[];
+    priorityColorMap?: ColorMap;
+    statusColorMap?: ColorMap;
+    kanbanAppearance?: DatabaseViewKanbanAppearance;
     readonly?: boolean;
     enableFieldManagement?: boolean;
   }>(),
   {
     schema: null,
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
+    kanbanAppearance: undefined,
     readonly: false,
     enableFieldManagement: false,
   },
@@ -35,11 +51,67 @@ const emit = defineEmits<{
   "card-click": [payload: unknown];
   add: [];
   "add-column": [];
+  "update:columns": [columns: KanbanColumnData[]];
   "record-change": [payload: { recordId: string; startDate?: string; endDate?: string }];
   "update:records": [records: DataRecord[]];
+  "kanban-quick-add": [payload: DatabaseViewKanbanQuickAddEvent];
+  "kanban-card-move": [payload: DatabaseViewKanbanCardMoveEvent];
 }>();
 
+defineSlots<DatabaseViewKanbanSlots>();
 defineOptions({ name: "DatabaseViewContent" });
+
+const slots = useSlots();
+const recordMap = computed(() => new Map(props.records.map((record) => [record.id, record])));
+
+function resolveRecord(task: Task): DataRecord {
+  return recordMap.value.get(task.id) ?? taskToDataRecord(task);
+}
+
+function buildCardSlotContext(
+  slotProps: Omit<DatabaseViewKanbanCardSlotContext, "record" | "fields">,
+): DatabaseViewKanbanCardSlotContext {
+  const record = resolveRecord(slotProps.task);
+  return {
+    ...slotProps,
+    record,
+    fields: record.fields,
+  };
+}
+
+function buildColumnHeaderSlotContext(
+  slotProps: Omit<DatabaseViewKanbanColumnHeaderSlotContext, "tasks" | "records">,
+): DatabaseViewKanbanColumnHeaderSlotContext {
+  const tasks = slotProps.column.tasks;
+  return {
+    ...slotProps,
+    tasks,
+    records: tasks.map((task) => resolveRecord(task)),
+  };
+}
+
+function handleKanbanQuickAdd(
+  payload: Omit<DatabaseViewKanbanQuickAddEvent, "record" | "fields">,
+) {
+  const record = resolveRecord(payload.task);
+  emit("kanban-quick-add", {
+    ...payload,
+    record,
+    fields: record.fields,
+  });
+}
+
+function handleKanbanCardMove(
+  payload: Omit<DatabaseViewKanbanCardMoveEvent, "record" | "fields" | "recordId">,
+) {
+  const record = resolveRecord(payload.task);
+  emit("kanban-card-move", {
+    ...payload,
+    recordId: record.id,
+    record,
+    fields: record.fields,
+  });
+}
 </script>
 
 <template>
@@ -70,10 +142,31 @@ defineOptions({ name: "DatabaseViewContent" });
       :records="props.records"
       :schema="props.schema ?? undefined"
       :view="props.view"
+      :priority-color-map="props.priorityColorMap"
+      :status-color-map="props.statusColorMap"
+      :kanban-appearance="props.kanbanAppearance"
       @card-click="emit('card-click', $event)"
-      @update:columns="() => undefined"
+      @update:columns="emit('update:columns', $event)"
       @add-column="emit('add-column')"
-    />
+      @quick-add="handleKanbanQuickAdd"
+      @card-move="handleKanbanCardMove"
+    >
+      <template v-if="slots['kanban-column-header']" #column-header="slotProps">
+        <slot name="kanban-column-header" v-bind="buildColumnHeaderSlotContext(slotProps)" />
+      </template>
+      <template v-if="slots['kanban-card']" #card="slotProps">
+        <slot name="kanban-card" v-bind="buildCardSlotContext(slotProps)" />
+      </template>
+      <template v-if="slots['kanban-card-title']" #card-title="slotProps">
+        <slot name="kanban-card-title" v-bind="buildCardSlotContext(slotProps)" />
+      </template>
+      <template v-if="slots['kanban-card-meta']" #meta="slotProps">
+        <slot name="kanban-card-meta" v-bind="buildCardSlotContext(slotProps)" />
+      </template>
+      <template v-if="slots['kanban-card-tags']" #tags="slotProps">
+        <slot name="kanban-card-tags" v-bind="buildCardSlotContext(slotProps)" />
+      </template>
+    </KanbanBoard>
 
     <GalleryView
       v-else-if="props.viewType === 'gallery'"

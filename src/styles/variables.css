@@ -274,17 +274,21 @@
   --of-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 
   /* ─── Font Sizes ─── */
+  --of-font-size-2xs: 0.5625rem;
   --of-font-size-xs: 0.6875rem;
   --of-font-size-sm: 0.75rem;
   --of-font-size-base: 0.8125rem;
   --of-font-size-md: 0.875rem;
   --of-font-size-lg: 1rem;
   --of-font-size-xl: 1.125rem;
+  --of-font-size-2xl: 1.5rem;
+  --of-font-size-3xl: 2rem;
 
   /* ─── Font Weights ─── */
   --of-font-weight-normal: 400;
   --of-font-weight-medium: 500;
   --of-font-weight-semibold: 600;
+  --of-font-weight-bold: 700;
 
   /* ─── Line Heights ─── */
   --of-line-height-tight: 1.2;
@@ -299,9 +303,14 @@
   /* ─── Spacing ─── */
   --of-spacing-xs: 0.125rem;
   --of-spacing-0_5: 0.125rem;
+  --of-spacing-0_75: 0.1875rem;
   --of-spacing-1: 0.25rem;
+  --of-spacing-1_25: 0.3125rem;
+  --of-spacing-1_5: 0.375rem;
   --of-spacing-2: 0.5rem;
+  --of-spacing-2_5: 0.625rem;
   --of-spacing-3: 0.75rem;
+  --of-spacing-3_5: 0.875rem;
   --of-spacing-4: 1rem;
   --of-spacing-5: 1.25rem;
   --of-spacing-6: 1.5rem;
@@ -313,6 +322,7 @@
   --of-radius-md: 0.375rem;
   --of-radius-lg: 0.5rem;
   --of-radius-xl: 0.625rem;
+  --of-radius-2xl: 1.25rem;
   --of-radius-full: 9999px;
 
   /* ─── Shadows ─── */
@@ -342,6 +352,25 @@
   --of-sidebar-item-py: 0.625rem;
   --of-sidebar-item-py-compact: 0.375rem;
   --of-statusbar-height: 32px;
+
+  /* ─── Z-Index ─── */
+  --of-z-base: 1;
+  --of-z-raised: 2;
+  --of-z-sticky: 10;
+  --of-z-dropdown: 100;
+  --of-z-sidebar: 199;
+  --of-z-navbar: 200;
+  --of-z-overlay: 1000;
+  --of-z-modal: 1001;
+  --of-z-popover: 1002;
+  --of-z-context-menu: 1003;
+  --of-z-toast: 9999;
+
+  /* ─── Breakpoints ─── */
+  --of-breakpoint-sm: 640px;
+  --of-breakpoint-md: 768px;
+  --of-breakpoint-lg: 1024px;
+  --of-breakpoint-xl: 1280px;
 
   /* ─── Transitions ─── */
   --of-transition-fast: all 0.15s ease;

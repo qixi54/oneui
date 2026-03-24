@@ -53,29 +53,35 @@ const displayValue = computed(() => {
     linear-gradient(145deg, var(--of-surface-panel), var(--of-surface-workspace-raised)),
     var(--of-surface-workspace-raised);
   box-shadow: var(--of-elevation-card);
-  padding: 16px;
+  padding: var(--of-spacing-4);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
+  transition: var(--of-transition-normal);
+}
+
+.of-number-card:hover {
+  box-shadow: var(--of-elevation-card-hover);
+  border-color: var(--of-border-strong);
 }
 
 .of-number-card__title {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-secondary);
 }
 
 .of-number-card__value-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-number-card__value {
   margin: 0;
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--of-font-size-3xl);
+  font-weight: var(--of-font-weight-bold);
   line-height: 1;
 }
 
@@ -89,7 +95,7 @@ const displayValue = computed(() => {
 
 .of-number-card__compare {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-tertiary);
 }
 </style>

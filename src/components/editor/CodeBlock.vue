@@ -57,10 +57,10 @@ async function handleCopy() {
 .code-block {
   background: var(--of-surface-panel, var(--of-color-gray-800));
   border-radius: var(--of-radius-md);
-  padding: 14px 16px;
+  padding: var(--of-spacing-3_5) var(--of-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   overflow: hidden;
 }
 
@@ -68,12 +68,12 @@ async function handleCopy() {
 .code-block__header {
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: var(--of-spacing-1_5);
 }
 
 .code-block__lang {
   font-family: var(--of-font-mono);
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   text-transform: lowercase;
 }
@@ -82,11 +82,11 @@ async function handleCopy() {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   background: transparent;
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-700));
   border-radius: var(--of-radius-sm);
-  padding: 2px 8px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
   cursor: pointer;
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   transition: var(--of-transition-fast);
@@ -106,7 +106,7 @@ async function handleCopy() {
 
 .code-block__copy-label {
   font-family: var(--of-font-sans);
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
 }
 
 /* Code */
@@ -120,8 +120,8 @@ async function handleCopy() {
 
 .code-block__code {
   font-family: var(--of-font-mono);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-primary, var(--of-color-gray-200));
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
 }
 </style>

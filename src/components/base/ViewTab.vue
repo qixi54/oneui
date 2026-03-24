@@ -50,22 +50,22 @@ function select(key: string) {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 2px;
+  gap: var(--of-spacing-0_5);
 }
 
 .of-view-tab__item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
+  gap: var(--of-spacing-1_5);
+  padding: var(--of-spacing-2_5) var(--of-spacing-4);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-family: var(--of-font-sans);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
   line-height: 1;
   color: var(--of-color-gray-500);
   transition: var(--of-transition-fast);

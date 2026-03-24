@@ -110,7 +110,7 @@ const showDot = computed(() => !!dotColor.value);
 <style scoped>
 .prop-row {
   width: 100%;
-  padding: 8px 0;
+  padding: var(--of-spacing-2) 0;
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--of-color-gray-100);
@@ -121,8 +121,8 @@ const showDot = computed(() => !!dotColor.value);
 
 .prop-row__key {
   font-family: var(--of-font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-color-gray-500);
   width: 80px;
   flex-shrink: 0;
@@ -134,7 +134,7 @@ const showDot = computed(() => !!dotColor.value);
 .prop-row__value-area {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   flex: 1;
   min-width: 0;
 }
@@ -142,12 +142,12 @@ const showDot = computed(() => !!dotColor.value);
 .prop-row__badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: 8px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-0_75) var(--of-spacing-2_5);
+  border-radius: var(--of-radius-lg);
   font-family: var(--of-font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;
@@ -164,8 +164,8 @@ const showDot = computed(() => !!dotColor.value);
 
 .prop-row__plain-text {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-700);
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
 }
 </style>

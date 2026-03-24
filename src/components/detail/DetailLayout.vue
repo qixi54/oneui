@@ -248,7 +248,7 @@ function onDescriptionUpdate(value: string) {
 .detail-layout__main {
   flex: 1;
   min-width: 0;
-  padding: 24px 32px;
+  padding: var(--of-spacing-6) var(--of-spacing-8);
   border-right: 1px solid var(--of-color-gray-200);
   display: flex;
   flex-direction: column;
@@ -258,11 +258,11 @@ function onDescriptionUpdate(value: string) {
 /* 任务标题 */
 .detail-layout__title {
   font-family: var(--of-font-sans);
-  font-size: 22px;
-  font-weight: 700;
+  font-size: var(--of-font-size-2xl);
+  font-weight: var(--of-font-weight-bold);
   color: var(--of-color-gray-900);
   line-height: 1.35;
-  margin: 0 0 12px 0;
+  margin: 0 0 var(--of-spacing-3) 0;
   padding: 0;
   word-break: break-word;
 }
@@ -272,18 +272,18 @@ function onDescriptionUpdate(value: string) {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: var(--of-spacing-2_5);
+  margin-bottom: var(--of-spacing-6);
 }
 
 .detail-layout__badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: 8px;
+  padding: var(--of-spacing-0_75) var(--of-spacing-2_5);
+  border-radius: var(--of-radius-lg);
   font-family: var(--of-font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
 }
 
@@ -294,7 +294,7 @@ function onDescriptionUpdate(value: string) {
 
 .detail-layout__meta-text {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-500);
 }
 
@@ -309,10 +309,10 @@ function onDescriptionUpdate(value: string) {
 
 .detail-layout__section-title {
   font-family: var(--of-font-sans);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-gray-700);
-  margin-bottom: 12px;
+  margin-bottom: var(--of-spacing-3);
 }
 
 /* 描述内容 */
@@ -323,9 +323,9 @@ function onDescriptionUpdate(value: string) {
 .detail-layout__state {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   min-height: 220px;
-  padding: 16px 0;
+  padding: var(--of-spacing-4) 0;
 }
 
 .detail-layout__state-icon {
@@ -336,27 +336,27 @@ function onDescriptionUpdate(value: string) {
 .detail-layout__state-copy {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .detail-layout__state-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-900));
 }
 
 .detail-layout__state-description {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: var(--of-font-size-base);
+  line-height: var(--of-line-height-relaxed);
   color: var(--of-text-secondary, var(--of-color-gray-500));
 }
 
 .detail-layout__desc-placeholder {
   font-family: var(--of-font-sans);
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-color-gray-500);
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
   margin: 0;
 }
 
@@ -369,7 +369,7 @@ function onDescriptionUpdate(value: string) {
 
 .detail-layout__empty-hint {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-400);
   margin: 0;
 }
@@ -377,7 +377,7 @@ function onDescriptionUpdate(value: string) {
 .detail-layout__footer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   flex-wrap: wrap;
   margin-top: 28px;
 }
@@ -386,7 +386,7 @@ function onDescriptionUpdate(value: string) {
 .detail-layout__sidebar {
   width: 320px;
   flex-shrink: 0;
-  padding: 20px;
+  padding: var(--of-spacing-5);
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-color-gray-200);
   box-sizing: border-box;
@@ -405,18 +405,18 @@ function onDescriptionUpdate(value: string) {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--of-color-gray-200);
-    padding: 20px 16px;
+    padding: var(--of-spacing-5) var(--of-spacing-4);
   }
 
   .detail-layout__sidebar {
     width: 100%;
     border: none;
     border-top: 1px solid var(--of-color-gray-200);
-    padding: 16px;
+    padding: var(--of-spacing-4);
   }
 
   .detail-layout__footer {
-    margin-top: 20px;
+    margin-top: var(--of-spacing-5);
   }
 }
 </style>

@@ -83,25 +83,25 @@ function handleClick(item: BreadcrumbItemData) {
   list-style: none;
   padding: 0;
   margin: 0;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 .of-breadcrumb__item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 .of-breadcrumb__link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   color: var(--of-text-secondary, var(--of-color-gray-600, #475569));
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   text-decoration: none;
   transition: color 0.15s ease;
   cursor: default;
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   padding: var(--of-spacing-xs, 2px) 0;
   border-radius: var(--of-radius-sm, 4px);
 }
@@ -113,7 +113,7 @@ function handleClick(item: BreadcrumbItemData) {
 
 .of-breadcrumb__link--active {
   color: var(--of-text-primary, var(--of-color-gray-800, #1e293b));
-  font-weight: 500;
+  font-weight: var(--of-font-weight-medium);
   pointer-events: none;
   cursor: default;
 }
@@ -122,8 +122,8 @@ function handleClick(item: BreadcrumbItemData) {
   display: inline-flex;
   align-items: center;
   color: var(--of-text-tertiary, var(--of-color-gray-400, #94a3b8));
-  padding: 0 4px;
-  font-size: 12px;
+  padding: 0 var(--of-spacing-1);
+  font-size: var(--of-font-size-sm);
   user-select: none;
 }
 

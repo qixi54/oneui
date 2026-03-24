@@ -81,15 +81,15 @@ defineOptions({ inheritAttrs: false });
 }
 
 .of-empty-state__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-text);
   margin: 0;
   padding: 0;
 }
 
 .of-empty-state__description {
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-color-text-secondary);
   margin: 0;
   padding: 0;
@@ -98,13 +98,13 @@ defineOptions({ inheritAttrs: false });
 
 .of-empty-state__action {
   margin-top: var(--of-spacing-2);
-  padding: 8px 16px;
+  padding: var(--of-spacing-2) var(--of-spacing-4);
   background: var(--of-accent-default);
   color: var(--of-color-text-inverse);
   border: none;
   border-radius: var(--of-radius-md);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   cursor: pointer;
   transition: var(--of-transition-fast);
 }

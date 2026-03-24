@@ -17,9 +17,9 @@ const emit = defineEmits<{
 .of-new-row-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   background: transparent;
   border: none;
   border-top: none;
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 }
 
 .of-new-row-label {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   transition: var(--of-transition-fast);
 }

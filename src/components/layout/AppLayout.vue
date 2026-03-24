@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: var(--of-radius-md);
   cursor: pointer;
-  font-size: 18px;
+  font-size: var(--of-font-size-xl);
   color: var(--of-text-secondary);
   flex-shrink: 0;
   transition: var(--of-transition-fast);
@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
   top: 0;
   left: 0;
   height: 100vh;
-  z-index: 200;
+  z-index: var(--of-z-navbar);
   transform: translateX(-100%);
   transition: transform 0.3s ease;
 }
@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
   position: fixed;
   inset: 0;
   background: var(--of-surface-overlay);
-  z-index: 199;
+  z-index: var(--of-z-sidebar);
 }
 
 /* ── Density: compact ── */

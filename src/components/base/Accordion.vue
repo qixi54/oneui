@@ -115,13 +115,13 @@ function toggleItem(item: AccordionItem) {
 .of-accordion {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   width: 100%;
 }
 
 .of-accordion__item {
   border: 1px solid var(--of-border-subtle, #e5e7eb);
-  border-radius: 12px;
+  border-radius: var(--of-radius-xl);
   background: var(--of-surface-elevated, #ffffff);
   overflow: hidden;
 }
@@ -135,8 +135,8 @@ function toggleItem(item: AccordionItem) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
+  gap: var(--of-spacing-3);
+  padding: var(--of-spacing-4) 18px;
   border: none;
   background: transparent;
   text-align: left;
@@ -152,25 +152,25 @@ function toggleItem(item: AccordionItem) {
   flex: 1;
   min-width: 0;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 .of-accordion__title {
-  font-size: 14px;
-  line-height: 1.5;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  line-height: var(--of-line-height-normal);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text, #111827));
 }
 
 .of-accordion__subtitle {
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: var(--of-font-size-sm);
+  line-height: var(--of-line-height-normal);
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
 }
 
 .of-accordion__icon {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   line-height: 1;
   color: var(--of-text-tertiary, var(--of-color-text-secondary, #6b7280));
 }

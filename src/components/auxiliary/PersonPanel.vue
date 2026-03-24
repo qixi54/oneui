@@ -76,32 +76,32 @@ function fallbackText(name: string) {
 <style scoped>
 .of-person-panel {
   display: grid;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-person-panel__label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-gray-700);
 }
 
 .of-person-panel__row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-person-panel__avatar {
   width: 30px;
   height: 30px;
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--of-text-primary);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
 }
 
 .of-person-panel__avatar img {
@@ -120,11 +120,11 @@ function fallbackText(name: string) {
   min-width: 0;
   height: 32px;
   border: 1px solid var(--of-color-gray-200);
-  border-radius: 8px;
-  padding: 0 10px;
+  border-radius: var(--of-radius-lg);
+  padding: 0 var(--of-spacing-2_5);
   background: var(--of-color-bg-elevated);
   color: var(--of-color-text);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
 }
 
 .of-person-panel.disabled {

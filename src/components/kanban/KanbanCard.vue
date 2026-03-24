@@ -12,6 +12,7 @@ const props = withDefaults(
   defineProps<{
     task: Task;
     dragging?: boolean;
+    variant?: "default" | "compact" | "custom";
     /**
      * 优先级颜色映射，会与内置默认映射合并（传入优先）
      * 例：{ urgent: { text: '#DC2626', bg: '#FEE2E2', label: '紧急' } }
@@ -25,6 +26,7 @@ const props = withDefaults(
   }>(),
   {
     dragging: false,
+    variant: "default",
     priorityColorMap: undefined,
     statusColorMap: undefined,
   },
@@ -32,6 +34,43 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   click: [task: Task];
+}>();
+
+type BadgeState = ReturnType<typeof resolveBadge>;
+
+defineSlots<{
+  card?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+  title?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+  meta?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+  tags?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
 }>();
 
 const resolvedPriority = computed(() =>
@@ -61,25 +100,75 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
   <button
     class="of-kanban-card"
     type="button"
-    :class="{ 'of-kanban-card--dragging': dragging }"
+    :class="[
+      `of-kanban-card--${variant}`,
+      { 'of-kanban-card--dragging': dragging },
+    ]"
+    :data-kanban-card-id="task.id"
+    :data-kanban-card-title="task.title"
+    :data-kanban-card-status="task.status ?? ''"
+    :data-kanban-card-priority="task.priority ?? ''"
+    :data-kanban-card-role="task.role ?? ''"
+    :data-kanban-card-variant="variant"
+    :data-kanban-card-dragging="dragging ? 'true' : 'false'"
     @click="emit('click', task)"
   >
-    <!-- 标题 -->
-    <div class="of-card-title">{{ task.title }}</div>
+    <slot
+      v-if="$slots.card"
+      name="card"
+      :task="task"
+      :display-date="displayDate"
+      :priority-badge="resolvedPriority"
+      :status-badge="resolvedStatus"
+      :priority-label="priorityLabel"
+      :status-label="statusLabel"
+    />
 
-    <!-- Meta 行：任务ID + 日期 + spacer + 角色徽章 -->
-    <div class="of-card-meta">
-      <span class="of-card-id">{{ task.id }}</span>
-      <span v-if="displayDate" class="of-card-date">{{ displayDate }}</span>
-      <span class="of-card-spacer" />
-      <span v-if="task.role" class="of-card-role-badge">{{ task.role }}</span>
-    </div>
+    <template v-else>
+      <slot
+        name="title"
+        :task="task"
+        :display-date="displayDate"
+        :priority-badge="resolvedPriority"
+        :status-badge="resolvedStatus"
+        :priority-label="priorityLabel"
+        :status-label="statusLabel"
+      >
+        <div class="of-card-title">{{ task.title }}</div>
+      </slot>
 
-    <!-- Tags 行：优先级徽章 + 状态徽章 -->
-    <div class="of-card-tags">
-      <span class="of-badge" :style="priorityStyle">{{ priorityLabel }}</span>
-      <span class="of-badge" :style="statusStyle">{{ statusLabel }}</span>
-    </div>
+      <slot
+        name="meta"
+        :task="task"
+        :display-date="displayDate"
+        :priority-badge="resolvedPriority"
+        :status-badge="resolvedStatus"
+        :priority-label="priorityLabel"
+        :status-label="statusLabel"
+      >
+        <div class="of-card-meta">
+          <span class="of-card-id">{{ task.id }}</span>
+          <span v-if="displayDate" class="of-card-date">{{ displayDate }}</span>
+          <span class="of-card-spacer" />
+          <span v-if="task.role" class="of-card-role-badge">{{ task.role }}</span>
+        </div>
+      </slot>
+
+      <slot
+        name="tags"
+        :task="task"
+        :display-date="displayDate"
+        :priority-badge="resolvedPriority"
+        :status-badge="resolvedStatus"
+        :priority-label="priorityLabel"
+        :status-label="statusLabel"
+      >
+        <div class="of-card-tags">
+          <span class="of-badge" :style="priorityStyle">{{ priorityLabel }}</span>
+          <span class="of-badge" :style="statusStyle">{{ statusLabel }}</span>
+        </div>
+      </slot>
+    </template>
   </button>
 </template>
 
@@ -87,11 +176,11 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 .of-kanban-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   text-align: left;
   border-radius: var(--of-radius-lg);
-  padding: 12px 14px;
+  padding: var(--of-spacing-3) var(--of-spacing-3_5);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   box-shadow: var(--of-shadow-card);
   cursor: pointer;
@@ -109,29 +198,38 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
   opacity: 0.5;
 }
 
+.of-kanban-card--compact {
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2_5) var(--of-spacing-3);
+}
+
+.of-kanban-card--custom {
+  align-items: stretch;
+}
+
 .of-card-title {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-primary, var(--of-color-gray-900));
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   word-break: break-word;
 }
 
 .of-card-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .of-card-id {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-500));
   white-space: nowrap;
 }
 
 .of-card-date {
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   white-space: nowrap;
 }
@@ -143,10 +241,10 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 .of-card-role-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 7px;
+  padding: var(--of-spacing-0_5) 7px;
   border-radius: var(--of-radius-full);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   background: var(--of-surface-selected, var(--of-color-gray-100));
   color: var(--of-text-secondary, var(--of-color-gray-600));
   white-space: nowrap;
@@ -155,17 +253,17 @@ const displayDate = computed(() => formatDate(props.task.updatedAt ?? props.task
 .of-card-tags {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   flex-wrap: wrap;
 }
 
 .of-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 500;
+  padding: var(--of-spacing-0_75) var(--of-spacing-2_5);
+  border-radius: var(--of-radius-xl);
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   line-height: 1.4;
 }

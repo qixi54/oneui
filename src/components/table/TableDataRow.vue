@@ -314,7 +314,7 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 .of-td {
   display: flex;
   align-items: center;
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-table-row-text-primary);
   overflow: hidden;
   box-sizing: border-box;
@@ -354,10 +354,10 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 .of-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: var(--of-spacing-0_75) var(--of-spacing-2_5);
+  border-radius: var(--of-radius-xl);
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   line-height: 1.4;
 }
@@ -368,16 +368,16 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 }
 
 .of-td-id {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-table-row-text-secondary);
-  font-weight: 500;
+  font-weight: var(--of-font-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .of-td-title {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-table-row-text-primary);
   font-weight: 400;
   overflow: hidden;
@@ -386,7 +386,7 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 }
 
 .of-td-text {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-table-row-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -395,17 +395,17 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 
 .of-td-empty {
   color: var(--of-table-row-text-tertiary);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
 }
 
 .of-table-row__actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   margin-left: auto;
   min-width: 116px;
-  padding: 0 10px 0 8px;
+  padding: 0 var(--of-spacing-2_5) 0 var(--of-spacing-2);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
@@ -421,14 +421,14 @@ function handleActionKeydown(action: RowActionItem, event: KeyboardEvent) {
 .of-table-row__action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1_25) var(--of-spacing-2_5);
   border: 1px solid var(--of-table-row-action-border);
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   background: var(--of-table-row-action-surface);
   color: var(--of-table-row-action-text);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   cursor: pointer;
   transition: var(--of-transition-fast);

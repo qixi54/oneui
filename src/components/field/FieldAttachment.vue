@@ -61,24 +61,24 @@ function removeFile(index: number) {
 .of-field-attachment {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   width: 100%;
-  padding: 4px;
+  padding: var(--of-spacing-1);
   outline: none;
 }
 .of-field-attachment-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 .of-field-attachment-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  font-size: 12px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
+  font-size: var(--of-font-size-sm);
   background: var(--of-surface-muted, var(--of-color-gray-100));
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   color: var(--of-text-primary, var(--of-color-text, #1a1a1a));
 }
 .of-field-attachment-name {
@@ -91,7 +91,7 @@ function removeFile(index: number) {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   padding: 0;
   line-height: 1;
@@ -99,10 +99,10 @@ function removeFile(index: number) {
 .of-field-attachment-add {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  font-size: 12px;
+  padding: var(--of-spacing-1) var(--of-spacing-2);
+  font-size: var(--of-font-size-sm);
   border: 1px dashed var(--of-border-subtle, var(--of-color-gray-300));
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   background: transparent;
   color: var(--of-text-secondary, var(--of-color-gray-500));
   cursor: pointer;

@@ -132,15 +132,15 @@ function handleKeydown(e: KeyboardEvent) {
 .one-select-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  border-radius: 8px;
-  padding: 3px 10px;
+  gap: var(--of-spacing-1);
+  border-radius: var(--of-radius-lg);
+  padding: var(--of-spacing-0_75) var(--of-spacing-2_5);
   border: 1px solid var(--one-sb-border);
   background: var(--one-sb-bg);
   color: var(--one-sb-text);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
+  line-height: var(--of-line-height-tight);
   white-space: nowrap;
   box-sizing: border-box;
   user-select: none;

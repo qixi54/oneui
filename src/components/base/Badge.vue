@@ -107,23 +107,23 @@ const badgeStyle = computed<CSSProperties>(() => {
   justify-content: center;
   width: fit-content;
   border: 1px solid var(--one-badge-border);
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   background: var(--one-badge-bg);
   color: var(--one-badge-color);
   font-family: var(--of-font-sans);
-  font-weight: 500;
-  line-height: 1.2;
+  font-weight: var(--of-font-weight-medium);
+  line-height: var(--of-line-height-tight);
   white-space: nowrap;
   box-sizing: border-box;
 }
 
 .one-badge--sm {
-  font-size: 11px;
-  padding: 1px 6px;
+  font-size: var(--of-font-size-xs);
+  padding: 1px var(--of-spacing-1_5);
 }
 
 .one-badge--md {
-  font-size: 12px;
-  padding: 2px 8px;
+  font-size: var(--of-font-size-sm);
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
 }
 </style>

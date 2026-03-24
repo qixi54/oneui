@@ -232,7 +232,7 @@ function handleDelete() {
 .of-detail-sheet-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--of-z-overlay);
   background: var(--of-color-overlay);
   display: flex;
   align-items: flex-end;
@@ -257,7 +257,7 @@ function handleDelete() {
   max-height: 90dvh;
   background: var(--of-surface-workspace-raised, var(--of-surface-elevated, #fff));
   box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--of-radius-2xl) var(--of-radius-2xl) 0 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -268,7 +268,7 @@ function handleDelete() {
   max-width: none;
   height: min(95dvh, calc(100dvh - 32px));
   max-height: none;
-  border-radius: 16px;
+  border-radius: var(--of-radius-2xl);
 }
 
 .of-detail-sheet-shell {
@@ -286,24 +286,24 @@ function handleDelete() {
   max-width: none;
   max-height: none;
   height: 100%;
-  border-radius: 12px;
+  border-radius: var(--of-radius-xl);
 }
 
 .of-detail-sheet__header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: var(--of-spacing-3) var(--of-spacing-4);
   border-bottom: 1px solid var(--of-border-workspace, var(--of-border-subtle));
-  gap: 12px;
+  gap: var(--of-spacing-3);
 }
 
 .of-detail-sheet__close {
   border: none;
   background: none;
-  font-size: 18px;
+  font-size: var(--of-font-size-xl);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   cursor: pointer;
-  padding: 4px;
+  padding: var(--of-spacing-1);
   min-width: 32px;
   min-height: 32px;
   display: flex;
@@ -312,8 +312,8 @@ function handleDelete() {
 }
 
 .of-detail-sheet__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
   margin: 0;
   flex: 1;
@@ -327,32 +327,32 @@ function handleDelete() {
 .of-detail-sheet__body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: var(--of-spacing-4);
   display: flex;
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
 }
 
 .of-detail-sheet__body--full-page {
-  padding: 20px 24px;
+  padding: var(--of-spacing-5) var(--of-spacing-6);
 }
 
 /* 属性区 */
 .of-detail-sheet__properties {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
 }
 
 .of-detail-sheet__field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 .of-detail-sheet__label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
 }
 
@@ -361,26 +361,26 @@ function handleDelete() {
   display: flex;
   align-items: center;
   border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
-  border-radius: 8px;
-  padding: 4px 8px;
+  border-radius: var(--of-radius-lg);
+  padding: var(--of-spacing-1) var(--of-spacing-2);
   background: var(--of-surface-workspace, var(--of-surface-elevated));
 }
 
 .of-detail-sheet__value {
-  font-size: 15px;
+  font-size: var(--of-font-size-md);
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
-  padding: 8px 0;
+  padding: var(--of-spacing-2) 0;
 }
 
 /* 内容区 */
 .of-detail-sheet__content {
-  padding-top: 16px;
+  padding-top: var(--of-spacing-4);
   border-top: 1px solid var(--of-border-workspace, var(--of-border-subtle));
-  margin-top: 16px;
+  margin-top: var(--of-spacing-4);
 }
 
 .of-detail-sheet__content-block {
-  margin-bottom: 24px;
+  margin-bottom: var(--of-spacing-6);
 }
 
 .of-detail-sheet__content-block:last-child {
@@ -388,65 +388,65 @@ function handleDelete() {
 }
 
 .of-detail-sheet__content-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
-  margin-bottom: 8px;
+  margin-bottom: var(--of-spacing-2);
   display: block;
 }
 
 .of-detail-sheet__markdown {
-  font-size: 15px;
+  font-size: var(--of-font-size-md);
   line-height: 1.7;
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
 }
 
 /* markdown 内部元素间距 */
 .of-detail-sheet__markdown :deep(h1) {
-  font-size: 24px;
-  margin: 16px 0 8px;
+  font-size: var(--of-font-size-2xl);
+  margin: var(--of-spacing-4) 0 var(--of-spacing-2);
 }
 .of-detail-sheet__markdown :deep(h2) {
-  font-size: 20px;
-  margin: 14px 0 6px;
+  font-size: var(--of-font-size-xl);
+  margin: var(--of-spacing-3_5) 0 var(--of-spacing-1_5);
 }
 .of-detail-sheet__markdown :deep(h3) {
-  font-size: 17px;
-  margin: 12px 0 4px;
+  font-size: var(--of-font-size-lg);
+  margin: var(--of-spacing-3) 0 var(--of-spacing-1);
 }
 .of-detail-sheet__markdown :deep(p) {
-  margin: 8px 0;
+  margin: var(--of-spacing-2) 0;
 }
 .of-detail-sheet__markdown :deep(ul),
 .of-detail-sheet__markdown :deep(ol) {
-  padding-left: 20px;
-  margin: 8px 0;
+  padding-left: var(--of-spacing-5);
+  margin: var(--of-spacing-2) 0;
 }
 .of-detail-sheet__markdown :deep(pre) {
-  margin: 12px 0;
-  border-radius: 8px;
+  margin: var(--of-spacing-3) 0;
+  border-radius: var(--of-radius-lg);
   overflow-x: auto;
 }
 .of-detail-sheet__markdown :deep(code) {
   background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 1px var(--of-spacing-1);
+  border-radius: var(--of-radius-sm);
   font-size: 0.9em;
 }
 .of-detail-sheet__markdown :deep(blockquote) {
   border-left: 3px solid var(--of-border-strong, var(--of-color-gray-300, #d1d5db));
-  padding-left: 12px;
-  margin: 8px 0;
+  padding-left: var(--of-spacing-3);
+  margin: var(--of-spacing-2) 0;
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
 }
 
 .of-detail-sheet__footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-3) var(--of-spacing-4);
   border-top: 1px solid var(--of-border-workspace, var(--of-border-subtle));
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-bottom: max(var(--of-spacing-3), env(safe-area-inset-bottom));
 }
 
 .of-detail-sheet__footer-spacer {
@@ -454,10 +454,10 @@ function handleDelete() {
 }
 
 .of-detail-sheet__btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: var(--of-spacing-2_5) var(--of-spacing-5);
+  border-radius: var(--of-radius-lg);
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   border: none;
   cursor: pointer;
   min-height: 44px;

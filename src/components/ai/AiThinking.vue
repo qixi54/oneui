@@ -27,15 +27,15 @@ defineProps<{ size?: "sm" | "md" }>();
 .of-ai-thinking {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   background: var(--of-surface-muted, var(--of-color-gray-100));
-  border-radius: 0 12px 12px 12px;
+  border-radius: 0 var(--of-radius-xl) var(--of-radius-xl) var(--of-radius-xl);
 }
 
 .of-ai-thinking.sm {
-  padding: 6px 10px;
-  gap: 3px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
+  gap: var(--of-spacing-0_75);
 }
 
 .of-ai-thinking__dot {

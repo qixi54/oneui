@@ -118,8 +118,8 @@ function handleToggleKeyDown(event: KeyboardEvent) {
   background: var(--of-table-group-row-surface);
   border-bottom: 1px solid var(--of-table-group-row-border);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-table-group-row-text-primary);
   box-sizing: border-box;
   user-select: none;
@@ -130,8 +130,8 @@ function handleToggleKeyDown(event: KeyboardEvent) {
   align-items: center;
   width: 100%;
   height: 100%;
-  padding: 0 12px;
-  gap: 8px;
+  padding: 0 var(--of-spacing-3);
+  gap: var(--of-spacing-2);
   box-sizing: border-box;
 }
 
@@ -169,10 +169,10 @@ function handleToggleKeyDown(event: KeyboardEvent) {
   display: inline-flex;
   align-items: center;
   gap: var(--of-spacing-1);
-  padding: 2px 8px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
   border-radius: var(--of-radius-xl);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   line-height: 1.4;
   background: var(--of-table-group-row-badge-surface);
@@ -188,8 +188,8 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 }
 
 .of-table-group-row__label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-table-group-row-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -197,17 +197,17 @@ function handleToggleKeyDown(event: KeyboardEvent) {
 }
 
 .of-table-group-row__count {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-table-group-row-text-secondary);
   font-weight: 400;
   white-space: nowrap;
 }
 
 .of-table-group-row__agg {
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-table-group-row-text-tertiary);
   font-weight: 400;
   white-space: nowrap;
-  margin-left: 4px;
+  margin-left: var(--of-spacing-1);
 }
 </style>

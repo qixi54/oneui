@@ -22,7 +22,7 @@ defineOptions({ inheritAttrs: false });
 .of-search-hl__match {
   background: var(--of-surface-selected, #fef3c7);
   color: var(--of-text-strong, #92400e);
-  border-radius: 2px;
+  border-radius: var(--of-radius-sm);
   padding: 0 1px;
 }
 </style>

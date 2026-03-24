@@ -1,6 +1,11 @@
 import type { FieldDef as CellFieldDef } from "../table/FieldCell.vue";
 import type {
+  DatabaseDetailWorkspaceModeOption,
+  DatabaseDetailWorkspacePropertyItem,
+  DatabaseDetailPresenterResolution,
+  DatabaseDetailPresenterShell,
   DatabaseViewDetailPresentation,
+  DatabaseViewLegacyDetailPresentation,
   DatabaseViewResolvedDetailPresentation,
   DatabaseViewViewTab,
 } from "../../contracts/database";
@@ -27,17 +32,33 @@ export interface DatabaseViewCurrentSort {
   order: "asc" | "desc" | null;
 }
 
-export interface DatabaseWorkspaceModeOption {
-  value: DatabaseViewResolvedDetailPresentation;
-  label: string;
-}
-
-export interface DatabaseDetailPropertyItem {
-  key: string;
-  label: string;
+export type DatabaseWorkspaceModeOption = DatabaseDetailWorkspaceModeOption;
+export interface DatabaseDetailPropertyItem extends DatabaseDetailWorkspacePropertyItem {
   field: CellFieldDef | null;
   value: CellValue | undefined;
-  fallbackText: string;
+}
+
+export function normalizeDetailPresentation(
+  presentation: Exclude<DatabaseViewDetailPresentation, "auto">,
+): DatabaseViewResolvedDetailPresentation {
+  switch (presentation) {
+    case "sheet":
+      return "drawer";
+    case "full-page":
+      return "fullscreen";
+    default:
+      return presentation;
+  }
+}
+
+export function denormalizeDetailPresentation(
+  presentation: DatabaseViewResolvedDetailPresentation,
+  fallback: DatabaseViewLegacyDetailPresentation = "sheet",
+): Exclude<DatabaseViewDetailPresentation, "auto"> {
+  if (fallback === "sheet") {
+    return presentation === "drawer" ? "sheet" : presentation === "fullscreen" ? "full-page" : presentation;
+  }
+  return presentation;
 }
 
 export function cloneView(view: ViewConfig): ViewConfig {
@@ -503,25 +524,47 @@ export function resolveDetailPresentation(options: {
   isMobileViewport: boolean;
 }): DatabaseViewResolvedDetailPresentation {
   if (options.requested !== "auto") {
-    return options.requested;
+    return normalizeDetailPresentation(options.requested);
   }
 
   if (options.preferred) {
     if (options.preferred === "side-panel" && options.isMobileViewport) {
-      return "sheet";
+      return "drawer";
     }
     return options.preferred;
   }
 
-  return options.isMobileViewport ? "sheet" : "side-panel";
+  return options.isMobileViewport ? "drawer" : "side-panel";
+}
+
+export function resolveDetailPresenter(options: {
+  presentation: DatabaseViewResolvedDetailPresentation;
+}): DatabaseDetailPresenterResolution {
+  if (options.presentation === "side-panel") {
+    const shell: DatabaseDetailPresenterShell = "side-panel";
+    return {
+      shell,
+      mode: "persistent",
+      resizable: true,
+      maskClosable: true,
+    };
+  }
+
+  const shell: DatabaseDetailPresenterShell = "drawer";
+  return {
+    shell,
+    fullscreen: options.presentation === "fullscreen",
+    resizable: options.presentation !== "fullscreen",
+    maskClosable: true,
+  };
 }
 
 export function buildWorkspaceModes(isMobileViewport: boolean): DatabaseWorkspaceModeOption[] {
   const modes: DatabaseWorkspaceModeOption[] = [];
   if (!isMobileViewport) {
-    modes.push({ value: "side-panel", label: "侧栏" });
+    modes.push({ value: "side-panel", label: "侧边面板" });
   }
-  modes.push({ value: "sheet", label: "抽屉" });
-  modes.push({ value: "full-page", label: "全屏" });
+  modes.push({ value: "drawer", label: "详情弹窗" });
+  modes.push({ value: "fullscreen", label: "全屏视图" });
   return modes;
 }

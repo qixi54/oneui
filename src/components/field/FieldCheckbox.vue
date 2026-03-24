@@ -51,6 +51,6 @@ function onKeydown(e: KeyboardEvent) {
   height: 100%;
   min-height: 28px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--of-font-size-lg);
 }
 </style>

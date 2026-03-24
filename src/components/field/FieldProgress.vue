@@ -49,21 +49,21 @@ function onCommit() {
 .of-field-progress {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   width: 100%;
-  padding: 4px 6px;
+  padding: var(--of-spacing-1) var(--of-spacing-1_5);
 }
 .of-field-progress-bar {
   flex: 1;
   height: 6px;
   background: var(--of-surface-muted, var(--of-color-gray-200));
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   overflow: hidden;
 }
 .of-field-progress-fill {
   height: 100%;
   background: var(--of-accent-default, var(--of-text-strong));
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   transition: width 0.15s ease;
 }
 .of-field-progress-slider {
@@ -77,7 +77,7 @@ function onCommit() {
 }
 .of-field-progress-label {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-500));
   min-width: 36px;
   text-align: right;

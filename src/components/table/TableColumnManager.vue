@@ -107,7 +107,7 @@ function onDragEnd() {
   border-radius: var(--of-radius-xl);
   box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
   min-width: 220px;
-  padding: 12px 16px;
+  padding: var(--of-spacing-3) var(--of-spacing-4);
   font-family: var(--of-font-sans);
 }
 
@@ -115,12 +115,12 @@ function onDragEnd() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: var(--of-spacing-2);
 }
 
 .of-col-manager__title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-800));
 }
 
@@ -129,7 +129,7 @@ function onDragEnd() {
   background: none;
   cursor: pointer;
   color: var(--of-text-tertiary, var(--of-color-gray-400));
-  padding: 2px;
+  padding: var(--of-spacing-0_5);
   border-radius: var(--of-radius-sm);
   display: flex;
   align-items: center;
@@ -142,21 +142,21 @@ function onDragEnd() {
 
 .of-col-manager__actions {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--of-spacing-2);
+  margin-bottom: var(--of-spacing-2);
 }
 
 .of-col-manager__action-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
+  gap: var(--of-spacing-1);
+  font-size: var(--of-font-size-xs);
   font-family: var(--of-font-sans);
   color: var(--of-text-secondary, var(--of-color-gray-500));
   background: var(--of-surface-workspace, var(--of-surface-muted));
   border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: var(--of-radius-md);
-  padding: 3px 8px;
+  padding: var(--of-spacing-0_75) var(--of-spacing-2);
   cursor: pointer;
 }
 
@@ -168,8 +168,8 @@ function onDragEnd() {
 .of-col-manager__row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 0;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-1_25) 0;
   border-bottom: 1px solid var(--of-border-workspace, var(--of-border-subtle));
 }
 
@@ -195,7 +195,7 @@ function onDragEnd() {
 }
 
 .of-col-manager__label {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-primary, var(--of-color-gray-800));
   flex: 1;
 }

@@ -283,7 +283,7 @@ function slotPayload(branch: DesktopBranch) {
 .of-checkbox-label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   cursor: pointer;
 }
 
@@ -311,10 +311,10 @@ function slotPayload(branch: DesktopBranch) {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   margin-left: auto;
   min-width: 116px;
-  padding: 0 10px 0 8px;
+  padding: 0 var(--of-spacing-2_5) 0 var(--of-spacing-2);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
@@ -331,14 +331,14 @@ function slotPayload(branch: DesktopBranch) {
 .of-table-row__action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1_25) var(--of-spacing-2_5);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   color: var(--of-text-secondary, var(--of-color-gray-600));
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
   cursor: pointer;
   transition: var(--of-transition-fast);

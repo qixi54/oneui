@@ -40,17 +40,17 @@ function handleClick(e: MouseEvent) {
 .ref-link {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--of-spacing-0_75);
   background: var(--of-surface-selected, #eceff3);
   border-radius: var(--of-radius-sm);
-  padding: 2px 8px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
   font-family: var(--of-font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-accent-default, #334155);
   cursor: pointer;
   text-decoration: none;
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   transition: var(--of-transition-fast);
   vertical-align: middle;
 }

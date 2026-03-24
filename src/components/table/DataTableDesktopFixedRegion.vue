@@ -97,7 +97,7 @@ function slotPayload() {
   min-width: 0;
   position: sticky;
   left: 0;
-  z-index: 10;
+  z-index: var(--of-z-sticky);
   overflow-y: auto;
   background: var(--of-surface-workspace-raised, var(--of-surface-elevated, var(--of-color-bg-elevated)));
   border-right: 1px solid var(--of-border-workspace, var(--of-border-subtle, var(--of-color-gray-200)));

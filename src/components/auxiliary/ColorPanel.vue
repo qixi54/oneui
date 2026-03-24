@@ -77,18 +77,18 @@ function handlePresetPick(color: string) {
 <style scoped>
 .of-color-panel {
   display: grid;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
 }
 
 .of-color-panel__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-color-panel__label {
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-gray-700);
 }
 
@@ -98,14 +98,14 @@ function handlePresetPick(color: string) {
 
 .of-color-panel__picker-row {
   display: flex;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-color-panel__picker {
   width: 42px;
   height: 32px;
   border: 1px solid var(--of-color-gray-200);
-  border-radius: 8px;
+  border-radius: var(--of-radius-lg);
   padding: 0;
   background: var(--of-color-bg-elevated);
 }
@@ -114,23 +114,23 @@ function handlePresetPick(color: string) {
   flex: 1;
   height: 32px;
   border: 1px solid var(--of-color-gray-200);
-  border-radius: 8px;
-  padding: 0 10px;
+  border-radius: var(--of-radius-lg);
+  padding: 0 var(--of-spacing-2_5);
   background: var(--of-color-bg-elevated);
   color: var(--of-color-text);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-color-panel__presets {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-color-panel__preset {
   width: 22px;
   height: 22px;
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   border: 1px solid var(--of-color-black-alpha-08);
   cursor: pointer;
 }

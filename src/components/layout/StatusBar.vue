@@ -61,7 +61,7 @@ withDefaults(
 .of-statusbar__left {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--of-spacing-1_25);
   flex-shrink: 0;
 }
 
@@ -75,7 +75,7 @@ withDefaults(
 
 .of-statusbar__sync-text {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-text-tertiary));
   line-height: 1;
 }
@@ -93,14 +93,14 @@ withDefaults(
 
 .of-statusbar__shortcuts {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-text-tertiary));
   line-height: 1;
 }
 
 .of-statusbar__version {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-text-tertiary));
   line-height: 1;
 }

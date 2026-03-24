@@ -62,13 +62,13 @@ withDefaults(defineProps<Props>(), {
   min-height: 220px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
 }
 
 .of-table-chart__title {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary);
 }
 
@@ -83,12 +83,12 @@ withDefaults(defineProps<Props>(), {
 .of-table-chart__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-table-chart__table th,
 .of-table-chart__table td {
-  padding: 10px 12px;
+  padding: var(--of-spacing-2_5) var(--of-spacing-3);
   border-bottom: 1px solid var(--of-border-divider);
   white-space: nowrap;
 }
@@ -96,6 +96,6 @@ withDefaults(defineProps<Props>(), {
 .of-table-chart__table th {
   background: var(--of-surface-muted);
   color: var(--of-text-secondary);
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
 }
 </style>

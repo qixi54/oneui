@@ -104,7 +104,7 @@ function stripMarkdown(md: string): string {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   line-height: 1.4;
   color: var(--of-text-secondary, var(--of-color-text-secondary, #4b5563));
   word-break: break-word;
@@ -112,12 +112,12 @@ function stripMarkdown(md: string): string {
 
 .of-field-md-preview__more {
   color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-field-md-preview__full {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--of-font-size-md);
+  line-height: var(--of-line-height-relaxed);
   color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
 }
 
@@ -135,8 +135,8 @@ function stripMarkdown(md: string): string {
 
 .of-field-md-preview__full :deep(code) {
   background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
-  padding: 1px 4px;
-  border-radius: 6px;
+  padding: 1px var(--of-spacing-1);
+  border-radius: var(--of-radius-md);
   font-size: 0.9em;
 }
 </style>

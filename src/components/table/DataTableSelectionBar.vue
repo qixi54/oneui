@@ -38,8 +38,8 @@ const emit = defineEmits<{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: var(--of-spacing-3);
+  padding: var(--of-spacing-2_5) var(--of-spacing-3_5);
   border-bottom: 1px solid
     var(--of-border-workspace, var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200))));
   background: var(
@@ -51,7 +51,7 @@ const emit = defineEmits<{
 .of-data-table-selection-bar__summary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   min-width: 0;
 }
 
@@ -61,28 +61,28 @@ const emit = defineEmits<{
   justify-content: center;
   min-width: 22px;
   height: 22px;
-  padding: 0 6px;
-  border-radius: 999px;
+  padding: 0 var(--of-spacing-1_5);
+  border-radius: var(--of-radius-full);
   background: var(--of-status-active-bg, var(--of-surface-elevated, var(--of-color-bg-elevated, #fff)));
   color: var(
     --of-status-active,
     var(--of-row-action-text, var(--of-text-primary, var(--of-color-text-primary, #111827)))
   );
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-bold);
 }
 
 .of-data-table-selection-bar__text {
   color: var(--of-text-secondary, var(--of-color-text-secondary, var(--of-color-gray-600)));
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
 }
 
 .of-data-table-selection-bar__actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   flex-wrap: wrap;
 }
 
@@ -91,13 +91,13 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: center;
   min-height: 30px;
-  padding: 6px 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-3);
   border: 1px solid var(--of-row-action-border, var(--of-border-default, var(--of-border-subtle, var(--of-color-gray-200))));
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   color: var(--of-row-action-text, var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-800))));
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   cursor: pointer;
   transition: var(--of-transition-fast);
 }

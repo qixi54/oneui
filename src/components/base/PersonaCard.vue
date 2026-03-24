@@ -242,8 +242,8 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   flex-direction: column;
   background: var(--of-color-bg-elevated);
   border: 1px solid var(--of-border-color);
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: var(--of-radius-xl);
+  padding: var(--of-spacing-3) var(--of-spacing-3_5);
   box-sizing: border-box;
   transition:
     border-color 0.2s,
@@ -260,8 +260,8 @@ function handleHeaderKeydown(e: KeyboardEvent) {
 
 /* ── Size modifier ───────────────────────────────────────── */
 .of-persona-card--sm {
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: var(--of-spacing-2) var(--of-spacing-2_5);
+  border-radius: var(--of-radius-lg);
 }
 
 /* ── Active state ────────────────────────────────────────── */
@@ -302,7 +302,7 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
   width: 100%;
   min-width: 0;
 }
@@ -313,10 +313,10 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: var(--of-radius-lg);
   background: var(--pc-accent-bg);
   border: 1.5px solid var(--pc-accent-border);
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
   line-height: 1;
   box-sizing: border-box;
 }
@@ -325,7 +325,7 @@ function handleHeaderKeydown(e: KeyboardEvent) {
 .of-persona-card__body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--of-spacing-0_75);
   flex: 1;
   min-width: 0;
 }
@@ -334,12 +334,12 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 5px;
+  gap: var(--of-spacing-1_25);
   min-width: 0;
 }
 
 .of-persona-card__name {
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-text-primary);
   line-height: 1.3;
   white-space: nowrap;
@@ -352,13 +352,13 @@ function handleHeaderKeydown(e: KeyboardEvent) {
 .of-persona-card__title-badge {
   display: inline-block;
   flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--pc-accent);
   background: var(--pc-accent-bg);
   border: 1px solid var(--pc-accent-border);
-  border-radius: 999px;
-  padding: 1px 6px;
+  border-radius: var(--of-radius-full);
+  padding: 1px var(--of-spacing-1_5);
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -376,18 +376,18 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: var(--of-spacing-0_75);
   margin-top: 1px;
 }
 
 .of-persona-card__tag {
   display: inline-block;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--pc-accent);
   background: var(--pc-accent-tag-bg);
-  border-radius: 999px;
-  padding: 1px 6px;
+  border-radius: var(--of-radius-full);
+  padding: 1px var(--of-spacing-1_5);
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -397,7 +397,7 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -411,13 +411,13 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   border-radius: 50%;
   background: var(--of-surface-selected);
   color: var(--of-text-primary);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-bold);
   flex-shrink: 0;
 }
 
 .of-persona-card__chevron {
-  font-size: 9px;
+  font-size: var(--of-font-size-2xs);
   color: var(--of-color-text-tertiary);
   flex-shrink: 0;
   line-height: 1;
@@ -432,7 +432,7 @@ function handleHeaderKeydown(e: KeyboardEvent) {
 /* ── Expanded detail ─────────────────────────────────────── */
 .of-persona-card__detail {
   border-top: 1px solid var(--of-color-border-light);
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: var(--of-spacing-2_5);
+  padding-top: var(--of-spacing-2_5);
 }
 </style>

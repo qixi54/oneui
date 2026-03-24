@@ -19,8 +19,8 @@ const initial = display.charAt(0).toUpperCase();
 .of-field-creator {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 6px;
+  gap: var(--of-spacing-1_5);
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
 }
 .of-field-creator-avatar {
   display: flex;
@@ -31,20 +31,20 @@ const initial = display.charAt(0).toUpperCase();
   border-radius: 50%;
   background: var(--of-surface-selected, var(--of-surface-muted));
   color: var(--of-accent-strong, var(--of-text-strong));
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
   flex-shrink: 0;
 }
 .of-field-creator-name {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-text, #1a1a1a));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .of-field-creator-empty {
-  padding: 2px 6px;
-  font-size: 13px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-gray-300));
 }
 </style>

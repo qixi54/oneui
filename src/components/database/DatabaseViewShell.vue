@@ -74,7 +74,7 @@ defineOptions({ name: "DatabaseViewShell", inheritAttrs: false });
 .of-database-view {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
   min-width: 0;
   min-height: 100%;
   background: var(--of-surface-workspace, var(--of-surface-elevated, var(--of-color-white)));
@@ -94,24 +94,24 @@ defineOptions({ name: "DatabaseViewShell", inheritAttrs: false });
 }
 
 .of-database-view__state--loading {
-  gap: 14px;
+  gap: var(--of-spacing-3_5);
   color: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 
 .of-database-view__state-text {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .of-database-view__state-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text));
 }
 
 .of-database-view__state-description {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 

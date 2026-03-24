@@ -20,8 +20,8 @@ const display = props.value != null ? `${prefix}${props.value}` : "";
 <style scoped>
 .of-field-auto-number {
   display: inline-block;
-  padding: 2px 6px;
-  font-size: 13px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
+  font-size: var(--of-font-size-base);
   color: var(--of-color-gray-500);
   font-variant-numeric: tabular-nums;
 }

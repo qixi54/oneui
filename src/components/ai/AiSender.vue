@@ -114,16 +114,16 @@ function handleAction() {
 .of-ai-sender__tools {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
   border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
 }
 
 .of-ai-sender__inner {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2) var(--of-spacing-3);
 }
 
 .of-ai-sender.is-disabled {
@@ -134,8 +134,8 @@ function handleAction() {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding-bottom: 2px;
+  gap: var(--of-spacing-1);
+  padding-bottom: var(--of-spacing-0_5);
 }
 
 .of-ai-sender__textarea {
@@ -146,7 +146,7 @@ function handleAction() {
   resize: none;
   background: transparent;
   font-family: var(--of-font-sans);
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   line-height: 22px;
   color: var(--of-text-primary, var(--of-color-gray-800));
   padding: 0;
@@ -180,7 +180,7 @@ function handleAction() {
   background: var(--of-accent-default, #334155);
   color: var(--of-text-inverse, var(--of-color-text-inverse));
   padding: 0;
-  margin-bottom: 2px;
+  margin-bottom: var(--of-spacing-0_5);
 }
 
 .of-ai-sender__action-btn:hover {

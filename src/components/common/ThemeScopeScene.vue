@@ -55,7 +55,7 @@ defineOptions({ name: "ThemeScopeScene" });
   gap: var(--of-spacing-4);
   padding: var(--of-spacing-5);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
-  border-radius: 20px;
+  border-radius: var(--of-radius-2xl);
   background:
     radial-gradient(circle at top right, color-mix(in oklab, var(--of-accent-soft) 55%, transparent), transparent 44%),
     linear-gradient(180deg, var(--of-surface-elevated, var(--of-color-bg-elevated)), var(--of-surface-muted, var(--of-color-bg-hover)));
@@ -78,8 +78,8 @@ defineOptions({ name: "ThemeScopeScene" });
 
 .of-theme-scope-scene__eyebrow {
   margin: 0;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-bold);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--of-text-tertiary, var(--of-color-text-tertiary));
@@ -88,15 +88,15 @@ defineOptions({ name: "ThemeScopeScene" });
 .of-theme-scope-scene__title {
   margin: 0;
   color: var(--of-text-primary, var(--of-color-text-primary));
-  font-size: 20px;
-  line-height: 1.2;
+  font-size: var(--of-font-size-xl);
+  line-height: var(--of-line-height-tight);
 }
 
 .of-theme-scope-scene__description {
   margin: 0;
   max-width: 72ch;
   color: var(--of-text-secondary, var(--of-color-text-secondary));
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
 }
 
 .of-theme-scope-scene__meta {

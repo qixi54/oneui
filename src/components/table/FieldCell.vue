@@ -178,9 +178,9 @@ const displayValue = computed(() => {
 .of-field-cell {
   position: relative;
   min-height: 28px;
-  padding: 2px 6px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: var(--of-radius-sm);
   display: flex;
   align-items: center;
   transition: background 0.1s;
@@ -207,7 +207,7 @@ const displayValue = computed(() => {
 }
 
 .of-field-cell__display {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-gray-700));
   white-space: nowrap;
   overflow: hidden;
@@ -216,7 +216,7 @@ const displayValue = computed(() => {
 }
 
 .of-field-cell__loading {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-text-tertiary));
 }
 
@@ -228,13 +228,13 @@ const displayValue = computed(() => {
 
   .of-field-cell :deep(.of-field-input) {
     min-height: 44px;
-    font-size: 16px;
-    padding: 8px 12px;
+    font-size: var(--of-font-size-lg);
+    padding: var(--of-spacing-2) var(--of-spacing-3);
   }
 
   .of-field-cell__display {
-    font-size: 15px;
-    padding: 8px 0;
+    font-size: var(--of-font-size-md);
+    padding: var(--of-spacing-2) 0;
   }
 }
 </style>

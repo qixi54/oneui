@@ -89,8 +89,8 @@ const columnClass = computed(() => {
   border: 1px solid var(--of-border-subtle);
   background: var(--of-surface-elevated, var(--of-color-bg-canvas));
   color: var(--of-text-secondary, var(--of-color-text-secondary));
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   transition: var(--of-transition-fast);
   cursor: pointer;
   display: flex;

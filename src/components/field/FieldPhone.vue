@@ -45,8 +45,8 @@ function onKeydown(e: KeyboardEvent) {
   width: 100%;
   height: 100%;
   min-height: 28px;
-  padding: 2px 6px;
-  font-size: 13px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
+  font-size: var(--of-font-size-base);
   border: none;
   outline: none;
   background: transparent;

@@ -315,7 +315,7 @@ function handleDragEnd() {
   width: 100%;
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-xl);
-  padding: 14px;
+  padding: var(--of-spacing-3_5);
   background: var(--of-color-bg-elevated);
   font-family: var(--of-font-sans);
 }
@@ -324,20 +324,20 @@ function handleDragEnd() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: var(--of-spacing-3);
+  margin-bottom: var(--of-spacing-3);
 }
 
 .of-form-designer__title {
   margin: 0;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-bold);
   color: var(--of-color-gray-900);
 }
 
 .of-form-designer__meta {
-  margin: 4px 0 0;
-  font-size: 12px;
+  margin: var(--of-spacing-1) 0 0;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-500);
 }
 
@@ -346,12 +346,12 @@ function handleDragEnd() {
   background: var(--of-color-gray-50);
   color: var(--of-color-gray-700);
   border-radius: var(--of-radius-md);
-  padding: 6px 10px;
-  font-size: 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
+  font-size: var(--of-font-size-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 .of-form-designer__add-btn:hover {
@@ -361,8 +361,8 @@ function handleDragEnd() {
 .of-form-designer__row {
   border: 1px solid var(--of-color-gray-100);
   border-radius: var(--of-radius-lg);
-  padding: 10px;
-  margin-bottom: 8px;
+  padding: var(--of-spacing-2_5);
+  margin-bottom: var(--of-spacing-2);
 }
 
 .of-form-designer__row:last-child {
@@ -374,7 +374,7 @@ function handleDragEnd() {
   cursor: grab;
   display: inline-flex;
   align-items: center;
-  margin-right: 4px;
+  margin-right: var(--of-spacing-1);
 }
 
 .of-form-designer__drag.disabled {
@@ -384,7 +384,7 @@ function handleDragEnd() {
 .of-form-designer__inputs {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) 140px auto auto;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   align-items: center;
 }
 
@@ -394,8 +394,8 @@ function handleDragEnd() {
   min-height: 32px;
   border: 1px solid var(--of-color-gray-200);
   border-radius: var(--of-radius-md);
-  padding: 6px 10px;
-  font-size: 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
+  font-size: var(--of-font-size-sm);
   box-sizing: border-box;
   color: var(--of-color-gray-800);
   background: var(--of-color-bg-elevated);
@@ -404,18 +404,18 @@ function handleDragEnd() {
 .of-form-designer__checkbox-label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: var(--of-spacing-1);
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-600);
 }
 
 .of-form-designer__remove-btn {
-  margin-top: 8px;
+  margin-top: var(--of-spacing-2);
   border: none;
   background: transparent;
   color: var(--of-color-error);
   cursor: pointer;
-  padding: 4px;
+  padding: var(--of-spacing-1);
   border-radius: var(--of-radius-sm);
   display: inline-flex;
   align-items: center;
@@ -426,13 +426,13 @@ function handleDragEnd() {
 }
 
 .of-form-designer__options-wrap {
-  margin-top: 8px;
+  margin-top: var(--of-spacing-2);
 }
 
 .of-form-designer__options-label {
   display: block;
-  margin-bottom: 4px;
-  font-size: 12px;
+  margin-bottom: var(--of-spacing-1);
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-500);
 }
 

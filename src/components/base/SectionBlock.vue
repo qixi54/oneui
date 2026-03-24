@@ -195,7 +195,7 @@ function onSave() {
 <style scoped>
 .of-section-block {
   border: 1px solid var(--of-border-subtle);
-  border-radius: 8px;
+  border-radius: var(--of-radius-lg);
   overflow: hidden;
   transition:
     border-color 0.2s,
@@ -209,8 +209,8 @@ function onSave() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   background: var(--of-surface-panel);
   cursor: pointer;
   user-select: none;
@@ -225,7 +225,7 @@ function onSave() {
 .of-section-block__header-left {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   flex: 1;
   min-width: 0;
 }
@@ -233,19 +233,19 @@ function onSave() {
 .of-section-block__header-right {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   flex-shrink: 0;
 }
 
 .of-section-block__icon {
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   line-height: 1;
   flex-shrink: 0;
 }
 
 .of-section-block__title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary);
   line-height: 1.4;
   white-space: nowrap;
@@ -256,11 +256,11 @@ function onSave() {
 .of-section-block__status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 1px 7px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.6;
+  padding: 1px var(--of-spacing-2);
+  border-radius: var(--of-radius-sm);
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
+  line-height: var(--of-line-height-relaxed);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -268,14 +268,14 @@ function onSave() {
 .of-section-block__action-btn {
   display: inline-flex;
   align-items: center;
-  padding: 2px 10px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-2_5);
   border: 1px solid var(--of-border-subtle);
-  border-radius: 4px;
+  border-radius: var(--of-radius-sm);
   background: var(--of-surface-elevated);
   color: var(--of-text-secondary);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.5;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
+  line-height: var(--of-line-height-normal);
   cursor: pointer;
   transition:
     background 0.15s,
@@ -310,7 +310,7 @@ function onSave() {
   height: 22px;
   padding: 0;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--of-radius-sm);
   background: transparent;
   cursor: pointer;
   transition: background 0.15s;
@@ -322,7 +322,7 @@ function onSave() {
 }
 
 .of-section-block__collapse-icon {
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-text-tertiary);
   line-height: 1;
   display: inline-block;
@@ -345,8 +345,8 @@ function onSave() {
 }
 
 .of-section-block__body {
-  padding: 10px 12px;
-  font-size: 12px;
+  padding: var(--of-spacing-2_5) var(--of-spacing-3);
+  font-size: var(--of-font-size-sm);
   line-height: 1.8;
   color: var(--of-text-secondary);
   box-sizing: border-box;

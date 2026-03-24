@@ -155,7 +155,7 @@ watch(
 }
 
 .of-mermaid__loading-text {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-secondary, var(--of-color-text-secondary, #8c8c8c));
 }
 
@@ -199,16 +199,16 @@ watch(
   border-radius: 50%;
   background: var(--of-color-error, #dc2626);
   color: var(--of-color-text-inverse);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-bold);
   flex-shrink: 0;
   margin-top: 1px;
 }
 
 .of-mermaid__error-text {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-color-error, #dc2626);
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   word-break: break-all;
 }
 </style>

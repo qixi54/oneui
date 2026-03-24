@@ -167,7 +167,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   transition: background-color 0.15s ease;
-  z-index: 10;
+  z-index: var(--of-z-sticky);
   touch-action: none;
 }
 

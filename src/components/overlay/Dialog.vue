@@ -193,18 +193,18 @@ function handleCancel() {
 }
 
 .of-dialog__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text, #111827));
   margin: 0 0 var(--of-spacing-2, 8px) 0;
   line-height: 1.4;
 }
 
 .of-dialog__text {
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   margin: 0;
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
 }
 
 /* ── Buttons ──────────────────────────────────────────────── */
@@ -212,9 +212,9 @@ function handleCancel() {
   display: inline-flex;
   align-items: center;
   gap: var(--of-spacing-2, 8px);
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: var(--of-spacing-2) var(--of-spacing-5);
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   border-radius: var(--of-radius-md, 6px);
   border: 1px solid transparent;
   cursor: pointer;

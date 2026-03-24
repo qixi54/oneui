@@ -76,15 +76,15 @@ const tagStyle = computed<CSSProperties>(() => {
 .one-ref-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 6px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1) var(--of-spacing-2_5);
+  border-radius: var(--of-radius-md);
   background: var(--one-ref-tag-bg);
   color: var(--one-ref-tag-color);
   text-decoration: none;
   cursor: default;
   box-sizing: border-box;
-  line-height: 1.2;
+  line-height: var(--of-line-height-tight);
   white-space: nowrap;
 }
 
@@ -104,8 +104,8 @@ a.one-ref-tag:hover {
 }
 
 .one-ref-tag__text {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   font-family: var(--of-font-sans), sans-serif;
   color: var(--one-ref-tag-color);
 }

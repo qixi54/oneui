@@ -108,7 +108,7 @@ function getLineStatus(index: number): "done" | "pending" {
 
 .of-stepper__step {
   display: flex;
-  gap: 12px;
+  gap: var(--of-spacing-3);
 }
 
 .of-stepper__step--horizontal {
@@ -132,9 +132,9 @@ function getLineStatus(index: number): "done" | "pending" {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: var(--of-radius-full);
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -160,15 +160,15 @@ function getLineStatus(index: number): "done" | "pending" {
 .of-stepper__content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   min-width: 0;
 }
 
 .of-stepper__label {
   margin: 0;
   padding: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   line-height: 1.4;
   color: var(--of-color-text);
 }
@@ -176,26 +176,26 @@ function getLineStatus(index: number): "done" | "pending" {
 .of-stepper__description {
   margin: 0;
   padding: 0;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: var(--of-font-size-sm);
+  line-height: var(--of-line-height-normal);
   color: var(--of-color-text-secondary);
 }
 
 .of-stepper__line {
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--of-radius-full);
 }
 
 .of-stepper__line--horizontal {
   width: 48px;
   height: 2px;
-  margin: 15px 12px 0;
+  margin: 15px var(--of-spacing-3) 0;
 }
 
 .of-stepper__line--vertical {
   width: 2px;
   height: 24px;
-  margin: 8px 0 8px 15px;
+  margin: var(--of-spacing-2) 0 var(--of-spacing-2) 15px;
 }
 
 .of-stepper__line--done {

@@ -174,17 +174,17 @@ function handleSelect(type: FieldType) {
 }
 
 .of-field-type-picker__search {
-  padding: 8px;
+  padding: var(--of-spacing-2);
   border-bottom: 1px solid var(--of-field-type-picker-search-border);
   flex-shrink: 0;
 }
 
 .of-field-type-picker__search-input {
   width: 100%;
-  padding: 6px 8px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2);
   border: 1px solid var(--of-field-type-picker-search-border);
-  border-radius: 4px;
-  font-size: 12px;
+  border-radius: var(--of-radius-sm);
+  font-size: var(--of-font-size-sm);
   outline: none;
   background: var(--of-field-type-picker-search-surface);
   color: var(--of-field-type-picker-text-primary);
@@ -207,32 +207,32 @@ function handleSelect(type: FieldType) {
 
 .of-field-type-picker__list {
   overflow-y: auto;
-  padding: 4px 0;
+  padding: var(--of-spacing-1) 0;
 }
 
 .of-field-type-picker__group {
-  padding: 0 4px;
+  padding: 0 var(--of-spacing-1);
 }
 
 .of-field-type-picker__group-label {
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-field-type-picker-text-tertiary);
-  padding: 6px 8px 2px;
-  font-weight: 500;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2) var(--of-spacing-0_5);
+  font-weight: var(--of-font-weight-medium);
   user-select: none;
 }
 
 .of-field-type-picker__item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   width: 100%;
-  padding: 5px 8px;
+  padding: var(--of-spacing-1_25) var(--of-spacing-2);
   border: none;
   background: none;
-  border-radius: 4px;
+  border-radius: var(--of-radius-sm);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-field-type-picker-text-primary);
   text-align: left;
   transition:

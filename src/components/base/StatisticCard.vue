@@ -81,6 +81,12 @@ const colorClass = computed(() => {
   border: 1px solid var(--of-border-workspace);
   border-radius: var(--of-radius-lg);
   box-shadow: var(--of-elevation-card);
+  transition: var(--of-transition-normal);
+}
+
+.of-statistic-card:hover {
+  box-shadow: var(--of-elevation-card-hover);
+  border-color: var(--of-border-strong);
 }
 
 .of-statistic-card__icon-container {
@@ -101,19 +107,19 @@ const colorClass = computed(() => {
 .of-statistic-card__content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--of-spacing-0_5);
 }
 
 .of-statistic-card__value {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--of-font-size-xl);
+  font-weight: var(--of-font-weight-bold);
   color: var(--of-text-strong);
   margin: 0;
   padding: 0;
 }
 
 .of-statistic-card__label {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary);
   margin: 0;
   padding: 0;

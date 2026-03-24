@@ -150,8 +150,8 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
 .of-mobile-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2);
 }
 
 .of-mobile-card-wrapper {
@@ -163,8 +163,8 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
 .of-mobile-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-3) var(--of-spacing-4);
   background: var(--of-surface-workspace-raised, var(--of-surface-elevated, #fff));
   border: 1px solid var(--of-border-workspace, var(--of-border-subtle, #e5e7eb));
   border-radius: var(--of-radius-lg, 8px);
@@ -174,7 +174,7 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
     transform 0.15s ease,
     background 0.15s;
   position: relative;
-  z-index: 1;
+  z-index: var(--of-z-base);
 }
 
 .of-mobile-card:active {
@@ -187,8 +187,8 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
 }
 
 .of-mobile-card__title {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
   line-height: 1.4;
 }
@@ -196,22 +196,22 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
 .of-mobile-card__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   align-items: center;
 }
 
 .of-mobile-card__badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: var(--of-spacing-0_5) var(--of-spacing-2);
+  border-radius: var(--of-radius-xl);
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   white-space: nowrap;
 }
 
 .of-mobile-card__tag {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   white-space: nowrap;
 }
@@ -227,8 +227,8 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
   justify-content: center;
   background: var(--of-color-error, #dc2626);
   color: var(--of-color-white, #fff);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-medium);
   border-radius: 0 var(--of-radius-lg, 8px) var(--of-radius-lg, 8px) 0;
 }
 
@@ -236,12 +236,12 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: var(--of-spacing-3);
   border: 1px dashed var(--of-border-workspace, var(--of-border-subtle, #d1d5db));
   border-radius: var(--of-radius-lg, 8px);
   background: var(--of-surface-workspace, transparent);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   cursor: pointer;
   min-height: 44px;
 }

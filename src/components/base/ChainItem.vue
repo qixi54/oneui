@@ -79,9 +79,9 @@ const avatarStyle = computed<CSSProperties>(() => ({
 .one-chain-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  border-radius: 8px;
-  padding: 12px;
+  gap: var(--of-spacing-2);
+  border-radius: var(--of-radius-lg);
+  padding: var(--of-spacing-3);
   border: 1px solid;
   width: 100%;
   box-sizing: border-box;
@@ -91,7 +91,7 @@ const avatarStyle = computed<CSSProperties>(() => ({
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .one-chain-item__avatar {
@@ -101,26 +101,26 @@ const avatarStyle = computed<CSSProperties>(() => ({
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
   flex-shrink: 0;
 }
 
 .one-chain-item__title {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
+  line-height: var(--of-line-height-tight);
 }
 
 .one-chain-item__duration {
   margin-left: auto;
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-color-text-secondary, #6b7280);
   white-space: nowrap;
 }
 
 .one-chain-item__desc {
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   font-family: var(--of-font-mono, "Roboto Mono", monospace);
   line-height: 1.4;
   word-break: break-all;

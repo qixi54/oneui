@@ -184,7 +184,7 @@ function handleResizeStart(event: PointerEvent) {
   top: 0;
   right: 0;
   height: 100vh;
-  z-index: 200;
+  z-index: var(--of-z-navbar);
   display: flex;
   flex-direction: column;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #ffffff));
@@ -198,12 +198,30 @@ function handleResizeStart(event: PointerEvent) {
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
+  width: 12px;
   height: 100%;
   border: none;
   padding: 0;
   background: transparent;
   cursor: ew-resize;
+  z-index: var(--of-z-raised);
+}
+
+.of-side-panel__resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 2px;
+  height: 44px;
+  border-radius: var(--of-radius-full);
+  background: var(--of-color-gray-200);
+  transform: translateY(-50%);
+  transition: background-color 0.16s ease;
+}
+
+.of-side-panel__resize-handle:hover::after {
+  background: var(--of-color-gray-300);
 }
 
 .of-side-panel__header {
@@ -222,8 +240,8 @@ function handleResizeStart(event: PointerEvent) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--of-font-size-md);
+  font-weight: var(--of-font-weight-semibold);
   line-height: 1.4;
   color: var(--of-text-primary, var(--of-color-text, #111827));
 }

@@ -130,7 +130,7 @@ function isExpanded(item: SidebarItem): boolean {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--of-spacing-0_5);
   min-height: 0;
 }
 
@@ -139,13 +139,13 @@ function isExpanded(item: SidebarItem): boolean {
   flex-direction: row;
   align-items: center;
   gap: var(--of-spacing-2);
-  padding: 6px 10px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
   background: transparent;
   border: none;
   border-radius: var(--of-radius-md);
   cursor: pointer;
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   font-weight: 400;
   color: var(--of-text-secondary);
   line-height: 1.4;
@@ -157,7 +157,7 @@ function isExpanded(item: SidebarItem): boolean {
 
 .of-sidebar__item--child {
   padding-left: 28px;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-sidebar__item:hover:not(.of-sidebar__item--active) {
@@ -192,11 +192,11 @@ function isExpanded(item: SidebarItem): boolean {
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 5px;
+  padding: 0 var(--of-spacing-1_25);
   background: var(--of-surface-muted);
   color: var(--of-text-secondary);
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   border-radius: var(--of-radius-full);
   flex-shrink: 0;
   box-sizing: border-box;
@@ -216,7 +216,7 @@ function isExpanded(item: SidebarItem): boolean {
 .of-sidebar__children {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--of-spacing-0_5);
 }
 
 .of-sidebar__footer {

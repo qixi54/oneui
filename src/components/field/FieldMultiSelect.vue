@@ -191,7 +191,7 @@ watch(
 .of-field-multiselect {
   width: 100%;
   min-height: 28px;
-  padding: 2px 6px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
   display: flex;
   align-items: center;
   outline: none;
@@ -202,40 +202,40 @@ watch(
 
 .of-field-multiselect__chips {
   display: flex;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   flex-wrap: wrap;
 }
 
 .of-field-multiselect__placeholder {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-text-tertiary));
 }
 
 .of-field-multiselect__dropdown {
   position: fixed;
-  z-index: 9999;
+  z-index: var(--of-z-toast);
   background: var(--of-surface-elevated, var(--of-surface-panel));
   border: 1px solid var(--of-border-subtle, var(--of-border-strong));
-  border-radius: 8px;
+  border-radius: var(--of-radius-lg);
   box-shadow: var(--of-shadow-dropdown);
   overflow: hidden;
 }
 
 .of-field-multiselect__option {
   min-height: 30px;
-  padding: 6px 10px;
-  font-size: 13px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
+  font-size: var(--of-font-size-base);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-field-multiselect__checkbox {
   width: 14px;
   height: 14px;
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-300));
-  border-radius: 4px;
+  border-radius: var(--of-radius-sm);
   flex-shrink: 0;
   box-sizing: border-box;
   background: var(--of-surface-elevated, var(--of-color-bg-canvas));
@@ -253,7 +253,7 @@ watch(
 }
 
 .of-field-multiselect__option.selected {
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
 }
 
@@ -264,9 +264,9 @@ watch(
 
 .of-field-multiselect__badge {
   display: inline-block;
-  padding: 1px 6px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 1px var(--of-spacing-1_5);
+  border-radius: var(--of-radius-md);
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-text-inverse);
   line-height: 18px;
   background: var(--of-accent-default, var(--of-text-strong));
@@ -275,17 +275,17 @@ watch(
 .of-field-multiselect__actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   border-top: 1px solid var(--of-border-subtle, var(--of-color-border-light));
-  padding: 8px;
+  padding: var(--of-spacing-2);
 }
 
 .of-field-multiselect__btn {
   border: 1px solid var(--of-border-subtle, var(--of-border-strong));
   background: var(--of-surface-elevated, var(--of-surface-panel));
-  border-radius: 6px;
-  font-size: 12px;
-  padding: 3px 10px;
+  border-radius: var(--of-radius-md);
+  font-size: var(--of-font-size-sm);
+  padding: var(--of-spacing-0_75) var(--of-spacing-2_5);
   cursor: pointer;
 }
 

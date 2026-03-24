@@ -64,7 +64,7 @@ const dotSize = computed(() => DOT_SIZE_MAP[props.size]);
 .of-status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 .of-status-indicator__dot {

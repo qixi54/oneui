@@ -92,7 +92,7 @@ watch(
 .of-ai-message-list {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: var(--of-spacing-4);
   overflow-y: auto;
   flex: 1;
   box-sizing: border-box;
@@ -101,6 +101,6 @@ watch(
 .of-ai-message-list-inner {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
 }
 </style>

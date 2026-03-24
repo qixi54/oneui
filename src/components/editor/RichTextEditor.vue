@@ -183,18 +183,18 @@ function saveContent() {
 .of-rich-editor__toolbar-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 10px 12px 0 12px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2_5) var(--of-spacing-3) 0 var(--of-spacing-3);
 }
 
 .of-rich-editor__btn {
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-300));
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   color: var(--of-text-primary, var(--of-color-gray-700));
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   line-height: 1;
-  padding: 8px 12px;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   cursor: pointer;
 }
 
@@ -216,25 +216,25 @@ function saveContent() {
 
 .of-rich-editor__form {
   display: grid;
-  gap: 8px;
+  gap: var(--of-spacing-2);
 }
 
 .of-rich-editor__label {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-text-secondary));
 }
 
 .of-rich-editor__input {
   border: 1px solid var(--of-border-subtle, var(--of-border-color));
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 13px;
+  border-radius: var(--of-radius-md);
+  padding: var(--of-spacing-2) var(--of-spacing-2_5);
+  font-size: var(--of-font-size-base);
 }
 
 .of-rich-editor :deep(.ql-toolbar.ql-snow) {
   border: none;
   border-bottom: 1px solid var(--of-border-subtle, var(--of-border-color));
-  padding: 8px 10px;
+  padding: var(--of-spacing-2) var(--of-spacing-2_5);
 }
 
 .of-rich-editor :deep(.ql-container.ql-snow) {
@@ -243,7 +243,7 @@ function saveContent() {
 
 .of-rich-editor :deep(.ql-editor) {
   min-height: var(--of-rich-editor-min-height, 220px);
-  font-size: 14px;
+  font-size: var(--of-font-size-md);
   color: var(--of-text-primary, var(--of-color-text-primary));
 }
 

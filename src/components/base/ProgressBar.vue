@@ -69,7 +69,7 @@ const fillStyle = computed(() => ({
 .of-progress-bar {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   width: 100%;
 }
 
@@ -87,8 +87,8 @@ const fillStyle = computed(() => ({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
+  gap: var(--of-spacing-2);
+  font-size: var(--of-font-size-sm);
   line-height: 1.4;
   color: var(--of-text-secondary, var(--of-color-text-secondary, #8c8c8c));
 }

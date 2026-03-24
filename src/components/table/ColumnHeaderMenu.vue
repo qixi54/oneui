@@ -191,7 +191,7 @@ const menuStyle = computed(() => {
 .of-col-menu-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1002;
+  z-index: var(--of-z-overlay);
 }
 
 .of-col-menu-overlay__hitarea {
@@ -209,12 +209,12 @@ const menuStyle = computed(() => {
   border: 1px solid var(--of-border-default, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
   border-radius: var(--of-radius-lg, 8px);
   box-shadow: var(--of-elevation-dropdown, var(--of-shadow-dropdown));
-  padding: 4px 0;
-  z-index: 1003;
+  padding: var(--of-spacing-1) 0;
+  z-index: var(--of-z-overlay);
 }
 
 .of-col-menu__section {
-  padding: 4px 8px;
+  padding: var(--of-spacing-1) var(--of-spacing-2);
 }
 
 .of-col-menu__rename-input {
@@ -222,9 +222,9 @@ const menuStyle = computed(() => {
   border: none;
   border-bottom: 2px solid var(--of-border-active, var(--of-border-strong, var(--of-color-gray-300, #d1d5db)));
   background: transparent;
-  padding: 6px 4px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: var(--of-spacing-1_5) var(--of-spacing-1);
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text-primary, #1a1a1a));
   outline: none;
   font-family: inherit;
@@ -237,18 +237,18 @@ const menuStyle = computed(() => {
 .of-col-menu__divider {
   height: 1px;
   background: var(--of-border-divider, var(--of-border-subtle, var(--of-color-gray-100, #f3f4f6)));
-  margin: 4px 0;
+  margin: var(--of-spacing-1) 0;
 }
 
 .of-col-menu__item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   width: 100%;
-  padding: 6px 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-3);
   border: none;
   background: transparent;
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-text-primary, var(--of-color-gray-700, #374151)));
   cursor: pointer;
   text-align: left;
@@ -261,7 +261,7 @@ const menuStyle = computed(() => {
 
 .of-col-menu__item-value {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-tertiary, var(--of-color-text-tertiary, var(--of-color-gray-400, #9ca3af)));
 }
 
@@ -274,6 +274,6 @@ const menuStyle = computed(() => {
 }
 
 .of-col-menu__sub {
-  padding: 4px 8px;
+  padding: var(--of-spacing-1) var(--of-spacing-2);
 }
 </style>

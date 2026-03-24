@@ -22,13 +22,13 @@ function handleClick(event: MouseEvent) {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
   background: transparent;
   border: none;
   cursor: pointer;
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   font-weight: 400;
   color: var(--of-color-gray-400);
   line-height: 1;

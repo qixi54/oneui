@@ -91,7 +91,7 @@ function handleKeydown(event: KeyboardEvent) {
   padding: var(--of-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
   width: 100%;
   text-align: left;
 }
@@ -107,15 +107,15 @@ function handleKeydown(event: KeyboardEvent) {
 
 .content-block__para {
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-gray-700));
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
   margin: 0;
 }
 
 .content-block__placeholder {
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-gray-300));
   font-style: italic;
 }
@@ -125,11 +125,11 @@ function handleKeydown(event: KeyboardEvent) {
   resize: vertical;
   border: 1px solid var(--of-border-strong, rgba(15, 23, 42, 0.14));
   border-radius: var(--of-radius-sm);
-  padding: 8px 10px;
+  padding: var(--of-spacing-2) var(--of-spacing-2_5);
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-gray-700));
-  line-height: 1.6;
+  line-height: var(--of-line-height-relaxed);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   outline: none;
   box-shadow: 0 0 0 2px var(--of-surface-selected, #eceff3);

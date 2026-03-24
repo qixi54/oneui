@@ -81,10 +81,10 @@ function handleBlur() {
 .of-quick-add-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   width: 100%;
   height: 38px;
-  padding: 0 12px;
+  padding: 0 var(--of-spacing-3);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-lg);
@@ -109,7 +109,7 @@ function handleBlur() {
 }
 
 .of-quick-add-placeholder {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
   transition: var(--of-transition-fast);
   text-align: left;
@@ -122,11 +122,11 @@ function handleBlur() {
 .of-quick-add-input {
   width: 100%;
   height: 38px;
-  padding: 0 12px;
+  padding: 0 var(--of-spacing-3);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   border: 1px solid var(--of-border-strong, var(--of-color-gray-300));
   border-radius: var(--of-radius-lg);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-gray-900));
   outline: none;
   box-shadow: 0 0 0 3px var(--of-surface-selected, var(--of-color-gray-100));

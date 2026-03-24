@@ -117,7 +117,7 @@ function triggerPick() {
 <style scoped>
 .of-file-upload {
   display: grid;
-  gap: 10px;
+  gap: var(--of-spacing-2_5);
 }
 
 .of-file-upload__native {
@@ -128,14 +128,14 @@ function triggerPick() {
   width: 100%;
   min-height: 84px;
   border: 1px dashed var(--of-color-gray-300);
-  border-radius: 10px;
+  border-radius: var(--of-radius-xl);
   background: var(--of-color-bg-elevated);
   color: var(--of-color-gray-600);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   cursor: pointer;
   transition: var(--of-transition-fast);
 }
@@ -156,17 +156,17 @@ function triggerPick() {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .of-file-upload__item {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   border: 1px solid var(--of-border-subtle);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: var(--of-radius-lg);
+  padding: var(--of-spacing-2) var(--of-spacing-2_5);
   background: var(--of-color-bg-elevated);
 }
 
@@ -176,19 +176,19 @@ function triggerPick() {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--of-color-text);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
 }
 
 .of-file-upload__size {
   color: var(--of-color-gray-500);
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
 }
 
 .of-file-upload__remove {
   width: 24px;
   height: 24px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   background: transparent;
   color: var(--of-color-gray-500);
   display: inline-flex;

@@ -82,8 +82,8 @@ function execCommand(cmd: string) {
 }
 .of-field-richtext-toolbar {
   display: flex;
-  gap: 2px;
-  padding: 2px 4px;
+  gap: var(--of-spacing-0_5);
+  padding: var(--of-spacing-0_5) var(--of-spacing-1);
   border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
 }
 .of-field-richtext-btn {
@@ -93,10 +93,10 @@ function execCommand(cmd: string) {
   width: 24px;
   height: 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 .of-field-richtext-btn:hover {
@@ -104,11 +104,11 @@ function execCommand(cmd: string) {
 }
 .of-field-richtext-editor {
   flex: 1;
-  padding: 4px 6px;
-  font-size: 13px;
+  padding: var(--of-spacing-1) var(--of-spacing-1_5);
+  font-size: var(--of-font-size-base);
   outline: none;
   min-height: 40px;
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   color: var(--of-text-primary, var(--of-color-text, #1a1a1a));
 }
 </style>

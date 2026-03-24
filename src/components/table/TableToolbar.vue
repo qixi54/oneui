@@ -323,9 +323,9 @@ const groupableColumns = computed(() =>
 .of-table-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--of-spacing-4);
   background: var(--of-color-bg-elevated, #fff);
   border-bottom: 1px solid var(--of-color-gray-200, #e5e7eb);
   font-family: var(--of-font-sans);
@@ -336,7 +336,7 @@ const groupableColumns = computed(() =>
   display: flex;
   align-items: center;
   height: 30px;
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
   overflow: hidden;
 }
@@ -344,13 +344,13 @@ const groupableColumns = computed(() =>
 .of-table-toolbar__view-tab {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 10px;
+  gap: var(--of-spacing-1);
+  padding: 0 var(--of-spacing-2_5);
   height: 100%;
   border: none;
   background: transparent;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   cursor: pointer;
   white-space: nowrap;
@@ -358,7 +358,7 @@ const groupableColumns = computed(() =>
 }
 
 .of-table-toolbar__view-tab:first-child {
-  border-radius: 6px 0 0 6px;
+  border-radius: var(--of-radius-md) 0 0 var(--of-radius-md);
 }
 
 .of-table-toolbar__view-tab:last-child {
@@ -368,7 +368,7 @@ const groupableColumns = computed(() =>
 .of-table-toolbar__view-tab--active {
   background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
   color: var(--of-text-primary, var(--of-color-gray-700, #374151));
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
 }
 
 .of-table-toolbar__tab-icon {
@@ -390,14 +390,14 @@ const groupableColumns = computed(() =>
 .of-table-toolbar__btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  gap: var(--of-spacing-1);
+  padding: var(--of-spacing-1) var(--of-spacing-2_5);
   height: 28px;
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  border-radius: 6px;
+  border-radius: var(--of-radius-md);
   background: transparent;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   cursor: pointer;
   white-space: nowrap;
@@ -419,32 +419,32 @@ const groupableColumns = computed(() =>
   height: 16px;
   background: var(--of-surface-muted, var(--of-color-gray-200, #e5e7eb));
   color: var(--of-color-white, #fff);
-  border-radius: 8px;
-  font-size: 10px;
+  border-radius: var(--of-radius-lg);
+  font-size: var(--of-font-size-xs);
   line-height: 16px;
   text-align: center;
-  padding: 0 4px;
+  padding: 0 var(--of-spacing-1);
 }
 
 .of-table-toolbar__dropdown {
   position: fixed;
-  z-index: 1000;
+  z-index: var(--of-z-overlay);
 }
 
 .of-table-toolbar__simple-panel {
   background: var(--of-color-bg-elevated, #fff);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  border-radius: 8px;
+  border-radius: var(--of-radius-lg);
   box-shadow: var(--of-shadow-popover);
   min-width: 180px;
-  padding: 8px;
+  padding: var(--of-spacing-2);
 }
 
 .of-table-toolbar__panel-title {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
-  padding: 4px 8px 8px;
+  padding: var(--of-spacing-1) var(--of-spacing-2) var(--of-spacing-2);
 }
 
 .of-table-toolbar__sort-item {
@@ -452,11 +452,11 @@ const groupableColumns = computed(() =>
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 6px 8px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2);
   border: none;
   background: transparent;
-  border-radius: 4px;
-  font-size: 13px;
+  border-radius: var(--of-radius-sm);
+  font-size: var(--of-font-size-base);
   font-family: var(--of-font-sans);
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   cursor: pointer;
@@ -473,18 +473,18 @@ const groupableColumns = computed(() =>
 }
 
 .of-table-toolbar__sort-dir {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
 }
 
 .of-table-toolbar__clear-btn {
   width: 100%;
-  padding: 6px 8px;
-  margin-top: 4px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2);
+  margin-top: var(--of-spacing-1);
   border: none;
   border-top: 1px solid var(--of-border-subtle, var(--of-color-gray-100, #f3f4f6));
   background: transparent;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   font-family: var(--of-font-sans);
   color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
   cursor: pointer;
@@ -502,11 +502,11 @@ const groupableColumns = computed(() =>
 .of-table-toolbar__search {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   width: 200px;
   height: 28px;
-  padding: 0 10px;
-  border-radius: 6px;
+  padding: 0 var(--of-spacing-2_5);
+  border-radius: var(--of-radius-md);
   background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
 }
 
@@ -519,7 +519,7 @@ const groupableColumns = computed(() =>
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   outline: none;
   font-family: var(--of-font-sans);

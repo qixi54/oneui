@@ -39,8 +39,8 @@ withDefaults(
   width: 100%;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 0 0 12px 12px;
+  gap: var(--of-spacing-2_5);
+  padding: 0 0 var(--of-spacing-3) var(--of-spacing-3);
   border-bottom: 1px solid var(--of-color-gray-100);
   box-sizing: border-box;
 }
@@ -54,14 +54,14 @@ withDefaults(
 .comment-item__avatar {
   width: 28px;
   height: 28px;
-  border-radius: 14px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--of-color-text-inverse);
   font-family: var(--of-font-sans);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
   flex-shrink: 0;
   letter-spacing: 0;
   user-select: none;
@@ -73,34 +73,34 @@ withDefaults(
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--of-spacing-1);
 }
 
 /* 头部行 */
 .comment-item__header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   flex-wrap: wrap;
 }
 
 .comment-item__author {
   font-family: var(--of-font-sans);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-color-gray-800);
   white-space: nowrap;
 }
 
 .comment-item__action {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-500);
 }
 
 .comment-item__time {
   font-family: var(--of-font-sans);
-  font-size: 11px;
+  font-size: var(--of-font-size-xs);
   color: var(--of-color-gray-400);
   margin-left: auto;
   white-space: nowrap;
@@ -109,9 +109,9 @@ withDefaults(
 /* 内容文字 */
 .comment-item__text {
   font-family: var(--of-font-sans);
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-gray-600);
-  line-height: 1.5;
+  line-height: var(--of-line-height-normal);
   word-break: break-word;
 }
 </style>

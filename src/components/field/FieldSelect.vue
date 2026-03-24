@@ -173,7 +173,7 @@ const selectedOption = computed(() => {
 .of-field-select {
   width: 100%;
   min-height: 28px;
-  padding: 2px 6px;
+  padding: var(--of-spacing-0_5) var(--of-spacing-1_5);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -181,16 +181,16 @@ const selectedOption = computed(() => {
 }
 
 .of-field-select__display {
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-text-primary));
 }
 
 .of-field-select__dropdown {
   position: fixed;
-  z-index: 9999;
+  z-index: var(--of-z-toast);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   border: 1px solid var(--of-border-subtle, var(--of-border-strong));
-  border-radius: 8px;
+  border-radius: var(--of-radius-lg);
   box-shadow: var(--of-shadow-dropdown);
   overflow: hidden;
   max-height: 260px;
@@ -199,8 +199,8 @@ const selectedOption = computed(() => {
 
 .of-field-select__option {
   min-height: 30px;
-  padding: 6px 10px;
-  font-size: 13px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
+  font-size: var(--of-font-size-base);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -212,7 +212,7 @@ const selectedOption = computed(() => {
 }
 
 .of-field-select__option.selected {
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-text-primary));
 }
 
@@ -222,9 +222,9 @@ const selectedOption = computed(() => {
 
 .of-field-select__badge {
   display: inline-block;
-  padding: 1px 6px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 1px var(--of-spacing-1_5);
+  border-radius: var(--of-radius-md);
+  font-size: var(--of-font-size-sm);
   color: var(--of-color-text-inverse);
   line-height: 18px;
 }
@@ -238,21 +238,21 @@ const selectedOption = computed(() => {
   bottom: 0;
   width: 100%;
   max-height: 50dvh;
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--of-radius-2xl) var(--of-radius-2xl) 0 0;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .of-field-select__dropdown--sheet .of-field-select__option {
   min-height: 44px;
-  font-size: 16px;
-  padding: 12px 16px;
+  font-size: var(--of-font-size-lg);
+  padding: var(--of-spacing-3) var(--of-spacing-4);
 }
 
 @media (max-width: 768px), (pointer: coarse) {
   .of-field-select {
     min-height: 44px;
-    font-size: 16px;
-    padding: 8px 12px;
+    font-size: var(--of-font-size-lg);
+    padding: var(--of-spacing-2) var(--of-spacing-3);
   }
 }
 </style>

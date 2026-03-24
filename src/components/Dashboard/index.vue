@@ -181,12 +181,12 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--of-spacing-4);
   container-type: inline-size;
   background: var(--of-surface-workspace);
   border: 1px solid var(--of-border-workspace);
   border-radius: var(--of-radius-2xl, var(--of-radius-xl));
-  padding: 16px;
+  padding: var(--of-spacing-4);
   box-sizing: border-box;
 }
 
@@ -198,8 +198,8 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
 
 .of-dashboard__title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary);
 }
 
@@ -216,7 +216,7 @@ const fallbackWidgets = computed<DashboardWidget[]>(() => {
   border-radius: var(--of-radius-xl);
   background: var(--of-surface-workspace-raised);
   box-shadow: var(--of-elevation-card);
-  padding: 14px;
+  padding: var(--of-spacing-3_5);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,

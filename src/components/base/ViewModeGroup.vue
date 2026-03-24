@@ -50,9 +50,9 @@ const DEFAULT_OPTIONS: ViewModeOption[] = [
 <style scoped>
 .one-view-mode-group {
   display: inline-flex;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 6px;
+  gap: var(--of-spacing-0_5);
+  padding: var(--of-spacing-0_5);
+  border-radius: var(--of-radius-md);
   border: 1px solid var(--of-border-subtle, #e5e7eb);
 }
 
@@ -62,7 +62,7 @@ const DEFAULT_OPTIONS: ViewModeOption[] = [
   justify-content: center;
   width: 28px;
   height: 26px;
-  border-radius: 4px;
+  border-radius: var(--of-radius-sm);
   border: none;
   background: transparent;
   cursor: pointer;

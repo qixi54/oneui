@@ -3,11 +3,17 @@ import { computed } from "vue";
 import Drawer from "../overlay/Drawer.vue";
 import SidePanel from "../overlay/SidePanel.vue";
 import DatabaseDetailWorkspace from "./DatabaseDetailWorkspace.vue";
-import type { DatabaseViewResolvedDetailPresentation } from "../../contracts/database";
-import type {
-  DatabaseDetailPropertyItem,
-  DatabaseWorkspaceModeOption,
+import {
+  normalizeDetailPresentation,
+  resolveDetailPresenter,
 } from "./databaseViewUtils";
+import type {
+  DatabaseDetailWorkspaceModeOption,
+  DatabaseDetailWorkspacePropertyItem,
+  DatabaseDetailPresenterSlots,
+  DatabaseDetailPresenterResolution,
+  DatabaseViewDetailPresentation,
+} from "../../contracts/database";
 
 const props = withDefaults(
   defineProps<{
@@ -17,17 +23,19 @@ const props = withDefaults(
     recordId?: string;
     viewType: string;
     description: string;
-    presentation: DatabaseViewResolvedDetailPresentation;
+    presentation: Exclude<DatabaseViewDetailPresentation, "auto">;
+    source?: string;
     sidePanelWidth: number;
     drawerWidth: number;
     canSwitchPresentation?: boolean;
-    workspaceModes?: DatabaseWorkspaceModeOption[];
-    propertyItems?: DatabaseDetailPropertyItem[];
+    workspaceModes?: DatabaseDetailWorkspaceModeOption[];
+    propertyItems?: DatabaseDetailWorkspacePropertyItem[];
     readonly?: boolean;
     hasDraftChanges?: boolean;
   }>(),
   {
     recordId: "",
+    source: undefined,
     canSwitchPresentation: false,
     workspaceModes: () => [],
     propertyItems: () => [],
@@ -42,25 +50,34 @@ const emit = defineEmits<{
   delete: [rowId: string];
   close: [];
   "update:width": [value: number];
-  "update:presentation": [value: DatabaseViewResolvedDetailPresentation];
+  "update:presentation": [value: Exclude<DatabaseViewDetailPresentation, "auto">];
 }>();
+
+defineSlots<DatabaseDetailPresenterSlots>();
+
+type PresenterComponent = typeof SidePanel | typeof Drawer;
 
 function handleCommit(rowId: string, fieldId: string, value: unknown) {
   emit("commit", rowId, fieldId, value);
 }
 
-const overlayComponent = computed(() =>
-  props.presentation === "side-panel" ? SidePanel : Drawer,
+const presenter = computed<DatabaseDetailPresenterResolution>(() =>
+  resolveDetailPresenter({ presentation: normalizeDetailPresentation(props.presentation) }),
+);
+
+const overlayComponent = computed<PresenterComponent>(() =>
+  presenter.value.shell === "side-panel" ? SidePanel : Drawer,
 );
 
 const overlayProps = computed(() => {
-  if (props.presentation === "side-panel") {
+  if (presenter.value.shell === "side-panel") {
     return {
       modelValue: props.visible,
       title: props.title,
       width: props.sidePanelWidth,
-      resizable: true,
-      mode: "persistent" as const,
+      resizable: presenter.value.resizable,
+      mode: presenter.value.mode,
+      maskClosable: presenter.value.maskClosable,
     };
   }
 
@@ -68,9 +85,9 @@ const overlayProps = computed(() => {
     modelValue: props.visible,
     title: props.title,
     width: props.drawerWidth,
-    resizable: props.presentation !== "full-page",
-    fullscreen: props.presentation === "full-page",
-    maskClosable: true,
+    resizable: presenter.value.resizable,
+    fullscreen: presenter.value.fullscreen,
+    maskClosable: presenter.value.maskClosable,
   };
 });
 
@@ -92,6 +109,7 @@ defineOptions({ name: "DatabaseDetailPresenter" });
       :description="props.description"
       :view-type="props.viewType"
       :presentation="props.presentation"
+      :source="props.source"
       :can-switch-presentation="props.canSwitchPresentation"
       :workspace-modes="props.workspaceModes"
       :property-items="props.propertyItems"
@@ -102,6 +120,22 @@ defineOptions({ name: "DatabaseDetailPresenter" });
       @delete="emit('delete', $event)"
       @close="emit('close')"
       @update:presentation="emit('update:presentation', $event)"
-    />
+    >
+      <template v-if="$slots.header" #header="slotProps">
+        <slot name="header" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.actions" #actions="slotProps">
+        <slot name="actions" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.preview" #preview="slotProps">
+        <slot name="preview" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.activity" #activity="slotProps">
+        <slot name="activity" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.footer" #footer="slotProps">
+        <slot name="footer" v-bind="slotProps" />
+      </template>
+    </DatabaseDetailWorkspace>
   </component>
 </template>

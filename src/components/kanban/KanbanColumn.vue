@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, useSlots } from "vue";
 import { Plus } from "lucide-vue-next";
 import { VueDraggable } from "vue-draggable-plus";
 import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
 import KanbanCard from "./KanbanCard.vue";
 import type { KanbanColumnData, Task, ColorMap } from "../../types";
-import { DEFAULT_STATUS_MAP, mergeColorMap } from "../../composables/useBadge";
+import { DEFAULT_STATUS_MAP, mergeColorMap, resolveBadge } from "../../composables/useBadge";
+
+type BadgeState = ReturnType<typeof resolveBadge>;
 
 const props = withDefaults(
   defineProps<{
     column: KanbanColumnData;
     ghostClass?: string;
+    cardVariant?: "default" | "compact" | "custom";
+    columnVariant?: "default" | "board" | "flat";
+    showColumnCount?: boolean;
     /**
      * 卡片优先级颜色映射（透传给 KanbanCard）
      */
@@ -22,6 +27,9 @@ const props = withDefaults(
   }>(),
   {
     ghostClass: "of-ghost",
+    cardVariant: "default",
+    columnVariant: "default",
+    showColumnCount: true,
     priorityColorMap: undefined,
     statusColorMap: undefined,
   },
@@ -32,6 +40,53 @@ const emit = defineEmits<{
   "card-click": [task: Task];
   "update:column": [column: KanbanColumnData];
 }>();
+
+defineSlots<{
+  header?(props: {
+    column: KanbanColumnData;
+    taskCount: number;
+    dotColor: string;
+    tasks: Task[];
+    addCard: () => void;
+  }): unknown;
+  card?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+  title?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+  meta?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+  tags?(props: {
+    task: Task;
+    displayDate: string;
+    priorityBadge: BadgeState;
+    statusBadge: BadgeState;
+    priorityLabel: string;
+    statusLabel: string;
+  }): unknown;
+}>();
+
+const slots = useSlots();
+const hasCustomCardContent = computed(
+  () => Boolean(slots.card || slots.title || slots.meta || slots.tags),
+);
 
 // 本地任务副本，用于双向绑定拖拽
 const localTasks = ref<Task[]>([...props.column.tasks]);
@@ -53,7 +108,8 @@ watch(localTasks, (val) => {
   emit("update:column", { ...props.column, tasks: val });
 });
 
-const useVirtual = computed(() => localTasks.value.length > 50);
+// 自定义卡片内容可能改变高度，因此一旦启用 card slots，就关闭虚拟化以保持布局确定性。
+const useVirtual = computed(() => localTasks.value.length > 50 && !hasCustomCardContent.value);
 const cardContainerRef = ref<HTMLElement | null>(null);
 const virtualizationState = createVirtualListState();
 const {
@@ -82,16 +138,37 @@ const dotColor = computed(() => {
 </script>
 
 <template>
-  <div class="of-kanban-column">
+  <div
+    class="of-kanban-column"
+    :class="`of-kanban-column--${columnVariant}`"
+    :data-kanban-column-id="column.id"
+    :data-kanban-column-title="column.title"
+    :data-kanban-column-color="column.color ?? ''"
+    :data-kanban-column-task-count="localTasks.length"
+    :data-kanban-column-variant="columnVariant"
+  >
     <!-- 列头 -->
     <div class="of-col-header">
-      <span class="of-col-dot" :style="{ background: dotColor }" />
-      <span class="of-col-title">{{ column.title }}</span>
-      <span class="of-col-count">{{ localTasks.length }}</span>
-      <span class="of-col-spacer" />
-      <button class="of-col-add-btn" @click="emit('add-card', column.id)">
-        <Plus :size="14" />
-      </button>
+      <slot
+        name="header"
+        :column="column"
+        :task-count="localTasks.length"
+        :dot-color="dotColor"
+        :tasks="localTasks"
+        :add-card="() => emit('add-card', column.id)"
+      >
+        <span
+          class="of-col-dot"
+          :style="{ background: dotColor }"
+          :data-kanban-column-dot-color="dotColor"
+        />
+        <span class="of-col-title">{{ column.title }}</span>
+        <span v-if="showColumnCount" class="of-col-count">{{ localTasks.length }}</span>
+        <span class="of-col-spacer" />
+        <button class="of-col-add-btn" @click="emit('add-card', column.id)">
+          <Plus :size="14" />
+        </button>
+      </slot>
     </div>
 
     <!-- 拖拽列表 -->
@@ -109,8 +186,24 @@ const dotColor = computed(() => {
         v-for="task in localTasks"
         :key="task.id"
         :task="task"
+        :variant="cardVariant"
+        :priority-color-map="priorityColorMap"
+        :status-color-map="statusColorMap"
         @click="emit('card-click', $event)"
-      />
+      >
+        <template v-if="slots.card" #card="slotProps">
+          <slot name="card" v-bind="slotProps" />
+        </template>
+        <template v-if="slots.title" #title="slotProps">
+          <slot name="title" v-bind="slotProps" />
+        </template>
+        <template v-if="slots.meta" #meta="slotProps">
+          <slot name="meta" v-bind="slotProps" />
+        </template>
+        <template v-if="slots.tags" #tags="slotProps">
+          <slot name="tags" v-bind="slotProps" />
+        </template>
+      </KanbanCard>
     </VueDraggable>
 
     <div v-else ref="cardContainerRef" class="of-col-cards of-col-cards-virtual">
@@ -120,8 +213,24 @@ const dotColor = computed(() => {
             v-for="{ data: task } in visibleCards"
             :key="task.id"
             :task="task"
+            :variant="cardVariant"
+            :priority-color-map="priorityColorMap"
+            :status-color-map="statusColorMap"
             @click="emit('card-click', $event)"
-          />
+          >
+            <template v-if="slots.card" #card="slotProps">
+              <slot name="card" v-bind="slotProps" />
+            </template>
+            <template v-if="slots.title" #title="slotProps">
+              <slot name="title" v-bind="slotProps" />
+            </template>
+            <template v-if="slots.meta" #meta="slotProps">
+              <slot name="meta" v-bind="slotProps" />
+            </template>
+            <template v-if="slots.tags" #tags="slotProps">
+              <slot name="tags" v-bind="slotProps" />
+            </template>
+          </KanbanCard>
         </div>
       </div>
     </div>
@@ -135,17 +244,26 @@ const dotColor = computed(() => {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--of-spacing-3);
   background: var(--of-surface-panel, var(--of-color-gray-50));
   border-radius: var(--of-radius-xl);
-  padding: 16px 12px;
+  padding: var(--of-spacing-4) var(--of-spacing-3);
   font-family: var(--of-font-sans);
+}
+
+.of-kanban-column--flat {
+  background: transparent;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+}
+
+.of-kanban-column--board {
+  box-shadow: var(--of-shadow-card);
 }
 
 .of-col-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
 }
 
 .of-col-dot {
@@ -156,13 +274,13 @@ const dotColor = computed(() => {
 }
 
 .of-col-title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-primary, var(--of-color-gray-700));
 }
 
 .of-col-count {
-  font-size: 12px;
+  font-size: var(--of-font-size-sm);
   color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
@@ -193,7 +311,7 @@ const dotColor = computed(() => {
 .of-col-cards {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--of-spacing-2);
   min-height: 40px;
 }
 

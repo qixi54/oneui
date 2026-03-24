@@ -194,7 +194,7 @@ provide("of-tabs-set", setActiveTab);
   background: transparent;
   cursor: pointer;
   font-family: inherit;
-  font-weight: 500;
+  font-weight: var(--of-font-weight-medium);
   color: var(--_color-text-muted);
   white-space: nowrap;
   transition:
@@ -220,18 +220,18 @@ provide("of-tabs-set", setActiveTab);
    Size 变体
    ============================================================ */
 .of-tabs--sm .of-tabs__tab {
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-3);
+  font-size: var(--of-font-size-sm);
 }
 
 .of-tabs--md .of-tabs__tab {
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: var(--of-spacing-2) var(--of-spacing-4);
+  font-size: var(--of-font-size-md);
 }
 
 .of-tabs--lg .of-tabs__tab {
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: var(--of-spacing-2_5) var(--of-spacing-5);
+  font-size: var(--of-font-size-lg);
 }
 
 /* ============================================================
@@ -261,7 +261,7 @@ provide("of-tabs-set", setActiveTab);
    ============================================================ */
 .of-tabs--card .of-tabs__nav {
   border-bottom: 1px solid var(--_color-border);
-  gap: 4px;
+  gap: var(--of-spacing-1);
   align-items: stretch;
   padding: 0 var(--_spacing-1);
   padding-top: var(--_spacing-2);
@@ -287,7 +287,7 @@ provide("of-tabs-set", setActiveTab);
   border-color: var(--_color-border);
   border-bottom-color: var(--_color-surface);
   color: var(--_color-text);
-  font-weight: 600;
+  font-weight: var(--of-font-weight-semibold);
 }
 
 /* ============================================================
@@ -327,13 +327,13 @@ provide("of-tabs-set", setActiveTab);
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 5px;
+  padding: 0 var(--of-spacing-1_25);
   background-color: var(--_color-badge-bg);
   color: var(--_color-badge-text);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
   line-height: 1;
-  border-radius: 9999px;
+  border-radius: var(--of-radius-full);
   flex-shrink: 0;
 }
 

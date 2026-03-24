@@ -219,14 +219,14 @@ function handleRowKeydown(event: KeyboardEvent) {
   min-width: 240px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-3);
   border-right: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   overflow: hidden;
   position: sticky;
   left: 0;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
-  z-index: 1;
+  z-index: var(--of-z-base);
 }
 
 .gantt-row__dot {
@@ -238,8 +238,8 @@ function handleRowKeydown(event: KeyboardEvent) {
 
 .gantt-row__title {
   font-family: var(--of-font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-primary, var(--of-color-gray-800));
   white-space: nowrap;
   overflow: hidden;
@@ -249,16 +249,16 @@ function handleRowKeydown(event: KeyboardEvent) {
 
 .gantt-row__priority {
   font-family: var(--of-font-sans);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 5px;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-semibold);
+  padding: 1px var(--of-spacing-1_25);
   border-radius: var(--of-radius-sm);
   flex-shrink: 0;
 }
 
 .gantt-row__chart {
   height: 40px;
-  padding: 8px 0;
+  padding: var(--of-spacing-2) 0;
   position: relative;
   overflow: hidden;
   background-image: repeating-linear-gradient(
@@ -278,7 +278,7 @@ function handleRowKeydown(event: KeyboardEvent) {
   border-radius: var(--of-radius-md);
   display: flex;
   align-items: center;
-  padding: 0 8px;
+  padding: 0 var(--of-spacing-2);
   white-space: nowrap;
   overflow: hidden;
   min-width: 40px;
@@ -306,8 +306,8 @@ function handleRowKeydown(event: KeyboardEvent) {
 
 .gantt-row__bar-label {
   font-family: var(--of-font-sans);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--of-font-size-xs);
+  font-weight: var(--of-font-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;

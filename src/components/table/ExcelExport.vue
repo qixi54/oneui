@@ -94,23 +94,23 @@ async function handleExport() {
 .of-excel-export {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--of-spacing-1_5);
   font-family: var(--of-font-sans);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-medium);
   color: var(--of-text-primary, var(--of-color-gray-700));
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-md);
-  padding: 6px 12px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-3);
   cursor: pointer;
   transition: var(--of-transition-fast);
   white-space: nowrap;
 }
 
 .of-excel-export.sm {
-  font-size: 12px;
-  padding: 4px 10px;
+  font-size: var(--of-font-size-sm);
+  padding: var(--of-spacing-1) var(--of-spacing-2_5);
 }
 
 .of-excel-export:hover:not(.disabled) {

@@ -77,8 +77,8 @@ function countColor(item: StatusSummaryItem): string {
   flex-direction: row;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 14px;
-  padding: 5px 13px;
+  gap: var(--of-spacing-3_5);
+  padding: var(--of-spacing-1_25) 13px;
   background: var(--of-surface-card);
   border-bottom: 1px solid var(--of-border-workspace);
   box-sizing: border-box;
@@ -88,7 +88,7 @@ function countColor(item: StatusSummaryItem): string {
 .of-status-summary__item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--of-spacing-1);
   white-space: nowrap;
   flex-shrink: 0;
 }

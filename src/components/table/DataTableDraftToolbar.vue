@@ -31,24 +31,24 @@ const emit = defineEmits<{
 .of-data-table-draft-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--of-spacing-2);
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   background: var(--of-surface-selected, var(--of-color-bg-active, #f3f4f6));
   border-top: 1px solid var(--of-border-divider, var(--of-border-subtle, #e5e7eb));
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
 }
 
 .of-data-table-draft-count {
   color: var(--of-text-secondary, var(--of-color-text-secondary, #4b5563));
-  font-weight: 500;
+  font-weight: var(--of-font-weight-medium);
   flex: 1;
 }
 
 .of-data-table-draft-btn {
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: var(--of-spacing-1) var(--of-spacing-3);
+  border-radius: var(--of-radius-sm);
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
   border: none;
   cursor: pointer;
 }

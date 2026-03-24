@@ -208,9 +208,9 @@ function onResizeStart(e: MouseEvent, colKey: string) {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
+  gap: var(--of-spacing-1);
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-secondary, var(--of-color-text-secondary, var(--of-color-gray-500)));
   white-space: nowrap;
   overflow: hidden;
@@ -296,7 +296,7 @@ function onResizeStart(e: MouseEvent, colKey: string) {
   bottom: 0;
   width: 4px;
   cursor: col-resize;
-  z-index: 1;
+  z-index: var(--of-z-base);
 }
 
 .of-th-resizer:hover {

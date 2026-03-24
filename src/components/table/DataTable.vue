@@ -1317,8 +1317,8 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 }
 
 .of-data-table--compact :deep(.of-table-group-row__cell) {
-  padding: 0 10px;
-  gap: 6px;
+  padding: 0 var(--of-spacing-2_5);
+  gap: var(--of-spacing-1_5);
 }
 
 .of-data-table--standard :deep(.of-table-group-row) {
@@ -1326,8 +1326,8 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 }
 
 .of-data-table--standard :deep(.of-table-group-row__cell) {
-  padding: 0 12px;
-  gap: 8px;
+  padding: 0 var(--of-spacing-3);
+  gap: var(--of-spacing-2);
 }
 
 .of-data-table--comfortable :deep(.of-table-group-row) {
@@ -1335,72 +1335,72 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 }
 
 .of-data-table--comfortable :deep(.of-table-group-row__cell) {
-  padding: 0 14px;
-  gap: 8px;
+  padding: 0 var(--of-spacing-3_5);
+  gap: var(--of-spacing-2);
 }
 
 /* Active cell focus ring */
 :deep(.of-cell--active) {
   outline: 2px solid var(--of-border-strong, var(--of-color-gray-300));
   outline-offset: -1px;
-  border-radius: 3px;
+  border-radius: var(--of-radius-sm);
 }
 
 .of-data-table--compact :deep(.of-mobile-list) {
-  padding: 6px;
-  gap: 6px;
+  padding: var(--of-spacing-1_5);
+  gap: var(--of-spacing-1_5);
 }
 
 .of-data-table--standard :deep(.of-mobile-list) {
-  padding: 8px;
-  gap: 8px;
+  padding: var(--of-spacing-2);
+  gap: var(--of-spacing-2);
 }
 
 .of-data-table--comfortable :deep(.of-mobile-list) {
-  padding: 10px;
-  gap: 10px;
+  padding: var(--of-spacing-2_5);
+  gap: var(--of-spacing-2_5);
 }
 
 .of-data-table--compact :deep(.of-mobile-card) {
-  padding: 10px 12px;
-  gap: 6px;
+  padding: var(--of-spacing-2_5) var(--of-spacing-3);
+  gap: var(--of-spacing-1_5);
 }
 
 .of-data-table--standard :deep(.of-mobile-card) {
-  padding: 12px 16px;
-  gap: 8px;
+  padding: var(--of-spacing-3) var(--of-spacing-4);
+  gap: var(--of-spacing-2);
 }
 
 .of-data-table--comfortable :deep(.of-mobile-card) {
-  padding: 14px 18px;
-  gap: 10px;
+  padding: var(--of-spacing-3_5) 18px;
+  gap: var(--of-spacing-2_5);
 }
 
 .of-data-table--compact :deep(.of-mobile-add-btn) {
-  padding: 8px 12px;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
   min-height: 40px;
 }
 
 .of-data-table--standard :deep(.of-mobile-add-btn) {
-  padding: 10px 12px;
+  padding: var(--of-spacing-2_5) var(--of-spacing-3);
   min-height: 44px;
 }
 
 .of-data-table--comfortable :deep(.of-mobile-add-btn) {
-  padding: 12px 14px;
+  padding: var(--of-spacing-3) var(--of-spacing-3_5);
   min-height: 48px;
 }
 
 .of-data-table--compact :deep(.of-new-row-btn) {
-  padding: 6px 10px;
+  padding: var(--of-spacing-1_5) var(--of-spacing-2_5);
 }
 
 .of-data-table--standard :deep(.of-new-row-btn) {
-  padding: 8px 12px;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
 }
 
 .of-data-table--comfortable :deep(.of-new-row-btn) {
-  padding: 10px 14px;
+  padding: var(--of-spacing-2_5) var(--of-spacing-3_5);
 }
 
 /* Drag state */
@@ -1419,7 +1419,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   bottom: 0;
   width: 2px;
   background: var(--of-border-strong, var(--of-color-gray-300, #d1d5db));
-  z-index: 10;
+  z-index: var(--of-z-sticky);
   pointer-events: none;
 }
 
@@ -1441,14 +1441,14 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   background: var(--of-surface-selected, var(--of-color-gray-100, rgba(243, 244, 246, 0.8)));
   outline: 1px solid var(--of-border-subtle, var(--of-color-gray-200, rgba(229, 231, 235, 0.8)));
   outline-offset: -1px;
-  border-radius: 2px;
+  border-radius: var(--of-radius-sm);
 }
 
 /* Add field overlay & popup */
 .of-add-field-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1001;
+  z-index: var(--of-z-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1465,7 +1465,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 
 .of-add-field-popup {
   position: relative;
-  z-index: 1;
+  z-index: var(--of-z-base);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated, #fff));
   border-radius: var(--of-radius-lg, 8px);
   box-shadow: var(--of-shadow-overlay-lg);

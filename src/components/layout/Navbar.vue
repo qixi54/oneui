@@ -102,8 +102,8 @@ function handleAvatarClick() {
 
 .of-navbar__logo-default {
   font-family: var(--of-font-sans);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--of-font-size-lg);
+  font-weight: var(--of-font-weight-bold);
   color: var(--of-accent-strong);
   letter-spacing: -0.02em;
 }
@@ -145,7 +145,7 @@ function handleAvatarClick() {
   border: none;
   outline: none;
   font-family: var(--of-font-sans);
-  font-size: 13px;
+  font-size: var(--of-font-size-base);
   color: var(--of-text-primary);
   min-width: 0;
 }
@@ -190,12 +190,12 @@ function handleAvatarClick() {
   right: 4px;
   min-width: 14px;
   height: 14px;
-  padding: 0 3px;
+  padding: 0 var(--of-spacing-0_75);
   background: var(--of-accent-strong);
   color: var(--of-text-inverse);
   font-family: var(--of-font-sans);
-  font-size: 9px;
-  font-weight: 600;
+  font-size: var(--of-font-size-2xs);
+  font-weight: var(--of-font-weight-semibold);
   line-height: 14px;
   border-radius: var(--of-radius-full);
   text-align: center;
@@ -213,8 +213,8 @@ function handleAvatarClick() {
   border-radius: var(--of-radius-full);
   cursor: pointer;
   font-family: var(--of-font-sans);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--of-font-size-base);
+  font-weight: var(--of-font-weight-semibold);
   color: var(--of-text-inverse);
   transition: var(--of-transition-fast);
   flex-shrink: 0;
