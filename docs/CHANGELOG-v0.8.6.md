@@ -40,6 +40,45 @@
 8. `README.md`, `README.en.md`, `docs/ONEUI-INDEX.md`
    - 同步更新 examples 路径、scene/preset demo 说明与当前 release 证据索引。
 
+## Post-release Follow-up
+
+`2026-03-22` 当天还补了一轮不改版本号的 issue closeout，用来收口 `ONEUI-FE-VUE-00002` 与 `ONEUI-FE-VUE-00004`：
+
+1. `docs/DATABASE-VIEW-DETAIL-USAGE.md`
+   - 新增面向业务仓的 `DatabaseView detail` 使用指南，补齐 `source / target / presentation`、deep link、workspace persistence 与 `list / notifications / dashboard` 示例。
+
+2. `src/components/workspace/WorkspaceDetailActionBar.vue`
+   - 新增 detail action bar 原语，业务仓可只传结构化 action 数据。
+
+3. `src/components/workspace/WorkspaceDetailPreviewBlock.vue`
+   - 新增 detail preview block 原语，业务仓可只传 preview/meta/content 数据。
+
+4. `src/components/workspace/WorkspaceActivityFeed.vue`
+   - 新增 detail activity feed 原语，业务仓可直接传 activity item 列表。
+
+5. `src/types/workspace.ts`, `src/index.ts`, `src/types/index.ts`
+   - 补齐 workspace/detail primitive 对应类型与根导出，避免业务仓自己猜接入契约。
+
+`2026-03-23` 又补了一轮不改版本号的 kanban integration closeout，用来收口 `ONEUI-ARCH-00048` 与 `ONEUI-ARCH-00050`：
+
+1. `src/components/kanban/KanbanBoard.vue`, `src/components/kanban/KanbanColumn.vue`, `src/components/kanban/KanbanCard.vue`
+   - 补齐 board-level slot forwarding、`priorityColorMap/statusColorMap` 透传，以及稳定的 `data-kanban-*` 定制挂点。
+
+2. `src/components/database/DatabaseViewContent.vue`, `src/components/database/DatabaseView.vue`
+   - 打通 `KanbanBoard` 的 `update:columns` 冒泡链路。
+   - `DatabaseView` 在 kanban 更新时按 `record.id` 合并原始 `fields`，不再把记录重建成瘦身版 `DataRecord`。
+   - 新增 kanban `create/update/delete` 动作回传，并并入 `useDatabaseView` action/middleware 主链。
+
+3. `src/composables/useDatabaseView.ts`, `src/composables/useDatabaseViewMiddleware.ts`, `src/contracts/database.ts`
+   - 新增 `create-record / update-record / delete-record` action 语义，toast / analytics / optimistic middleware 可覆盖看板持久化动作。
+   - 清理 database contract 中遗留的 `any` warning，并对齐组件层 action payload。
+
+4. `src/tests/database-view.integration.spec.ts`, `src/tests/database-view-middleware.integration.spec.ts`
+   - 新增 record preservation、kanban create/update/delete action forwarding、middleware coverage 与 slot/virtualization 相关回归测试。
+
+5. `README.md`, `docs/ONEUI-INDEX.md`
+   - 更新 DatabaseView actions、KanbanBoard slots、custom card slot 关闭虚拟滚动等公开契约说明，避免文档继续落后于代码事实。
+
 ## 发布范围与质量
 
 1. 版本号：`package.json` / `package-lock.json` 更新为 `0.8.6`。

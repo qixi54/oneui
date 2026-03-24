@@ -1,7 +1,6 @@
 import { computed, ref, type ComputedRef, type Ref } from "vue";
 import type {
   DatabaseViewDetailPresentation,
-  DatabaseViewResolvedDetailPresentation,
   DatabaseViewViewTab,
 } from "../contracts/database";
 import {
@@ -40,7 +39,7 @@ interface UseDatabaseDetailWorkspaceOptions {
   viewTabs: Readonly<ComputedRef<DatabaseViewViewTab[]>>;
   detailPresentation: Readonly<Ref<DatabaseViewDetailPresentation>>;
   initialSearchKeyword?: string;
-  initialDetailPresentation?: DatabaseViewResolvedDetailPresentation | null;
+  initialDetailPresentation?: Exclude<DatabaseViewDetailPresentation, "auto"> | null;
   initialSidePanelWidth?: number;
   initialDrawerWidth?: number;
   initialWorkspaceActive?: boolean;
@@ -116,7 +115,12 @@ export function useDatabaseDetailWorkspace(
     }),
   );
   const workspaceModes = computed(() =>
-    buildWorkspaceModes(isMobileViewport.value),
+    buildWorkspaceModes(
+      isMobileViewport.value,
+      options.detailPresentation.value === "sheet" || options.detailPresentation.value === "full-page"
+        ? options.detailPresentation.value
+        : undefined,
+    ),
   );
   const canSwitchDetailPresentation = computed(
     () => options.detailPresentation.value === "auto",
@@ -165,10 +169,11 @@ export function useDatabaseDetailWorkspace(
   });
 
   function setPreferredDetailPresentation(
-    mode: DatabaseViewResolvedDetailPresentation,
+    mode: Exclude<DatabaseViewDetailPresentation, "auto">,
   ) {
     if (!canSwitchDetailPresentation.value) return;
-    preferredDetailPresentation.value = mode;
+    preferredDetailPresentation.value =
+      mode === "sheet" ? "drawer" : mode === "full-page" ? "fullscreen" : mode;
   }
 
   function handleRowSelect(record: DataRecord) {

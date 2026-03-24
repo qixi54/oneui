@@ -6,6 +6,7 @@ import {
   type Ref,
 } from "vue";
 import type {
+  DatabaseViewDetailPresentation,
   DatabaseViewResolvedDetailPresentation,
   DatabaseViewWorkspacePreferences,
 } from "../contracts/database";
@@ -34,7 +35,18 @@ export function readWorkspacePreferences(tableId?: string): DatabaseViewWorkspac
   try {
     const raw = window.localStorage.getItem(storageKey);
     if (!raw) return {};
-    return JSON.parse(raw) as DatabaseViewWorkspacePreferences;
+    const parsed = JSON.parse(raw) as DatabaseViewWorkspacePreferences & {
+      detailPresentation?: Exclude<DatabaseViewDetailPresentation, "auto">;
+    };
+    return {
+      ...parsed,
+      detailPresentation:
+        parsed.detailPresentation === "sheet"
+          ? "drawer"
+          : parsed.detailPresentation === "full-page"
+            ? "fullscreen"
+            : parsed.detailPresentation,
+    };
   } catch {
     return {};
   }
@@ -82,14 +94,18 @@ interface UseDatabaseWorkspaceStateOptions {
   tableId: Readonly<Ref<string | undefined>>;
   activeViewId: Readonly<Ref<string>>;
   initialSearchKeyword?: string;
-  initialDetailPresentation?: DatabaseViewResolvedDetailPresentation | null;
+  initialDetailPresentation?: Exclude<DatabaseViewDetailPresentation, "auto"> | null;
   initialSidePanelWidth?: number;
   initialDrawerWidth?: number;
 }
 
 export function useDatabaseWorkspaceState(options: UseDatabaseWorkspaceStateOptions) {
   const preferredDetailPresentation = ref<DatabaseViewResolvedDetailPresentation | null>(
-    options.initialDetailPresentation ?? null,
+    options.initialDetailPresentation === "sheet"
+      ? "drawer"
+      : options.initialDetailPresentation === "full-page"
+        ? "fullscreen"
+        : (options.initialDetailPresentation ?? null),
   );
   const sidePanelWidth = ref(
     clampWorkspaceWidth(options.initialSidePanelWidth ?? DEFAULT_SIDE_PANEL_WIDTH, DEFAULT_SIDE_PANEL_WIDTH),

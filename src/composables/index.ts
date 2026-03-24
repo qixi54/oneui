@@ -136,6 +136,11 @@ export type {
 } from "./useDatabaseViewMiddleware";
 
 export { useDatabaseViewport, useDatabaseWorkspaceState } from "./useDatabaseWorkspace";
+export { useWorkspacePersistence } from "./useWorkspacePersistence";
+export type {
+  WorkspacePersistenceBackend,
+  UseWorkspacePersistenceOptions,
+} from "./useWorkspacePersistence";
 
 export { useSearch } from "./useSearch";
 export type { UseSearchOptions, SearchHighlight } from "./useSearch";

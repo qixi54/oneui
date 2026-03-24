@@ -68,6 +68,12 @@ function resolveDefaultSuccessMessage<T extends DataRecord>(context: DatabaseVie
   switch (context.action) {
     case "cell-edit":
       return "单元格更新已完成";
+    case "create-record":
+      return "记录已创建";
+    case "update-record":
+      return "记录已更新";
+    case "delete-record":
+      return "记录已删除";
     case "select-record":
       return "记录选择已更新";
     case "schema-event":

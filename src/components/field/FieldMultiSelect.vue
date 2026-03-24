@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
+import type { CellValue } from "@/components/table/FieldCell.vue";
+import { useStandaloneField, useStandaloneOptions, type StandaloneOptionsFieldProps } from "./standalone";
 
-const props = defineProps<{ value?: CellValue; field: FieldDef }>();
-const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
+const props = defineProps<StandaloneOptionsFieldProps>();
+const emit = defineEmits<{
+  commit: [value: CellValue];
+  cancel: [];
+  tabNext: [];
+  "update:modelValue": [value: CellValue];
+}>();
 
 const triggerRef = ref<HTMLElement | null>(null);
 const dropdownRef = ref<HTMLElement | null>(null);
 const dropdownStyle = ref({ top: "0px", left: "0px", width: "0px" });
-const isOpen = ref(true);
+const isOpen = ref(false);
 
-const options = computed(() => props.field.options ?? []);
+const { isStandalone, currentValue, resolvedLabel, resolvedDisabled } = useStandaloneField(props);
+const options = useStandaloneOptions(props);
 const draftValues = ref<string[]>([]);
 const activeIndex = ref(0);
 
@@ -20,8 +27,8 @@ const selectedOptions = computed(() => {
 });
 
 function initDraft() {
-  draftValues.value = Array.isArray(props.value)
-    ? props.value.filter((v): v is string => typeof v === "string")
+  draftValues.value = Array.isArray(currentValue.value)
+    ? currentValue.value.filter((v): v is string => typeof v === "string")
     : [];
 }
 
@@ -46,7 +53,11 @@ function toggleValue(optValue: string) {
 
 function commitAndClose() {
   isOpen.value = false;
-  emit("commit", [...draftValues.value]);
+  const value = [...draftValues.value];
+  emit("commit", value);
+  if (isStandalone.value) {
+    emit("update:modelValue", value);
+  }
 }
 
 function cancelAndClose() {
@@ -56,6 +67,20 @@ function cancelAndClose() {
 }
 
 function onKeydown(e: KeyboardEvent) {
+  if (resolvedDisabled.value) return;
+  if (!isOpen.value && isStandalone.value) {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      isOpen.value = true;
+      nextTick(() => updateDropdownPosition());
+      return;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      emit("cancel");
+    }
+    return;
+  }
   if (e.key === "ArrowDown") {
     e.preventDefault();
     activeIndex.value = Math.min(activeIndex.value + 1, Math.max(options.value.length - 1, 0));
@@ -84,6 +109,14 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
+function onTriggerClick() {
+  if (!isStandalone.value || resolvedDisabled.value) return;
+  isOpen.value = !isOpen.value;
+  if (isOpen.value) {
+    updateDropdownPosition();
+  }
+}
+
 function onWindowPointerDown(e: MouseEvent) {
   const target = e.target as Node | null;
   if (!target) return;
@@ -94,10 +127,13 @@ function onWindowPointerDown(e: MouseEvent) {
 
 onMounted(() => {
   initDraft();
-  nextTick(() => {
-    updateDropdownPosition();
-    triggerRef.value?.focus();
-  });
+  if (!isStandalone.value) {
+    isOpen.value = true;
+    nextTick(() => {
+      updateDropdownPosition();
+      triggerRef.value?.focus();
+    });
+  }
   window.addEventListener("resize", updateDropdownPosition);
   window.addEventListener("scroll", updateDropdownPosition, true);
   window.addEventListener("mousedown", onWindowPointerDown, true);
@@ -110,7 +146,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => props.value,
+  currentValue,
   () => {
     initDraft();
   },
@@ -118,7 +154,45 @@ watch(
 </script>
 
 <template>
+  <div v-if="isStandalone" class="of-field-standalone">
+    <label v-if="label" class="of-field-standalone__label">
+      {{ label }}
+      <span v-if="required" class="of-field-standalone__required">*</span>
+    </label>
+    <div
+      class="of-field-standalone__control"
+      :class="{
+        'of-field-standalone__control--error': error,
+        'of-field-standalone__control--disabled': resolvedDisabled,
+      }"
+    >
+      <button
+        ref="triggerRef"
+        type="button"
+        class="of-field-multiselect"
+        :aria-label="resolvedLabel"
+        :disabled="resolvedDisabled"
+        @click="onTriggerClick"
+        @keydown="onKeydown"
+      >
+        <div v-if="selectedOptions.length" class="of-field-multiselect__chips">
+          <span
+            v-for="opt in selectedOptions"
+            :key="opt.value"
+            class="of-field-multiselect__badge"
+            :style="opt.color ? { background: opt.color } : undefined"
+          >
+            {{ opt.label }}
+          </span>
+        </div>
+        <span v-else class="of-field-multiselect__placeholder">—</span>
+      </button>
+    </div>
+    <span v-if="error" class="of-field-standalone__error">{{ error }}</span>
+  </div>
+
   <button
+    v-else
     ref="triggerRef"
     type="button"
     class="of-field-multiselect"
@@ -136,58 +210,101 @@ watch(
       </span>
     </div>
     <span v-else class="of-field-multiselect__placeholder">—</span>
-
-    <Teleport to="body">
-      <div
-        v-if="isOpen"
-        ref="dropdownRef"
-        class="of-field-multiselect__dropdown"
-        :style="dropdownStyle"
-      >
-        <button
-          v-for="(opt, i) in options"
-          :key="opt.value"
-          type="button"
-          class="of-field-multiselect__option"
-          role="checkbox"
-          :aria-checked="draftValues.includes(opt.value)"
-          :class="{ active: i === activeIndex, selected: draftValues.includes(opt.value) }"
-          @mouseenter="activeIndex = i"
-          @click.stop="toggleValue(opt.value)"
-          @focusin="activeIndex = i"
-          @keydown.enter.prevent="toggleValue(opt.value)"
-          @keydown.space.prevent="toggleValue(opt.value)"
-        >
-          <span
-            class="of-field-multiselect__checkbox"
-            :class="{ 'of-field-multiselect__checkbox--checked': draftValues.includes(opt.value) }"
-            aria-hidden="true"
-          />
-          <span
-            v-if="opt.color"
-            class="of-field-multiselect__badge"
-            :style="{ background: opt.color }"
-            >{{ opt.label }}</span>
-          <span v-else>{{ opt.label }}</span>
-        </button>
-        <div class="of-field-multiselect__actions">
-          <button class="of-field-multiselect__btn" type="button" @click.stop="cancelAndClose">
-            取消
-          </button>
-          <button
-            class="of-field-multiselect__btn of-field-multiselect__btn--primary"
-            type="button"
-            @click.stop="commitAndClose"
-          >
-            完成
-          </button>
-        </div>
-      </div>
-    </Teleport>
   </button>
+
+  <Teleport to="body">
+    <div
+      v-if="isOpen"
+      ref="dropdownRef"
+      class="of-field-multiselect__dropdown"
+      :style="dropdownStyle"
+    >
+      <button
+        v-for="(opt, i) in options"
+        :key="opt.value"
+        type="button"
+        class="of-field-multiselect__option"
+        role="checkbox"
+        :aria-checked="draftValues.includes(opt.value)"
+        :class="{ active: i === activeIndex, selected: draftValues.includes(opt.value) }"
+        @mouseenter="activeIndex = i"
+        @click.stop="toggleValue(opt.value)"
+        @focusin="activeIndex = i"
+        @keydown.enter.prevent="toggleValue(opt.value)"
+        @keydown.space.prevent="toggleValue(opt.value)"
+      >
+        <span
+          class="of-field-multiselect__checkbox"
+          :class="{ 'of-field-multiselect__checkbox--checked': draftValues.includes(opt.value) }"
+          aria-hidden="true"
+        />
+        <span
+          v-if="opt.color"
+          class="of-field-multiselect__badge"
+          :style="{ background: opt.color }"
+          >{{ opt.label }}</span>
+        <span v-else>{{ opt.label }}</span>
+      </button>
+      <div class="of-field-multiselect__actions">
+        <button class="of-field-multiselect__btn" type="button" @click.stop="cancelAndClose">
+          取消
+        </button>
+        <button
+          class="of-field-multiselect__btn of-field-multiselect__btn--primary"
+          type="button"
+          @click.stop="commitAndClose"
+        >
+          完成
+        </button>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
+.of-field-standalone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--of-spacing-1);
+}
+
+.of-field-standalone__label {
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
+  color: var(--of-text-secondary);
+}
+
+.of-field-standalone__required {
+  color: var(--of-color-error);
+  margin-left: var(--of-spacing-0_5);
+}
+
+.of-field-standalone__control {
+  border: 1px solid var(--of-border-subtle);
+  border-radius: var(--of-radius-md);
+  background: var(--of-surface-elevated);
+  transition: var(--of-transition-fast);
+}
+
+.of-field-standalone__control:focus-within {
+  border-color: var(--of-accent-default);
+  box-shadow: 0 0 0 2px var(--of-accent-soft);
+}
+
+.of-field-standalone__control--error {
+  border-color: var(--of-color-error);
+}
+
+.of-field-standalone__control--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.of-field-standalone__error {
+  font-size: var(--of-font-size-xs);
+  color: var(--of-color-error);
+}
+
 .of-field-multiselect {
   width: 100%;
   min-height: 28px;

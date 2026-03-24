@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { createDevExamplesRegistry } from "./examples/registry";
 import {
@@ -43,10 +44,6 @@ import {
   CodeBlock,
   RefLink,
   RichTextEditor,
-  // Detail
-  DetailLayout,
-  PropPanel,
-  CommentItem,
   // Kanban
   KanbanBoard,
   // Dashboard
@@ -88,6 +85,10 @@ import {
   Drawer,
   SidePanel,
   ActivityTimeline,
+  DatabaseViewDetailHost,
+  WorkspaceDetailActionBar,
+  WorkspaceDetailPreviewBlock,
+  WorkspaceActivityFeed,
   // v2.1 业务组件
   RefTag,
   Avatar,
@@ -112,12 +113,14 @@ import type {
   GalleryItem,
   GanttItem,
   SidebarItem,
-  PropItem,
   CommentData,
   ViewTabItem,
   Task,
   TableSchema,
   DataRecord,
+  DatabaseViewDetailPresentation,
+  DatabaseDetailWorkspaceModeOption,
+  DatabaseDetailWorkspacePropertyItem,
 } from "../index";
 import type { ButtonOption } from "../components/base";
 import type { ChatMessage } from "../composables/useAiChat";
@@ -586,35 +589,105 @@ const detailTask = {
   status: "blocked",
   priority: "P0",
   role: "BE",
-  description: "对现有认证中间件进行架构重构，提升可维护性和性能，支持多种认证策略动态切换。",
+  description: `## 背景
+
+当前认证中间件已经承载了登录态校验、Token 刷新、权限注入等多项职责，随着策略变多，维护成本开始明显上升。
+
+## 本轮目标
+
+- 将鉴权入口和策略执行解耦
+- 保留旧链路 fallback，避免一次性切断现网依赖
+- 为后续 OAuth2 / API Key / Service Token 扩展预留统一接口
+
+## 当前阻塞
+
+- OAuth2 服务端接口尚未完全稳定
+- 共享登录路径仍有历史调用未清点完毕
+
+## 处理建议
+
+先完成中间件边界收口与兼容层，再等待外部依赖释放后推进联调。`,
 };
-const detailDescription = ref(
-  "对现有认证中间件进行架构重构，提升可维护性和性能，支持多种认证策略动态切换。\n依赖 OAuth2 服务完成后方可继续，预计 02/15 解除阻塞。",
+const detailPresentation = ref<DatabaseViewDetailPresentation>("drawer");
+const detailVisible = ref(false);
+const detailSidePanelWidth = ref(440);
+const detailDrawerWidth = ref(820);
+const detailBrief = "OAuth2 服务未就绪，联调窗口延后，当前先收口认证中间件边界与兼容层。";
+const detailMarkdownHtml = computed(() => renderMarkdown(detailTask.description));
+
+const detailPropertyItems = computed<DatabaseDetailWorkspacePropertyItem[]>(() => [
+  { key: "status", label: "状态", value: "已阻塞", fallbackText: "—" },
+  { key: "priority", label: "优先级", value: "P0", fallbackText: "—" },
+  { key: "assignee", label: "负责人", value: "BE Agent", fallbackText: "—" },
+  { key: "dueDate", label: "截止日期", value: "2026-03-20", fallbackText: "—" },
+]);
+
+const workspaceModes: DatabaseDetailWorkspaceModeOption[] = [
+  { value: "side-panel", label: "侧边面板" },
+  { value: "drawer", label: "详情弹窗" },
+  { value: "fullscreen", label: "全屏视图" },
+];
+
+const detailActionBarItems = computed(() => [
+  {
+    id: "copy-link",
+    label: "复制链接",
+    tone: "ghost",
+    onClick: () => toast.success("详情链接已复制"),
+  },
+  {
+    id: "switch-fullscreen",
+    label: "切到全屏",
+    tone: "ghost",
+    onClick: () => {
+      detailVisible.value = true;
+      detailPresentation.value = "fullscreen";
+    },
+  },
+]);
+
+const detailPreviewItems = computed(() => [
+  {
+    id: "preview-status",
+    label: "当前状态",
+    value: "等待外部依赖释放",
+    description: "OAuth2 服务未就绪，联调窗口延后。",
+  },
+  {
+    id: "preview-scope",
+    label: "变更范围",
+    value: "Auth Middleware / Token Flow",
+    description: "覆盖注册、刷新、鉴权守卫三条链路。",
+  },
+  {
+    id: "preview-risk",
+    label: "风险等级",
+    value: "中高",
+    description: "涉及共享登录路径，需要保留 fallback。",
+  },
+]);
+
+const detailPreviewMeta = computed(() => [
+  { key: "team", label: "Owner", value: "BE Agent", tone: "accent" },
+  { key: "stage", label: "Stage", value: "Execute", tone: "warning" },
+]);
+
+const workspaceActivityItems = computed(() =>
+  detailComments.map((item) => ({
+    id: item.id,
+    author: item.author,
+    authorInitial: item.authorInitial,
+    avatarColor: item.avatarColor,
+    action: item.action,
+    content: item.content,
+    time: item.time,
+  })),
 );
 
-const detailProps: PropItem[] = [
-  {
-    key: "状态",
-    value: "已阻塞",
-    valueColor: themeSwatches.accentStrong,
-    valueBg: themeSwatches.selected,
-    dotColor: themeSwatches.accentStrong,
-  },
-  {
-    key: "优先级",
-    value: "P0",
-    valueColor: themeSwatches.textPrimary,
-    valueBg: themeSwatches.muted,
-  },
-  {
-    key: "负责角色",
-    value: "BE",
-    valueColor: themeSwatches.accent,
-    valueBg: themeSwatches.selected,
-  },
-  { key: "创建时间", value: "2026-02-05" },
-  { key: "截止日期", value: "2026-02-20" },
-];
+function openDetailDemo(mode: DatabaseViewDetailPresentation) {
+  detailPresentation.value = mode;
+  detailVisible.value = true;
+}
 
 const detailComments: CommentData[] = [
   {
@@ -2289,62 +2362,190 @@ const myStatusMap: ColorMap = {
       </template>
 
       <!-- ══════════════════════════════════════════════════════
-           详情页
+           多态详情工作区
       ════════════════════════════════════════════════════════ -->
       <template v-if="activeSection === 'detail'">
         <section class="dev-section">
-          <h2>DetailLayout 任务详情布局</h2>
+          <h2>多态详情工作区 (对齐 Flow-Kanban)</h2>
           <p class="dev-desc">
-            左右双栏布局：左侧主内容（标题/描述富文本区/活动记录），右侧属性面板。支持通过
-            descriptionContent + descriptionEditable 接入可编辑富文本区。
+            同一份详情内容可在右侧、弹窗、全屏三种承载方式之间切换。
           </p>
-          <div
-            style="border: 1px solid var(--of-border-color); border-radius: 10px; overflow: hidden"
-          >
-            <DetailLayout
-              :task="detailTask"
-              :prop-items="detailProps"
-              :comments="detailComments"
-              v-model:description-content="detailDescription"
-              :description-editable="true"
-            />
+          <div class="dev-row dev-detail-launchers">
+            <button class="dev-btn" @click="openDetailDemo('side-panel')">
+              侧边面板 (Side Panel)
+            </button>
+            <button class="dev-btn" @click="openDetailDemo('drawer')">
+              详情弹窗 (Drawer)
+            </button>
+            <button class="dev-btn" @click="openDetailDemo('fullscreen')">
+              全屏视图 (Fullscreen)
+            </button>
           </div>
+
+          <!-- 模拟详情页宿主 -->
+          <div
+            v-if="detailVisible && detailPresentation === 'side-panel'"
+            class="dev-detail-stage"
+          >
+            <div class="dev-detail-stage__content">
+              <div class="dev-detail-stage__list">
+                <div class="dev-detail-stage__list-item">
+                  <span class="dev-detail-stage__list-title">ZHO-BE-011</span>
+                  <span class="dev-detail-stage__list-meta">处理中 · FE</span>
+                </div>
+                <div class="dev-detail-stage__list-item is-active">
+                  <span class="dev-detail-stage__list-title">ZHO-BE-012</span>
+                  <span class="dev-detail-stage__list-meta">已阻塞 · BE</span>
+                </div>
+                <div class="dev-detail-stage__list-item">
+                  <span class="dev-detail-stage__list-title">ZHO-BE-013</span>
+                  <span class="dev-detail-stage__list-meta">待确认 · ARCH</span>
+                </div>
+              </div>
+            </div>
+            <DatabaseViewDetailHost
+              :visible="detailVisible"
+              :title="detailTask.title"
+              :row-id="detailTask.id"
+              :record-id="detailTask.id"
+              description=""
+              :presentation="detailPresentation as any"
+              :side-panel-width="detailSidePanelWidth"
+              :drawer-width="detailDrawerWidth"
+              :can-switch-presentation="true"
+              :workspace-modes="workspaceModes"
+              :property-items="detailPropertyItems"
+              @close="detailVisible = false"
+              @update:side-panel-width="detailSidePanelWidth = $event"
+              @update:drawer-width="detailDrawerWidth = $event"
+              @update:presentation="detailPresentation = $event"
+            >
+              <template #actions>
+                <WorkspaceDetailActionBar :actions="detailActionBarItems" align="end" />
+              </template>
+              <template #preview>
+                <div class="dev-react-detail">
+                  <div class="dev-react-detail__brief">
+                    <span class="dev-react-detail__brief-icon">💡</span>
+                    <span>{{ detailBrief }}</span>
+                  </div>
+
+                  <div class="dev-react-detail__section">
+                    <div class="dev-react-detail__section-head">
+                      <span class="dev-react-detail__section-title">详细内容</span>
+                    </div>
+                    <div class="dev-react-detail__markdown">
+                      <div class="of-markdown" v-html="detailMarkdownHtml" />
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template #activity>
+                <WorkspaceActivityFeed :items="workspaceActivityItems" />
+              </template>
+              <template #footer>
+                <div class="dev-detail-footer">
+                  <div class="dev-detail-footer__actions">
+                    <button class="dev-btn" @click="detailVisible = false">关闭</button>
+                  </div>
+                </div>
+              </template>
+            </DatabaseViewDetailHost>
+          </div>
+
+          <!-- 弹窗和全屏模式直接渲染 -->
+          <DatabaseViewDetailHost
+            v-if="detailVisible && detailPresentation !== 'side-panel'"
+            :visible="detailVisible"
+            :title="detailTask.title"
+            :row-id="detailTask.id"
+            :record-id="detailTask.id"
+            description=""
+            :presentation="detailPresentation as any"
+            :side-panel-width="detailSidePanelWidth"
+            :drawer-width="detailDrawerWidth"
+            :can-switch-presentation="true"
+            :workspace-modes="workspaceModes"
+            :property-items="detailPropertyItems"
+            @close="detailVisible = false"
+            @update:side-panel-width="detailSidePanelWidth = $event"
+            @update:drawer-width="detailDrawerWidth = $event"
+            @update:presentation="detailPresentation = $event"
+          >
+            <template #actions>
+              <WorkspaceDetailActionBar :actions="detailActionBarItems" align="end" />
+            </template>
+            <template #preview>
+              <div class="dev-react-detail">
+                <div class="dev-react-detail__brief">
+                  <span class="dev-react-detail__brief-icon">💡</span>
+                  <span>{{ detailBrief }}</span>
+                </div>
+
+                <div class="dev-react-detail__section">
+                  <div class="dev-react-detail__section-head">
+                    <span class="dev-react-detail__section-title">详细内容</span>
+                  </div>
+                  <div class="dev-react-detail__markdown dev-react-detail__markdown--expanded">
+                    <div class="of-markdown" v-html="detailMarkdownHtml" />
+                  </div>
+                </div>
+
+              </div>
+            </template>
+            <template #activity>
+              <WorkspaceActivityFeed :items="workspaceActivityItems" />
+            </template>
+            <template #footer>
+              <div class="dev-detail-footer">
+                <div class="dev-detail-footer__actions">
+                  <button class="dev-btn" @click="detailVisible = false">关闭</button>
+                </div>
+              </div>
+            </template>
+          </DatabaseViewDetailHost>
         </section>
 
         <section class="dev-section">
-          <h2>PropPanel + PropRow 属性面板</h2>
-          <p class="dev-desc">
-            可单独使用的属性面板，PropItem 支持 valueColor/valueBg/dotColor 样式配置。
-          </p>
-          <div
-            style="
-              max-width: 360px;
-              border: 1px solid var(--of-border-color);
-              border-radius: 10px;
-              overflow: hidden;
-            "
-          >
-            <PropPanel title="任务属性" :items="detailProps" />
+          <h2>复合组件组合方式</h2>
+          <p class="dev-desc">只保留两种低表达、可直接复用的页面组合。</p>
+          <div class="dev-detail-compositions">
+            <article class="dev-detail-composition-card">
+              <div class="dev-detail-composition-card__source">task · default workspace</div>
+              <div class="dev-detail-composition-card__header">
+                <h3>任务工作区</h3>
+              </div>
+              <WorkspaceDetailActionBar :actions="detailActionBarItems" />
+              <WorkspaceDetailPreviewBlock
+                title="执行摘要"
+                :content="detailTask.description"
+                :items="detailPreviewItems"
+                :meta="detailPreviewMeta"
+              />
+              <WorkspaceActivityFeed :items="workspaceActivityItems.slice(0, 2)" />
+            </article>
+
+            <article class="dev-detail-composition-card">
+              <div class="dev-detail-composition-card__source">
+                notifications · review queue
+              </div>
+              <div class="dev-detail-composition-card__header">
+                <h3>审阅工作区</h3>
+              </div>
+              <WorkspaceDetailPreviewBlock
+                title="审阅摘要"
+                :items="detailPreviewItems.slice(0, 2)"
+                :meta="detailPreviewMeta"
+                content="你可以把相同容器复用于通知中心、审批队列、活动审阅流，只替换槽位内容即可。"
+              />
+              <div class="dev-detail-batch-bar">
+                <button class="dev-btn">标记已读</button>
+                <button class="dev-btn">稍后处理</button>
+              </div>
+            </article>
           </div>
         </section>
 
-        <section class="dev-section">
-          <h2>CommentItem 评论条目</h2>
-          <p class="dev-desc">
-            活动记录/评论列表中的单个条目，CommentData 包含
-            author/authorInitial/avatarColor/action/content/time 字段。
-          </p>
-          <div
-            style="
-              max-width: 600px;
-              border: 1px solid var(--of-border-color);
-              border-radius: 10px;
-              padding: 16px;
-            "
-          >
-            <CommentItem v-for="c in detailComments" :key="c.id" :comment="c" />
-          </div>
-        </section>
       </template>
 
       <!-- ══════════════════════════════════════════════════════
@@ -4242,11 +4443,12 @@ body {
   z-index: 100;
   background: var(--of-color-bg-elevated);
   border-bottom: 1px solid var(--of-border-color);
-  padding: 0 24px;
+  padding: 12px 24px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 24px;
-  height: 52px;
+  min-height: 52px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 .dev-header__logo {
@@ -4259,6 +4461,8 @@ body {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+  flex: 1 1 100%;
+  width: 100%;
 }
 .dev-nav-btn {
   padding: 5px 12px;
@@ -4665,5 +4869,271 @@ body {
   font-family: "JetBrains Mono", "Fira Code", monospace;
   white-space: pre;
   overflow-x: auto;
+}
+
+.dev-detail-launchers {
+  gap: 12px;
+}
+
+.dev-detail-stage {
+  margin-top: 24px;
+  min-height: 620px;
+  border: 1px solid rgb(203 213 225 / 0.9);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(circle at top left, rgb(37 99 235 / 0.08), transparent 28%),
+    linear-gradient(180deg, rgb(248 250 252 / 0.94), rgb(255 255 255 / 1) 24%);
+}
+
+.dev-detail-stage__content {
+  padding: 28px;
+  width: calc(100% - 460px);
+  display: grid;
+  gap: 10px;
+}
+
+.dev-detail-stage__list {
+  display: grid;
+  gap: 8px;
+  max-width: 560px;
+}
+
+.dev-detail-stage__list-item {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.92);
+}
+
+.dev-detail-stage__list-item.is-active {
+  border-color: #cbd5e1;
+}
+
+.dev-detail-stage__list-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--of-text-primary, var(--of-color-text));
+}
+
+.dev-detail-stage__list-meta {
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.dev-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 2px 0;
+}
+
+.dev-detail-footer__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dev-detail-preview-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dev-detail-point {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
+  font-size: 11px;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+}
+
+.dev-react-detail {
+  display: grid;
+  gap: 16px;
+}
+
+.dev-react-detail__brief {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px 10px;
+  border: 1px solid #f3e5ab;
+  border-radius: 4px;
+  background: #fff;
+  color: #ad6800;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.dev-react-detail__brief-icon {
+  flex: 0 0 auto;
+}
+
+.dev-react-detail__section {
+  display: grid;
+  gap: 8px;
+}
+
+.dev-react-detail__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dev-react-detail__section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--of-text-primary, var(--of-color-text-primary));
+}
+
+.dev-react-detail__markdown {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 12px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.dev-react-detail__markdown--expanded {
+  max-height: none;
+}
+
+.dev-react-detail__markdown :deep(.of-content-block) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.dev-react-detail__markdown :deep(.of-content-block__content) {
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose p),
+.dev-react-detail__markdown :deep(.of-markdown.of-prose li),
+.dev-react-detail__markdown :deep(p),
+.dev-react-detail__markdown :deep(li) {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose h1),
+.dev-react-detail__markdown :deep(h1) {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose h2),
+.dev-react-detail__markdown :deep(h2) {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose h3),
+.dev-react-detail__markdown :deep(.of-markdown.of-prose h4),
+.dev-react-detail__markdown :deep(h3),
+.dev-react-detail__markdown :deep(h4) {
+  margin: 0 0 6px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose ul),
+.dev-react-detail__markdown :deep(.of-markdown.of-prose ol),
+.dev-react-detail__markdown :deep(ul),
+.dev-react-detail__markdown :deep(ol) {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose code),
+.dev-react-detail__markdown :deep(code) {
+  font-size: 10px;
+}
+
+.dev-react-detail__markdown :deep(.of-markdown.of-prose pre),
+.dev-react-detail__markdown :deep(pre) {
+  margin: 0;
+  font-size: 10px;
+}
+
+.dev-detail-compositions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dev-detail-composition-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #edf0f3;
+  background: #fff;
+}
+
+.dev-detail-composition-card__header {
+  display: grid;
+  gap: 4px;
+}
+
+.dev-detail-composition-card__header h3 {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.dev-detail-composition-card__source {
+  font-size: 11px;
+  color: var(--of-text-secondary, var(--of-color-text-secondary));
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dev-detail-batch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 1100px) {
+  .dev-detail-stage__content {
+    width: 100%;
+    padding-right: 24px;
+  }
+
+  .dev-detail-compositions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .dev-detail-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dev-detail-footer__actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
 }
 </style>

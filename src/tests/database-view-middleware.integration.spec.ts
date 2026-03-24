@@ -413,4 +413,77 @@ describe("DatabaseView middleware presets", () => {
     expect(records.value[0]?.fields.title).toBe("optimistic");
     expect(databaseView.error.value?.message).toBe("boom");
   });
+
+  it("middleware presets 应该覆盖 create/update/delete record 动作", async () => {
+    const trace: string[] = [];
+    const onCreateRecord = vi.fn().mockResolvedValue(undefined);
+    const onUpdateRecord = vi.fn().mockResolvedValue(undefined);
+    const onDeleteRecord = vi.fn().mockResolvedValue(undefined);
+
+    const databaseView = useDatabaseView({
+      tableId: "tbl-1",
+      schema: ref(buildSchema()),
+      records: ref(buildRecords()),
+      views: ref(buildViews()),
+      actions: {
+        middleware: composeDatabaseViewMiddlewares(
+          createDatabaseViewToastMiddleware({
+            onSuccess: (message, context) => {
+              trace.push(`success:${message}:${context.action}`);
+            },
+          }),
+          createDatabaseViewAnalyticsMiddleware({
+            onEvent: (event) => {
+              trace.push(`analytics:${event.phase}:${event.action}`);
+            },
+          }),
+        ),
+        onCreateRecord,
+        onUpdateRecord,
+        onDeleteRecord,
+      },
+      autoLoad: false,
+    });
+
+    await flushPromises();
+    trace.length = 0;
+
+    const newRecord = { id: "R-2", fields: { title: "created" } };
+    await databaseView.emitCreateRecord({ record: newRecord });
+    await databaseView.emitUpdateRecord({
+      recordId: "R-1",
+      patch: { title: "updated" },
+      record: { id: "R-1", fields: { title: "updated" } },
+    });
+    await databaseView.emitDeleteRecord({ recordId: "R-1" });
+
+    const relevantTrace = trace.filter(
+      (entry) =>
+        entry.includes("create-record") ||
+        entry.includes("update-record") ||
+        entry.includes("delete-record") ||
+        entry.includes("记录已创建") ||
+        entry.includes("记录已更新") ||
+        entry.includes("记录已删除"),
+    );
+
+    expect(onCreateRecord).toHaveBeenCalledWith({ record: newRecord });
+    expect(onUpdateRecord).toHaveBeenCalledWith({
+      recordId: "R-1",
+      patch: { title: "updated" },
+      record: { id: "R-1", fields: { title: "updated" } },
+    });
+    expect(onDeleteRecord).toHaveBeenCalledWith({ recordId: "R-1" });
+    expect(relevantTrace).toEqual([
+      "analytics:before:create-record",
+      "analytics:after:create-record",
+      "success:记录已创建:create-record",
+      "analytics:before:update-record",
+      "analytics:after:update-record",
+      "success:记录已更新:update-record",
+      "analytics:before:delete-record",
+      "analytics:after:delete-record",
+      "success:记录已删除:delete-record",
+    ]);
+  });
 });

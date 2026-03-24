@@ -228,14 +228,13 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 If you need to review the current traceable release materials, start with these docs:
 
-- Current evidence index: [`docs/plans/2026-03-22-release-0.8.6-evidence-index.md`](docs/plans/2026-03-22-release-0.8.6-evidence-index.md)
-- Release proof: [`docs/plans/2026-03-22-release-0.8.6-proof.md`](docs/plans/2026-03-22-release-0.8.6-proof.md)
-- Verification result: [`docs/plans/2026-03-22-release-0.8.6-verification.md`](docs/plans/2026-03-22-release-0.8.6-verification.md)
+- Current release proof: [`docs/plans/2026-03-23-release-0.8.8-proof.md`](docs/plans/2026-03-23-release-0.8.8-proof.md)
+- Changelog: [`docs/CHANGELOG-v0.8.8.md`](docs/CHANGELOG-v0.8.8.md)
+- Issue verification: [`docs/oneui-arch-00053-verification-20260323.md`](docs/oneui-arch-00053-verification-20260323.md)
 - Pre-release smoke: [`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
 - Package entrypoints verification: [`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
-- Changelog: [`docs/CHANGELOG-v0.8.6.md`](docs/CHANGELOG-v0.8.6.md)
 
-The current public npm version is `0.8.6`, and publish, pack, dry-run, and dual-host smoke checks all have separate evidence.
+The current published version is `0.8.8`; publish, pack, dry-run, consumer smoke, and publish receipt evidence for this round are closed out in `docs/plans/2026-03-23-release-0.8.8-proof.md`.
 
 ---
 

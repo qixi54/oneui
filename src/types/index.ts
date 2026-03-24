@@ -99,6 +99,21 @@ export interface DataTableProps {
   virtualThreshold?: number;
 }
 
+// ─── Workspace ──────────────────────────────────────────────────────────────
+
+export type {
+  WorkspaceActivityItem,
+  WorkspaceDetailActionItem,
+  WorkspaceAdapter,
+  WorkspaceDetailPresentation,
+  WorkspaceFilterItem,
+  WorkspaceMetaItem,
+  WorkspacePersistenceSnapshot,
+  WorkspacePreviewItem,
+  WorkspaceSlotProps,
+  WorkspaceToolbarAction,
+} from "./workspace";
+
 // ─── Kanban ──────────────────────────────────────────────────────────────────
 
 export interface KanbanColumnData {

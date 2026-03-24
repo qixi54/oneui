@@ -629,6 +629,22 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
     await runActionWithMiddleware("cell-edit", payload, () => options.actions?.onCellEdit?.(payload));
   }
 
+  async function emitCreateRecord(payload: { record: T }): Promise<void> {
+    await runActionWithMiddleware("create-record", payload, () => options.actions?.onCreateRecord?.(payload));
+  }
+
+  async function emitUpdateRecord(payload: {
+    recordId: string;
+    patch: Record<string, unknown>;
+    record: T;
+  }): Promise<void> {
+    await runActionWithMiddleware("update-record", payload, () => options.actions?.onUpdateRecord?.(payload));
+  }
+
+  async function emitDeleteRecord(payload: { recordId: string }): Promise<void> {
+    await runActionWithMiddleware("delete-record", payload, () => options.actions?.onDeleteRecord?.(payload));
+  }
+
   async function emitSchemaEvent(event: DatabaseSchemaEvent): Promise<void> {
     await runActionWithMiddleware("schema-event", event, () => options.actions?.onSchemaEvent?.(event));
   }
@@ -720,6 +736,9 @@ export function useDatabaseView<T extends DataRecord = DataRecord>(
     setPage,
     setPageSize,
     emitCellEdit,
+    emitCreateRecord,
+    emitUpdateRecord,
+    emitDeleteRecord,
     emitSchemaEvent,
     setRecords,
   };

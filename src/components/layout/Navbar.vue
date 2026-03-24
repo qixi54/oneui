@@ -46,6 +46,10 @@ function handleAvatarClick() {
       <slot name="logo">
         <span class="of-navbar__logo-default">OneFlow</span>
       </slot>
+
+      <div v-if="$slots['header-left']" class="of-navbar__header of-navbar__header--left">
+        <slot name="header-left" />
+      </div>
     </div>
 
     <!-- 中间搜索框 -->
@@ -64,6 +68,10 @@ function handleAvatarClick() {
 
     <!-- 右侧操作区 -->
     <div class="of-navbar__right">
+      <div v-if="$slots['header-right']" class="of-navbar__header of-navbar__header--right">
+        <slot name="header-right" />
+      </div>
+
       <!-- 通知按钮 -->
       <button class="of-navbar__notify-btn" @click="handleNotifyClick">
         <BellIcon class="of-navbar__notify-icon" :size="16" />
@@ -97,7 +105,9 @@ function handleAvatarClick() {
 .of-navbar__left {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  gap: var(--of-spacing-3);
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .of-navbar__logo-default {
@@ -110,16 +120,19 @@ function handleAvatarClick() {
 
 /* ── Center ── */
 .of-navbar__center {
-  flex: 1;
+  flex: 1 0 220px;
   display: flex;
   justify-content: center;
+  min-width: 0;
 }
 
 .of-navbar__search {
   display: flex;
   align-items: center;
   gap: var(--of-spacing-2);
-  width: 280px;
+  width: 100%;
+  max-width: 280px;
+  min-width: 0;
   height: 36px;
   padding: 0 var(--of-spacing-3);
   background: var(--of-surface-panel);
@@ -158,8 +171,16 @@ function handleAvatarClick() {
 .of-navbar__right {
   display: flex;
   align-items: center;
-  gap: var(--of-spacing-2);
-  flex-shrink: 0;
+  gap: var(--of-spacing-3);
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.of-navbar__header {
+  display: flex;
+  align-items: center;
+  gap: var(--of-spacing-3);
+  min-width: 0;
 }
 
 .of-navbar__notify-btn {

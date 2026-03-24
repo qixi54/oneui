@@ -57,7 +57,20 @@ export { ThemeScope, ThemeScopeScene } from "./components/common";
 // ─── Layout ──────────────────────────────────────────────────────────────────
 export { AppLayout, Navbar, Sidebar, StatusBar } from "./components/layout";
 
+// ─── Workspace ──────────────────────────────────────────────────────────────
+export {
+  WorkspaceShell,
+  WorkspaceDetailActionBar,
+  WorkspaceDetailPreviewBlock,
+  WorkspaceActivityFeed,
+} from "./components/workspace";
+
 // ─── Field (standalone) ─────────────────────────────────────────────────────
+export { default as FieldText } from "./components/field/FieldText.vue";
+export { default as FieldSelect } from "./components/field/FieldSelect.vue";
+export { default as FieldMultiSelect } from "./components/field/FieldMultiSelect.vue";
+export { default as FieldDate } from "./components/field/FieldDate.vue";
+export { default as FieldRichText } from "./components/field/FieldRichText.vue";
 export { default as FieldMarkdownPreview } from "./components/field/FieldMarkdownPreview.vue";
 
 // ─── Table ───────────────────────────────────────────────────────────────────
@@ -103,8 +116,26 @@ export { FormDesigner } from "./components/form";
 
 // ─── Database ────────────────────────────────────────────────────────────────
 export { DatabaseView } from "./components/database";
+export {
+  DatabaseDetailPresenter,
+  DatabaseDetailWorkspace,
+  DatabaseViewDetailHost,
+  resolveDetailPresenter,
+} from "./components/database";
 export type {
   DatabaseViewActions as DatabaseViewComponentActions,
+  DatabaseDetailPresenterResolution,
+  DatabaseDetailPresenterShell,
+  DatabaseViewDetailPresentation,
+  DatabaseViewLegacyDetailPresentation,
+  DatabaseViewResolvedDetailPresentation,
+  DatabaseDetailWorkspaceModeOption,
+  DatabaseDetailWorkspacePropertyItem,
+  DatabaseDetailWorkspaceSlotContext,
+  DatabaseDetailWorkspaceSlots,
+  DatabaseViewSlots,
+  DatabaseDetailPresenterSlots,
+  DatabaseViewDetailHostSlots,
   DatabaseViewSchemaEvent,
   DatabaseViewViewTab,
   DatabaseViewProps,
@@ -208,6 +239,16 @@ export type {
   SidebarItem,
   BadgeConfig,
   ColorMap,
+  WorkspaceAdapter,
+  WorkspaceDetailPresentation,
+  WorkspaceFilterItem,
+  WorkspaceActivityItem,
+  WorkspaceDetailActionItem,
+  WorkspaceMetaItem,
+  WorkspacePersistenceSnapshot,
+  WorkspacePreviewItem,
+  WorkspaceSlotProps,
+  WorkspaceToolbarAction,
 } from "./types";
 export {
   isSelectField,
@@ -312,6 +353,12 @@ export type {
   SupabaseViewBackendOptions,
   UseViewPersistenceOptions,
 } from "./composables/useViewPersistence";
+
+export { useWorkspacePersistence } from "./composables/useWorkspacePersistence";
+export type {
+  WorkspacePersistenceBackend,
+  UseWorkspacePersistenceOptions,
+} from "./composables/useWorkspacePersistence";
 
 export { useDatabaseView } from "./composables/useDatabaseView";
 export {

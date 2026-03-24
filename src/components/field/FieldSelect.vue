@@ -1,22 +1,31 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useBreakpoint } from "@/composables/useBreakpoint";
-import type { CellValue, FieldDef } from "@/components/table/FieldCell.vue";
+import type { CellValue } from "@/components/table/FieldCell.vue";
+import { useStandaloneField, useStandaloneOptions, type StandaloneOptionsFieldProps } from "./standalone";
 
-const props = defineProps<{ value?: CellValue; field: FieldDef }>();
-const emit = defineEmits<{ commit: [value: CellValue]; cancel: []; tabNext: [] }>();
+const props = defineProps<StandaloneOptionsFieldProps>();
+const emit = defineEmits<{
+  commit: [value: CellValue];
+  cancel: [];
+  tabNext: [];
+  "update:modelValue": [value: CellValue];
+}>();
 
 const { isMobile } = useBreakpoint();
 
 const triggerRef = ref<HTMLElement | null>(null);
 const dropdownRef = ref<HTMLElement | null>(null);
 const dropdownStyle = ref({ top: "0px", left: "0px", width: "0px" });
-const isOpen = ref(true);
+const isOpen = ref(false);
 
-const options = computed(() => props.field.options ?? []);
+const { isStandalone, currentValue, resolvedLabel, resolvedDisabled } = useStandaloneField(props);
+const options = useStandaloneOptions(props);
+const currentStringValue = computed(() =>
+  typeof currentValue.value === "string" ? currentValue.value : null,
+);
 const selectedIndex = computed(() => {
-  const currentValue = typeof props.value === "string" ? props.value : null;
-  return options.value.findIndex((opt) => opt.value === currentValue);
+  return options.value.findIndex((opt) => opt.value === currentStringValue.value);
 });
 const activeIndex = ref(0);
 
@@ -33,6 +42,9 @@ function updateDropdownPosition() {
 function selectValue(raw: string | null) {
   isOpen.value = false;
   emit("commit", raw);
+  if (isStandalone.value) {
+    emit("update:modelValue", raw);
+  }
 }
 
 function closeAsCancel() {
@@ -42,6 +54,20 @@ function closeAsCancel() {
 }
 
 function onKeydown(e: KeyboardEvent) {
+  if (resolvedDisabled.value) return;
+  if (!isOpen.value && isStandalone.value) {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      isOpen.value = true;
+      nextTick(() => updateDropdownPosition());
+      return;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      emit("cancel");
+    }
+    return;
+  }
   if (!options.value.length) {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -76,6 +102,14 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
+function onTriggerClick() {
+  if (!isStandalone.value || resolvedDisabled.value) return;
+  isOpen.value = !isOpen.value;
+  if (isOpen.value) {
+    updateDropdownPosition();
+  }
+}
+
 function onWindowPointerDown(e: MouseEvent) {
   const target = e.target as Node | null;
   if (!target) return;
@@ -86,10 +120,13 @@ function onWindowPointerDown(e: MouseEvent) {
 
 onMounted(() => {
   activeIndex.value = selectedIndex.value >= 0 ? selectedIndex.value : 0;
-  nextTick(() => {
-    updateDropdownPosition();
-    triggerRef.value?.focus();
-  });
+  if (!isStandalone.value) {
+    isOpen.value = true;
+    nextTick(() => {
+      updateDropdownPosition();
+      triggerRef.value?.focus();
+    });
+  }
   window.addEventListener("resize", updateDropdownPosition);
   window.addEventListener("scroll", updateDropdownPosition, true);
   window.addEventListener("mousedown", onWindowPointerDown, true);
@@ -106,13 +143,57 @@ watch(selectedIndex, (idx) => {
 });
 
 const selectedOption = computed(() => {
-  const currentValue = typeof props.value === "string" ? props.value : null;
-  return options.value.find((opt) => opt.value === currentValue);
+  return options.value.find((opt) => opt.value === currentStringValue.value);
 });
 </script>
 
 <template>
-  <div ref="triggerRef" class="of-field-select" tabindex="0" role="listbox" :aria-label="field.label" @keydown="onKeydown">
+  <div v-if="isStandalone" class="of-field-standalone">
+    <label v-if="label" class="of-field-standalone__label">
+      {{ label }}
+      <span v-if="required" class="of-field-standalone__required">*</span>
+    </label>
+    <div
+      class="of-field-standalone__control"
+      :class="{
+        'of-field-standalone__control--error': error,
+        'of-field-standalone__control--disabled': resolvedDisabled,
+      }"
+    >
+      <button
+        ref="triggerRef"
+        type="button"
+        class="of-field-select of-field-select--standalone"
+        role="listbox"
+        :aria-label="resolvedLabel"
+        :disabled="resolvedDisabled"
+        @click="onTriggerClick"
+        @keydown="onKeydown"
+      >
+        <span
+          v-if="selectedOption?.color"
+          class="of-field-select__badge"
+          :style="{ background: selectedOption.color }"
+        >
+          {{ selectedOption.label }}
+        </span>
+        <span v-else class="of-field-select__display">
+          {{ selectedOption?.label ?? "—" }}
+        </span>
+      </button>
+    </div>
+    <span v-if="error" class="of-field-standalone__error">{{ error }}</span>
+  </div>
+
+  <div
+    v-else
+    ref="triggerRef"
+    class="of-field-select"
+    tabindex="0"
+    role="listbox"
+    :aria-label="resolvedLabel"
+    @keydown="onKeydown"
+  >
     <span
       v-if="selectedOption?.color"
       class="of-field-select__badge"
@@ -123,53 +204,96 @@ const selectedOption = computed(() => {
     <span v-else class="of-field-select__display">
       {{ selectedOption?.label ?? "—" }}
     </span>
-
-    <Teleport to="body">
-      <div
-        v-if="isOpen"
-        ref="dropdownRef"
-        class="of-field-select__dropdown"
-        :class="{ 'of-field-select__dropdown--sheet': isMobile }"
-        :style="isMobile ? {} : dropdownStyle"
-      >
-        <div
-          class="of-field-select__option of-field-select__option--clear"
-          role="option"
-          tabindex="0"
-          :aria-selected="selectedIndex === -1"
-          :class="{ active: activeIndex === -1, selected: selectedIndex === -1 }"
-          @click.stop="selectValue(null)"
-          @focusin="activeIndex = -1"
-          @keydown.enter.prevent="selectValue(null)"
-          @keydown.space.prevent="selectValue(null)"
-        >
-          —
-        </div>
-        <div
-          v-for="(opt, i) in options"
-          :key="opt.value"
-          class="of-field-select__option"
-          role="option"
-          tabindex="0"
-          :aria-selected="i === selectedIndex"
-          :class="{ active: i === activeIndex, selected: i === selectedIndex }"
-          @mouseenter="activeIndex = i"
-          @click.stop="selectValue(opt.value)"
-          @focusin="activeIndex = i"
-          @keydown.enter.prevent="selectValue(opt.value)"
-          @keydown.space.prevent="selectValue(opt.value)"
-        >
-          <span v-if="opt.color" class="of-field-select__badge" :style="{ background: opt.color }">
-            {{ opt.label }}
-          </span>
-          <span v-else>{{ opt.label }}</span>
-        </div>
-      </div>
-    </Teleport>
   </div>
+
+  <Teleport to="body">
+    <div
+      v-if="isOpen"
+      ref="dropdownRef"
+      class="of-field-select__dropdown"
+      :class="{ 'of-field-select__dropdown--sheet': isMobile }"
+      :style="isMobile ? {} : dropdownStyle"
+    >
+      <div
+        class="of-field-select__option of-field-select__option--clear"
+        role="option"
+        tabindex="0"
+        :aria-selected="selectedIndex === -1"
+        :class="{ active: activeIndex === -1, selected: selectedIndex === -1 }"
+        @click.stop="selectValue(null)"
+        @focusin="activeIndex = -1"
+        @keydown.enter.prevent="selectValue(null)"
+        @keydown.space.prevent="selectValue(null)"
+      >
+        —
+      </div>
+      <div
+        v-for="(opt, i) in options"
+        :key="opt.value"
+        class="of-field-select__option"
+        role="option"
+        tabindex="0"
+        :aria-selected="i === selectedIndex"
+        :class="{ active: i === activeIndex, selected: i === selectedIndex }"
+        @mouseenter="activeIndex = i"
+        @click.stop="selectValue(opt.value)"
+        @focusin="activeIndex = i"
+        @keydown.enter.prevent="selectValue(opt.value)"
+        @keydown.space.prevent="selectValue(opt.value)"
+      >
+        <span v-if="opt.color" class="of-field-select__badge" :style="{ background: opt.color }">
+          {{ opt.label }}
+        </span>
+        <span v-else>{{ opt.label }}</span>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
+.of-field-standalone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--of-spacing-1);
+}
+
+.of-field-standalone__label {
+  font-size: var(--of-font-size-sm);
+  font-weight: var(--of-font-weight-medium);
+  color: var(--of-text-secondary);
+}
+
+.of-field-standalone__required {
+  color: var(--of-color-error);
+  margin-left: var(--of-spacing-0_5);
+}
+
+.of-field-standalone__control {
+  border: 1px solid var(--of-border-subtle);
+  border-radius: var(--of-radius-md);
+  background: var(--of-surface-elevated);
+  transition: var(--of-transition-fast);
+}
+
+.of-field-standalone__control:focus-within {
+  border-color: var(--of-accent-default);
+  box-shadow: 0 0 0 2px var(--of-accent-soft);
+}
+
+.of-field-standalone__control--error {
+  border-color: var(--of-color-error);
+}
+
+.of-field-standalone__control--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.of-field-standalone__error {
+  font-size: var(--of-font-size-xs);
+  color: var(--of-color-error);
+}
+
 .of-field-select {
   width: 100%;
   min-height: 28px;
@@ -178,6 +302,13 @@ const selectedOption = computed(() => {
   display: flex;
   align-items: center;
   outline: none;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.of-field-select--standalone {
+  justify-content: flex-start;
 }
 
 .of-field-select__display {

@@ -1,4 +1,5 @@
 import type {
+  DatabaseViewLegacyDetailPresentation,
   DatabaseViewDetailPresentation,
   DatabaseViewResolvedDetailPresentation,
 } from "../contracts/database";
@@ -40,7 +41,7 @@ export interface DetailCellFieldDef {
 }
 
 export interface DatabaseWorkspaceModeOption {
-  value: DatabaseViewResolvedDetailPresentation;
+  value: Exclude<DatabaseViewDetailPresentation, "auto">;
   label: string;
 }
 
@@ -251,30 +252,37 @@ export function resolveDetailPresentation(options: {
   isMobileViewport: boolean;
 }): DatabaseViewResolvedDetailPresentation {
   if (options.requested !== "auto") {
-    return options.requested;
+    return options.requested === "sheet"
+      ? "drawer"
+      : options.requested === "full-page"
+        ? "fullscreen"
+        : options.requested;
   }
 
   if (options.preferred) {
     if (options.preferred === "side-panel" && options.isMobileViewport) {
-      return "sheet";
+      return "drawer";
     }
     return options.preferred;
   }
 
-  return options.isMobileViewport ? "sheet" : "side-panel";
+  return options.isMobileViewport ? "drawer" : "side-panel";
 }
 
 export function buildWorkspaceModes(
   isMobileViewport: boolean,
+  legacyAlias?: DatabaseViewLegacyDetailPresentation,
 ): DatabaseWorkspaceModeOption[] {
   const modes: DatabaseWorkspaceModeOption[] = [];
+  const drawerValue = legacyAlias === "sheet" ? "sheet" : "drawer";
+  const fullscreenValue = legacyAlias === "full-page" ? "full-page" : "fullscreen";
 
   if (!isMobileViewport) {
-    modes.push({ value: "side-panel", label: "右侧工作区" });
+    modes.push({ value: "side-panel", label: "侧边面板" });
   }
 
-  modes.push({ value: "sheet", label: "抽屉" });
-  modes.push({ value: "full-page", label: "全页" });
+  modes.push({ value: drawerValue, label: "详情弹窗" });
+  modes.push({ value: fullscreenValue, label: "全屏视图" });
 
   return modes;
 }

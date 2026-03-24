@@ -1,0 +1,50 @@
+{
+  "creator": "ARCH",
+  "title": "DatabaseView Kanban Ergonomics Closeout",
+  "brief": "统一收口 DatabaseView/Kanban 第二阶段增强，解决 slot context 过瘦、整卡定制缺口与 lifecycle 事件语义不足。",
+  "description": "# Part 1 执行摘要\n本计划合并收口 ONEUI-ARCH-00054 / 00056 / 00058，目标是在不破坏现有 API 的前提下，把 DatabaseView 提升为业务级可定制看板入口。当前实现已公开分段 slot 与 colorMap 透传，但 slot context 仍缺 record 级真相、card body 仍无法完整替换、quick add 与拖拽仍未发出显式语义事件，证据见 /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:567、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:727、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseViewContent.vue:77、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanBoard.vue:43、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/contracts/database.ts:252。执行顺序冻结为：先补 slot context，再补 full-card slot 与最小 appearance，最后补 lifecycle 事件与验收留痕。\n\n# Part 2 需求分析\nP0：kanban slot context 直接暴露 record 与 fields，消除业务侧 task.id 到 recordMap 的二次查询。P1：新增 kanban-card slot 与最小 appearance 配置，让业务层完整替换 card body，同时继续保留旧的 title/meta/tags slot。P1：新增 kanban-quick-add 与 kanban-card-move 事件，让业务层直接获得 quick add 与跨列拖拽语义，而不是继续对整份 records 做 diff。\n\n# Part 3 详细方案\n改动范围固定为 /opt/Oneflow/flowlab/项目/oneui/code/develop/src/contracts/database.ts:252、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanBoard.vue:43、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanCard.vue:39、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanColumn.vue:38、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseViewContent.vue:77、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:727、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/tests/database-view.integration.spec.ts:1。DatabaseViewKanbanCardSlotContext 增加 record 与 fields；DatabaseViewKanbanColumnHeaderSlotContext 增加 tasks 与 records；新增 kanban-card slot、kanbanAppearance prop、kanban-quick-add emits、kanban-card-move emits；继续保留 update:columns 状态回流与旧 title/meta/tags slots。\n\n# Part 4 实现路线图\nPhase A：冻结契约并补 Plan 留痕。Phase B：先改 KanbanBoard、KanbanCard、KanbanColumn，再改 DatabaseViewContent 与 DatabaseView。Phase C：补集成测试，执行 lint、stylelint、type-check、build 与 targeted vitest，并写回 issue、task、plan evidence。\n\n# Part 5 工作量估计\nARCH 约 1.5 天执行工作量，额外 0.5 天缓冲，总预算 2.0 天。\n\n# Part 6 风险评估\n高风险一：full-card slot 直接替换默认结构后影响旧消费方；缓解动作是仅在显式定义 kanban-card 时覆盖默认卡片。高风险二：拖拽事件误判 move 语义；缓解动作是在 KanbanBoard 层保存前后列快照并比较 from/to。中风险：slot context 字段增多后类型变复杂；缓解动作是使用统一 context type，不把 payload 拆成多套 ad-hoc 结构。\n\n# Part 7 验收标准\n1. DatabaseView kanban slots 可直接读取 record 与 fields。2. DatabaseView 可公开 kanban-card full slot，旧分段 slot 保持可用。3. quick add 与 card move 会发出显式 lifecycle 事件。4. npm run lint、npm run lint:style、npm run type-check 与 npm run build 全部通过，且 targeted vitest 通过。\n\n# Part 8 回滚方案\n若 full-card slot 或 lifecycle 事件引入兼容问题，先撤回新增 slot 与 emits，保留当前 update:columns 和分段 slot 方案。本轮不改服务器代码、不改共享 schema，因此回滚只需回退本地仓库代码。\n\n# Part 9 架构决策记录\n先补数据契约，再补视图契约，再补交互契约；保持 non-breaking；appearance 首轮只交付最小集合，不在这一轮扩成独立主题系统。\n\n# Part 10 参考和附录\n代码参考：/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:567、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseView.vue:727、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/database/DatabaseViewContent.vue:77、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanBoard.vue:43、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanCard.vue:39、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanColumn.vue:38、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/contracts/database.ts:252。",
+  "plan_type": "feature",
+  "priority": "P1",
+  "execution_mode": "interactive",
+  "acceptance_criteria": [
+    {
+      "title": "slot context upgraded",
+      "criterion": "DatabaseView kanban slots can directly access record and fields without external recordMap lookups.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/database-view.integration.spec.ts'"
+    },
+    {
+      "title": "full card slot compatible",
+      "criterion": "DatabaseView supports kanban-card full replacement while existing kanban-card-title/meta/tags slots remain functional.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/database-view.integration.spec.ts'"
+    },
+    {
+      "title": "lifecycle events exposed",
+      "criterion": "DatabaseView exposes explicit kanban-quick-add and kanban-card-move events with record/task and from/to column context.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/database-view.integration.spec.ts'"
+    },
+    {
+      "title": "repo gates pass",
+      "criterion": "lint, stylelint, type-check and build all pass after the enhancement.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npm run lint && npm run lint:style && npm run type-check'"
+    }
+  ],
+  "tags": [
+    "database-view",
+    "kanban",
+    "ergonomics",
+    "issue:ONEUI-ARCH-00054",
+    "issue:ONEUI-ARCH-00056",
+    "issue:ONEUI-ARCH-00058"
+  ],
+  "meta": {
+    "delivery_profile": "standard_delivery",
+    "issues": [
+      "ONEUI-ARCH-00054",
+      "ONEUI-ARCH-00056",
+      "ONEUI-ARCH-00058"
+    ],
+    "artifacts": [
+      "docs/plans/2026-03-23-databaseview-kanban-ergonomics-plan.md"
+    ]
+  }
+}

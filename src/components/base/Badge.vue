@@ -2,23 +2,22 @@
 import { computed, type CSSProperties, type VNode } from "vue";
 
 type LooseString<T extends string> = T | (string & {});
+type BadgeColor = "default" | "blue" | "green" | "orange" | "red" | "purple" | "gray";
+type BadgeVariant = "outlined" | "solid" | "subtle";
+type BadgeToneKey = Exclude<BadgeColor, "default">;
 
 export interface BadgeProps {
-  color?: LooseString<"default" | "blue" | "green" | "orange" | "red" | "purple" | "gray">;
+  color?: LooseString<BadgeColor>;
   priority?: "P0" | "P1" | "P2" | "P3";
   size?: "sm" | "md";
-}
-
-interface BadgeTone {
-  background: string;
-  text: string;
-  border: string;
+  variant?: BadgeVariant;
 }
 
 const props = withDefaults(defineProps<BadgeProps>(), {
   color: undefined,
   priority: undefined,
   size: "md",
+  variant: "outlined",
 });
 
 defineOptions({ inheritAttrs: false });
@@ -27,75 +26,87 @@ defineSlots<{
   default?: () => VNode[];
 }>();
 
-const COLOR_MAP: Record<string, BadgeTone> = {
-  default: {
-    background: "var(--of-surface-muted)",
-    text: "var(--of-text-secondary)",
-    border: "var(--of-border-subtle)",
-  },
+const COLOR_TOKENS: Record<BadgeToneKey, { bg: string; text: string; border: string; solid: string }> = {
   blue: {
-    background: "var(--of-surface-selected)",
-    text: "var(--of-accent-strong)",
-    border: "var(--of-border-subtle)",
+    bg: "var(--of-badge-blue-bg)",
+    text: "var(--of-badge-blue-text)",
+    border: "var(--of-badge-blue-border)",
+    solid: "var(--of-color-blue-500)",
   },
   green: {
-    background: "var(--of-surface-panel)",
-    text: "var(--of-text-strong)",
-    border: "var(--of-border-subtle)",
+    bg: "var(--of-badge-green-bg)",
+    text: "var(--of-badge-green-text)",
+    border: "var(--of-badge-green-border)",
+    solid: "var(--of-color-green-500)",
   },
   orange: {
-    background: "var(--of-surface-muted)",
-    text: "var(--of-text-primary)",
-    border: "var(--of-border-strong)",
+    bg: "var(--of-badge-orange-bg)",
+    text: "var(--of-badge-orange-text)",
+    border: "var(--of-badge-orange-border)",
+    solid: "var(--of-color-orange-500)",
   },
   red: {
-    background: "var(--of-surface-selected)",
-    text: "var(--of-text-strong)",
-    border: "var(--of-border-strong)",
+    bg: "var(--of-badge-red-bg)",
+    text: "var(--of-badge-red-text)",
+    border: "var(--of-badge-red-border)",
+    solid: "var(--of-color-red-500)",
   },
   purple: {
-    background: "var(--of-surface-panel)",
-    text: "var(--of-text-secondary)",
-    border: "var(--of-border-subtle)",
+    bg: "var(--of-badge-purple-bg)",
+    text: "var(--of-badge-purple-text)",
+    border: "var(--of-badge-purple-border)",
+    solid: "var(--of-color-purple-600)",
   },
   gray: {
-    background: "var(--of-surface-muted)",
-    text: "var(--of-text-secondary)",
-    border: "var(--of-border-subtle)",
+    bg: "var(--of-badge-gray-bg)",
+    text: "var(--of-badge-gray-text)",
+    border: "var(--of-badge-gray-border)",
+    solid: "var(--of-color-gray-500)",
   },
 };
 
-const PRIORITY_MAP: Record<NonNullable<BadgeProps["priority"]>, keyof typeof COLOR_MAP> = {
+const PRIORITY_MAP: Record<NonNullable<BadgeProps["priority"]>, BadgeToneKey> = {
   P0: "red",
   P1: "orange",
   P2: "blue",
   P3: "green",
 };
 
-const resolvedColorKey = computed<keyof typeof COLOR_MAP>(() => {
+const resolvedColorKey = computed<BadgeToneKey>(() => {
   if (props.priority) {
     return PRIORITY_MAP[props.priority];
   }
 
   if (props.color) {
-    return props.color in COLOR_MAP ? (props.color as keyof typeof COLOR_MAP) : "default";
+    if (props.color === "default") {
+      return "gray";
+    }
+
+    return props.color in COLOR_TOKENS ? (props.color as BadgeToneKey) : "gray";
   }
 
   return "gray";
 });
 
 const badgeStyle = computed<CSSProperties>(() => {
-  const tone = COLOR_MAP[resolvedColorKey.value];
+  const tone = COLOR_TOKENS[resolvedColorKey.value];
+  const variant = props.variant;
   return {
-    "--one-badge-bg": tone.background,
-    "--one-badge-color": tone.text,
-    "--one-badge-border": tone.border,
+    "--one-badge-bg": variant === "solid" ? tone.solid : tone.bg,
+    "--one-badge-color": variant === "solid" ? "var(--of-color-white)" : tone.text,
+    "--one-badge-border": variant === "outlined" ? tone.border : "transparent",
+    "--one-badge-border-width": variant === "outlined" ? "1px" : "0px",
   } as CSSProperties;
 });
 </script>
 
 <template>
-  <span class="one-badge" :class="`one-badge--${size}`" :style="badgeStyle" v-bind="$attrs">
+  <span
+    class="one-badge"
+    :class="[`one-badge--${size}`, `one-badge--${variant}`]"
+    :style="badgeStyle"
+    v-bind="$attrs"
+  >
     <slot />
   </span>
 </template>
@@ -106,7 +117,7 @@ const badgeStyle = computed<CSSProperties>(() => {
   align-items: center;
   justify-content: center;
   width: fit-content;
-  border: 1px solid var(--one-badge-border);
+  border: var(--one-badge-border-width) solid var(--one-badge-border);
   border-radius: var(--of-radius-md);
   background: var(--one-badge-bg);
   color: var(--one-badge-color);
@@ -125,5 +136,10 @@ const badgeStyle = computed<CSSProperties>(() => {
 .one-badge--md {
   font-size: var(--of-font-size-sm);
   padding: var(--of-spacing-0_5) var(--of-spacing-2);
+}
+
+.one-badge--solid,
+.one-badge--subtle {
+  border-width: 0;
 }
 </style>

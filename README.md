@@ -219,14 +219,13 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 如果你需要核对当前可追溯的发布材料，优先看这几份文档：
 
-- 当前版本证据索引：[`docs/plans/2026-03-22-release-0.8.6-evidence-index.md`](docs/plans/2026-03-22-release-0.8.6-evidence-index.md)
-- 发布 proof：[`docs/plans/2026-03-22-release-0.8.6-proof.md`](docs/plans/2026-03-22-release-0.8.6-proof.md)
-- 验收结果：[`docs/plans/2026-03-22-release-0.8.6-verification.md`](docs/plans/2026-03-22-release-0.8.6-verification.md)
+- 当前发布 proof：[`docs/plans/2026-03-23-release-0.8.8-proof.md`](docs/plans/2026-03-23-release-0.8.8-proof.md)
+- 版本日志：[`docs/CHANGELOG-v0.8.8.md`](docs/CHANGELOG-v0.8.8.md)
+- 对应缺陷验收：[`docs/oneui-arch-00053-verification-20260323.md`](docs/oneui-arch-00053-verification-20260323.md)
 - 预发布验证：[`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
 - 子路径入口治理：[`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
-- 版本日志：[`docs/CHANGELOG-v0.8.6.md`](docs/CHANGELOG-v0.8.6.md)
 
-当前 npm 公开版本为 `0.8.6`，对应的发布、pack、dry-run 和双宿主 smoke 都有独立留痕。
+当前已发布版本为 `0.8.8`；本轮发布前验证、pack、dry-run、consumer smoke 与实际发布回执统一收口在 `docs/plans/2026-03-23-release-0.8.8-proof.md`。
 
 ---
 
@@ -242,6 +241,21 @@ import { DatabaseView, useDatabaseView } from '@oneflowui/ui'
 用于证明 `local/provider` 双模式、视图切换、selected record 与 detail workspace 可以在同一页面层里闭环。
 当前页面级契约还把 `detailPresentation` 和 `density` 作为明确的对齐方向：桌面端优先右侧 workspace，
 移动端保留 sheet fallback；页面密度则统一按 `compact / standard / comfortable` 三档表达。
+
+如果业务页来自通知、看板卡片或列表钻取，建议把 `detail-source` 一并传给 `DatabaseView`，这样 detail slot
+就能同时拿到 `source` 和 `presentation` 两个 deep-link hints，而不需要业务侧再重复拼装来源说明。
+
+```vue
+<DatabaseView
+  table-id="issues"
+  detail-source="notifications"
+  detail-presentation="sheet"
+>
+  <template #actions="{ source, presentation }">
+    <span>{{ source }} / {{ presentation }}</span>
+  </template>
+</DatabaseView>
+```
 
 ```ts
 const view = useDatabaseView({
@@ -273,15 +287,32 @@ const view = useDatabaseView({
 type DatabaseViewActions = {
   onFetch?: (params: { viewId: string }) => Promise<void> | void
   onRefresh?: () => Promise<void> | void
-  onUpdateRecord?: (recordId: string, patch: Record<string, unknown>) => Promise<void> | void
-  onCreateRecord?: (record: Record<string, unknown>) => Promise<void> | void
-  onDeleteRecord?: (recordId: string) => Promise<void> | void
+  onUpdateRecord?: (payload: {
+    tableId: string
+    recordId: string
+    patch: Record<string, unknown>
+    record: DataRecord
+  }) => Promise<void> | void
+  onCreateRecord?: (payload: {
+    tableId: string
+    record: DataRecord
+  }) => Promise<void> | void
+  onDeleteRecord?: (payload: {
+    tableId: string
+    recordId: string
+  }) => Promise<void> | void
   onSaveView?: (viewId: string, payload: Record<string, unknown>) => Promise<void> | void
   onSchemaChange?: (payload: Record<string, unknown>) => Promise<void> | void
 }
 ```
 
 如果接入的是 `provider` 模式，建议把 `onFetch` / `onRefresh` 作为必配项；如果接入的是 `local` 模式，则重点只需要保证 `onUpdateRecord`、`onCreateRecord`、`onDeleteRecord` 和 `onSaveView` 这几类页面动作可回传。
+
+其中 `kanban` 视图会在以下场景自动回传这些动作：
+
+- 拖拽卡片换列或排序后，按 `record.id` 回传 `onUpdateRecord`
+- `QuickAddRow` 新建卡片后，回传 `onCreateRecord`
+- 若上层把某些记录从列集合中移除，可回传 `onDeleteRecord`
 
 ### Middleware presets
 
@@ -320,6 +351,14 @@ const view = useDatabaseView({
   },
 })
 ```
+
+除 `cell-edit` 之外，middleware 现在也会覆盖：
+
+- `create-record`
+- `update-record`
+- `delete-record`
+
+因此看板里的 quick-add、拖拽换列和删卡这类持久化动作，也会进入同一套 toast / analytics / optimistic 链路。
 
 如果你更想要一个“一键拿到可直接消费的 middleware”的入口，可以优先用官方 preset 工厂：
 
@@ -476,6 +515,7 @@ const columns = [
 当前 dev app 已经把“选中记录 -> detail workspace”这条链路接起来了：点击 table / kanban / gallery / timeline 中的条目，会把当前记录送入详情工作区，再由 `DetailLayout`、`PropPanel`、`CommentItem` 这组组件展示主内容、属性和活动记录。
 
 这证明页面级方案已经具备“列表视图 + 选中态 + 详情工作区”的最小闭环，并且可以作为业务页面底座直接接入。
+更完整的外部接入约定见 [`docs/DATABASE-VIEW-DETAIL-USAGE.md`](docs/DATABASE-VIEW-DETAIL-USAGE.md)。
 
 ### `detailPresentation` / `density`
 
@@ -508,6 +548,7 @@ const columns = [
 | **仪表盘** | Dashboard, BarChart, PieChart, DoughnutChart, NumberCard |
 | **编辑器** | RichTextEditor, CodeBlock, ContentBlock |
 | **详情** | DetailLayout, PropPanel, CommentItem |
+| **工作区** | WorkspaceShell, WorkspaceDetailActionBar, WorkspaceDetailPreviewBlock, WorkspaceActivityFeed |
 | **表单** | FormDesigner, 10 种 Field 组件 |
 | **布局** | AppLayout, Sidebar, Navbar, SplitPane |
 | **通用** | Modal, Dialog, Toast, Tabs, Breadcrumb, MermaidChart, ContextMenu |
@@ -524,8 +565,44 @@ const columns = [
   kanban-field-id="stage"
   :lane-order="['todo', 'doing', 'done']"
   :lane-titles="{ todo: '待处理', doing: '进行中', done: '已完成' }"
+  :priority-color-map="priorityMap"
+  :status-color-map="statusMap"
 />
 ```
+
+`KanbanBoard` 现在支持高层 slot forwarding，可直接从 board 层定制列头和卡片内容：
+
+```vue
+<KanbanBoard :records="records">
+  <template #column-header="{ column, taskCount, dotColor }">
+    <div class="kanban-header">
+      <span :style="{ color: dotColor }">●</span>
+      <span>{{ column.title }}</span>
+      <strong>{{ taskCount }}</strong>
+    </div>
+  </template>
+
+  <template #card-title="{ task }">
+    <div class="kanban-card-title">
+      {{ task.title }}
+    </div>
+  </template>
+
+  <template #card-meta="{ task, displayDate }">
+    <div class="kanban-card-meta">
+      {{ task.id }} · {{ displayDate }}
+    </div>
+  </template>
+
+  <template #card-tags="{ priorityLabel, statusLabel }">
+    <div class="kanban-card-tags">
+      {{ priorityLabel }} / {{ statusLabel }}
+    </div>
+  </template>
+</KanbanBoard>
+```
+
+注意：当启用 `card-title / card-meta / card-tags` 这类自定义 card slot 时，`KanbanColumn` 会自动关闭虚拟滚动，避免卡片高度变化导致布局错位。
 
 ### AI 聊天面板
 

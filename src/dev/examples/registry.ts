@@ -1,6 +1,6 @@
 import type { Component, ComputedRef } from "vue";
 import type { OpsAppSection } from "../opsCommandRegistry";
-import { DatabaseViewDemo } from "./database";
+import { DatabaseDetailPrimitivesDemo, DatabaseViewDemo } from "./database";
 import { ThemeScopeDemo } from "./theme";
 
 export type ExampleThemeMode = "neutral" | "ops-console";
@@ -53,6 +53,16 @@ export function createDevExamplesRegistry(options: ExampleRegistryOptions): DevE
       title: "DatabaseView Demo",
       summary: "页面级数据库工作区示例，承接 enterprise demo 与 preset demo。",
       component: DatabaseViewDemo,
+    },
+    {
+      id: "database-detail-primitives-demo",
+      section: "section",
+      group: "database",
+      order: 110,
+      when: "database-view",
+      title: "Database Detail Primitives Demo",
+      summary: "演示 DatabaseView detail slots 如何接入 workspace detail primitives。",
+      component: DatabaseDetailPrimitivesDemo,
     },
   ]);
 }

@@ -35,6 +35,12 @@
 
 ## Release & Verification
 
+### 0.8.8 已发布（DatabaseView Kanban Customization Closeout）
+
+- `docs/plans/2026-03-23-release-0.8.8-proof.md`
+- `docs/CHANGELOG-v0.8.8.md`
+- `docs/oneui-arch-00053-verification-20260323.md`
+
 ### 0.8.6 发布补齐（Examples Structure & Metadata Registry）
 
 - `docs/plans/2026-03-22-release-0.8.6-evidence-index.md`
@@ -471,6 +477,7 @@ click(event: MouseEvent)
   color?: string                        // 自定义颜色（CSS 颜色值）
   priority?: "P0" | "P1" | "P2" | "P3" // 优先级语义色
   size?: "sm" | "md"                    // 尺寸，默认 "md"
+  variant?: "outlined" | "solid" | "subtle" // 风格变体，默认 "outlined"
 }
 ```
 
@@ -480,6 +487,8 @@ click(event: MouseEvent)
 **示例**:
 ```vue
 <Badge priority="P0">紧急</Badge>
+<Badge color="green" variant="solid">已完成</Badge>
+<Badge color="blue" variant="subtle">进行中</Badge>
 <Badge color="#6366f1">自定义</Badge>
 ```
 
@@ -1348,6 +1357,74 @@ close()                // 关闭菜单（点击外部或 Escape）
 
 ---
 
+## Workspace 工作区
+
+### WorkspaceDetailActionBar
+
+**路径**: `src/components/workspace/WorkspaceDetailActionBar.vue`
+
+**用途**: detail 工作区动作条，统一渲染结构化 action item，减少业务仓重复写按钮组样式。
+
+**Props**:
+```ts
+{
+  actions?: WorkspaceDetailActionItem[]
+  emptyText?: string
+  align?: "start" | "end"
+}
+```
+
+**Slots**:
+- `#before` — 动作条前置内容
+- `#after` — 动作条后置内容
+
+---
+
+### WorkspaceDetailPreviewBlock
+
+**路径**: `src/components/workspace/WorkspaceDetailPreviewBlock.vue`
+
+**用途**: detail 预览区块，统一承载标题、副标题、meta、preview item 和正文内容。
+
+**Props**:
+```ts
+{
+  title?: string
+  subtitle?: string
+  content?: string
+  editable?: boolean
+  items?: WorkspacePreviewItem[]
+  meta?: WorkspaceMetaItem[]
+  emptyText?: string
+}
+```
+
+**Slots**:
+- `#content` — 自定义正文内容
+- `#footer` — 底部扩展区
+
+---
+
+### WorkspaceActivityFeed
+
+**路径**: `src/components/workspace/WorkspaceActivityFeed.vue`
+
+**用途**: detail 活动流区块，基于 `CommentItem` 渲染结构化 activity item 列表。
+
+**Props**:
+```ts
+{
+  items?: WorkspaceActivityItem[]
+  emptyText?: string
+}
+```
+
+**Slots**:
+- `#header` — 活动流头部
+- `#footer` — 活动流尾部
+
+---
+
 ## Editor 编辑器
 
 ### BlockQuote
@@ -1503,6 +1580,10 @@ tabNext()                    // Tab 切换到下一个单元格
 ### FieldMultiSelect
 **路径**: `src/components/field/FieldMultiSelect.vue` — 多选字段编辑器（Teleport 下拉，勾选多个选项）
 
+**说明**:
+- 支持 `field + value` 表格模式
+- 支持 `v-model + label + options` 独立表单模式
+
 ### FieldNumber
 **路径**: `src/components/field/FieldNumber.vue` — 数字字段编辑器
 
@@ -1512,8 +1593,31 @@ tabNext()                    // Tab 切换到下一个单元格
 ### FieldSelect
 **路径**: `src/components/field/FieldSelect.vue` — 单选字段编辑器（Teleport 下拉，单选选项）
 
+**说明**:
+- 支持 `field + value` 表格模式
+- 支持 `v-model + label + options` 独立表单模式
+
 ### FieldText
 **路径**: `src/components/field/FieldText.vue` — 文本字段编辑器
+
+**说明**:
+- 支持 `field + value` 表格模式
+- 支持 `v-model + label + placeholder + required + error` 独立表单模式
+
+### FieldDate
+**路径**: `src/components/field/FieldDate.vue` — 日期字段编辑器
+
+**说明**:
+- 支持 `field + value` 表格模式
+- 支持 `v-model + label + required + error` 独立表单模式
+
+### FieldRichText
+**路径**: `src/components/field/FieldRichText.vue` — 富文本字段编辑器
+
+**说明**:
+- 支持 `field + value` 表格模式
+- 支持 `v-model + label + required + error` 独立表单模式
+- 独立模式默认不自动 focus，仍通过 `blur` 或 `Ctrl/Cmd+Enter` 提交
 
 ### FieldUrl
 **路径**: `src/components/field/FieldUrl.vue` — URL 字段编辑器
@@ -1631,10 +1735,14 @@ add()
 {
   columns?: KanbanColumnData[]            // 列数据列表
   records?: DataRecord[]                  // 数据记录
+  schema?: TableSchema                    // Schema，用于从 select options 推导泳道
+  view?: ViewConfig                       // 视图配置
   kanbanFieldId?: string                  // 看板分组字段 ID
   laneOrder?: string[]                    // 列顺序
   laneTitles?: Record<string, string>     // 列标题映射
-  addColumnVisible?: boolean              // 是否显示添加列按钮，默认 true
+  addColumnVisible?: boolean              // 是否显示添加列按钮，默认 false
+  priorityColorMap?: ColorMap             // 优先级颜色映射
+  statusColorMap?: ColorMap               // 状态颜色映射
 }
 ```
 
@@ -1644,6 +1752,12 @@ add()
 "add-column"()
 "card-click"(task: Task)
 ```
+
+**Slots**:
+- `#column-header({ column, taskCount, dotColor, addCard })` — 自定义列头
+- `#card-title({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })` — 自定义卡片标题区
+- `#card-meta({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })` — 自定义卡片 meta 区
+- `#card-tags({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })` — 自定义卡片标签区
 
 ---
 
@@ -1667,6 +1781,11 @@ add()
 ```ts
 click(task: Task)
 ```
+
+**Slots**:
+- `#title({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })`
+- `#meta({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })`
+- `#tags({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })`
 
 ---
 
@@ -1693,6 +1812,16 @@ click(task: Task)
 "update:column"(column: KanbanColumnData)
 ```
 
+**Slots**:
+- `#header({ column, taskCount, dotColor, addCard })` — 自定义列头
+- `#title({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })` — 透传到 `KanbanCard`
+- `#meta({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })` — 透传到 `KanbanCard`
+- `#tags({ task, displayDate, priorityBadge, statusBadge, priorityLabel, statusLabel })` — 透传到 `KanbanCard`
+
+**运行规则**:
+- 当卡片数量超过虚拟滚动阈值且未启用自定义 card slots 时，使用虚拟滚动
+- 当启用 `title/meta/tags` 任一自定义 card slot 时，自动关闭虚拟滚动，避免可变高度卡片导致布局错位
+
 ---
 
 ### QuickAddRow
@@ -1704,7 +1833,7 @@ click(task: Task)
 **Props**:
 ```ts
 {
-  placeholder?: string    // 占位文本，默认 "输入任务标题..."
+  placeholder?: string    // 占位文本，默认 "快速创建任务，按 Enter 提交"
 }
 ```
 
@@ -1738,7 +1867,7 @@ cancel()
 
 **路径**: `src/components/layout/Navbar.vue`
 
-**用途**: 顶部导航栏，包含 Logo、搜索框、通知图标和头像。
+**用途**: 顶部导航栏，包含 Logo、搜索框、通知图标、头像和可扩展 header 区域。
 
 **Props**:
 ```ts
@@ -1758,6 +1887,8 @@ search(value: string)
 
 **Slots**:
 - `#logo` — Logo 区域
+- `#header-left` — 位于 `logo` 右侧、搜索框左侧的扩展区
+- `#header-right` — 位于搜索框右侧、通知按钮左侧的扩展区
 
 ---
 

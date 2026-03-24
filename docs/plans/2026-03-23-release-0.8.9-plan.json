@@ -1,0 +1,45 @@
+{
+  "creator": "ARCH",
+  "title": "Release OneUI v0.8.9",
+  "brief": "按 OneUI 标准发版链发布 DatabaseView/Kanban ergonomics closeout 到 npm 主站，完成 proof 与 FlowAPI closeout。",
+  "description": "# Part 1 执行摘要\n本计划用于把已完成的 DatabaseView/Kanban ergonomics 改动按 OneUI 标准发版链发布到 npm 主站。当前 @oneflowui/ui 主站最新版本是 0.8.8，仓库版本也仍为 0.8.8，因此必须先提升到 0.8.9，然后执行仓库内门禁、发包门禁、tarball 外部 consumer smoke 与实际 publish。\n\n# Part 2 需求分析\nP0：版本必须唯一，不能重发 0.8.8。P0：必须走 npm 主站而不是镜像站。P0：必须执行 npm publish --dry-run、npm pack、tarball 外部 consumer build smoke。P1：发布证据、proof 和 closeout 必须写回 FlowAPI。\n\n# Part 3 详细方案\n代码改动限制在版本号与 release 文档，不对功能实现做额外风险扩散。当前版本锚点位于 /opt/Oneflow/flowlab/项目/oneui/code/develop/package.json:3 与 /opt/Oneflow/flowlab/项目/oneui/code/develop/package-lock.json:3。已完成功能验收证据位于 /opt/Oneflow/flowlab/项目/oneui/code/develop/docs/oneui-kanban-ergonomics-verification-20260323.md:1，发布 proof 将记录到 /opt/Oneflow/flowlab/项目/oneui/code/develop/docs/plans/2026-03-23-release-0.8.9-proof.md:1。发版前执行 npm run lint、npm run lint:style、npm test、npx vitest run src/tests/database-view.integration.spec.ts、npm run type-check、npm run build。完成后使用 npm publish --dry-run --access public --registry=https://registry.npmjs.org 与 npm pack，扫描 dist 中 worker / import.meta.url / assets 风险，再用 Vite 5.4.21 和 latest stable Vite 进行 tarball consumer smoke。全部通过后执行真实 npm publish --access public --registry=https://registry.npmjs.org。\n\n# Part 4 实现路线图\nPhase A：冻结 release scope，版本提升到 0.8.9。Phase B：跑仓库内门禁。Phase C：跑发包门禁与外部 consumer smoke。Phase D：执行真实 publish，校验 npm view @oneflowui/ui version，写回 proof 与 FlowAPI closeout。\n\n# Part 5 工作量估计\nARCH 约 0.5 天完成 release gate、proof、publish 与 FlowAPI closeout。\n\n# Part 6 风险评估\n高风险一：默认 registry 仍指向镜像站，导致 whoami 与 publish 站点错配；缓解动作是所有 publish 相关命令显式指定 https://registry.npmjs.org。高风险二：tarball 虽能打包但 consumer 侧构建失败；缓解动作是在两个 Vite 版本矩阵下做真实 install + build。中风险：当前工作区含其他已存在改动；缓解动作是仅提升版本与补文档，不回滚或覆盖现有用户改动。\n\n# Part 7 验收标准\n1. package.json 与 package-lock.json 版本提升到 0.8.9。2. npm run lint、npm run lint:style、npm test、npx vitest run src/tests/database-view.integration.spec.ts、npm run type-check、npm run build 全部通过。3. npm publish --dry-run --access public --registry=https://registry.npmjs.org 与 npm pack 通过。4. tarball 在 Vite 5.4.21 与 latest stable Vite consumer 中均能成功 vite build。5. npm publish --access public --registry=https://registry.npmjs.org 成功，且 npm view @oneflowui/ui version --registry=https://registry.npmjs.org 返回 0.8.9。\n\n# Part 8 回滚方案\n若在真实发布前任一门禁失败，则停止 publish，仅保留本地版本与 proof 变更，修复后重跑。若真实发布成功，则不回退已发布版本，而是通过后续 patch 版本修复。\n\n# Part 9 架构决策记录\n本轮保持最小风险 release：不继续追加功能改动，不修改发布入口结构，只提升 patch 版本并复用既有构建产物入口；发布路径强制使用 npm 主站，避免镜像站认证错配。\n\n# Part 10 参考和附录\n代码与证据参考：/opt/Oneflow/flowlab/项目/oneui/code/develop/package.json:3、/opt/Oneflow/flowlab/项目/oneui/code/develop/package-lock.json:3、/opt/Oneflow/flowlab/项目/oneui/code/develop/docs/CHANGELOG-v0.8.9.md:1、/opt/Oneflow/flowlab/项目/oneui/code/develop/docs/oneui-kanban-ergonomics-verification-20260323.md:1、/opt/Oneflow/flowlab/项目/oneui/code/develop/docs/plans/2026-03-23-release-0.8.9-proof.md:1。",
+  "plan_type": "feature",
+  "priority": "P1",
+  "execution_mode": "interactive",
+  "acceptance_criteria": [
+    {
+      "title": "repo gates pass",
+      "criterion": "lint, stylelint, full test, targeted vitest, type-check and build all pass before publish.",
+      "verify_command": "bash -lc 'test -f /tmp/oneui_release_089/build.log && test -f /tmp/oneui_release_089/repo-lint.log && test -f /tmp/oneui_release_089/repo-test.log && test -f /tmp/oneui_release_089/repo-typecheck.log'"
+    },
+    {
+      "title": "package gates pass",
+      "criterion": "npm publish --dry-run and npm pack succeed against the npmjs registry.",
+      "verify_command": "bash -lc 'test -f /tmp/oneui_release_089/npm-publish-dryrun-089.log && test -f /tmp/oneui_release_089/npm-pack-089.log && test -f /tmp/oneui_release_089/oneflowui-ui-0.8.9.tgz'"
+    },
+    {
+      "title": "consumer smoke pass",
+      "criterion": "The packed tarball builds successfully in external Vite 5.4.21 and latest stable Vite consumers.",
+      "verify_command": "bash -lc 'test -f /tmp/oneui_release_089/consumer-vite-5.4.21/build.log && test -f /tmp/oneui_release_089/consumer-vite-latest/build.log'"
+    },
+    {
+      "title": "real publish visible",
+      "criterion": "npm publish succeeds and npm view returns 0.8.9 from https://registry.npmjs.org.",
+      "verify_command": "bash -lc 'npm view @oneflowui/ui version --registry=https://registry.npmjs.org | grep -x 0.8.9'"
+    }
+  ],
+  "tags": [
+    "release",
+    "npm",
+    "oneui",
+    "version:0.8.9"
+  ],
+  "meta": {
+    "delivery_profile": "service_delivery",
+    "artifacts": [
+      "docs/CHANGELOG-v0.8.9.md",
+      "docs/plans/2026-03-23-release-0.8.9-proof.md",
+      "docs/plans/2026-03-23-release-0.8.9-plan.md"
+    ]
+  }
+}

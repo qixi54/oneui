@@ -1,8 +1,9 @@
 /* eslint-disable vue/one-component-per-file */
 import { mount } from "@vue/test-utils";
-import { defineComponent, nextTick, ref } from "vue";
+import { defineComponent, h, nextTick, ref } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import DatabaseView from "../components/database/DatabaseView.vue";
+import DatabaseViewContent from "../components/database/DatabaseViewContent.vue";
 import {
   composeDatabaseViewMiddlewares,
   createDatabaseViewAnalyticsMiddleware,
@@ -10,6 +11,13 @@ import {
   createDatabaseViewToastMiddleware,
   useDatabaseView,
 } from "../composables";
+import type {
+  DatabaseViewKanbanAppearance,
+  DatabaseViewKanbanCardMoveEvent,
+  DatabaseViewKanbanCardSlotContext,
+  DatabaseViewKanbanColumnHeaderSlotContext,
+  DatabaseViewKanbanQuickAddEvent,
+} from "../contracts/database";
 import type { DataRecord, TableSchema, ViewConfig } from "../types";
 
 function buildSchema(): TableSchema {
@@ -57,9 +65,40 @@ function buildRecords(): DataRecord[] {
       id: "R-1",
       fields: {
         title: "DatabaseView 主页",
+        brief: "主页卡片摘要",
+        prdVersion: "v1.0",
+        status: "todo",
+        priority: "P0",
+        startDate: "2026-03-20",
+        endDate: "2026-03-21",
+      },
+    },
+    {
+      id: "R-2",
+      fields: {
+        title: "第二条记录",
+        brief: "第二条摘要",
+        prdVersion: "v1.1",
+        status: "done",
+        priority: "P1",
+        startDate: "2026-03-22",
+        endDate: "2026-03-23",
+      },
+    },
+  ];
+}
+
+function buildKanbanPreserveRecords(): DataRecord[] {
+  return [
+    {
+      id: "R-1",
+      fields: {
+        title: "DatabaseView 主页",
         status: "todo",
         startDate: "2026-03-20",
         endDate: "2026-03-21",
+        owner: "Alice",
+        customFlag: "keep-me",
       },
     },
     {
@@ -69,6 +108,7 @@ function buildRecords(): DataRecord[] {
         status: "done",
         startDate: "2026-03-22",
         endDate: "2026-03-23",
+        estimate: 8,
       },
     },
   ];
@@ -166,6 +206,162 @@ const DataTableStub = defineComponent({
 const KanbanBoardStub = defineComponent({
   name: "KanbanBoard",
   template: '<div data-view="kanban" data-role="kanban-view">kanban</div>',
+});
+
+const KanbanBoardForwardStub = defineComponent({
+  name: "KanbanBoard",
+  emits: ["update:columns", "add-column", "card-click"],
+  template: `
+    <div data-view="kanban" data-role="kanban-forward-view">
+      <button
+        data-role="emit-update-columns"
+        @click="$emit('update:columns', [{ id: 'todo', title: 'Todo', tasks: [{ id: 'todo-task-1', title: 'Kanban Task', status: 'todo', priority: 'P1' }] }])"
+      >
+        update
+      </button>
+      <button data-role="emit-card-click" @click="$emit('card-click', { id: 'task-1' })">
+        card
+      </button>
+      <button data-role="emit-add-column" @click="$emit('add-column')">add</button>
+    </div>
+  `,
+});
+
+const KanbanBoardPreserveStub = defineComponent({
+  name: "KanbanBoard",
+  emits: ["update:columns"],
+  template: `
+    <div data-view="kanban" data-role="kanban-preserve-view">
+      <button
+        data-role="emit-update-columns"
+        @click="$emit('update:columns', [
+          {
+            id: 'todo',
+            title: 'Todo',
+            tasks: [
+              {
+                id: 'R-1',
+                title: 'DatabaseView 主页（移动后）',
+                status: 'todo',
+                priority: 'P0',
+                startDate: '2026-03-20',
+                endDate: '2026-03-21',
+              },
+              {
+                id: 'TASK-NEW',
+                title: '快速新增任务',
+                status: 'todo',
+                priority: 'P3',
+              },
+            ],
+          },
+          {
+            id: 'done',
+            title: 'Done',
+            tasks: [
+              {
+                id: 'R-2',
+                title: '第二条记录',
+                status: 'done',
+                priority: 'P1',
+                startDate: '2026-03-22',
+                endDate: '2026-03-23',
+              },
+            ],
+          },
+        ])"
+      >
+        update
+      </button>
+    </div>
+  `,
+});
+
+const KanbanBoardSlotProbeStub = defineComponent({
+  name: "KanbanBoard",
+  props: {
+    priorityColorMap: {
+      type: Object,
+      default: undefined,
+    },
+    statusColorMap: {
+      type: Object,
+      default: undefined,
+    },
+    kanbanAppearance: {
+      type: Object,
+      default: undefined,
+    },
+  },
+  emits: ["quick-add", "card-move"],
+  template: `
+    <div
+      data-view="kanban"
+      data-role="kanban-slot-probe"
+      :data-priority-label="priorityColorMap?.P0?.label ?? ''"
+      :data-status-label="statusColorMap?.todo?.label ?? ''"
+      :data-card-variant="kanbanAppearance?.cardVariant ?? ''"
+      :data-column-variant="kanbanAppearance?.columnVariant ?? ''"
+      :data-show-column-count="String(kanbanAppearance?.showColumnCount ?? '')"
+    >
+      <slot
+        name="column-header"
+        :column="{ id: 'todo', title: 'Todo', tasks: [{ id: 'R-1', title: '任务卡片', status: 'todo', priority: 'P0' }] }"
+        :task-count="2"
+        dot-color="#ff5500"
+        :tasks="[{ id: 'R-1', title: '任务卡片', status: 'todo', priority: 'P0' }]"
+        :add-card="() => undefined"
+      />
+      <slot
+        name="card"
+        :task="{ id: 'R-1', title: '任务卡片', status: 'todo', priority: 'P0' }"
+        display-date="3/23"
+        :priority-badge="{ label: '最高', style: { color: '#f00' } }"
+        :status-badge="{ label: '待处理', style: { color: '#0f0' } }"
+        priority-label="最高"
+        status-label="待处理"
+      />
+      <slot
+        name="card-title"
+        :task="{ id: 'R-1', title: '任务卡片', status: 'todo', priority: 'P0' }"
+        display-date="3/23"
+        :priority-badge="{ label: '最高', style: { color: '#f00' } }"
+        :status-badge="{ label: '待处理', style: { color: '#0f0' } }"
+        priority-label="最高"
+        status-label="待处理"
+      />
+      <slot
+        name="meta"
+        :task="{ id: 'R-1', title: '任务卡片', status: 'todo', priority: 'P0' }"
+        display-date="3/23"
+        :priority-badge="{ label: '最高', style: { color: '#f00' } }"
+        :status-badge="{ label: '待处理', style: { color: '#0f0' } }"
+        priority-label="最高"
+        status-label="待处理"
+      />
+      <slot
+        name="tags"
+        :task="{ id: 'R-1', title: '任务卡片', status: 'todo', priority: 'P0' }"
+        display-date="3/23"
+        :priority-badge="{ label: '最高', style: { color: '#f00' } }"
+        :status-badge="{ label: '待处理', style: { color: '#0f0' } }"
+        priority-label="最高"
+        status-label="待处理"
+      />
+      <button
+        data-role="emit-quick-add"
+        @click="$emit('quick-add', { columnId: 'todo', title: '快速新增任务', task: { id: 'TASK-NEW', title: '快速新增任务', status: 'todo', priority: 'P3' } })"
+      >
+        quick-add
+      </button>
+      <button
+        data-role="emit-card-move"
+        @click="$emit('card-move', { fromColumnId: 'todo', toColumnId: 'done', task: { id: 'R-1', title: '任务卡片', status: 'done', priority: 'P0' } })"
+      >
+        move
+      </button>
+    </div>
+  `,
 });
 
 const GalleryViewStub = defineComponent({
@@ -775,6 +971,515 @@ describe("DatabaseView 页面级集成", () => {
     });
   });
 
+  it("DatabaseViewContent 应该把 kanban 的 update:columns、card-click、add-column 逐层转发", async () => {
+    const wrapper = mount(DatabaseViewContent, {
+      props: {
+        viewType: "kanban",
+        records: buildRecords(),
+        schema: buildSchema(),
+        view: buildViews()[1],
+        columns: [],
+        readonly: false,
+        enableFieldManagement: false,
+      },
+      global: {
+        stubs: {
+          KanbanBoard: KanbanBoardForwardStub,
+        },
+      },
+    });
+
+    await wrapper.get('[data-role="emit-update-columns"]').trigger("click");
+    await wrapper.get('[data-role="emit-card-click"]').trigger("click");
+    await wrapper.get('[data-role="emit-add-column"]').trigger("click");
+    await nextTick();
+
+    expect(wrapper.emitted("update:columns")?.at(-1)?.[0]).toEqual([
+      {
+        id: "todo",
+        title: "Todo",
+        tasks: [
+          {
+            id: "todo-task-1",
+            title: "Kanban Task",
+            status: "todo",
+            priority: "P1",
+          },
+        ],
+      },
+    ]);
+    expect(wrapper.emitted("card-click")?.at(-1)?.[0]).toEqual({ id: "task-1" });
+    expect(wrapper.emitted("add-column")?.length).toBe(1);
+  });
+
+  it("DatabaseViewContent 应该把 kanban slots 与 colorMap 透传给 KanbanBoard", async () => {
+    const quickAddEvents: DatabaseViewKanbanQuickAddEvent[] = [];
+    const moveEvents: DatabaseViewKanbanCardMoveEvent[] = [];
+    const wrapper = mount(DatabaseViewContent, {
+      props: {
+        viewType: "kanban",
+        records: buildRecords(),
+        schema: buildSchema(),
+        view: buildViews()[1],
+        columns: [],
+        kanbanAppearance: {
+          cardVariant: "compact",
+          columnVariant: "flat",
+          showColumnCount: false,
+        } satisfies DatabaseViewKanbanAppearance,
+        priorityColorMap: {
+          P0: {
+            label: "最高",
+            text: "#991b1b",
+            bg: "#fee2e2",
+          },
+        },
+        statusColorMap: {
+          todo: {
+            label: "待处理",
+            text: "#9a3412",
+            bg: "#ffedd5",
+            dot: "#ff5500",
+          },
+        },
+      },
+      slots: {
+        "kanban-column-header": ({ column, taskCount, dotColor, records }: DatabaseViewKanbanColumnHeaderSlotContext) =>
+          h("div", { "data-role": "column-slot" }, `${column.title}|${taskCount}|${dotColor}|${records[0]?.fields.title ?? ''}`),
+        "kanban-card": ({ record, fields }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "card-slot" }, `${record.id}|${String(fields.brief ?? "")}`),
+        "kanban-card-title": ({ task, priorityLabel, fields }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "title-slot" }, `${task.title}|${priorityLabel}|${String(fields.prdVersion ?? "")}`),
+        "kanban-card-meta": ({ task, displayDate, record }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "meta-slot" }, `${task.id}|${displayDate}|${record.id}`),
+        "kanban-card-tags": ({ statusLabel }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "tags-slot" }, statusLabel),
+      },
+      global: {
+        stubs: {
+          KanbanBoard: KanbanBoardSlotProbeStub,
+        },
+      },
+    });
+
+    const probe = wrapper.get('[data-role="kanban-slot-probe"]');
+    expect(probe.attributes("data-priority-label")).toBe("最高");
+    expect(probe.attributes("data-status-label")).toBe("待处理");
+    expect(probe.attributes("data-card-variant")).toBe("compact");
+    expect(probe.attributes("data-column-variant")).toBe("flat");
+    expect(probe.attributes("data-show-column-count")).toBe("false");
+    expect(wrapper.get('[data-role="column-slot"]').text()).toBe("Todo|2|#ff5500|DatabaseView 主页");
+    expect(wrapper.get('[data-role="card-slot"]').text()).toBe("R-1|主页卡片摘要");
+    expect(wrapper.get('[data-role="title-slot"]').text()).toBe("任务卡片|最高|v1.0");
+    expect(wrapper.get('[data-role="meta-slot"]').text()).toBe("R-1|3/23|R-1");
+    expect(wrapper.get('[data-role="tags-slot"]').text()).toBe("待处理");
+
+    await wrapper.get('[data-role="emit-quick-add"]').trigger("click");
+    await wrapper.get('[data-role="emit-card-move"]').trigger("click");
+    quickAddEvents.push(wrapper.emitted("kanban-quick-add")?.at(-1)?.[0] as DatabaseViewKanbanQuickAddEvent);
+    moveEvents.push(wrapper.emitted("kanban-card-move")?.at(-1)?.[0] as DatabaseViewKanbanCardMoveEvent);
+
+    expect(quickAddEvents[0]).toEqual({
+      columnId: "todo",
+      title: "快速新增任务",
+      task: {
+        id: "TASK-NEW",
+        title: "快速新增任务",
+        status: "todo",
+        priority: "P3",
+      },
+      record: {
+        id: "TASK-NEW",
+        fields: {
+          title: "快速新增任务",
+          description: "",
+          status: "todo",
+          priority: "P3",
+          assignee: "",
+          startDate: "",
+          endDate: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+      fields: {
+        title: "快速新增任务",
+        description: "",
+        status: "todo",
+        priority: "P3",
+        assignee: "",
+        startDate: "",
+        endDate: "",
+        tags: [],
+      },
+    });
+    expect(moveEvents[0]).toEqual({
+      recordId: "R-1",
+      fromColumnId: "todo",
+      toColumnId: "done",
+      task: {
+        id: "R-1",
+        title: "任务卡片",
+        status: "done",
+        priority: "P0",
+      },
+      record: buildRecords()[0],
+      fields: buildRecords()[0].fields,
+    });
+  });
+
+  it("DatabaseView 应该把 kanban update:columns 归并回 update:records", async () => {
+    const wrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-kanban",
+        schema: buildSchema(),
+        records: buildRecords(),
+        views: buildViews(),
+        currentViewId: "v-kanban",
+      },
+      global: {
+        stubs: {
+          Teleport: true,
+          TableToolbar: TableToolbarStub,
+          DataTable: DataTableStub,
+          KanbanBoard: KanbanBoardForwardStub,
+          GalleryView: GalleryViewStub,
+          GanttTimeline: GanttTimelineStub,
+          EmptyState: EmptyStateStub,
+        },
+      },
+    });
+
+    await wrapper.get('[data-role="emit-update-columns"]').trigger("click");
+    await nextTick();
+
+    expect(wrapper.emitted("update:records")?.at(-1)?.[0]).toEqual([
+      {
+        id: "todo-task-1",
+        fields: {
+          title: "Kanban Task",
+          description: "",
+          status: "todo",
+          priority: "P1",
+          assignee: "",
+          startDate: "",
+          endDate: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+    ]);
+  });
+
+  it("DatabaseView 应该在 kanban 更新时保留同 id 记录的非看板字段", async () => {
+    const wrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-kanban-preserve",
+        schema: buildSchema(),
+        records: buildKanbanPreserveRecords(),
+        views: buildViews(),
+        currentViewId: "v-kanban",
+      },
+      global: {
+        stubs: {
+          Teleport: true,
+          TableToolbar: TableToolbarStub,
+          DataTable: DataTableStub,
+          KanbanBoard: KanbanBoardPreserveStub,
+          GalleryView: GalleryViewStub,
+          GanttTimeline: GanttTimelineStub,
+          EmptyState: EmptyStateStub,
+        },
+      },
+    });
+
+    await wrapper.get('[data-role="emit-update-columns"]').trigger("click");
+    await nextTick();
+
+    expect(wrapper.emitted("update:records")?.at(-1)?.[0]).toEqual([
+      {
+        id: "R-1",
+        fields: {
+          title: "DatabaseView 主页（移动后）",
+          status: "todo",
+          startDate: "2026-03-20",
+          endDate: "2026-03-21",
+          priority: "P0",
+          owner: "Alice",
+          customFlag: "keep-me",
+          description: "",
+          assignee: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+      {
+        id: "TASK-NEW",
+        fields: {
+          title: "快速新增任务",
+          description: "",
+          status: "todo",
+          priority: "P3",
+          assignee: "",
+          startDate: "",
+          endDate: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+      {
+        id: "R-2",
+        fields: {
+          title: "第二条记录",
+          status: "done",
+          startDate: "2026-03-22",
+          endDate: "2026-03-23",
+          priority: "P1",
+          estimate: 8,
+          description: "",
+          assignee: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+    ]);
+  });
+
+  it("DatabaseView 应该为 kanban 更新回传 create/update/delete 动作", async () => {
+    const onUpdateRecord = vi.fn();
+    const onCreateRecord = vi.fn();
+    const onDeleteRecord = vi.fn();
+
+    const wrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-kanban-persist",
+        schema: buildSchema(),
+        records: buildKanbanPreserveRecords(),
+        views: buildViews(),
+        currentViewId: "v-kanban",
+        actions: {
+          onUpdateRecord,
+          onCreateRecord,
+          onDeleteRecord,
+        },
+      },
+      global: {
+        stubs: {
+          Teleport: true,
+          TableToolbar: TableToolbarStub,
+          DataTable: DataTableStub,
+          KanbanBoard: KanbanBoardPreserveStub,
+          GalleryView: GalleryViewStub,
+          GanttTimeline: GanttTimelineStub,
+          EmptyState: EmptyStateStub,
+        },
+      },
+    });
+
+    await wrapper.get('[data-role="emit-update-columns"]').trigger("click");
+    await nextTick();
+    await flushPromises();
+
+    expect(onUpdateRecord).toHaveBeenCalledTimes(2);
+    expect(onUpdateRecord).toHaveBeenCalledWith({
+      tableId: "tbl-kanban-persist",
+      recordId: "R-1",
+      patch: {
+        title: "DatabaseView 主页（移动后）",
+        priority: "P0",
+        description: "",
+        assignee: "",
+        tags: [],
+      },
+      record: {
+        id: "R-1",
+        fields: {
+          title: "DatabaseView 主页（移动后）",
+          status: "todo",
+          startDate: "2026-03-20",
+          endDate: "2026-03-21",
+          priority: "P0",
+          owner: "Alice",
+          customFlag: "keep-me",
+          description: "",
+          assignee: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+    });
+    expect(onUpdateRecord).toHaveBeenCalledWith({
+      tableId: "tbl-kanban-persist",
+      recordId: "R-2",
+      patch: {
+        priority: "P1",
+        description: "",
+        assignee: "",
+        tags: [],
+      },
+      record: {
+        id: "R-2",
+        fields: {
+          title: "第二条记录",
+          status: "done",
+          startDate: "2026-03-22",
+          endDate: "2026-03-23",
+          priority: "P1",
+          estimate: 8,
+          description: "",
+          assignee: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+    });
+    expect(onCreateRecord).toHaveBeenCalledWith({
+      tableId: "tbl-kanban-persist",
+      record: {
+        id: "TASK-NEW",
+        fields: {
+          title: "快速新增任务",
+          description: "",
+          status: "todo",
+          priority: "P3",
+          assignee: "",
+          startDate: "",
+          endDate: "",
+          tags: [],
+        },
+        createdAt: undefined,
+        updatedAt: undefined,
+      },
+    });
+    expect(onDeleteRecord).not.toHaveBeenCalled();
+  });
+
+  it("业务页面应该可以通过 DatabaseView 直接自定义 kanban slots 与 colorMap", async () => {
+    const onKanbanQuickAdd = vi.fn();
+    const onKanbanCardMove = vi.fn();
+    const wrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-kanban-custom",
+        schema: buildSchema(),
+        records: buildRecords(),
+        views: buildViews(),
+        currentViewId: "v-kanban",
+        kanbanAppearance: {
+          cardVariant: "compact",
+          columnVariant: "flat",
+          showColumnCount: false,
+        },
+        priorityColorMap: {
+          P0: {
+            label: "最高",
+            text: "#991b1b",
+            bg: "#fee2e2",
+          },
+        },
+        statusColorMap: {
+          todo: {
+            label: "待处理",
+            text: "#9a3412",
+            bg: "#ffedd5",
+            dot: "#ff5500",
+          },
+        },
+        actions: {
+          onKanbanQuickAdd,
+          onKanbanCardMove,
+        },
+      },
+      slots: {
+        "kanban-column-header": ({ column, taskCount, dotColor, records }: DatabaseViewKanbanColumnHeaderSlotContext) =>
+          h("div", { "data-role": "dbv-column-slot" }, `${column.id}|${taskCount}|${dotColor}|${records[0]?.id ?? ''}`),
+        "kanban-card": ({ record, fields }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "dbv-card-slot" }, `${record.id}|${String(fields.brief ?? "")}`),
+        "kanban-card-title": ({ task, priorityLabel, fields }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "dbv-title-slot" }, `${task.id}|${priorityLabel}|${String(fields.prdVersion ?? "")}`),
+        "kanban-card-meta": ({ task, displayDate, record }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "dbv-meta-slot" }, `${task.title}|${displayDate}|${record.id}`),
+        "kanban-card-tags": ({ statusLabel }: DatabaseViewKanbanCardSlotContext) =>
+          h("div", { "data-role": "dbv-tags-slot" }, statusLabel),
+      },
+      global: {
+        stubs: {
+          Teleport: true,
+          TableToolbar: TableToolbarStub,
+          DataTable: DataTableStub,
+          KanbanBoard: KanbanBoardSlotProbeStub,
+          GalleryView: GalleryViewStub,
+          GanttTimeline: GanttTimelineStub,
+          EmptyState: EmptyStateStub,
+        },
+      },
+    });
+
+    const probe = wrapper.get('[data-role="kanban-slot-probe"]');
+    expect(probe.attributes("data-priority-label")).toBe("最高");
+    expect(probe.attributes("data-status-label")).toBe("待处理");
+    expect(probe.attributes("data-card-variant")).toBe("compact");
+    expect(probe.attributes("data-column-variant")).toBe("flat");
+    expect(wrapper.get('[data-role="dbv-column-slot"]').text()).toBe("todo|2|#ff5500|R-1");
+    expect(wrapper.get('[data-role="dbv-card-slot"]').text()).toBe("R-1|主页卡片摘要");
+    expect(wrapper.get('[data-role="dbv-title-slot"]').text()).toBe("R-1|最高|v1.0");
+    expect(wrapper.get('[data-role="dbv-meta-slot"]').text()).toBe("任务卡片|3/23|R-1");
+    expect(wrapper.get('[data-role="dbv-tags-slot"]').text()).toBe("待处理");
+
+    await wrapper.get('[data-role="emit-quick-add"]').trigger("click");
+    await wrapper.get('[data-role="emit-card-move"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.emitted("kanban-quick-add")?.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        columnId: "todo",
+        title: "快速新增任务",
+        task: expect.objectContaining({ id: "TASK-NEW" }),
+        record: expect.objectContaining({ id: "TASK-NEW" }),
+      }),
+    );
+    expect(wrapper.emitted("kanban-card-move")?.at(-1)?.[0]).toEqual({
+      recordId: "R-1",
+      fromColumnId: "todo",
+      toColumnId: "done",
+      task: {
+        id: "R-1",
+        title: "任务卡片",
+        status: "done",
+        priority: "P0",
+      },
+      record: buildRecords()[0],
+      fields: buildRecords()[0].fields,
+    });
+    expect(onKanbanQuickAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tableId: "tbl-kanban-custom",
+        columnId: "todo",
+        title: "快速新增任务",
+      }),
+    );
+    expect(onKanbanCardMove).toHaveBeenCalledWith({
+      tableId: "tbl-kanban-custom",
+      recordId: "R-1",
+      fromColumnId: "todo",
+      toColumnId: "done",
+      task: {
+        id: "R-1",
+        title: "任务卡片",
+        status: "done",
+        priority: "P0",
+      },
+      record: buildRecords()[0],
+      fields: buildRecords()[0].fields,
+    });
+  });
+
   it("DatabaseView 应该保留 loading / empty / error 三个关键状态", async () => {
     const sharedStubs = {
       Teleport: true,
@@ -866,6 +1571,68 @@ describe("DatabaseView 页面级集成", () => {
     });
   });
 
+  it("DatabaseView detail slot context 应该透传 source 与 presentation hints", async () => {
+    const DetailSlotProbe = defineComponent({
+      name: "DetailSlotProbe",
+      components: { DatabaseView },
+      setup() {
+        return {
+          schema: buildSchema(),
+          records: buildRecords(),
+          views: buildViews(),
+          detailSource: "notifications",
+          detailPresentation: "drawer",
+        };
+      },
+      template: `
+        <DatabaseView
+          table-id="tbl-1"
+          :schema="schema"
+          :records="records"
+          :views="views"
+          current-view-id="v-table"
+          selected-record-id="R-1"
+          :detail-source="detailSource"
+          :detail-presentation="detailPresentation"
+        >
+          <template #actions="{ source, presentation }">
+            <div
+              data-role="detail-slot"
+              :data-source="source ?? ''"
+              :data-presentation="presentation"
+            >
+              {{ source }}|{{ presentation }}
+            </div>
+          </template>
+        </DatabaseView>
+      `,
+    });
+
+    const wrapper = mount(DetailSlotProbe, {
+      global: {
+        stubs: {
+          Teleport: true,
+          TableToolbar: TableToolbarStub,
+          DataTable: DataTableStub,
+          KanbanBoard: KanbanBoardStub,
+          GalleryView: GalleryViewStub,
+          GanttTimeline: GanttTimelineStub,
+          EmptyState: EmptyStateStub,
+          DetailSheet: DetailSheetStub,
+          SidePanel: SidePanelStub,
+          Drawer: DrawerStub,
+        },
+      },
+    });
+
+    await nextTick();
+
+    const slot = wrapper.get('[data-role="detail-slot"]');
+    expect(slot.attributes("data-source")).toBe("notifications");
+    expect(slot.attributes("data-presentation")).toBe("drawer");
+    expect(slot.text()).toContain("notifications|drawer");
+  });
+
   it("DatabaseView 应该记住当前视图、搜索词和 workspace 宽度偏好", async () => {
     const stubs = {
       Teleport: true,
@@ -897,7 +1664,7 @@ describe("DatabaseView 页面级集成", () => {
     await nextTick();
     await firstWrapper.get('[data-role="resize-side-panel"]').trigger("click");
     await nextTick();
-    await firstWrapper.get('[data-role="workspace-mode-switch"] [data-mode="full-page"]').trigger("click");
+    await firstWrapper.get('[data-role="workspace-mode-switch"] [data-mode="fullscreen"]').trigger("click");
     await nextTick();
     firstWrapper.unmount();
 
@@ -905,7 +1672,7 @@ describe("DatabaseView 页面级集成", () => {
     expect(persisted).toMatchObject({
       activeViewId: "v-gallery",
       searchKeyword: "第二条",
-      detailPresentation: "full-page",
+      detailPresentation: "fullscreen",
       sidePanelWidth: 840,
     });
 

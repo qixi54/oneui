@@ -1,7 +1,10 @@
 import type { Component, Ref } from "vue";
 import type {
+  ColorMap,
   DataRecord,
   Density,
+  KanbanColumnData,
+  Task,
   TableColumn,
   TableSchema,
   ViewConfig,
@@ -46,6 +49,9 @@ export interface DatabaseViewProvider<T extends DataRecord = DataRecord> {
 export interface DatabaseViewActionContext<T extends DataRecord = DataRecord> {
   action:
     | "cell-edit"
+    | "create-record"
+    | "update-record"
+    | "delete-record"
     | "select-record"
     | "schema-event"
     | "save-view"
@@ -91,6 +97,13 @@ export type DatabaseViewSchemaEvent = DatabaseSchemaEvent;
 export interface DatabaseViewActions<T extends DataRecord = DataRecord> {
   middleware?: DatabaseViewActionMiddlewareList<T>;
   onCellEdit?: (payload: { rowId: string; fieldId: string; value: unknown }) => Promise<void> | void;
+  onCreateRecord?: (payload: { record: T }) => Promise<void> | void;
+  onUpdateRecord?: (payload: {
+    recordId: string;
+    patch: Record<string, unknown>;
+    record: T;
+  }) => Promise<void> | void;
+  onDeleteRecord?: (payload: { recordId: string }) => Promise<void> | void;
   onSelectRecord?: (record: T | null) => Promise<void> | void;
   onSchemaEvent?: (event: DatabaseSchemaEvent) => Promise<void> | void;
   onSaveView?: (view: ViewConfig) => Promise<void> | void;
@@ -167,6 +180,9 @@ export interface UseDatabaseViewResult<T extends DataRecord = DataRecord> {
   setPage: (page: number) => void;
   setPageSize: (pageSize: number) => void;
   emitCellEdit: (payload: { rowId: string; fieldId: string; value: unknown }) => Promise<void>;
+  emitCreateRecord: (payload: { record: T }) => Promise<void>;
+  emitUpdateRecord: (payload: { recordId: string; patch: Record<string, unknown>; record: T }) => Promise<void>;
+  emitDeleteRecord: (payload: { recordId: string }) => Promise<void>;
   emitSchemaEvent: (event: DatabaseSchemaEvent) => Promise<void>;
   setRecords: (next: readonly T[] | T[]) => void;
 }
@@ -181,26 +197,171 @@ export interface DatabaseViewUiOptions {
   enableFieldManagement?: boolean;
 }
 
-export type DatabaseViewDetailPresentation = "auto" | "side-panel" | "sheet" | "full-page";
-export type DatabaseViewResolvedDetailPresentation = Exclude<DatabaseViewDetailPresentation, "auto">;
+export type DatabaseViewLegacyDetailPresentation = "sheet" | "full-page";
+export type DatabaseViewResolvedDetailPresentation = "side-panel" | "drawer" | "fullscreen";
+export type DatabaseViewDetailPresentation =
+  | "auto"
+  | DatabaseViewResolvedDetailPresentation
+  | DatabaseViewLegacyDetailPresentation;
+export type DatabaseDetailPresenterShell = "side-panel" | "drawer" | "fullscreen";
+
+export interface DatabaseDetailPresenterResolution {
+  shell: DatabaseDetailPresenterShell;
+  mode?: "persistent" | "lazy";
+  fullscreen?: boolean;
+  resizable: boolean;
+  maskClosable: boolean;
+}
+
+export interface DatabaseDetailWorkspaceModeOption {
+  value: Exclude<DatabaseViewDetailPresentation, "auto">;
+  label: string;
+}
+
+export interface DatabaseDetailWorkspacePropertyItem {
+  key: string;
+  label: string;
+  field?: unknown;
+  value: unknown;
+  fallbackText: string;
+}
+
+export interface DatabaseDetailWorkspaceSlotContext {
+  rowId: string;
+  recordId: string;
+  source?: string;
+  title: string;
+  description: string;
+  viewType: string;
+  presentation: Exclude<DatabaseViewDetailPresentation, "auto">;
+  canSwitchPresentation: boolean;
+  workspaceModes: DatabaseDetailWorkspaceModeOption[];
+  propertyItems: DatabaseDetailWorkspacePropertyItem[];
+  readonly: boolean;
+  hasDraftChanges: boolean;
+}
+
+export interface DatabaseDetailWorkspaceSlots {
+  header?: (props: DatabaseDetailWorkspaceSlotContext) => unknown;
+  actions?: (props: DatabaseDetailWorkspaceSlotContext) => unknown;
+  preview?: (props: DatabaseDetailWorkspaceSlotContext) => unknown;
+  activity?: (props: DatabaseDetailWorkspaceSlotContext) => unknown;
+  footer?: (props: DatabaseDetailWorkspaceSlotContext) => unknown;
+}
+
+export interface DatabaseViewKanbanColumnHeaderSlotContext {
+  column: KanbanColumnData;
+  taskCount: number;
+  dotColor: string;
+  tasks: Task[];
+  records: DataRecord[];
+  addCard: () => void;
+}
+
+export interface DatabaseViewKanbanCardSlotContext {
+  task: Task;
+  record: DataRecord;
+  fields: DataRecord["fields"];
+  displayDate: string;
+  priorityBadge: {
+    label: string;
+    style: Record<string, string>;
+  };
+  statusBadge: {
+    label: string;
+    style: Record<string, string>;
+  };
+  priorityLabel: string;
+  statusLabel: string;
+}
+
+export type DatabaseViewKanbanFullCardSlotContext = DatabaseViewKanbanCardSlotContext;
+
+export interface DatabaseViewKanbanAppearance {
+  cardVariant?: "default" | "compact" | "custom";
+  columnVariant?: "default" | "board" | "flat";
+  quickAddVisible?: boolean;
+  showColumnCount?: boolean;
+}
+
+export interface DatabaseViewKanbanQuickAddEvent {
+  columnId: string;
+  title: string;
+  task: Task;
+  record: DataRecord;
+  fields: DataRecord["fields"];
+}
+
+export interface DatabaseViewKanbanCardMoveEvent {
+  recordId: string;
+  fromColumnId: string;
+  toColumnId: string;
+  task: Task;
+  record: DataRecord;
+  fields: DataRecord["fields"];
+}
+
+export interface DatabaseViewKanbanSlots {
+  "kanban-column-header"?: (props: DatabaseViewKanbanColumnHeaderSlotContext) => unknown;
+  "kanban-card"?: (props: DatabaseViewKanbanFullCardSlotContext) => unknown;
+  "kanban-card-title"?: (props: DatabaseViewKanbanCardSlotContext) => unknown;
+  "kanban-card-meta"?: (props: DatabaseViewKanbanCardSlotContext) => unknown;
+  "kanban-card-tags"?: (props: DatabaseViewKanbanCardSlotContext) => unknown;
+}
+
+export type DatabaseViewSlots = DatabaseDetailWorkspaceSlots & DatabaseViewKanbanSlots;
+export type DatabaseDetailPresenterSlots = DatabaseDetailWorkspaceSlots;
+export type DatabaseViewDetailHostSlots = DatabaseDetailWorkspaceSlots;
 
 export interface DatabaseViewWorkspacePreferences {
   activeViewId?: string;
-  detailPresentation?: DatabaseViewResolvedDetailPresentation;
+  detailPresentation?: Exclude<DatabaseViewDetailPresentation, "auto">;
   sidePanelWidth?: number;
   drawerWidth?: number;
   searchKeyword?: string;
 }
 
-export interface DatabaseViewComponentActions extends DatabaseViewActions<DataRecord> {
+export interface DatabaseViewComponentActions
+  extends Omit<DatabaseViewActions<DataRecord>, "onCreateRecord" | "onUpdateRecord" | "onDeleteRecord"> {
   onViewChange?: (payload: { tableId: string; view: ViewConfig }) => void | Promise<void>;
   onViewLoad?: (payload: { tableId: string; viewId: string }) => void | Promise<void>;
   onViewSave?: (payload: { tableId: string; viewId: string; name: string }) => void | Promise<void>;
+  onUpdateRecord?: (payload: {
+    tableId: string;
+    recordId: string;
+    patch: Record<string, unknown>;
+    record: DataRecord;
+  }) => void | Promise<void>;
+  onCreateRecord?: (payload: {
+    tableId: string;
+    record: DataRecord;
+  }) => void | Promise<void>;
+  onDeleteRecord?: (payload: {
+    tableId: string;
+    recordId: string;
+  }) => void | Promise<void>;
   onRecordChange?: (payload: {
     tableId: string;
     recordId: string;
     startDate?: string;
     endDate?: string;
+  }) => void | Promise<void>;
+  onKanbanQuickAdd?: (payload: {
+    tableId: string;
+    columnId: string;
+    title: string;
+    task: Task;
+    record: DataRecord;
+    fields: DataRecord["fields"];
+  }) => void | Promise<void>;
+  onKanbanCardMove?: (payload: {
+    tableId: string;
+    recordId: string;
+    fromColumnId: string;
+    toColumnId: string;
+    task: Task;
+    record: DataRecord;
+    fields: DataRecord["fields"];
   }) => void | Promise<void>;
 }
 
@@ -208,7 +369,11 @@ export interface DatabaseViewProps {
   tableId?: string;
   mode?: DatabaseViewMode;
   detailPresentation?: DatabaseViewDetailPresentation;
+  detailSource?: string;
   density?: Density;
+  priorityColorMap?: ColorMap;
+  statusColorMap?: ColorMap;
+  kanbanAppearance?: DatabaseViewKanbanAppearance;
   schema?: TableSchema | null;
   records?: DataRecord[];
   views?: ViewConfig[];
@@ -256,6 +421,8 @@ export interface DatabaseViewEmits {
   add: [];
   "add-column": [];
   "record-change": [{ recordId: string; startDate?: string; endDate?: string }];
+  "kanban-quick-add": [DatabaseViewKanbanQuickAddEvent];
+  "kanban-card-move": [DatabaseViewKanbanCardMoveEvent];
   "load-view": [string];
   "save-view": [string];
   sort: [string];
