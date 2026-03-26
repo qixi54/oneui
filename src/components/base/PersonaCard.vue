@@ -180,6 +180,7 @@ function handleHeaderKeydown(e: KeyboardEvent) {
       class="of-persona-card__header"
       role="button"
       tabindex="0"
+      :aria-disabled="disabled || undefined"
       @click="handleHeaderClick"
       @keydown="handleHeaderKeydown"
     >
@@ -305,6 +306,12 @@ function handleHeaderKeydown(e: KeyboardEvent) {
   gap: var(--of-spacing-2_5);
   width: 100%;
   min-width: 0;
+}
+
+.of-persona-card__header:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+  border-radius: var(--of-radius-lg);
 }
 
 /* ── Avatar ──────────────────────────────────────────────── */

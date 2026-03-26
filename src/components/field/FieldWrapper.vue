@@ -9,10 +9,10 @@ defineProps<{
 
 <template>
   <div class="of-field-standalone">
-    <label v-if="label" class="of-field-standalone__label">
+    <div v-if="label" class="of-field-standalone__label">
       {{ label }}
       <span v-if="required" class="of-field-standalone__required">*</span>
-    </label>
+    </div>
     <div
       class="of-field-standalone__control"
       :class="{

@@ -6,11 +6,14 @@ const props = defineProps<{
   icon: string | Component;
   label: string;
   active?: boolean;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: "click", event: MouseEvent): void;
 }>();
+
+const resolvedDisabled = computed(() => props.disabled ?? false);
 
 defineOptions({ inheritAttrs: false });
 
@@ -19,6 +22,7 @@ defineOptions({ inheritAttrs: false });
 const iconComponent = computed(() => resolveIcon(props.icon));
 
 function handleClick(event: MouseEvent) {
+  if (resolvedDisabled.value) return;
   emit("click", event);
 }
 </script>
@@ -27,6 +31,7 @@ function handleClick(event: MouseEvent) {
   <button
     class="of-toolbar-btn"
     :class="{ 'of-toolbar-btn--active': active }"
+    :disabled="resolvedDisabled"
     v-bind="$attrs"
     @click="handleClick"
   >
@@ -53,6 +58,17 @@ function handleClick(event: MouseEvent) {
   line-height: 1;
   white-space: nowrap;
   transition: var(--of-transition-fast);
+}
+
+.of-toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.of-toolbar-btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-toolbar-btn .of-toolbar-btn__icon {

@@ -162,11 +162,11 @@ onUnmounted(() => {
   flex-shrink: 0;
   flex-grow: 0;
   position: relative;
-  background-color: var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  background-color: var(--of-border-subtle, var(--of-color-gray-200));
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: var(--of-transition-fast);
   z-index: var(--of-z-sticky);
   touch-action: none;
 }
@@ -191,12 +191,12 @@ onUnmounted(() => {
 }
 
 .of-split-pane__divider:hover {
-  background-color: var(--of-border-strong, var(--of-color-gray-400, #9ca3af));
+  background-color: var(--of-border-strong, var(--of-color-gray-400));
 }
 
 /* 分隔条中间的指示线/点 */
 .of-split-pane__divider-inner {
-  background-color: var(--of-text-tertiary, var(--of-color-gray-400, #9ca3af));
+  background-color: var(--of-text-tertiary, var(--of-color-gray-400));
   border-radius: var(--of-radius-full, 9999px);
   opacity: 0.6;
   transition:
@@ -217,17 +217,22 @@ onUnmounted(() => {
 
 .of-split-pane__divider:hover > .of-split-pane__divider-inner {
   opacity: 1;
-  background-color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
+  background-color: var(--of-text-secondary, var(--of-color-gray-600));
 }
 
 /* 拖拽中状态 */
 .of-split-pane--dragging > .of-split-pane__divider {
-  background-color: var(--of-accent-default, #334155);
+  background-color: var(--of-accent-default, var(--of-text-strong));
 }
 
 .of-split-pane--dragging > .of-split-pane__divider > .of-split-pane__divider-inner {
   opacity: 1;
-  background-color: var(--of-surface-elevated, #ffffff);
+  background-color: var(--of-surface-elevated, var(--of-color-white));
+}
+
+.of-split-pane__divider:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 /* 拖拽时禁用文本选中 */

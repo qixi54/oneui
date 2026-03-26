@@ -41,13 +41,13 @@ function handleClick(e: MouseEvent) {
   display: inline-flex;
   align-items: center;
   gap: var(--of-spacing-0_75);
-  background: var(--of-surface-selected, #eceff3);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
   border-radius: var(--of-radius-sm);
   padding: var(--of-spacing-0_5) var(--of-spacing-2);
   font-family: var(--of-font-sans);
   font-size: var(--of-font-size-sm);
   font-weight: var(--of-font-weight-medium);
-  color: var(--of-accent-default, #334155);
+  color: var(--of-accent-default, var(--of-text-strong));
   cursor: pointer;
   text-decoration: none;
   line-height: var(--of-line-height-normal);
@@ -56,8 +56,8 @@ function handleClick(e: MouseEvent) {
 }
 
 .ref-link:hover {
-  background: var(--of-surface-muted, #f1f3f6);
-  color: var(--of-accent-strong, #0f172a);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  color: var(--of-accent-strong, var(--of-text-primary));
 }
 
 .ref-link__icon {

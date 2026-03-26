@@ -157,7 +157,7 @@ function handleToggleKeyDown(event: KeyboardEvent) {
   flex-shrink: 0;
   display: inline-block;
   transform: rotate(0deg);
-  transition: transform 0.15s;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1;
 }
 

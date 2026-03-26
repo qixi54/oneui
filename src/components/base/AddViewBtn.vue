@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import { PlusIcon } from "lucide-vue-next";
 
+const props = withDefaults(
+  defineProps<{
+    disabled?: boolean;
+  }>(),
+  {
+    disabled: false,
+  },
+);
+
 const emit = defineEmits<{
   (e: "click", event: MouseEvent): void;
 }>();
 
 function handleClick(event: MouseEvent) {
+  if (props.disabled) return;
   emit("click", event);
 }
 </script>
 
 <template>
-  <button class="of-add-view-btn" @click="handleClick">
+  <button class="of-add-view-btn" :disabled="disabled" @click="handleClick">
     <PlusIcon class="of-add-view-btn__icon" :size="12" />
     <span class="of-add-view-btn__label">添加视图</span>
   </button>
@@ -35,6 +45,17 @@ function handleClick(event: MouseEvent) {
   white-space: nowrap;
   transition: var(--of-transition-fast);
   border-radius: var(--of-radius-md);
+}
+
+.of-add-view-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.of-add-view-btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-add-view-btn .of-add-view-btn__icon {

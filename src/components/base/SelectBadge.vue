@@ -10,6 +10,7 @@ export interface SelectBadgeProps {
   bgColor?: string;
   borderColor?: string;
   clickable?: boolean;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<SelectBadgeProps>(), {
@@ -20,6 +21,7 @@ const props = withDefaults(defineProps<SelectBadgeProps>(), {
   borderColor: undefined,
   dot: false,
   clickable: true,
+  disabled: false,
 });
 
 const emit = defineEmits<{
@@ -99,10 +101,12 @@ const dotStyle = computed<CSSProperties>(() => ({
 const ChevronDown = resolveIcon("chevron-down");
 
 function handleClick(e: MouseEvent) {
+  if (props.disabled) return;
   emit("click", e);
 }
 
 function handleKeydown(e: KeyboardEvent) {
+  if (props.disabled) return;
   if (e.key !== "Enter" && e.key !== " ") return;
   e.preventDefault();
   handleClick(new MouseEvent("click"));
@@ -112,10 +116,14 @@ function handleKeydown(e: KeyboardEvent) {
 <template>
   <span
     class="one-select-badge"
-    :class="{ 'one-select-badge--clickable': clickable }"
+    :class="{
+      'one-select-badge--clickable': clickable,
+      'one-select-badge--disabled': disabled,
+    }"
     :style="containerStyle"
     role="button"
     tabindex="0"
+    :aria-disabled="disabled || undefined"
     v-bind="$attrs"
     @click="handleClick"
     @keydown="handleKeydown"
@@ -148,6 +156,17 @@ function handleKeydown(e: KeyboardEvent) {
 
 .one-select-badge--clickable {
   cursor: pointer;
+}
+
+.one-select-badge:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
+.one-select-badge--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .one-select-badge__dot {

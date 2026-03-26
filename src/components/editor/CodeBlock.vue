@@ -99,6 +99,11 @@ async function handleCopy() {
   background: var(--of-surface-muted, var(--of-color-gray-900));
 }
 
+.code-block__copy-btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .code-block__copy-btn--copied {
   color: var(--of-color-success);
   border-color: var(--of-color-success);

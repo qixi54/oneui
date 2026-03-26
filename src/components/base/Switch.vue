@@ -69,6 +69,12 @@ function toggle() {
   cursor: pointer;
 }
 
+.of-switch:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+  border-radius: var(--of-radius-full);
+}
+
 .of-switch--disabled {
   opacity: 0.5;
   cursor: not-allowed;

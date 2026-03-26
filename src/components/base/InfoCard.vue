@@ -7,6 +7,7 @@ export interface InfoCardProps {
   content?: string;
   contentLines?: number;
   borderColor?: string;
+  disabled?: boolean;
   // Memo specific
   tags?: string[];
   importance?: "normal" | "high";
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<InfoCardProps>(), {
   contentLines: 3,
   importance: "normal",
   unread: false,
+  disabled: false,
 });
 
 const emit = defineEmits<{
@@ -132,10 +134,12 @@ function tagStyle(index: number): CSSProperties {
 }
 
 function handleClick(e: MouseEvent) {
+  if (props.disabled) return;
   emit("click", e);
 }
 
 function handleKeydown(e: KeyboardEvent) {
+  if (props.disabled) return;
   if (e.key !== "Enter" && e.key !== " ") return;
   e.preventDefault();
   handleClick(new MouseEvent("click"));
@@ -145,10 +149,11 @@ function handleKeydown(e: KeyboardEvent) {
 <template>
   <div
     class="of-info-card"
-    :class="`of-info-card--${variant}`"
+    :class="[`of-info-card--${variant}`, { 'of-info-card--disabled': disabled }]"
     :style="cardStyle"
     role="button"
     tabindex="0"
+    :aria-disabled="disabled || undefined"
     v-bind="$attrs"
     @click="handleClick"
     @keydown="handleKeydown"
@@ -245,6 +250,17 @@ function handleKeydown(e: KeyboardEvent) {
 .of-info-card:hover {
   box-shadow: var(--of-elevation-card-hover);
   border-color: var(--of-border-strong);
+}
+
+.of-info-card:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
+.of-info-card--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .of-info-card__body {

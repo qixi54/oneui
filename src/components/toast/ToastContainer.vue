@@ -51,12 +51,12 @@ const { toasts, remove } = useToast();
 
 /* 进入动画 */
 .of-toast-enter-active {
-  transition: all 0.3s ease;
+  transition: var(--of-transition-slow);
 }
 
 /* 离开动画 */
 .of-toast-leave-active {
-  transition: all 0.25s ease;
+  transition: var(--of-transition-slow);
   position: absolute;
 }
 
@@ -72,6 +72,6 @@ const { toasts, remove } = useToast();
 
 /* 列表移动动画 */
 .of-toast-move {
-  transition: transform 0.3s ease;
+  transition: var(--of-transition-slow);
 }
 </style>

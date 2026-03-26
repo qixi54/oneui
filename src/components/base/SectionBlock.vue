@@ -222,6 +222,11 @@ function onSave() {
   background: var(--of-surface-selected);
 }
 
+.of-section-block__header:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .of-section-block__header-left {
   display: flex;
   align-items: center;
@@ -288,6 +293,12 @@ function onSave() {
   background: var(--of-surface-selected);
   border-color: var(--of-border-strong);
   color: var(--of-text-primary);
+}
+
+.of-section-block__action-btn:focus-visible,
+.of-section-block__collapse-btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-section-block__action-btn--save {

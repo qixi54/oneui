@@ -464,8 +464,12 @@ function handleDelete() {
 }
 
 .of-detail-sheet__btn--save {
-  background: var(--of-surface-selected, var(--of-color-primary-50, #f3f4f6));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
+  background: var(--of-accent-default, var(--of-color-primary-600));
+  color: var(--of-color-white, #fff);
+}
+
+.of-detail-sheet__btn--save:hover:not(:disabled) {
+  background: var(--of-accent-strong, var(--of-color-primary-700));
 }
 
 .of-detail-sheet__btn--save:disabled {
@@ -481,6 +485,10 @@ function handleDelete() {
 .of-detail-sheet__btn--delete {
   background: transparent;
   color: var(--of-color-error, #dc2626);
+}
+
+.of-detail-sheet__btn--delete:hover {
+  background: var(--of-color-error-light, rgba(220, 38, 38, 0.08));
 }
 
 /* Transition */

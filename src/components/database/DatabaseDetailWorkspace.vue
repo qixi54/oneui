@@ -241,7 +241,7 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
     --of-surface-workspace-strong,
     var(--of-row-action-surface, var(--of-surface-selected, var(--of-color-gray-100)))
   );
-  color: var(--of-text-primary, var(--of-color-text, #111827));
+  color: var(--of-text-primary, var(--of-color-text));
 }
 
 .of-database-view__workspace-chip {
@@ -251,7 +251,7 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   border-radius: var(--of-radius-full);
   background: var(
     --of-surface-workspace-strong,
-    var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6))
+    var(--of-surface-muted, var(--of-color-gray-100))
   );
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   font-size: var(--of-font-size-sm);
@@ -266,11 +266,11 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
   display: grid;
   gap: var(--of-spacing-1_5);
   padding: var(--of-spacing-3_5);
-  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
+  border: 1px solid var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
   border-radius: var(--of-radius-xl, 12px);
   background: var(
     --of-surface-workspace-raised,
-    var(--of-surface-elevated, var(--of-color-white, #ffffff))
+    var(--of-surface-elevated, var(--of-color-white))
   );
 }
 
@@ -308,31 +308,37 @@ defineOptions({ name: "DatabaseDetailWorkspace" });
 }
 
 .of-database-view__detail-workspace-btn--delete {
-  border-color: var(--of-color-error, var(--of-color-danger-border, #fecaca));
+  border-color: var(--of-color-error, var(--of-color-danger-border, var(--of-color-red-200)));
   background: var(
     --of-surface-workspace-strong,
-    var(--of-surface-selected, var(--of-color-danger-bg, #fef2f2))
+    var(--of-surface-selected, var(--of-color-danger-bg, var(--of-color-red-50)))
   );
-  color: var(--of-color-error, var(--of-color-danger, #b91c1c));
+  color: var(--of-color-error, var(--of-color-danger, var(--of-color-red-700)));
 }
 
 .of-database-view__detail-workspace-btn--cancel {
-  border-color: var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb)));
+  border-color: var(--of-workspace-border, var(--of-border-subtle, var(--of-color-gray-200)));
   background: var(
     --of-surface-workspace,
-    var(--of-surface-panel, var(--of-color-gray-50, #f9fafb))
+    var(--of-surface-panel, var(--of-color-gray-50))
   );
-  color: var(--of-text-primary, var(--of-color-text, #111827));
+  color: var(--of-text-primary, var(--of-color-text));
 }
 
 .of-database-view__detail-workspace-btn--save {
-  border-color: var(--of-row-action-border, var(--of-workspace-border, rgba(15, 23, 42, 0.14)));
-  background: var(--of-row-action-text, var(--of-accent-default, #334155));
-  color: var(--of-text-inverse, #fff);
+  border-color: var(--of-row-action-border, var(--of-workspace-border, var(--of-border-strong)));
+  background: var(--of-row-action-text, var(--of-accent-default, var(--of-text-strong)));
+  color: var(--of-text-inverse, var(--of-color-white));
 }
 
 .of-database-view__detail-workspace-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.of-database-view__workspace-mode-btn:focus-visible,
+.of-database-view__detail-workspace-btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 </style>

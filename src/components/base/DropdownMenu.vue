@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref } from "vue";
+import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { MoreHorizontal } from "lucide-vue-next";
 import type { Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
@@ -25,9 +25,15 @@ export interface MenuItem {
   variant?: "default" | "destructive";
 }
 
-defineProps<{
-  items: MenuItem[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    items: MenuItem[];
+    disabled?: boolean;
+  }>(),
+  {
+    disabled: false,
+  },
+);
 
 defineOptions({ inheritAttrs: false });
 
@@ -55,6 +61,7 @@ function handleItemClick(item: MenuItem) {
 }
 
 function toggleMenu() {
+  if (props.disabled) return;
   isOpen.value = !isOpen.value;
   if (isOpen.value) {
     nextTick(() => {
@@ -73,6 +80,15 @@ function closeMenu() {
   document.removeEventListener("keydown", onKeydown);
   triggerRef.value?.focus();
 }
+
+watch(
+  () => props.disabled,
+  (disabled) => {
+    if (disabled && isOpen.value) {
+      closeMenu();
+    }
+  },
+);
 </script>
 
 <template>
@@ -80,6 +96,7 @@ function closeMenu() {
     <button
       ref="triggerRef"
       class="of-dropdown-menu__trigger"
+      :disabled="disabled"
       aria-haspopup="true"
       :aria-expanded="isOpen"
       aria-label="更多操作"
@@ -143,6 +160,17 @@ function closeMenu() {
   transition: var(--of-transition-fast);
 }
 
+.of-dropdown-menu__trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.of-dropdown-menu__trigger:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .of-dropdown-menu__trigger:hover {
   background: var(--of-surface-selected);
   color: var(--of-text-primary);
@@ -188,6 +216,11 @@ function closeMenu() {
   cursor: pointer;
   transition: var(--of-transition-fast);
   text-align: left;
+}
+
+.of-dropdown-menu__item:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: -2px;
 }
 
 .of-dropdown-menu__item:hover {

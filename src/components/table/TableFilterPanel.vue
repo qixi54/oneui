@@ -159,7 +159,7 @@ function isNoValue(op: FilterOperator) {
   background: var(--of-surface-workspace-raised, var(--of-surface-elevated));
   border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: var(--of-radius-xl);
-  box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
+  box-shadow: var(--of-elevation-dropdown, var(--of-shadow-dropdown));
   min-width: 420px;
   padding: var(--of-spacing-3) var(--of-spacing-4);
   font-family: var(--of-font-sans);
@@ -256,6 +256,17 @@ function isNoValue(op: FilterOperator) {
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   color: var(--of-text-primary, var(--of-color-gray-800));
   outline: none;
+}
+
+.of-filter-panel__close:focus-visible,
+.of-filter-condition__logic-btn:focus-visible,
+.of-filter-condition__select:focus-visible,
+.of-filter-condition__input:focus-visible,
+.of-filter-condition__remove:focus-visible,
+.of-filter-panel__add-btn:focus-visible,
+.of-filter-panel__clear:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-filter-condition__select {

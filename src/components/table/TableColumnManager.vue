@@ -105,7 +105,7 @@ function onDragEnd() {
   background: var(--of-surface-workspace-raised, var(--of-surface-elevated));
   border: 1px solid var(--of-border-workspace, var(--of-border-subtle));
   border-radius: var(--of-radius-xl);
-  box-shadow: var(--of-elevation-modal, var(--of-shadow-modal));
+  box-shadow: var(--of-elevation-dropdown, var(--of-shadow-dropdown));
   min-width: 220px;
   padding: var(--of-spacing-3) var(--of-spacing-4);
   font-family: var(--of-font-sans);

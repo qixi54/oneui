@@ -15,16 +15,24 @@
  * />
  */
 
-defineProps<{
-  label: string;
-  modelValue: number;
-  min: number;
-  max: number;
-  step?: number;
-  description?: string;
-}>();
+withDefaults(
+  defineProps<{
+    label: string;
+    modelValue: number;
+    min: number;
+    max: number;
+    step?: number;
+    description?: string;
+    disabled?: boolean;
+  }>(),
+  {
+    step: 1,
+    description: undefined,
+    disabled: false,
+  },
+);
 
-defineEmits<{
+const emit = defineEmits<{
   "update:modelValue": [value: number];
 }>();
 
@@ -34,7 +42,7 @@ const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
 </script>
 
 <template>
-  <div class="of-range-slider" v-bind="$attrs">
+  <div class="of-range-slider" :class="{ 'of-range-slider--disabled': disabled }" v-bind="$attrs">
     <label class="of-range-slider__label" :for="sliderId">
       <span>{{ label }}</span>
       <input
@@ -43,9 +51,10 @@ const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
         type="range"
         :min="min"
         :max="max"
-        :step="step ?? 1"
+        :step="step"
         class="of-range-slider__input"
-        @input="$emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
+        :disabled="disabled"
+        @input="emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
       />
     </label>
     <p v-if="description" class="of-range-slider__description">
@@ -61,6 +70,10 @@ const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
   gap: var(--of-spacing-2);
 }
 
+.of-range-slider--disabled {
+  opacity: 0.5;
+}
+
 .of-range-slider__label {
   display: flex;
   flex-direction: column;
@@ -68,6 +81,15 @@ const sliderId = `of-range-slider-${Math.random().toString(36).slice(2, 10)}`;
   font-size: var(--of-font-size-md);
   font-weight: var(--of-font-weight-medium);
   color: var(--of-color-text);
+}
+
+.of-range-slider__input:disabled {
+  cursor: not-allowed;
+}
+
+.of-range-slider__input:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-range-slider__input {

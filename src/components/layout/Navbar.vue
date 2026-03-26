@@ -167,6 +167,12 @@ function handleAvatarClick() {
   color: var(--of-text-placeholder);
 }
 
+.of-navbar__search-input:focus-visible,
+.of-navbar__notify-btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 /* ── Right ── */
 .of-navbar__right {
   display: flex;

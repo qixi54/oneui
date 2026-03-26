@@ -13,18 +13,14 @@ function runOverlayEscapeCase(
     components: { Component },
     setup() {
       const open = ref(true);
-      return { open };
+      const props = () => options.props ?? {};
+      return { open, props };
     },
     template: `
-      <Component v-model="open" v-bind="props">
+      <Component v-model="open" v-bind="props()">
         <div>overlay body</div>
       </Component>
     `,
-    computed: {
-      props() {
-        return options.props ?? {};
-      },
-    },
   });
 
   return mount(Host, {

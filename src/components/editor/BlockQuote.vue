@@ -119,6 +119,11 @@ function handleKeydown(event: KeyboardEvent) {
   line-height: var(--of-line-height-relaxed);
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   outline: none;
-  box-shadow: 0 0 0 2px var(--of-surface-selected, #eceff3);
+  box-shadow: 0 0 0 2px var(--of-accent-soft, var(--of-surface-selected));
+}
+
+.block-quote__textarea:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 </style>

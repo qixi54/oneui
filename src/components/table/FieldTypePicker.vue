@@ -154,7 +154,7 @@ function handleSelect(type: FieldType) {
   --of-field-type-picker-search-surface: var(--of-surface-muted, var(--of-color-gray-50));
   --of-field-type-picker-search-border: var(--of-border-subtle, var(--of-color-gray-200));
   --of-field-type-picker-search-border-focus: var(--of-field-type-picker-border-focus);
-  --of-field-type-picker-focus-ring: rgba(59, 130, 246, 0.16);
+  --of-field-type-picker-focus-ring: var(--of-accent-soft);
   width: 220px;
   max-height: 320px;
   display: flex;
@@ -199,6 +199,12 @@ function handleSelect(type: FieldType) {
   border-color: var(--of-field-type-picker-search-border-focus);
   box-shadow: 0 0 0 3px var(--of-field-type-picker-focus-ring);
   background: var(--of-field-type-picker-surface);
+}
+
+.of-field-type-picker__search-input:focus-visible,
+.of-field-type-picker__item:focus-visible {
+  outline: 2px solid var(--of-field-type-picker-search-border-focus);
+  outline-offset: 2px;
 }
 
 .of-field-type-picker__search-input::placeholder {

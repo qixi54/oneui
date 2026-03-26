@@ -66,7 +66,7 @@ defineOptions({ name: "WorkspaceDetailActionBar" });
   min-height: 22px;
   padding: 0 var(--of-spacing-2);
   border-radius: var(--of-radius-md);
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   background: var(--of-surface-panel, var(--of-color-white, #fff));
   color: var(--of-text-secondary, var(--of-color-text-secondary, #4b5563));
   font-size: var(--of-font-size-xs);
@@ -79,15 +79,15 @@ defineOptions({ name: "WorkspaceDetailActionBar" });
 }
 
 .of-workspace-detail-action-bar__action--primary {
-  border-color: #eceff3;
-  background: #fafafa;
-  color: var(--of-text-primary, var(--of-color-text, #111827));
+  border-color: var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
+  color: var(--of-text-primary, var(--of-color-gray-900));
 }
 
 .of-workspace-detail-action-bar__action--danger {
-  border-color: #f1f5f9;
+  border-color: var(--of-border-subtle, var(--of-color-gray-200));
   background: var(--of-surface-elevated);
-  color: var(--of-text-secondary, var(--of-color-text-secondary, #9ca3af));
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
 }
 
 .of-workspace-detail-action-bar__action:disabled {

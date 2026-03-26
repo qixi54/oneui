@@ -57,8 +57,8 @@ defineOptions({ name: "WorkspaceActivityFeed" });
   display: grid;
   gap: var(--of-spacing-1);
   padding: 0 0 var(--of-spacing-2) var(--of-spacing-2_5);
-  border-left: 2px solid #f1f5f9;
-  border-bottom: 1px solid #f3f4f6;
+  border-left: 2px solid var(--of-border-subtle, var(--of-color-gray-200));
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-100));
 }
 
 .of-workspace-activity-feed__item:last-child {

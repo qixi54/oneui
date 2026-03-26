@@ -11,13 +11,15 @@ export interface ViewModeOption {
 export interface ViewModeGroupProps {
   options?: ViewModeOption[];
   modelValue: string;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<ViewModeGroupProps>(), {
   options: undefined,
+  disabled: false,
 });
 
-defineEmits<{
+const emit = defineEmits<{
   "update:modelValue": [value: string];
 }>();
 
@@ -33,14 +35,19 @@ const DEFAULT_OPTIONS: ViewModeOption[] = [
 </script>
 
 <template>
-  <div class="one-view-mode-group" v-bind="$attrs">
+  <div
+    class="one-view-mode-group"
+    :class="{ 'one-view-mode-group--disabled': disabled }"
+    v-bind="$attrs"
+  >
     <button
       v-for="opt in resolvedOptions"
       :key="opt.value"
       class="one-view-mode-group__btn"
       :class="{ 'one-view-mode-group__btn--active': modelValue === opt.value }"
+      :disabled="disabled"
       :title="opt.label"
-      @click="$emit('update:modelValue', opt.value)"
+      @click="emit('update:modelValue', opt.value)"
     >
       <component :is="resolveIcon(opt.icon)" class="one-view-mode-group__icon" />
     </button>
@@ -53,7 +60,12 @@ const DEFAULT_OPTIONS: ViewModeOption[] = [
   gap: var(--of-spacing-0_5);
   padding: var(--of-spacing-0_5);
   border-radius: var(--of-radius-md);
-  border: 1px solid var(--of-border-subtle, #e5e7eb);
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+}
+
+.one-view-mode-group--disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .one-view-mode-group__btn {
@@ -67,17 +79,26 @@ const DEFAULT_OPTIONS: ViewModeOption[] = [
   background: transparent;
   cursor: pointer;
   padding: 0;
-  color: var(--of-text-tertiary, #9ca3af);
-  transition: all 0.15s ease;
+  color: var(--of-text-tertiary, var(--of-color-gray-400));
+  transition: var(--of-transition-fast);
+}
+
+.one-view-mode-group__btn:disabled {
+  cursor: not-allowed;
+}
+
+.one-view-mode-group__btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .one-view-mode-group__btn:hover:not(.one-view-mode-group__btn--active) {
-  background: var(--of-surface-selected, #f9fafb);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .one-view-mode-group__btn--active {
-  background: var(--of-surface-selected, #eef2ff);
-  color: var(--of-accent-strong, #4f46e5);
+  background: var(--of-accent-soft, var(--of-surface-selected));
+  color: var(--of-accent-strong, var(--of-accent-default));
 }
 
 .one-view-mode-group__icon {

@@ -48,7 +48,7 @@ defineProps<{
 }
 
 .of-user-message__bubble {
-  background: var(--of-surface-selected, #eceff3);
+  background: var(--of-surface-selected, var(--of-color-gray-100));
   color: var(--of-text-primary, var(--of-color-text-inverse));
   border-radius: var(--of-radius-xl) 0 var(--of-radius-xl) var(--of-radius-xl);
   padding: var(--of-spacing-2_5) var(--of-spacing-3_5);
@@ -71,7 +71,7 @@ defineProps<{
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--of-surface-muted, #f1f3f6);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
   display: flex;
   align-items: center;
   justify-content: center;

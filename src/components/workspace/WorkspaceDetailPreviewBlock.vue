@@ -138,19 +138,19 @@ defineOptions({ name: "WorkspaceDetailPreviewBlock" });
 }
 
 .of-workspace-detail-preview-block__chip--accent {
-  border-color: #dbeafe;
+  border-color: var(--of-color-blue-50);
 }
 
 .of-workspace-detail-preview-block__chip--success {
-  border-color: var(--of-color-success-border, #bbf7d0);
+  border-color: var(--of-color-success-border, var(--of-color-green-200));
 }
 
 .of-workspace-detail-preview-block__chip--warning {
-  border-color: var(--of-color-warning-border, #fde68a);
+  border-color: var(--of-color-warning-border, var(--of-color-yellow-200));
 }
 
 .of-workspace-detail-preview-block__chip--danger {
-  border-color: var(--of-color-danger-border, #fecaca);
+  border-color: var(--of-color-danger-border, var(--of-color-red-200));
 }
 
 .of-workspace-detail-preview-block__chip-label,
@@ -296,14 +296,14 @@ defineOptions({ name: "WorkspaceDetailPreviewBlock" });
 .of-workspace-detail-preview-block__body :deep(blockquote) {
   margin: 0;
   padding-left: var(--of-spacing-3);
-  border-left: 2px solid var(--of-color-gray-200);
+  border-left: 2px solid var(--of-border-subtle, var(--of-color-gray-200));
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
 }
 
 .of-workspace-detail-preview-block__body :deep(code) {
   padding: 1px var(--of-spacing-1);
   border-radius: var(--of-radius-sm);
-  background: #f8fafc;
+  background: var(--of-surface-muted, var(--of-color-gray-50));
   font-size: var(--of-font-size-2xs);
 }
 
@@ -311,7 +311,7 @@ defineOptions({ name: "WorkspaceDetailPreviewBlock" });
   margin: 0;
   padding: var(--of-spacing-3);
   border-radius: var(--of-radius-md);
-  background: #f8fafc;
+  background: var(--of-surface-muted, var(--of-color-gray-50));
   overflow: auto;
 }
 </style>

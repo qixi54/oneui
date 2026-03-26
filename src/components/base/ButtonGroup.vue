@@ -24,12 +24,18 @@ export interface ButtonOption {
   icon?: string | Component; // lucide icon name (kebab-case) or component
 }
 
-const props = defineProps<{
-  options: ButtonOption[];
-  modelValue: string | number;
-}>();
+const props = withDefaults(
+  defineProps<{
+    options: ButtonOption[];
+    modelValue: string | number;
+    disabled?: boolean;
+  }>(),
+  {
+    disabled: false,
+  },
+);
 
-defineEmits<{
+const emit = defineEmits<{
   "update:modelValue": [value: string | number];
 }>();
 
@@ -52,7 +58,8 @@ const columnClass = computed(() => {
         'of-button-group__item',
         modelValue === opt.value ? 'of-button-group__item--active' : '',
       ]"
-      @click="$emit('update:modelValue', opt.value)"
+      :disabled="disabled"
+      @click="emit('update:modelValue', opt.value)"
     >
       <div v-if="opt.icon" class="of-button-group__item-content">
         <component :is="resolveIcon(opt.icon)" class="of-button-group__item-icon" />
@@ -96,6 +103,17 @@ const columnClass = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.of-button-group__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.of-button-group__item:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-button-group__item:hover:not(.of-button-group__item--active) {

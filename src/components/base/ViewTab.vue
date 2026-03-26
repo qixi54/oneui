@@ -3,10 +3,16 @@ import { type Component } from "vue";
 import { Table2Icon, KanbanIcon, LayoutGridIcon, GanttChartIcon } from "lucide-vue-next";
 import type { ViewTabItem } from "../../types";
 
-defineProps<{
-  modelValue: string;
-  items: ViewTabItem[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+    items: ViewTabItem[];
+    disabled?: boolean;
+  }>(),
+  {
+    disabled: false,
+  },
+);
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
@@ -26,6 +32,7 @@ function resolveIcon(name: string): Component | undefined {
 defineOptions({ inheritAttrs: false });
 
 function select(key: string) {
+  if (props.disabled) return;
   emit("update:modelValue", key);
 }
 </script>
@@ -37,6 +44,7 @@ function select(key: string) {
       :key="item.key"
       class="of-view-tab__item"
       :class="{ 'of-view-tab__item--active': modelValue === item.key }"
+      :disabled="disabled"
       @click="select(item.key)"
     >
       <component :is="resolveIcon(item.icon)" class="of-view-tab__icon" :size="14" />
@@ -70,6 +78,17 @@ function select(key: string) {
   color: var(--of-color-gray-500);
   transition: var(--of-transition-fast);
   white-space: nowrap;
+}
+
+.of-view-tab__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.of-view-tab__item:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-view-tab__item .of-view-tab__icon {

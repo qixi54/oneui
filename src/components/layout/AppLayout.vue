@@ -184,6 +184,11 @@ onBeforeUnmount(() => {
   background: var(--of-surface-muted);
 }
 
+.of-app-layout__hamburger:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 /* 移动端 Drawer 侧边栏 */
 .of-drawer-sidebar {
   position: fixed;
@@ -192,7 +197,7 @@ onBeforeUnmount(() => {
   height: 100vh;
   z-index: var(--of-z-navbar);
   transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  transition: var(--of-transition-slow);
 }
 .of-drawer-sidebar.of-drawer-sidebar--open {
   transform: translateX(0);

@@ -234,6 +234,12 @@ const menuStyle = computed(() => {
   border-bottom-color: var(--of-border-active, var(--of-border-strong, var(--of-color-gray-400, #9ca3af)));
 }
 
+.of-col-menu__rename-input:focus-visible,
+.of-col-menu__item:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .of-col-menu__divider {
   height: 1px;
   background: var(--of-border-divider, var(--of-border-subtle, var(--of-color-gray-100, #f3f4f6)));

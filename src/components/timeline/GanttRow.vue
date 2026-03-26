@@ -214,6 +214,13 @@ function handleRowKeydown(event: KeyboardEvent) {
   background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
+.gantt-row:focus-visible,
+.gantt-row__bar:focus-visible,
+.gantt-row__handle:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .gantt-row__label {
   width: 240px;
   min-width: 240px;

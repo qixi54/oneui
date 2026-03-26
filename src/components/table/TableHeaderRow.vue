@@ -294,9 +294,10 @@ function onResizeStart(e: MouseEvent, colKey: string) {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 8px;
   cursor: col-resize;
   z-index: var(--of-z-base);
+  transition: var(--of-transition-fast);
 }
 
 .of-th-resizer:hover {

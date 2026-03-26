@@ -171,9 +171,9 @@ const toolbarActions = computed(() => props.toolbarActions ?? []);
   min-height: 32px;
   padding: 0 var(--of-spacing-3);
   border-radius: var(--of-radius-full);
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  background: var(--of-surface-panel, var(--of-color-white, #fff));
-  color: var(--of-text-primary, var(--of-color-text, #111827));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-panel, var(--of-color-white));
+  color: var(--of-text-primary, var(--of-color-text));
   font-size: var(--of-font-size-base);
   font-weight: var(--of-font-weight-semibold);
   cursor: pointer;
@@ -181,19 +181,19 @@ const toolbarActions = computed(() => props.toolbarActions ?? []);
 
 .of-workspace-shell__action--ghost,
 .of-workspace-shell__filter {
-  background: var(--of-surface-muted, var(--of-color-gray-50, #f9fafb));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-workspace-shell__action--primary {
   border-color: transparent;
-  background: var(--of-accent-default, #334155);
-  color: #fff;
+  background: var(--of-accent-default, var(--of-text-strong));
+  color: var(--of-text-inverse, var(--of-color-white));
 }
 
 .of-workspace-shell__action--danger {
-  border-color: var(--of-color-danger-border, #fecaca);
-  background: var(--of-color-danger-bg, #fef2f2);
-  color: var(--of-color-danger, #b91c1c);
+  border-color: var(--of-color-danger-border, var(--of-color-red-200));
+  background: var(--of-color-danger-bg, var(--of-color-red-50));
+  color: var(--of-color-danger, var(--of-color-red-700));
 }
 
 .of-workspace-shell__action:disabled {
@@ -207,10 +207,10 @@ const toolbarActions = computed(() => props.toolbarActions ?? []);
   gap: var(--of-spacing-1_5);
   padding: var(--of-spacing-1) var(--of-spacing-2_5);
   border-radius: var(--of-radius-full);
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
-  background: var(--of-surface-muted, var(--of-color-gray-50, #f9fafb));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
   font-size: var(--of-font-size-sm);
-  color: var(--of-text-primary, var(--of-color-text, #111827));
+  color: var(--of-text-primary, var(--of-color-text));
 }
 
 .of-workspace-shell__chip-label,
@@ -219,28 +219,34 @@ const toolbarActions = computed(() => props.toolbarActions ?? []);
 }
 
 .of-workspace-shell__chip--accent {
-  border-color: var(--of-accent-border, rgba(51, 65, 85, 0.18));
-  background: var(--of-accent-soft, rgba(51, 65, 85, 0.08));
+  border-color: var(--of-accent-border, var(--of-border-strong));
+  background: var(--of-accent-soft, var(--of-surface-selected));
 }
 
 .of-workspace-shell__chip--success {
-  border-color: var(--of-color-success-border, #bbf7d0);
-  background: var(--of-color-success-bg, #f0fdf4);
+  border-color: var(--of-color-success-border, var(--of-color-green-200));
+  background: var(--of-color-success-bg, var(--of-color-green-50));
 }
 
 .of-workspace-shell__chip--warning {
-  border-color: var(--of-color-warning-border, #fde68a);
-  background: var(--of-color-warning-bg, #fffbeb);
+  border-color: var(--of-color-warning-border, var(--of-color-yellow-200));
+  background: var(--of-color-warning-bg, var(--of-color-yellow-50));
 }
 
 .of-workspace-shell__chip--danger {
-  border-color: var(--of-color-danger-border, #fecaca);
-  background: var(--of-color-danger-bg, #fef2f2);
+  border-color: var(--of-color-danger-border, var(--of-color-red-200));
+  background: var(--of-color-danger-bg, var(--of-color-red-50));
 }
 
 .of-workspace-shell__filter--active {
-  border-color: var(--of-accent-border, rgba(51, 65, 85, 0.18));
-  background: var(--of-accent-soft, rgba(51, 65, 85, 0.08));
+  border-color: var(--of-accent-border, var(--of-border-strong));
+  background: var(--of-accent-soft, var(--of-surface-selected));
+}
+
+.of-workspace-shell__action:focus-visible,
+.of-workspace-shell__filter:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-workspace-shell__body {

@@ -10,6 +10,7 @@ export interface MonitorItemProps {
   count?: string;
   color?: string;
   clickable?: boolean;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<MonitorItemProps>(), {
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<MonitorItemProps>(), {
   count: undefined,
   color: undefined,
   clickable: false,
+  disabled: false,
 });
 
 const emit = defineEmits<{
@@ -43,6 +45,9 @@ const fillStyle = computed(() => ({
 }));
 
 function handleClick() {
+  if (props.disabled) {
+    return;
+  }
   if (props.clickable) {
     emit("click");
   }
@@ -52,9 +57,13 @@ function handleClick() {
 <template>
   <div
     class="of-monitor-item"
-    :class="{ 'of-monitor-item--clickable': clickable }"
+    :class="{
+      'of-monitor-item--clickable': clickable,
+      'of-monitor-item--disabled': disabled,
+    }"
     role="button"
     tabindex="0"
+    :aria-disabled="disabled || undefined"
     v-bind="$attrs"
     @click="handleClick"
     @keydown.enter.prevent="handleClick"
@@ -100,6 +109,17 @@ function handleClick() {
 
 .of-monitor-item--clickable:hover {
   background: var(--of-surface-selected, var(--of-color-gray-50));
+}
+
+.of-monitor-item:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
+.of-monitor-item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .of-monitor-item__subtitle {

@@ -145,15 +145,15 @@ provide("of-tabs-set", setActiveTab);
    CSS 自定义属性（回退值）
    ============================================================ */
 .of-tabs {
-  --_color-primary: var(--of-accent-default, #334155);
-  --_color-primary-light: var(--of-surface-selected, #eceff3);
-  --_color-text: var(--of-color-text, #1f2937);
-  --_color-text-muted: var(--of-color-text-muted, #6b7280);
-  --_color-border: var(--of-color-border, #e5e7eb);
-  --_color-surface: var(--of-color-surface, #ffffff);
-  --_color-bg-hover: var(--of-color-bg-hover, #f9fafb);
-  --_color-badge-bg: var(--of-color-badge-bg, #334155);
-  --_color-badge-text: var(--of-color-badge-text, #ffffff);
+  --_color-primary: var(--of-accent-default, var(--of-text-strong));
+  --_color-primary-light: var(--of-surface-selected, var(--of-surface-muted));
+  --_color-text: var(--of-text-primary, var(--of-color-text));
+  --_color-text-muted: var(--of-text-secondary, var(--of-color-text-muted));
+  --_color-border: var(--of-border-subtle, var(--of-color-border));
+  --_color-surface: var(--of-surface-elevated, var(--of-color-surface));
+  --_color-bg-hover: var(--of-surface-muted, var(--of-color-bg-hover));
+  --_color-badge-bg: var(--of-accent-default, var(--of-text-strong));
+  --_color-badge-text: var(--of-color-text-inverse, var(--of-color-white));
   --_radius-sm: var(--of-radius-sm, 4px);
   --_radius-md: var(--of-radius-md, 6px);
   --_radius-lg: var(--of-radius-lg, 8px);

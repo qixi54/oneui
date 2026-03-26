@@ -147,6 +147,11 @@ function toggleItem(item: AccordionItem) {
   cursor: not-allowed;
 }
 
+.of-accordion__trigger:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .of-accordion__trigger-text {
   display: flex;
   flex: 1;
