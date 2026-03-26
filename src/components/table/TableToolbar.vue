@@ -3,9 +3,11 @@ import { ref, computed, type Component } from "vue";
 import { resolveIcon } from "../../utils/icon";
 import TableFilterPanel from "./TableFilterPanel.vue";
 import TableColumnManager from "./TableColumnManager.vue";
+import ExcelExport from "./ExcelExport.vue";
 import { ListFilter, ArrowUpDown, Layers, Columns3, Search } from "lucide-vue-next";
 import type { TableColumn } from "../../types";
 import type { FilterCondition, FilterLogic } from "../../composables/useTableFilter";
+import type { TableExportFieldMapping } from "../../types/table-import-export";
 import { useTableToolbarPanels } from "../../composables/useTableToolbarPanels";
 
 export interface ViewSwitcherTab {
@@ -38,6 +40,16 @@ const props = withDefaults(
     /** 搜索关键词 */
     searchKeyword?: string;
 
+    /** 导出入口 */
+    showExport?: boolean;
+    exportData?: Record<string, unknown>[];
+    exportColumns?: TableColumn[];
+    exportFilename?: string;
+    exportLabel?: string;
+    exportDisabled?: boolean;
+    exportSheetName?: string;
+    exportFieldMappings?: readonly TableExportFieldMapping[];
+
     /** 显示控制 */
     showViewSwitch?: boolean;
     showFilter?: boolean;
@@ -58,6 +70,14 @@ const props = withDefaults(
     currentSort: undefined,
     currentGroup: undefined,
     searchKeyword: "",
+    showExport: false,
+    exportData: undefined,
+    exportColumns: undefined,
+    exportFilename: "table-export",
+    exportLabel: "导出 Excel",
+    exportDisabled: false,
+    exportSheetName: "Sheet1",
+    exportFieldMappings: () => [],
     showViewSwitch: true,
     showFilter: true,
     showSort: true,
@@ -122,6 +142,10 @@ const groupableColumns = computed(() =>
   props.columns.filter(
     (c) => !c.hidden && (c.type === "status" || c.type === "string" || c.type === "priority"),
   ),
+);
+const resolvedExportColumns = computed(() => props.exportColumns ?? props.columns);
+const resolvedExportDisabled = computed(
+  () => props.exportDisabled || !props.exportData || props.exportData.length === 0,
 );
 </script>
 
@@ -314,6 +338,18 @@ const groupableColumns = computed(() =>
       />
     </div>
 
+    <ExcelExport
+      v-if="showExport && exportData"
+      :data="exportData"
+      :columns="resolvedExportColumns"
+      :filename="exportFilename"
+      :label="exportLabel"
+      :disabled="resolvedExportDisabled"
+      :sheet-name="exportSheetName"
+      :field-mappings="exportFieldMappings"
+      size="sm"
+    />
+
     <!-- Extra slot -->
     <slot />
   </div>
@@ -326,8 +362,8 @@ const groupableColumns = computed(() =>
   gap: var(--of-spacing-2);
   height: 44px;
   padding: 0 var(--of-spacing-4);
-  background: var(--of-color-bg-elevated, #fff);
-  border-bottom: 1px solid var(--of-color-gray-200, #e5e7eb);
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, var(--of-color-white)));
+  border-bottom: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   font-family: var(--of-font-sans);
   box-sizing: border-box;
 }
@@ -354,7 +390,7 @@ const groupableColumns = computed(() =>
   color: var(--of-text-secondary, var(--of-color-gray-500, #6b7280));
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition: var(--of-transition-fast);
 }
 
 .of-table-toolbar__view-tab:first-child {
@@ -366,8 +402,8 @@ const groupableColumns = computed(() =>
 }
 
 .of-table-toolbar__view-tab--active {
-  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-900));
   font-weight: var(--of-font-weight-semibold);
 }
 
@@ -401,23 +437,23 @@ const groupableColumns = computed(() =>
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition: var(--of-transition-fast);
 }
 
 .of-table-toolbar__btn:hover {
-  background: var(--of-surface-muted, var(--of-color-gray-50, #f9fafb));
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-table-toolbar__btn--active {
-  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
-  border-color: var(--of-border-strong, var(--of-color-gray-300, #d1d5db));
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-900));
+  border-color: var(--of-border-strong, var(--of-color-gray-300));
 }
 
 .of-table-toolbar__badge {
   min-width: 16px;
   height: 16px;
-  background: var(--of-surface-muted, var(--of-color-gray-200, #e5e7eb));
+  background: var(--of-accent-default, var(--of-color-primary-600));
   color: var(--of-color-white, #fff);
   border-radius: var(--of-radius-lg);
   font-size: var(--of-font-size-xs);
@@ -432,8 +468,8 @@ const groupableColumns = computed(() =>
 }
 
 .of-table-toolbar__simple-panel {
-  background: var(--of-color-bg-elevated, #fff);
-  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200, #e5e7eb));
+  background: var(--of-surface-elevated, var(--of-color-bg-elevated, var(--of-color-white)));
+  border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
   border-radius: var(--of-radius-lg);
   box-shadow: var(--of-shadow-popover);
   min-width: 180px;
@@ -464,12 +500,12 @@ const groupableColumns = computed(() =>
 }
 
 .of-table-toolbar__sort-item:hover {
-  background: var(--of-color-gray-50, #f9fafb);
+  background: var(--of-surface-muted, var(--of-color-gray-50));
 }
 
 .of-table-toolbar__sort-item.active {
-  background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
-  color: var(--of-text-primary, var(--of-color-gray-700, #374151));
+  background: var(--of-surface-selected, var(--of-color-gray-100));
+  color: var(--of-text-primary, var(--of-color-gray-900));
 }
 
 .of-table-toolbar__sort-dir {
@@ -492,7 +528,7 @@ const groupableColumns = computed(() =>
 }
 
 .of-table-toolbar__clear-btn:hover {
-  color: var(--of-text-primary, #0f172a);
+  color: var(--of-text-primary, var(--of-color-gray-900));
 }
 
 .of-table-toolbar__spacer {
@@ -507,7 +543,11 @@ const groupableColumns = computed(() =>
   height: 28px;
   padding: 0 var(--of-spacing-2_5);
   border-radius: var(--of-radius-md);
-  background: var(--of-surface-muted, var(--of-color-gray-100, #f3f4f6));
+  background: var(--of-surface-muted, var(--of-color-gray-100));
+}
+
+.of-table-toolbar :deep(.of-excel-export) {
+  flex-shrink: 0;
 }
 
 .of-table-toolbar__search-icon {
@@ -523,6 +563,15 @@ const groupableColumns = computed(() =>
   color: var(--of-text-secondary, var(--of-color-gray-600, #4b5563));
   outline: none;
   font-family: var(--of-font-sans);
+}
+
+.of-table-toolbar__view-tab:focus-visible,
+.of-table-toolbar__btn:focus-visible,
+.of-table-toolbar__sort-item:focus-visible,
+.of-table-toolbar__clear-btn:focus-visible,
+.of-table-toolbar__search-input:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-table-toolbar__search-input::placeholder {

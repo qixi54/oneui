@@ -8,6 +8,7 @@ import {
   GanttTimeline,
   KanbanBoard,
   TableToolbar,
+  buildTableImportPreview,
 } from "../../../index";
 import DatabaseEnterpriseDemo from "./DatabaseEnterpriseDemo.vue";
 import DatabasePresetDemo from "./DatabasePresetDemo.vue";
@@ -18,6 +19,7 @@ import type {
   FilterLogic,
   PropItem,
   TableColumn,
+  TableImportColumn,
   TableSchema,
   Task,
   ViewConfig,
@@ -261,6 +263,26 @@ const databaseDemoRecords: DataRecord[] = [
 ];
 
 const databaseDemoSelectedRecordId = ref(databaseDemoRecords[0]?.id ?? "");
+const databaseDemoImportPreviewRunCount = ref(1);
+
+const databaseDemoExportFieldMappings = [
+  { sourceKey: "title", targetKey: "title", targetLabel: "任务标题" },
+  { sourceKey: "assignee", targetKey: "assignee", targetLabel: "负责人" },
+  { sourceKey: "startDate", targetKey: "startDate", targetLabel: "开始日期" },
+] as const;
+
+const databaseDemoImportColumns: TableImportColumn[] = [
+  { key: "title", label: "标题", required: true, aliases: ["任务标题"] },
+  { key: "status", label: "状态", required: true, aliases: ["状态值"] },
+  { key: "assignee", label: "负责人", aliases: ["owner"] },
+  { key: "summary", label: "摘要", aliases: ["说明"] },
+];
+
+const databaseDemoImportHeaders = ["任务标题", "状态", "负责人", "外部备注"];
+const databaseDemoImportRows = [
+  ["接入导出按钮", "doing", "FE", "这一列不会映射"],
+  ["", "todo", "QA", "缺少标题会触发 error"],
+];
 
 function getDatabaseEntityId(value: unknown) {
   if (value && typeof value === "object") {
@@ -392,6 +414,25 @@ const databaseDemoVisibleRecords = computed(() => {
   });
 });
 
+const databaseDemoExportRows = computed(() =>
+  databaseDemoVisibleRecords.value.map((record) =>
+    Object.fromEntries(
+      databaseDemoColumns.value.map((column) => [column.key, record.fields[column.key] ?? ""]),
+    ),
+  ),
+);
+
+const databaseDemoImportPreview = computed(() => {
+  const runCount = databaseDemoImportPreviewRunCount.value;
+  void runCount;
+  return buildTableImportPreview({
+    columns: databaseDemoImportColumns,
+    headers: databaseDemoImportHeaders,
+    rows: databaseDemoImportRows,
+    requiredFields: ["title", "status"],
+  });
+});
+
 const databaseDemoSelectedRecord = computed(() => {
   const selectedId = databaseDemoSelectedRecordId.value;
   const recordById =
@@ -485,6 +526,8 @@ const databaseDemoShellSnapshot = computed(() => ({
   sort: databaseDemoSort.value,
   groupField: databaseDemoGroupField.value || null,
   visibleRecordCount: databaseDemoVisibleRecords.value.length,
+  exportRowCount: databaseDemoExportRows.value.length,
+  importPreviewSummary: databaseDemoImportPreview.value.summary,
   actionLog: databaseDemoActionLog.value,
 }));
 
@@ -586,6 +629,11 @@ function handleDatabaseRetry() {
   pushDatabaseDemoLog("retry -> normal");
 }
 
+function rerunDatabaseImportPreview() {
+  databaseDemoImportPreviewRunCount.value += 1;
+  pushDatabaseDemoLog(`import-preview -> run #${databaseDemoImportPreviewRunCount.value}`);
+}
+
 function restoreDatabaseDemo() {
   databaseDemoScenario.value = "normal";
   databaseDemoViewMode.value = "table";
@@ -597,6 +645,7 @@ function restoreDatabaseDemo() {
   databaseDemoGroupField.value = "";
   databaseDemoSort.value = { field: "startDate", order: "asc" };
   databaseDemoColumns.value = databaseDemoDefaultColumns.map((column) => ({ ...column }));
+  databaseDemoImportPreviewRunCount.value = 1;
   pushDatabaseDemoLog("restore -> default shell state");
 }
 
@@ -765,6 +814,11 @@ const view = useDatabaseView({
             :show-group="true"
             :show-columns="true"
             :show-search="true"
+            :show-export="true"
+            :export-data="databaseDemoExportRows"
+            :export-filename="`database-view-${databaseDemoViewMode}`"
+            :export-sheet-name="'DatabaseView'"
+            :export-field-mappings="databaseDemoExportFieldMappings"
             :saved-views="databaseDemoSavedViews"
             @update:currentView="handleDatabaseViewChange"
             @update:columns="handleDatabaseColumnsUpdate"
@@ -917,6 +971,51 @@ const view = useDatabaseView({
                 >
                   <div class="database-shell__card-item-title">{{ item.title }}</div>
                   <div class="database-shell__card-item-desc">{{ item.description }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="database-shell__aside-card">
+              <div class="database-shell__aside-head">
+                <div class="database-shell__aside-title">Import Preview MVP</div>
+                <button class="dev-btn dev-btn--info" style="padding: 6px 10px; font-size: 12px" @click="rerunDatabaseImportPreview">
+                  重新运行
+                </button>
+              </div>
+              <div class="database-shell__import-summary">
+                <span class="database-shell__badge">rows: {{ databaseDemoImportPreview.summary.totalRows }}</span>
+                <span class="database-shell__badge">valid: {{ databaseDemoImportPreview.summary.validRows }}</span>
+                <span class="database-shell__badge">invalid: {{ databaseDemoImportPreview.summary.invalidRows }}</span>
+                <span class="database-shell__badge">warnings: {{ databaseDemoImportPreview.summary.warningCount }}</span>
+                <span class="database-shell__badge">errors: {{ databaseDemoImportPreview.summary.errorCount }}</span>
+              </div>
+              <div class="database-shell__workspace-desc">
+                这里只做导入预校验，不触发真实落库；示例会保留一个未映射列和一个必填缺失行。
+              </div>
+              <div class="database-shell__import-section">
+                <div class="database-shell__card-item-title">Header mapping</div>
+                <div class="database-shell__import-mappings">
+                  <div
+                    v-for="mapping in databaseDemoImportPreview.mappings"
+                    :key="mapping.sourceHeader"
+                    class="database-shell__import-mapping"
+                  >
+                    <span>{{ mapping.sourceHeader }}</span>
+                    <span class="database-shell__import-arrow">→</span>
+                    <span>{{ mapping.targetLabel || mapping.targetKey || "未映射" }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="database-shell__import-section">
+                <div class="database-shell__card-item-title">Issue summary</div>
+                <div class="database-shell__log">
+                  <div
+                    v-for="(issue, index) in databaseDemoImportPreview.issues"
+                    :key="`${issue.code}-${index}`"
+                    class="database-shell__log-item"
+                  >
+                    {{ issue.severity }} · {{ issue.message }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1104,6 +1203,17 @@ const view = useDatabaseView({
   color: var(--of-color-text-primary);
 }
 
+.database-shell__aside-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--of-spacing-3);
+}
+
+.database-shell__aside-head .database-shell__aside-title {
+  margin-bottom: 0;
+}
+
 .database-shell__list {
   display: flex;
   flex-direction: column;
@@ -1119,6 +1229,41 @@ const view = useDatabaseView({
   display: flex;
   flex-direction: column;
   gap: var(--of-spacing-2);
+}
+
+.database-shell__import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--of-spacing-2);
+  margin: var(--of-spacing-2) 0;
+}
+
+.database-shell__import-section {
+  margin-top: var(--of-spacing-3);
+}
+
+.database-shell__import-mappings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--of-spacing-2);
+  margin-top: var(--of-spacing-2);
+}
+
+.database-shell__import-mapping {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--of-spacing-2);
+  align-items: center;
+  padding: var(--of-spacing-2) var(--of-spacing-3);
+  border: var(--of-shell-database-panel-border);
+  border-radius: var(--of-shell-database-main-radius);
+  background: var(--of-shell-database-card-bg);
+  color: var(--of-color-text-secondary);
+  font-size: var(--of-font-size-xs);
+}
+
+.database-shell__import-arrow {
+  color: var(--of-color-text-tertiary);
 }
 
 .database-shell__card-list {

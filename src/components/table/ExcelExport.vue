@@ -2,10 +2,14 @@
 import { ref } from "vue";
 import { Download } from "lucide-vue-next";
 import type { TableColumn } from "../../types";
+import type { TableExportFieldMapping } from "../../types/table-import-export";
+import { buildTableExportMatrix } from "../../utils/tableExport";
 
 interface XlsxModuleLike {
   utils: {
-    aoa_to_sheet(data: unknown[][]): Record<string, unknown>;
+    aoa_to_sheet(data: unknown[][]): Record<string, unknown> & {
+      "!cols"?: Array<{ wch: number }>;
+    };
     book_new(): Record<string, unknown>;
     book_append_sheet(
       workbook: Record<string, unknown>,
@@ -24,11 +28,15 @@ const props = withDefaults(
     label?: string;
     disabled?: boolean;
     size?: "sm" | "md";
+    sheetName?: string;
+    fieldMappings?: readonly TableExportFieldMapping[];
   }>(),
   {
     filename: "export",
     label: "导出 Excel",
     size: "md",
+    sheetName: "Sheet1",
+    fieldMappings: () => [],
   },
 );
 
@@ -47,23 +55,18 @@ async function handleExport() {
       throw new Error("请先安装 xlsx 包：npm install xlsx");
     })) as XlsxModuleLike;
 
-    // 构建表头行
-    const headers = props.columns.map((c) => c.label);
-    const keys = props.columns.map((c) => c.key);
-
-    // 构建数据行
-    const rows = props.data.map((row) => keys.map((k) => row[k] ?? ""));
+    const exportMatrix = buildTableExportMatrix({
+      columns: props.columns,
+      data: props.data,
+      fieldMappings: props.fieldMappings,
+    });
 
     // 创建工作表
-    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-
-    // 设置列宽（最小 10，按内容估算）
-    ws["!cols"] = props.columns.map((col) => ({
-      wch: Math.max(10, col.label.length * 2, 20),
-    }));
+    const ws = XLSX.utils.aoa_to_sheet(exportMatrix.matrix);
+    ws["!cols"] = exportMatrix.widths;
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.utils.book_append_sheet(wb, ws, props.sheetName);
     XLSX.writeFile(wb, `${props.filename}.xlsx`);
   } catch (e) {
     console.error("[ExcelExport]", e);

@@ -25,6 +25,7 @@ import FieldCell, {
 } from "./FieldCell.vue";
 import type {
   BulkActionItem,
+  ResolvedTableColumn,
 } from "../../types/data-table";
 import {
   normalizeFieldType,
@@ -36,12 +37,10 @@ import {
   buildGroupSpacerStyle,
 } from "./dataTableUtils";
 import type { RowActionItem } from "./TableDataRow.vue";
-import { useInlineEdit } from "@/composables/useInlineEdit";
 import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
 import { useTable } from "@/composables/useTable";
 import { useTableGroup, type GroupHeaderItem } from "@/composables/useTableGroup";
 import { useTableData } from "@/composables/useTableData";
-import { useTableColumns } from "@/composables/useTableColumns";
 import { useColumnResize } from "@/composables/useColumnResize";
 import { useKeyboardNavigation } from "@/composables/useKeyboardNavigation";
 import { useBreakpoint } from "@/composables/useBreakpoint";
@@ -51,6 +50,8 @@ import { useDraftRows } from "@/composables/useDraftRows";
 import { useDataTableLayout } from "@/composables/useDataTableLayout";
 import { useDataTableSelection } from "@/composables/useDataTableSelection";
 import { useDataTableDetailSheet } from "@/composables/useDataTableDetailSheet";
+import { useTableEditing } from "@/composables/useTableEditing";
+import { useTableColumnSchema } from "@/composables/useTableColumnSchema";
 import type {
   Density,
   Task,
@@ -210,9 +211,9 @@ const {
 type TableRowRecord = Record<string, unknown> & { id: string };
 
 const editableFieldKeys = computed(() =>
-  (props.fieldDefs ?? [])
-    .filter((field) => !field.readonly)
-    .map((field) => field.id),
+  effectiveColumns.value
+    .filter((field) => field.editable)
+    .map((field) => field.key),
 );
 
 function getFirstEditableFieldKey(row: T): string | null {
@@ -250,7 +251,7 @@ function handleInlineEdit(row: T, fieldKey?: string) {
     handleRowClick(row);
     return;
   }
-  inlineEdit.activate(rowId, targetFieldKey);
+  inlineEdit.activate(rowId, targetFieldKey, getRowValue(row as TableRowRecord, targetFieldKey));
   if (props.enableKeyboard) {
     setActiveCell(rowId, targetFieldKey);
   }
@@ -268,8 +269,8 @@ function handleRowActionClick(row: T, actionKey: string) {
 
 // ── Inline Edit ────────────────────────────────────────────────────────────
 
-const inlineEdit = useInlineEdit();
-const { commit: commitInlineEdit, editingCell } = inlineEdit;
+const inlineEdit = useTableEditing<TableRowRecord>();
+const { commit: commitInlineEdit, editingCell, getCellState } = inlineEdit;
 
 // ── Normalize Data ─────────────────────────────────────────────────────────
 
@@ -280,10 +281,11 @@ const { rows: normalizedData } = useTableData<T>({
 
 // ── Column Logic ───────────────────────────────────────────────────────────
 
-const { columns: resolvedColumns } = useTableColumns({
+const { resolvedColumns, fieldContracts } = useTableColumnSchema({
   columns: toRef(props, "columns"),
   schema: toRef(props, "schema"),
   view: toRef(props, "view"),
+  fieldDefs: toRef(props, "fieldDefs"),
 });
 
 // ── Column Resize ──────────────────────────────────────────────────────────
@@ -303,7 +305,7 @@ const {
   });
 
 // Apply resize overrides to columns
-const effectiveColumns = computed<TableColumn[]>(() => {
+const effectiveColumns = computed<ResolvedTableColumn[]>(() => {
   const overrides = columnWidthOverrides.value;
   return resolvedColumns.value.map((col) => {
     const overrideWidth = overrides.get(col.key);
@@ -402,7 +404,10 @@ const { activeCell, selectedRange, setActiveCell, handleKeyDown } = useKeyboardN
   containerRef: tableContainerRef,
   editingCell,
   enabled: computed(() => props.enableKeyboard),
-  onActivateEdit: (rowId, colKey) => inlineEdit.activate(rowId, colKey),
+  onActivateEdit: (rowId, colKey) => {
+    const row = dataRows.value.find((item) => getRowId(item) === rowId) as TableRowRecord | undefined;
+    inlineEdit.activate(rowId, colKey, row ? getRowValue(row, colKey) : undefined);
+  },
   onCancelEdit: () => inlineEdit.cancel(),
   onScrollToRow: (idx) => scrollToIndex(idx),
   getCellValue: (rowId, colKey) => {
@@ -582,16 +587,28 @@ function getRowId(row: T): string {
 }
 
 function getFieldDef(colKey: string): CellFieldDef {
-  return resolveFieldDef(props.fieldDefs, colKey);
+  return fieldContracts.value.get(colKey) ?? resolveFieldDef(props.fieldDefs, colKey);
 }
 
-function onCellCommit(rowId: string, fieldId: string, value: unknown) {
-  commitInlineEdit(rowId, fieldId, value);
-  emit("cell-edit", { rowId, fieldId, value });
+async function onCellCommit(rowId: string, fieldId: string, value: unknown) {
+  const row = dataRows.value.find((item) => getRowId(item) === rowId) as TableRowRecord | undefined;
+  const column = effectiveColumns.value.find((item) => item.key === fieldId);
+  const result = await commitInlineEdit({
+    rowId,
+    fieldId,
+    value,
+    originalValue: row ? getRowValue(row, fieldId) : undefined,
+    row,
+    parser: column?.parser,
+    validator: column?.validator,
+  });
+  if (!result.ok) return;
+  emit("cell-edit", { rowId, fieldId, value: result.value });
 }
 
 function onCellRequestEdit(rowId: string, fieldId: string) {
-  inlineEdit.activate(rowId, fieldId);
+  const row = dataRows.value.find((item) => getRowId(item) === rowId) as TableRowRecord | undefined;
+  inlineEdit.activate(rowId, fieldId, row ? getRowValue(row, fieldId) : undefined);
   if (props.enableKeyboard) {
     setActiveCell(rowId, fieldId);
   }
@@ -728,6 +745,10 @@ function isCellEditing(rowId: string, colKey: string): boolean {
     editingCell.value.rowId === rowId &&
     editingCell.value.fieldId === colKey
   );
+}
+
+function cellState(rowId: string, colKey: string) {
+  return getCellState(rowId, colKey);
 }
 
 function dragRowClasses(item: T): Record<string, boolean> {
@@ -894,6 +915,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         :field="getFieldDef(col.key)"
                         :value="getRowValue(item as T, col.key)"
                         :editing="isCellEditing(getRowId(item as T), col.key)"
+                        :state="cellState(getRowId(item as T), col.key)"
                         @commit="onCellCommit"
                         @request-edit="onCellRequestEdit"
                         @request-cancel="onCellRequestCancel"
@@ -979,6 +1001,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :field="getFieldDef(col.key)"
                     :value="getRowValue(item as T, col.key)"
                     :editing="isCellEditing(getRowId(item as T), col.key)"
+                    :state="cellState(getRowId(item as T), col.key)"
                     @commit="onCellCommit"
                     @request-edit="onCellRequestEdit"
                     @request-cancel="onCellRequestCancel"
@@ -1064,6 +1087,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         :field="getFieldDef(col.key)"
                         :value="getRowValue(item as T, col.key)"
                         :editing="isCellEditing(getRowId(item as T), col.key)"
+                        :state="cellState(getRowId(item as T), col.key)"
                         @commit="onCellCommit"
                         @request-edit="onCellRequestEdit"
                         @request-cancel="onCellRequestCancel"
@@ -1109,6 +1133,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :field="getFieldDef(col.key)"
                     :value="getRowValue(item as T, col.key)"
                     :editing="isCellEditing(getRowId(item as T), col.key)"
+                    :state="cellState(getRowId(item as T), col.key)"
                     @commit="onCellCommit"
                     @request-edit="onCellRequestEdit"
                     @request-cancel="onCellRequestCancel"
@@ -1178,6 +1203,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         :field="getFieldDef(col.key)"
                         :value="slotRow[col.key] as CellValue"
                         :editing="isCellEditing(getRowId(slotRow as T), col.key)"
+                        :state="cellState(getRowId(slotRow as T), col.key)"
                         :class="{
                           'of-cell--active': isActiveCell(getRowId(slotRow as T), col.key),
                           'of-cell--selected': isCellSelected(getRowId(slotRow as T), col.key),
@@ -1227,6 +1253,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :field="getFieldDef(col.key)"
                     :value="slotRow[col.key] as CellValue"
                     :editing="isCellEditing(getRowId(slotRow as T), col.key)"
+                    :state="cellState(getRowId(slotRow as T), col.key)"
                     :class="{
                       'of-cell--active': isActiveCell(getRowId(slotRow as T), col.key),
                       'of-cell--selected': isCellSelected(getRowId(slotRow as T), col.key),
@@ -1372,7 +1399,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
 }
 
 .of-data-table--comfortable :deep(.of-mobile-card) {
-  padding: var(--of-spacing-3_5) 18px;
+  padding: var(--of-spacing-3_5) var(--of-spacing-5);
   gap: var(--of-spacing-2_5);
 }
 

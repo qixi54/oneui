@@ -84,6 +84,7 @@ export {
   TableFilterPanel,
   TableColumnManager,
   TableToolbar,
+  ExcelExport,
   FieldCell,
   FieldTypePicker,
   ColumnHeaderMenu,
@@ -317,6 +318,25 @@ export type {
 // ─── Utils: Supabase Schema Introspection ───────────────────────────────────
 export { inferSchema, fetchSchemaFromSupabase, humanizeColumnName } from "./utils/supabaseSchema";
 export type { PgColumnInfo, InferSchemaOptions } from "./utils/supabaseSchema";
+export { buildTableExportMatrix, resolveTableExportColumns } from "./utils/tableExport";
+export { buildTableImportPreview } from "./utils/tableImport";
+export type {
+  TableExportBuildOptions,
+  TableExportColumn,
+  TableExportColumnWidth,
+  TableExportFieldMapping,
+  TableExportMatrix,
+  TableImportColumn,
+  TableImportFieldMapping,
+  TableImportIssueCode,
+  TableImportIssueSeverity,
+  TableImportManualFieldMapping,
+  TableImportPreviewOptions,
+  TableImportPreviewResult,
+  TableImportPreviewRow,
+  TableImportPreviewSummary,
+  TableImportValidationIssue,
+} from "./types/table-import-export";
 
 // ─── Composables ─────────────────────────────────────────────────────────────
 export {

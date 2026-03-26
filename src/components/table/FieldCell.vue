@@ -1,41 +1,16 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from "vue";
 import { useInlineEdit } from "@/composables/useInlineEdit";
+import type {
+  TableCellEditState,
+  TableColumnFieldContract,
+  TableColumnFieldOption,
+  TableColumnFieldType,
+} from "../../types/data-table";
 
-export type FieldType =
-  | "text"
-  | "number"
-  | "checkbox"
-  | "select"
-  | "multiselect"
-  | "date"
-  | "datetime"
-  | "rating"
-  | "url"
-  | "email"
-  | "currency"
-  | "richtext"
-  | "auto_number"
-  | "creator"
-  | "progress"
-  | "relation"
-  | "attachment"
-  | "phone";
-
-export interface FieldOption {
-  label: string;
-  value: string;
-  color?: string;
-}
-
-export interface FieldDef {
-  id: string;
-  type: FieldType;
-  label: string;
-  options?: FieldOption[];
-  max?: number;
-  readonly?: boolean;
-}
+export type FieldType = TableColumnFieldType;
+export type FieldOption = TableColumnFieldOption;
+export type FieldDef = TableColumnFieldContract;
 
 export type CellValue = string | number | boolean | string[] | null | undefined;
 
@@ -46,11 +21,13 @@ const props = withDefaults(
     value?: CellValue;
     readonly?: boolean;
     editing?: boolean;
+    state?: TableCellEditState | null;
   }>(),
   {
     value: undefined,
     readonly: false,
     editing: undefined,
+    state: null,
   },
 );
 
@@ -65,9 +42,19 @@ const emit = defineEmits<{
 const { isEditing, activate, commit: commitEdit, cancel } = useInlineEdit();
 
 const localEditing = computed(() => isEditing(props.rowId, props.field.id));
-const isEffectivelyEditing = computed(() => props.editing ?? localEditing.value);
+const isStateEditing = computed(() => {
+  const phase = props.state?.phase;
+  return phase === "editing" || phase === "dirty" || phase === "validating" || phase === "error";
+});
+const isEffectivelyEditing = computed(() => {
+  if (props.editing !== undefined) return props.editing;
+  if (props.state !== null) return isStateEditing.value;
+  return localEditing.value;
+});
 const isReadonly = computed(() => props.readonly || props.field.readonly);
 const isActionable = computed(() => !isReadonly.value);
+const hasError = computed(() => props.state?.phase === "error" && props.state.error !== null);
+const errorMessage = computed(() => props.state?.error?.message ?? "");
 
 function handleClick() {
   if (isReadonly.value) return;
@@ -101,11 +88,13 @@ const editorMap: Record<FieldType, ReturnType<typeof defineAsyncComponent>> = {
   checkbox: defineAsyncComponent(() => import("@/components/field/FieldCheckbox.vue")),
   select: defineAsyncComponent(() => import("@/components/field/FieldSelect.vue")),
   multiselect: defineAsyncComponent(() => import("@/components/field/FieldMultiSelect.vue")),
+  multi_select: defineAsyncComponent(() => import("@/components/field/FieldMultiSelect.vue")),
   date: defineAsyncComponent(() => import("@/components/field/FieldDate.vue")),
   datetime: defineAsyncComponent(() => import("@/components/field/FieldDatetime.vue")),
   rating: defineAsyncComponent(() => import("@/components/field/FieldRating.vue")),
   url: defineAsyncComponent(() => import("@/components/field/FieldUrl.vue")),
   email: defineAsyncComponent(() => import("@/components/field/FieldEmail.vue")),
+  user: defineAsyncComponent(() => import("@/components/field/FieldText.vue")),
   currency: defineAsyncComponent(() => import("@/components/field/FieldCurrency.vue")),
   richtext: defineAsyncComponent(() => import("@/components/field/FieldRichText.vue")),
   auto_number: defineAsyncComponent(() => import("@/components/field/FieldAutoNumber.vue")),
@@ -113,6 +102,7 @@ const editorMap: Record<FieldType, ReturnType<typeof defineAsyncComponent>> = {
   progress: defineAsyncComponent(() => import("@/components/field/FieldProgress.vue")),
   relation: defineAsyncComponent(() => import("@/components/field/FieldRelation.vue")),
   attachment: defineAsyncComponent(() => import("@/components/field/FieldAttachment.vue")),
+  formula: defineAsyncComponent(() => import("@/components/field/FieldText.vue")),
   phone: defineAsyncComponent(() => import("@/components/field/FieldPhone.vue")),
 };
 
@@ -127,6 +117,13 @@ const displayValue = computed(() => {
   if (v === null || v === undefined || v === "") return "—";
   if (Array.isArray(v)) return v.join(", ");
   if (typeof v === "boolean") return v ? "✓" : "—";
+  if (props.field.formatter) {
+    return props.field.formatter(v, {
+      rowId: props.rowId,
+      fieldId: props.field.id,
+      originalValue: props.state?.originalValue,
+    });
+  }
   return String(v);
 });
 </script>
@@ -139,7 +136,9 @@ const displayValue = computed(() => {
       'of-field-cell--editing': isEffectivelyEditing,
       'of-field-cell--readonly': isReadonly,
       'of-field-cell--actionable': isActionable,
+      'of-field-cell--error': hasError,
     }"
+    :data-edit-phase="state?.phase ?? (isEffectivelyEditing ? 'editing' : 'idle')"
     :type="isReadonly || isEffectivelyEditing ? undefined : 'button'"
     :aria-label="`${field.label}字段`"
     :title="isReadonly ? undefined : `点击编辑 ${field.label}`"
@@ -171,6 +170,8 @@ const displayValue = computed(() => {
       />
       <span v-else class="of-field-cell__display">{{ displayValue }}</span>
     </template>
+
+    <span v-if="hasError" class="of-field-cell__error">{{ errorMessage }}</span>
   </component>
 </template>
 
@@ -195,7 +196,12 @@ const displayValue = computed(() => {
   outline-offset: -1px;
   background: var(--of-surface-elevated, var(--of-color-bg-elevated));
   cursor: default;
-  padding: 0;
+  padding: 0 var(--of-spacing-0_5);
+}
+
+.of-field-cell--error {
+  outline: 2px solid var(--of-danger-border, var(--of-color-danger-500, #dc2626));
+  outline-offset: -1px;
 }
 
 .of-field-cell--readonly {
@@ -218,6 +224,19 @@ const displayValue = computed(() => {
 .of-field-cell__loading {
   font-size: var(--of-font-size-base);
   color: var(--of-text-tertiary, var(--of-color-text-tertiary));
+}
+
+.of-field-cell__error {
+  position: absolute;
+  left: var(--of-spacing-1_5);
+  right: var(--of-spacing-1_5);
+  bottom: calc(var(--of-spacing-2) * -1);
+  font-size: var(--of-font-size-xs, 12px);
+  line-height: 1.2;
+  color: var(--of-danger-text, var(--of-color-danger-600, #b91c1c));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Touch-optimized: all field editors get larger touch targets on mobile */

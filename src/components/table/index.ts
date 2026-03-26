@@ -12,5 +12,4 @@ export { default as DetailSheet } from "./DetailSheet.vue";
 export { default as TableToolbar } from "./TableToolbar.vue";
 export { default as FieldTypePicker } from "./FieldTypePicker.vue";
 export { default as ColumnHeaderMenu } from "./ColumnHeaderMenu.vue";
-// ExcelExport 需要 xlsx 依赖，若需要可单独导入
-// export { default as ExcelExport }        from './ExcelExport.vue'
+export { default as ExcelExport } from "./ExcelExport.vue";
