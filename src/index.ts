@@ -72,6 +72,7 @@ export { default as FieldMultiSelect } from "./components/field/FieldMultiSelect
 export { default as FieldDate } from "./components/field/FieldDate.vue";
 export { default as FieldRichText } from "./components/field/FieldRichText.vue";
 export { default as FieldMarkdownPreview } from "./components/field/FieldMarkdownPreview.vue";
+export { default as FieldWrapper } from "./components/field/FieldWrapper.vue";
 
 // ─── Table ───────────────────────────────────────────────────────────────────
 export {
@@ -87,7 +88,6 @@ export {
   FieldTypePicker,
   ColumnHeaderMenu,
 } from "./components/table";
-// ExcelExport 可选导入（需要 xlsx 依赖）：import { ExcelExport } from 'oneflow-ui/dist/components/table'
 
 // ─── Plugin Registry ────────────────────────────────────────────────────────
 export {
@@ -191,6 +191,14 @@ export { MermaidChart } from "./components/mermaid";
 export { SplitPane } from "./components/split";
 export { default as ContextMenu } from "./components/ContextMenu/index.vue";
 export type { ContextMenuItem } from "./components/ContextMenu/index.vue";
+
+// ─── Field Composables ──────────────────────────────────────────────────────
+export { useFieldBase, useFieldOptions } from "./composables/useFieldBase";
+export type {
+  StandaloneFieldProps,
+  StandaloneOptionsFieldProps,
+  UseFieldBaseOptions,
+} from "./composables/useFieldBase";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type {
@@ -327,6 +335,8 @@ export { useMarkdown } from "./composables/useMarkdown";
 export { useToast } from "./composables/useToast";
 export { createVirtualListState, useVirtualList, useVirtualListStateCache } from "./composables/useVirtualList";
 export { useInlineEdit } from "./composables/useInlineEdit";
+export { useOverlay } from "./composables/useOverlay";
+export type { UseOverlayOptions } from "./composables/useOverlay";
 export { useColumnResize } from "./composables/useColumnResize";
 export { useFixedColumns } from "./composables/useFixedColumns";
 export { useKeyboardNavigation } from "./composables/useKeyboardNavigation";

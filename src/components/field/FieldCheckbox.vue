@@ -53,4 +53,9 @@ function onKeydown(e: KeyboardEvent) {
   cursor: pointer;
   font-size: var(--of-font-size-lg);
 }
+
+.of-field-checkbox:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
 </style>

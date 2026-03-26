@@ -28,6 +28,16 @@ export type { UseMarkdownOptions } from "./useMarkdown";
 export { useInlineEdit } from "./useInlineEdit";
 export type { EditingCell } from "./useInlineEdit";
 
+export { useFieldBase, useFieldOptions } from "./useFieldBase";
+export type {
+  StandaloneFieldProps,
+  StandaloneOptionsFieldProps,
+  UseFieldBaseOptions,
+} from "./useFieldBase";
+
+export { useOverlay } from "./useOverlay";
+export type { UseOverlayOptions } from "./useOverlay";
+
 export { createVirtualListState, useVirtualList, useVirtualListStateCache } from "./useVirtualList";
 export type { UseVirtualListOptions, VirtualItem, VirtualListState } from "./useVirtualList";
 

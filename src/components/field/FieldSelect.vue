@@ -2,7 +2,12 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import type { CellValue } from "@/components/table/FieldCell.vue";
-import { useStandaloneField, useStandaloneOptions, type StandaloneOptionsFieldProps } from "./standalone";
+import FieldWrapper from "./FieldWrapper.vue";
+import {
+  useFieldBase,
+  useFieldOptions,
+  type StandaloneOptionsFieldProps,
+} from "@/composables/useFieldBase";
 
 const props = defineProps<StandaloneOptionsFieldProps>();
 const emit = defineEmits<{
@@ -19,8 +24,11 @@ const dropdownRef = ref<HTMLElement | null>(null);
 const dropdownStyle = ref({ top: "0px", left: "0px", width: "0px" });
 const isOpen = ref(false);
 
-const { isStandalone, currentValue, resolvedLabel, resolvedDisabled } = useStandaloneField(props);
-const options = useStandaloneOptions(props);
+const { isStandalone, currentValue, resolvedLabel, resolvedDisabled } = useFieldBase({
+  props,
+  focusRef: triggerRef,
+});
+const options = useFieldOptions(props);
 const currentStringValue = computed(() =>
   typeof currentValue.value === "string" ? currentValue.value : null,
 );
@@ -124,7 +132,6 @@ onMounted(() => {
     isOpen.value = true;
     nextTick(() => {
       updateDropdownPosition();
-      triggerRef.value?.focus();
     });
   }
   window.addEventListener("resize", updateDropdownPosition);
@@ -148,18 +155,13 @@ const selectedOption = computed(() => {
 </script>
 
 <template>
-  <div v-if="isStandalone" class="of-field-standalone">
-    <label v-if="label" class="of-field-standalone__label">
-      {{ label }}
-      <span v-if="required" class="of-field-standalone__required">*</span>
-    </label>
-    <div
-      class="of-field-standalone__control"
-      :class="{
-        'of-field-standalone__control--error': error,
-        'of-field-standalone__control--disabled': resolvedDisabled,
-      }"
-    >
+  <FieldWrapper
+    v-if="isStandalone"
+    :label="label"
+    :required="required"
+    :disabled="resolvedDisabled"
+    :error="error"
+  >
       <button
         ref="triggerRef"
         type="button"
@@ -181,9 +183,7 @@ const selectedOption = computed(() => {
           {{ selectedOption?.label ?? "—" }}
         </span>
       </button>
-    </div>
-    <span v-if="error" class="of-field-standalone__error">{{ error }}</span>
-  </div>
+  </FieldWrapper>
 
   <div
     v-else
@@ -251,49 +251,6 @@ const selectedOption = computed(() => {
 </template>
 
 <style scoped>
-.of-field-standalone {
-  display: flex;
-  flex-direction: column;
-  gap: var(--of-spacing-1);
-}
-
-.of-field-standalone__label {
-  font-size: var(--of-font-size-sm);
-  font-weight: var(--of-font-weight-medium);
-  color: var(--of-text-secondary);
-}
-
-.of-field-standalone__required {
-  color: var(--of-color-error);
-  margin-left: var(--of-spacing-0_5);
-}
-
-.of-field-standalone__control {
-  border: 1px solid var(--of-border-subtle);
-  border-radius: var(--of-radius-md);
-  background: var(--of-surface-elevated);
-  transition: var(--of-transition-fast);
-}
-
-.of-field-standalone__control:focus-within {
-  border-color: var(--of-accent-default);
-  box-shadow: 0 0 0 2px var(--of-accent-soft);
-}
-
-.of-field-standalone__control--error {
-  border-color: var(--of-color-error);
-}
-
-.of-field-standalone__control--disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.of-field-standalone__error {
-  font-size: var(--of-font-size-xs);
-  color: var(--of-color-error);
-}
-
 .of-field-select {
   width: 100%;
   min-height: 28px;
@@ -305,6 +262,12 @@ const selectedOption = computed(() => {
   border: none;
   background: transparent;
   text-align: left;
+}
+
+.of-field-select:focus-visible,
+.of-field-select__option:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-field-select--standalone {

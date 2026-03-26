@@ -218,7 +218,7 @@ function handleCancel() {
   border-radius: var(--of-radius-md, 6px);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--of-transition-fast, all 0.15s ease);
+  transition: var(--of-transition-fast);
   line-height: 1;
   white-space: nowrap;
 }
@@ -226,6 +226,11 @@ function handleCancel() {
 .of-dialog__btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.of-dialog__btn:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 /* 取消按钮 */

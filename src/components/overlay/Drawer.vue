@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, useSlots, watch, type Slots } from "vue";
+import { computed, useSlots, type Slots } from "vue";
 import { X } from "lucide-vue-next";
-import { useFocusTrap } from "../../composables/useFocusTrap";
+import { useOverlay } from "../../composables/useOverlay";
 
 const props = withDefaults(
   defineProps<{
@@ -40,14 +40,6 @@ const drawerStyle = computed(() => ({
   "--of-drawer-width": `${props.width}px`,
 }));
 
-// ── Focus Trap ────────────────────────────────────────────────
-const {
-  containerRef: drawerRef,
-  activate: activateTrap,
-  deactivate: deactivateTrap,
-} = useFocusTrap();
-// ─────────────────────────────────────────────────────────────
-
 function handleClose() {
   emit("update:modelValue", false);
 }
@@ -56,33 +48,9 @@ function clampWidth(width: number): number {
   return Math.max(props.minWidth, Math.min(props.maxWidth, width));
 }
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === "Escape" && props.modelValue) handleClose();
-}
-
-onMounted(() => {
-  if (typeof document === "undefined") return;
-  document.addEventListener("keydown", onKeydown);
-});
-
-watch(
-  () => props.modelValue,
-  (open) => {
-    if (typeof document === "undefined") return;
-    document.body.style.overflow = open ? "hidden" : "";
-    if (open) {
-      activateTrap();
-    } else {
-      deactivateTrap();
-    }
-  },
-  { immediate: true },
-);
-
-onBeforeUnmount(() => {
-  if (typeof document === "undefined") return;
-  document.removeEventListener("keydown", onKeydown);
-  document.body.style.overflow = "";
+const { containerRef: drawerRef } = useOverlay({
+  open: () => props.modelValue,
+  onClose: handleClose,
 });
 
 function handleResizeStart(event: PointerEvent) {
@@ -167,7 +135,7 @@ function handleResizeStart(event: PointerEvent) {
   inset: 0;
   display: flex;
   justify-content: flex-end;
-  background: rgba(15, 23, 42, 0.32);
+  background: var(--of-overlay-backdrop, rgba(15, 23, 42, 0.32));
 }
 
 .of-drawer-overlay__hitarea {
@@ -212,13 +180,13 @@ function handleResizeStart(event: PointerEvent) {
   width: 2px;
   height: 44px;
   border-radius: var(--of-radius-full);
-  background: var(--of-color-gray-300);
+  background: var(--of-border-strong, var(--of-color-gray-300));
   transform: translateY(-50%);
-  transition: background-color 0.16s ease;
+  transition: var(--of-transition-fast);
 }
 
 .of-drawer__resize-handle:hover::after {
-  background: var(--of-color-gray-300);
+  background: var(--of-border-strong, var(--of-color-gray-300));
 }
 
 .of-drawer--fullscreen {
@@ -270,12 +238,18 @@ function handleResizeStart(event: PointerEvent) {
   cursor: pointer;
   flex-shrink: 0;
   line-height: 1;
-  transition: var(--of-transition-fast, all 0.15s ease);
+  transition: var(--of-transition-fast);
 }
 
 .of-drawer__close:hover {
   background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
   color: var(--of-text-primary, var(--of-color-text, #111827));
+}
+
+.of-drawer__resize-handle:focus-visible,
+.of-drawer__close:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-drawer__body {
@@ -287,14 +261,12 @@ function handleResizeStart(event: PointerEvent) {
 
 .of-drawer-enter-active,
 .of-drawer-leave-active {
-  transition:
-    background 0.22s ease,
-    opacity 0.22s ease;
+  transition: var(--of-transition-slow);
 }
 
 .of-drawer-enter-active .of-drawer,
 .of-drawer-leave-active .of-drawer {
-  transition: transform 0.22s ease;
+  transition: var(--of-transition-slow);
 }
 
 .of-drawer-enter-from,

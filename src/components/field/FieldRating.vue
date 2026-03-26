@@ -41,6 +41,12 @@ function select(n: number) {
   padding: var(--of-spacing-0_5) var(--of-spacing-1);
 }
 
+.of-field-rating:focus-visible,
+.of-field-rating__star:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
+}
+
 .of-field-rating__star {
   font-size: var(--of-font-size-xl);
   cursor: pointer;

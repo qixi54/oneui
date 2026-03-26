@@ -1,8 +1,9 @@
 export {
   useFieldBase as useStandaloneField,
   useFieldOptions as useStandaloneOptions,
-} from "@/composables/useFieldBase";
+} from "../../composables/useFieldBase";
 export type {
   StandaloneFieldProps,
   StandaloneOptionsFieldProps,
-} from "@/composables/useFieldBase";
+  UseFieldBaseOptions,
+} from "../../composables/useFieldBase";

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { watch, onUnmounted } from "vue";
 import { X } from "lucide-vue-next";
-import { useFocusTrap } from "../../composables/useFocusTrap";
+import { useOverlay } from "../../composables/useOverlay";
 
 /**
  * Modal 组件 - 通用弹窗
@@ -55,14 +54,6 @@ const emit = defineEmits<{
 // Teleport 根节点无法自动继承 attrs（如 class），关闭自动继承
 defineOptions({ inheritAttrs: false });
 
-// ── Focus Trap ────────────────────────────────────────────────
-const {
-  containerRef: modalRef,
-  activate: activateTrap,
-  deactivate: deactivateTrap,
-} = useFocusTrap();
-// ─────────────────────────────────────────────────────────────
-
 function close() {
   emit("update:modelValue", false);
 }
@@ -71,30 +62,9 @@ function onMaskClick() {
   if (props.maskClosable) close();
 }
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === "Escape" && props.modelValue) close();
-}
-
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (typeof document === "undefined") return; // SSR 守卫
-    if (val) {
-      document.body.style.overflow = "hidden";
-      document.addEventListener("keydown", onKeydown);
-      activateTrap();
-    } else {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", onKeydown);
-      deactivateTrap();
-    }
-  },
-);
-
-onUnmounted(() => {
-  if (typeof document === "undefined") return; // SSR 守卫
-  document.body.style.overflow = "";
-  document.removeEventListener("keydown", onKeydown);
+const { containerRef: modalRef } = useOverlay({
+  open: () => props.modelValue,
+  onClose: close,
 });
 </script>
 
@@ -163,7 +133,7 @@ onUnmounted(() => {
   align-items: flex-start;
   justify-content: center;
   padding: var(--of-spacing-8, 32px) var(--of-spacing-4, 16px);
-  background: rgba(15, 23, 42, 0.36);
+  background: var(--of-overlay-backdrop, rgba(15, 23, 42, 0.36));
   overflow-y: auto;
 }
 
@@ -228,13 +198,18 @@ onUnmounted(() => {
   border-radius: var(--of-radius-md, 6px);
   color: var(--of-text-secondary, var(--of-color-text-secondary, #6b7280));
   cursor: pointer;
-  transition: var(--of-transition-fast, all 0.15s ease);
+  transition: var(--of-transition-fast);
   flex-shrink: 0;
 }
 
 .of-modal__close:hover {
   background: var(--of-surface-selected, var(--of-color-gray-100, #f3f4f6));
   color: var(--of-text-primary, var(--of-color-text, #111827));
+}
+
+.of-modal__close:focus-visible {
+  outline: 2px solid var(--of-accent-default);
+  outline-offset: 2px;
 }
 
 .of-modal__close:active {
@@ -269,7 +244,7 @@ onUnmounted(() => {
 /* ── Transitions ──────────────────────────────────────────── */
 .of-modal-enter-active,
 .of-modal-leave-active {
-  transition: opacity 0.2s ease;
+  transition: var(--of-transition-slow);
 }
 
 .of-modal-enter-active .of-modal,

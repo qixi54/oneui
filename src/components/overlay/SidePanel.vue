@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, watch, type CSSProperties, type VNode } from "vue";
+import { computed, type CSSProperties, type VNode } from "vue";
 import { X } from "lucide-vue-next";
-import { useFocusTrap } from "../../composables/useFocusTrap";
+import { useOverlay } from "../../composables/useOverlay";
 
 export interface SidePanelProps {
   modelValue: boolean;
@@ -38,46 +38,14 @@ const panelStyle = computed<CSSProperties>(() => ({
   "--of-side-panel-width": `${props.width}px`,
 }));
 
-// ── Focus Trap ────────────────────────────────────────────────
-const {
-  containerRef: sidePanelRef,
-  activate: activateTrap,
-  deactivate: deactivateTrap,
-} = useFocusTrap();
-// ─────────────────────────────────────────────────────────────
-
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === "Escape" && props.modelValue) close();
-}
-
-onMounted(() => {
-  if (typeof document === "undefined") return;
-  document.addEventListener("keydown", onKeydown);
-});
-
-watch(
-  () => props.modelValue,
-  (open) => {
-    if (typeof document === "undefined") return;
-    document.body.style.overflow = open ? "hidden" : "";
-    if (open) {
-      activateTrap();
-    } else {
-      deactivateTrap();
-    }
-  },
-  { immediate: true },
-);
-
-onBeforeUnmount(() => {
-  if (typeof document === "undefined") return;
-  document.removeEventListener("keydown", onKeydown);
-  document.body.style.overflow = "";
-});
-
 function close() {
   emit("update:modelValue", false);
 }
+
+const { containerRef: sidePanelRef } = useOverlay({
+  open: () => props.modelValue,
+  onClose: close,
+});
 
 function clampWidth(width: number): number {
   return Math.max(props.minWidth, Math.min(props.maxWidth, width));
