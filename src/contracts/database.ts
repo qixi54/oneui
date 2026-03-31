@@ -373,6 +373,7 @@ export interface DatabaseViewProps {
   density?: Density;
   priorityColorMap?: ColorMap;
   statusColorMap?: ColorMap;
+  groupColorMap?: ColorMap;
   kanbanAppearance?: DatabaseViewKanbanAppearance;
   schema?: TableSchema | null;
   records?: DataRecord[];

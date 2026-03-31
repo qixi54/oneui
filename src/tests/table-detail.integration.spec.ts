@@ -493,6 +493,84 @@ describe("Table + Detail 集成", () => {
     expect(wrapper.text()).toContain("补齐 Task 2.4 的联调覆盖");
   });
 
+  it("DetailLayout 会把 meta 与属性面板统一走语义 colorMap", () => {
+    const wrapper = mount(DetailLayout, {
+      props: {
+        task: {
+          ...tasks[0],
+          status: "in_progress",
+          priority: "P1",
+        },
+        statusColorMap: {
+          in_progress: {
+            label: "执行中",
+            text: "#155e75",
+            bg: "#cffafe",
+            dot: "#0891b2",
+          },
+        },
+        priorityColorMap: {
+          P1: {
+            label: "核心",
+            text: "#7c2d12",
+            bg: "#ffedd5",
+            dot: "#ea580c",
+          },
+        },
+        propItems: [
+          {
+            key: "状态",
+            value: "in_progress",
+            type: "status",
+            statusColorMap: {
+              in_progress: {
+                label: "执行中",
+                text: "#155e75",
+                bg: "#cffafe",
+                dot: "#0891b2",
+              },
+            },
+          },
+          {
+            key: "优先级",
+            value: "P1",
+            type: "priority",
+            priorityColorMap: {
+              P1: {
+                label: "核心",
+                text: "#7c2d12",
+                bg: "#ffedd5",
+                dot: "#ea580c",
+              },
+            },
+          },
+          {
+            key: "分组",
+            value: "product",
+            type: "badge",
+            customColorMap: {
+              product: {
+                label: "产品组",
+                text: "#1d4ed8",
+                bg: "#dbeafe",
+                dot: "#2563eb",
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const metaBadges = wrapper.findAll(".detail-layout__meta .detail-layout__badge").map((node) => node.text());
+    expect(metaBadges).toContain("执行中");
+    expect(metaBadges).toContain("核心");
+
+    const propBadges = wrapper.findAll(".prop-row__badge").map((node) => node.text());
+    expect(propBadges).toContain("执行中");
+    expect(propBadges).toContain("核心");
+    expect(propBadges).toContain("产品组");
+  });
+
   it("DetailLayout 在非 ready 状态下会渲染统一状态壳", () => {
     const wrapper = mount(DetailLayout, {
       props: {

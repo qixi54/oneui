@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { CircleIcon, TagIcon, UserIcon, CalendarIcon, FolderIcon } from "lucide-vue-next";
-import type { GalleryItem } from "../../types";
+import type { ColorMap, GalleryItem } from "../../types";
+import {
+  DEFAULT_PRIORITY_MAP,
+  DEFAULT_STATUS_MAP,
+  mergeColorMap,
+  resolveBadge,
+} from "../../composables/useBadge";
 
 const props = withDefaults(
   defineProps<{
     item: GalleryItem;
+    priorityColorMap?: ColorMap;
+    statusColorMap?: ColorMap;
   }>(),
-  {},
+  {
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
+  },
 );
 
 const emit = defineEmits<{
@@ -24,6 +35,12 @@ const hasImageCover = computed(
 );
 
 const visibleProps = computed(() => (props.item.extraProps ?? []).slice(0, 2));
+const mergedPriorityMap = computed(() =>
+  mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap),
+);
+const mergedStatusMap = computed(() => mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap));
+const priorityBadge = computed(() => resolveBadge(props.item.priority, mergedPriorityMap.value));
+const statusBadge = computed(() => resolveBadge(props.item.status, mergedStatusMap.value));
 
 const iconMap: Record<string, typeof CircleIcon> = {
   tag: TagIcon,
@@ -43,17 +60,6 @@ const formattedDate = computed(() => {
   const date = new Date(d);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 });
-
-const statusDotColor: Record<string, string> = {
-  todo: "var(--of-text-tertiary, var(--of-color-gray-400))",
-  in_progress: "var(--of-accent-default, var(--of-text-secondary, var(--of-color-gray-500)))",
-  blocked: "var(--of-accent-strong, var(--of-color-error, #dc2626))",
-  done: "var(--of-text-strong, var(--of-color-gray-700, #374151))",
-};
-
-const dotColor = computed(
-  () => statusDotColor[props.item.status] ?? "var(--of-text-tertiary, var(--of-color-gray-400))",
-);
 </script>
 
 <template>
@@ -75,6 +81,26 @@ const dotColor = computed(
       <!-- Divider -->
       <div class="gallery-card__divider" />
 
+      <!-- Semantic badges -->
+      <div class="gallery-card__badges">
+        <span class="gallery-card__badge" :style="statusBadge.style">
+          <span
+            v-if="statusBadge.dot"
+            class="gallery-card__badge-dot"
+            :style="{ backgroundColor: statusBadge.dot }"
+          />
+          {{ statusBadge.label }}
+        </span>
+        <span class="gallery-card__badge" :style="priorityBadge.style">
+          <span
+            v-if="priorityBadge.dot"
+            class="gallery-card__badge-dot"
+            :style="{ backgroundColor: priorityBadge.dot }"
+          />
+          {{ priorityBadge.label }}
+        </span>
+      </div>
+
       <!-- Extra Props -->
       <div v-if="visibleProps.length > 0" class="gallery-card__props">
         <div v-for="prop in visibleProps" :key="prop.key" class="gallery-card__prop-row">
@@ -88,7 +114,10 @@ const dotColor = computed(
       <!-- Footer -->
       <div class="gallery-card__footer">
         <span class="gallery-card__task-id">
-          <span class="gallery-card__status-dot" :style="{ backgroundColor: dotColor }" />
+          <span
+            class="gallery-card__status-dot"
+            :style="{ backgroundColor: statusBadge.dot ?? statusBadge.style.color }"
+          />
           {{ item.id }}
         </span>
         <span class="gallery-card__footer-spacer" />
@@ -169,6 +198,33 @@ const dotColor = computed(
 .gallery-card__divider {
   height: 1px;
   background: var(--of-border-subtle, var(--of-color-gray-100));
+  flex-shrink: 0;
+}
+
+/* Semantic badges */
+.gallery-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--of-spacing-2);
+}
+
+.gallery-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--of-spacing-1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--of-font-sans);
+  font-size: 12px;
+  font-weight: var(--of-font-weight-medium);
+  line-height: 1.5;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.gallery-card__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
   flex-shrink: 0;
 }
 

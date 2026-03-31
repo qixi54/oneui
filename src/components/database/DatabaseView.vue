@@ -753,6 +753,7 @@ function handleDrawerWidthUpdate(width: number) {
         :columns="toolbarColumns"
         :priority-color-map="props.priorityColorMap"
         :status-color-map="props.statusColorMap"
+        :group-color-map="props.groupColorMap"
         :kanban-appearance="props.kanbanAppearance"
         :readonly="readonly"
         :enable-field-management="ui?.enableFieldManagement ?? false"

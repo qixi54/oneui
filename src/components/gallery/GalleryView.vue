@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { PlusIcon } from "lucide-vue-next";
 import GalleryCard from "./GalleryCard.vue";
 import { buildGalleryItems } from "../../types";
-import type { DataRecord, GalleryItem, TableSchema, ViewConfig } from "../../types";
+import type { ColorMap, DataRecord, GalleryItem, TableSchema, ViewConfig } from "../../types";
 
 const props = withDefaults(
   defineProps<{
@@ -15,6 +15,8 @@ const props = withDefaults(
     cardFieldIds?: string[];
     columns?: number;
     addable?: boolean;
+    priorityColorMap?: ColorMap;
+    statusColorMap?: ColorMap;
   }>(),
   {
     items: () => [],
@@ -25,6 +27,8 @@ const props = withDefaults(
     cardFieldIds: () => [],
     columns: 4,
     addable: true,
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
   },
 );
 
@@ -109,6 +113,8 @@ const resolvedItems = computed(() => {
       v-for="item in resolvedItems"
       :key="item.id"
       :item="item"
+      :priority-color-map="props.priorityColorMap"
+      :status-color-map="props.statusColorMap"
       @click="emit('card-click', item)"
     />
 

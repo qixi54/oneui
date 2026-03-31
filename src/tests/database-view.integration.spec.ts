@@ -196,6 +196,10 @@ const DataTableStub = defineComponent({
       type: Object,
       default: undefined,
     },
+    groupColorMap: {
+      type: Object,
+      default: undefined,
+    },
   },
   emits: ["cell-edit", "schema-add-field"],
   template: `
@@ -204,6 +208,7 @@ const DataTableStub = defineComponent({
       data-role="table-view"
       :data-priority-label="priorityColorMap?.P0?.label ?? ''"
       :data-status-label="statusColorMap?.todo?.label ?? ''"
+      :data-group-label="groupColorMap?.product?.label ?? ''"
     >
       <button
         data-role="emit-cell-edit"
@@ -381,7 +386,26 @@ const KanbanBoardSlotProbeStub = defineComponent({
 
 const GalleryViewStub = defineComponent({
   name: "GalleryView",
-  template: '<div data-view="gallery" data-role="gallery-view">gallery</div>',
+  props: {
+    priorityColorMap: {
+      type: Object,
+      default: undefined,
+    },
+    statusColorMap: {
+      type: Object,
+      default: undefined,
+    },
+  },
+  template: `
+    <div
+      data-view="gallery"
+      data-role="gallery-view"
+      :data-priority-label="priorityColorMap?.P0?.label ?? ''"
+      :data-status-label="statusColorMap?.todo?.label ?? ''"
+    >
+      gallery
+    </div>
+  `,
 });
 
 const GanttTimelineStub = defineComponent({
@@ -1201,6 +1225,68 @@ describe("DatabaseView 页面级集成", () => {
     expect(probe.attributes("data-status-label")).toBe("待处理");
   });
 
+  it("DatabaseViewContent 应该把 table groupColorMap 透传给 DataTable", async () => {
+    const wrapper = mount(DatabaseViewContent, {
+      props: {
+        viewType: "table",
+        records: buildRecords(),
+        schema: buildSchema(),
+        view: buildViews()[0],
+        columns: [],
+        groupColorMap: {
+          product: {
+            label: "产品组",
+            text: "#1d4ed8",
+            bg: "#dbeafe",
+          },
+        },
+      },
+      global: {
+        stubs: {
+          DataTable: DataTableStub,
+        },
+      },
+    });
+
+    expect(wrapper.get('[data-role="table-view"]').attributes("data-group-label")).toBe("产品组");
+  });
+
+  it("DatabaseViewContent 应该把 gallery colorMap 透传给 GalleryView", async () => {
+    const wrapper = mount(DatabaseViewContent, {
+      props: {
+        viewType: "gallery",
+        records: buildRecords(),
+        schema: buildSchema(),
+        view: buildViews()[2],
+        columns: [],
+        priorityColorMap: {
+          P0: {
+            label: "最高",
+            text: "#991b1b",
+            bg: "#fee2e2",
+          },
+        },
+        statusColorMap: {
+          todo: {
+            label: "待处理",
+            text: "#9a3412",
+            bg: "#ffedd5",
+            dot: "#ff5500",
+          },
+        },
+      },
+      global: {
+        stubs: {
+          GalleryView: GalleryViewStub,
+        },
+      },
+    });
+
+    const probe = wrapper.get('[data-role="gallery-view"]');
+    expect(probe.attributes("data-priority-label")).toBe("最高");
+    expect(probe.attributes("data-status-label")).toBe("待处理");
+  });
+
   it("DatabaseViewContent 应该把 timeline colorMap 透传给 GanttTimeline", async () => {
     const wrapper = mount(DatabaseViewContent, {
       props: {
@@ -1586,6 +1672,60 @@ describe("DatabaseView 页面级集成", () => {
       record: buildRecords()[0],
       fields: buildRecords()[0].fields,
     });
+  });
+
+  it("业务页面应该可以通过 DatabaseView 直接把 groupColorMap 与 gallery colorMap 透传到视图层", async () => {
+    const wrapper = mount(DatabaseView, {
+      props: {
+        tableId: "tbl-view-color-maps",
+        schema: buildSchema(),
+        records: buildRecords(),
+        views: buildViews(),
+        currentViewId: "v-table",
+        groupColorMap: {
+          product: {
+            label: "产品组",
+            text: "#1d4ed8",
+            bg: "#dbeafe",
+          },
+        },
+        priorityColorMap: {
+          P0: {
+            label: "最高",
+            text: "#991b1b",
+            bg: "#fee2e2",
+          },
+        },
+        statusColorMap: {
+          todo: {
+            label: "待处理",
+            text: "#9a3412",
+            bg: "#ffedd5",
+            dot: "#ff5500",
+          },
+        },
+      },
+      global: {
+        stubs: {
+          Teleport: true,
+          TableToolbar: TableToolbarStub,
+          DataTable: DataTableStub,
+          KanbanBoard: KanbanBoardStub,
+          GalleryView: GalleryViewStub,
+          GanttTimeline: GanttTimelineStub,
+          EmptyState: EmptyStateStub,
+        },
+      },
+    });
+
+    expect(wrapper.get('[data-role="table-view"]').attributes("data-group-label")).toBe("产品组");
+
+    await wrapper.get('[data-role="switch-gallery"]').trigger("click");
+    await nextTick();
+
+    const gallery = wrapper.get('[data-role="gallery-view"]');
+    expect(gallery.attributes("data-priority-label")).toBe("最高");
+    expect(gallery.attributes("data-status-label")).toBe("待处理");
   });
 
   it("DatabaseView 应该保留 loading / empty / error 三个关键状态", async () => {

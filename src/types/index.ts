@@ -144,6 +144,17 @@ export interface GanttItem extends Task {
 export interface PropItem {
   key: string;
   value: string;
+  /**
+   * 属性值渲染类型：
+   * - status: 使用 statusColorMap 渲染状态徽章
+   * - priority: 使用 priorityColorMap 渲染优先级徽章
+   * - badge: 使用 customColorMap 渲染自定义徽章
+   * - date/text: 纯文本
+   */
+  type?: "status" | "priority" | "badge" | "date" | "text";
+  statusColorMap?: ColorMap;
+  priorityColorMap?: ColorMap;
+  customColorMap?: ColorMap;
   valueColor?: string;
   valueBg?: string;
   dotColor?: string;

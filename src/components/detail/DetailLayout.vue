@@ -4,9 +4,20 @@ import { AlertCircle, Inbox, Loader2 } from "lucide-vue-next";
 import PropPanel from "./PropPanel.vue";
 import CommentItem from "./CommentItem.vue";
 import { ContentBlock } from "../editor";
-import type { Task, CommentData, PropItem } from "../../types";
+import {
+  DEFAULT_PRIORITY_MAP,
+  DEFAULT_STATUS_MAP,
+  mergeColorMap,
+  resolveBadge,
+} from "../../composables/useBadge";
+import type { Task, CommentData, PropItem, ColorMap } from "../../types";
 
 type DetailLayoutState = "ready" | "loading" | "empty" | "error";
+
+const DEFAULT_META_BADGE_STYLE = {
+  color: "var(--of-color-text-secondary)",
+  backgroundColor: "var(--of-color-gray-100)",
+};
 
 const props = withDefaults(
   defineProps<{
@@ -14,6 +25,8 @@ const props = withDefaults(
     title?: string;
     comments?: CommentData[];
     propItems?: PropItem[];
+    statusColorMap?: ColorMap;
+    priorityColorMap?: ColorMap;
     descriptionContent?: string;
     descriptionEditable?: boolean;
     state?: DetailLayoutState;
@@ -25,6 +38,8 @@ const props = withDefaults(
     title: "",
     comments: () => [],
     propItems: () => [],
+    statusColorMap: undefined,
+    priorityColorMap: undefined,
     descriptionContent: "",
     descriptionEditable: false,
     state: "ready",
@@ -59,74 +74,39 @@ const stateDescription = computed(() => {
   return "";
 });
 
-// 状态标签颜色
-const statusBadgeStyle = computed(() => {
-  if (!props.task) {
-    return {
-      text: "var(--of-color-text-secondary)",
-      bg: "var(--of-color-gray-100)",
-    };
-  }
-  const map: Record<string, { text: string; bg: string }> = {
-    todo: { text: "var(--of-status-todo-text)", bg: "var(--of-status-todo-bg)" },
-    in_progress: {
-      text: "var(--of-status-in-progress-text)",
-      bg: "var(--of-status-in-progress-bg)",
-    },
-    blocked: { text: "var(--of-status-blocked-text)", bg: "var(--of-status-blocked-bg)" },
-    done: { text: "var(--of-status-done-text)", bg: "var(--of-status-done-bg)" },
-  };
-  return (
-    map[props.task.status] ?? {
-      text: "var(--of-color-text-secondary)",
-      bg: "var(--of-color-gray-100)",
-    }
+const resolvedStatusBadge = computed(() => {
+  if (!props.task) return null;
+  return resolveBadge(props.task.status, mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap));
+});
+
+const resolvedPriorityBadge = computed(() => {
+  if (!props.task) return null;
+  return resolveBadge(
+    props.task.priority,
+    mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap),
   );
 });
 
-// 优先级标签颜色
-const priorityBadgeStyle = computed(() => {
-  if (!props.task) {
-    return {
-      text: "var(--of-color-text-secondary)",
-      bg: "var(--of-color-gray-100)",
-    };
-  }
-  const map: Record<string, { text: string; bg: string }> = {
-    P0: { text: "var(--of-priority-p0-text)", bg: "var(--of-priority-p0-bg)" },
-    P1: { text: "var(--of-priority-p1-text)", bg: "var(--of-priority-p1-bg)" },
-    P2: { text: "var(--of-priority-p2-text)", bg: "var(--of-priority-p2-bg)" },
-    P3: { text: "var(--of-priority-p3-text)", bg: "var(--of-priority-p3-bg)" },
-  };
-  return (
-    map[props.task.priority] ?? {
-      text: "var(--of-color-text-secondary)",
-      bg: "var(--of-color-gray-100)",
-    }
-  );
-});
+const statusBadgeStyle = computed(() =>
+  resolvedStatusBadge.value
+    ? {
+        color: resolvedStatusBadge.value.style.color,
+        backgroundColor: resolvedStatusBadge.value.style.background,
+      }
+    : DEFAULT_META_BADGE_STYLE,
+);
 
-// 状态显示文字
-const statusLabel = computed(() => {
-  if (!props.task) return "";
-  const labelMap: Record<string, string> = {
-    todo: "待处理",
-    in_progress: "进行中",
-    blocked: "阻塞",
-    done: "已完成",
-  };
-  return labelMap[props.task.status] ?? props.task.status;
-});
+const priorityBadgeStyle = computed(() =>
+  resolvedPriorityBadge.value
+    ? {
+        color: resolvedPriorityBadge.value.style.color,
+        backgroundColor: resolvedPriorityBadge.value.style.background,
+      }
+    : DEFAULT_META_BADGE_STYLE,
+);
 
-const displayStatusLabel = computed(() => {
-  if (!props.task) return "";
-  return statusLabel.value;
-});
-
-const displayPriorityLabel = computed(() => {
-  if (!props.task) return "";
-  return props.task.priority;
-});
+const displayStatusLabel = computed(() => resolvedStatusBadge.value?.label ?? "");
+const displayPriorityLabel = computed(() => resolvedPriorityBadge.value?.label ?? "");
 
 const displayRoleLabel = computed(() => props.task?.role ?? "");
 const displayAssigneeLabel = computed(() => props.task?.assignee ?? "");
@@ -152,7 +132,7 @@ function onDescriptionUpdate(value: string) {
           <!-- 状态徽章 -->
           <span
             class="detail-layout__badge"
-            :style="{ color: statusBadgeStyle.text, backgroundColor: statusBadgeStyle.bg }"
+            :style="statusBadgeStyle"
           >
             {{ displayStatusLabel }}
           </span>
@@ -160,7 +140,7 @@ function onDescriptionUpdate(value: string) {
           <!-- 优先级徽章 -->
           <span
             class="detail-layout__badge"
-            :style="{ color: priorityBadgeStyle.text, backgroundColor: priorityBadgeStyle.bg }"
+            :style="priorityBadgeStyle"
           >
             {{ displayPriorityLabel }}
           </span>

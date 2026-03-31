@@ -24,6 +24,7 @@ const props = withDefaults(
     columns: TableColumn[];
     priorityColorMap?: ColorMap;
     statusColorMap?: ColorMap;
+    groupColorMap?: ColorMap;
     kanbanAppearance?: DatabaseViewKanbanAppearance;
     readonly?: boolean;
     enableFieldManagement?: boolean;
@@ -32,6 +33,7 @@ const props = withDefaults(
     schema: null,
     priorityColorMap: undefined,
     statusColorMap: undefined,
+    groupColorMap: undefined,
     kanbanAppearance: undefined,
     readonly: false,
     enableFieldManagement: false,
@@ -123,6 +125,7 @@ function handleKanbanCardMove(
       :schema="props.schema ?? undefined"
       :view="props.view"
       :columns="props.columns"
+      :group-color-map="props.groupColorMap"
       :priority-color-map="props.priorityColorMap"
       :status-color-map="props.statusColorMap"
       :readonly="props.readonly"
@@ -176,6 +179,8 @@ function handleKanbanCardMove(
       :records="props.records"
       :schema="props.schema ?? undefined"
       :view="props.view"
+      :priority-color-map="props.priorityColorMap"
+      :status-color-map="props.statusColorMap"
       @card-click="emit('card-click', $event)"
       @add="emit('add')"
     />
