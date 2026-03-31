@@ -206,6 +206,46 @@ describe("Table + Detail 集成", () => {
     }
   });
 
+  it("DataTable 移动端会保留 status / priority badge 语义与 colorMap", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(375);
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          columns: [
+            { key: "title", label: "标题" },
+            { key: "status", label: "状态" },
+            { key: "priority", label: "优先级" },
+          ],
+          statusColorMap: {
+            in_progress: {
+              label: "执行中",
+              text: "#0f766e",
+              bg: "#ccfbf1",
+            },
+          },
+          priorityColorMap: {
+            P1: {
+              label: "最高",
+              text: "#991b1b",
+              bg: "#fee2e2",
+            },
+          },
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      const badges = wrapper.findAll(".of-mobile-card__badge").map((node) => node.text());
+      expect(badges).toContain("执行中");
+      expect(badges).toContain("最高");
+      expect(badges).toHaveLength(tasks.length * 2);
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
   it("DataTable 的 grid 语义应包含 row / columnheader / gridcell", async () => {
     const originalWidth = window.innerWidth;
     setViewportWidth(1280);

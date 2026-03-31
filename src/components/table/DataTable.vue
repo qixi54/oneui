@@ -809,6 +809,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
       :field-defs="fieldDefs"
       :selectable="effectiveSelectable"
       :addable="effectiveAddable"
+      :priority-color-map="priorityColorMap"
       :status-color-map="statusColorMap"
       :readonly="readonly"
       :density-class="densityClass"

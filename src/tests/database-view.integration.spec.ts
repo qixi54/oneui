@@ -386,7 +386,26 @@ const GalleryViewStub = defineComponent({
 
 const GanttTimelineStub = defineComponent({
   name: "GanttTimeline",
-  template: '<div data-view="timeline" data-role="timeline-view">timeline</div>',
+  props: {
+    priorityColorMap: {
+      type: Object,
+      default: undefined,
+    },
+    statusColorMap: {
+      type: Object,
+      default: undefined,
+    },
+  },
+  template: `
+    <div
+      data-view="timeline"
+      data-role="timeline-view"
+      :data-priority-label="priorityColorMap?.P0?.label ?? ''"
+      :data-status-label="statusColorMap?.todo?.label ?? ''"
+    >
+      timeline
+    </div>
+  `,
 });
 
 const DetailSheetStub = defineComponent({
@@ -958,6 +977,8 @@ describe("DatabaseView 页面级集成", () => {
     await wrapper.get('[data-role="switch-timeline"]').trigger("click");
     await nextTick();
     expect(wrapper.find('[data-view="timeline"]').exists()).toBe(true);
+    expect(wrapper.get('[data-role="timeline-view"]').attributes("data-priority-label")).toBe("");
+    expect(wrapper.get('[data-role="timeline-view"]').attributes("data-status-label")).toBe("");
 
     await wrapper.get('[data-role="switch-table"]').trigger("click");
     await nextTick();
@@ -1176,6 +1197,42 @@ describe("DatabaseView 页面级集成", () => {
     });
 
     const probe = wrapper.get('[data-role="table-view"]');
+    expect(probe.attributes("data-priority-label")).toBe("最高");
+    expect(probe.attributes("data-status-label")).toBe("待处理");
+  });
+
+  it("DatabaseViewContent 应该把 timeline colorMap 透传给 GanttTimeline", async () => {
+    const wrapper = mount(DatabaseViewContent, {
+      props: {
+        viewType: "timeline",
+        records: buildRecords(),
+        schema: buildSchema(),
+        view: buildViews()[3],
+        columns: [],
+        priorityColorMap: {
+          P0: {
+            label: "最高",
+            text: "#991b1b",
+            bg: "#fee2e2",
+          },
+        },
+        statusColorMap: {
+          todo: {
+            label: "待处理",
+            text: "#9a3412",
+            bg: "#ffedd5",
+            dot: "#ff5500",
+          },
+        },
+      },
+      global: {
+        stubs: {
+          GanttTimeline: GanttTimelineStub,
+        },
+      },
+    });
+
+    const probe = wrapper.get('[data-role="timeline-view"]');
     expect(probe.attributes("data-priority-label")).toBe("最高");
     expect(probe.attributes("data-status-label")).toBe("待处理");
   });

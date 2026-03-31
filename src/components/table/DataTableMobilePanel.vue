@@ -14,6 +14,7 @@ const props = withDefaults(
     fieldDefs?: CellFieldDef[];
     selectable?: boolean;
     addable?: boolean;
+    priorityColorMap?: ColorMap;
     statusColorMap?: ColorMap;
     readonly?: boolean;
     densityClass?: string;
@@ -25,6 +26,7 @@ const props = withDefaults(
     fieldDefs: () => [],
     selectable: true,
     addable: true,
+    priorityColorMap: undefined,
     statusColorMap: undefined,
     readonly: false,
     densityClass: "",
@@ -51,6 +53,7 @@ const emit = defineEmits<{
       :columns="props.columns"
       :selectable="props.selectable"
       :addable="props.addable"
+      :priority-color-map="props.priorityColorMap"
       :status-color-map="props.statusColorMap"
       :readonly="props.readonly"
       @row-click="(row) => emit('row-click', row as TableRowRecord)"

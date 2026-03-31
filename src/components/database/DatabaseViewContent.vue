@@ -186,6 +186,8 @@ function handleKanbanCardMove(
       :records="props.records"
       :schema="props.schema ?? undefined"
       :view-config="props.view"
+      :priority-color-map="props.priorityColorMap"
+      :status-color-map="props.statusColorMap"
       @row-click="emit('row-click', $event)"
       @record-change="emit('record-change', $event)"
       @update:records="emit('update:records', $event)"

@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { TableColumn, ColorMap } from "../../types";
-import { resolveBadge, mergeColorMap, DEFAULT_STATUS_MAP } from "../../composables/useBadge";
+import {
+  resolveBadge,
+  mergeColorMap,
+  DEFAULT_PRIORITY_MAP,
+  DEFAULT_STATUS_MAP,
+} from "../../composables/useBadge";
 
 type TableRow = Record<string, unknown> & { id: string };
 
@@ -11,12 +16,14 @@ const props = withDefaults(
     columns: TableColumn[];
     selectable?: boolean;
     addable?: boolean;
+    priorityColorMap?: ColorMap;
     statusColorMap?: ColorMap;
     readonly?: boolean;
   }>(),
   {
     selectable: false,
     addable: true,
+    priorityColorMap: undefined,
     statusColorMap: undefined,
     readonly: false,
   },
@@ -28,6 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const mergedStatusMap = computed(() => mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap));
+const mergedPriorityMap = computed(() => mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap));
 
 // Primary field = first column, secondary = next 2-3 columns
 const primaryCol = computed(() => props.columns[0]);
@@ -40,6 +48,10 @@ function getCellValue(row: TableRow, col: TableColumn): string {
 
 function getStatusBadge(value: string) {
   return resolveBadge(value, mergedStatusMap.value);
+}
+
+function getPriorityBadge(value: string) {
+  return resolveBadge(value, mergedPriorityMap.value);
 }
 
 // Swipe support
@@ -102,7 +114,21 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
         <!-- Primary field (title) -->
         <div v-if="primaryCol" class="of-mobile-card__title">
           <slot name="cell" :row="row" :col="primaryCol">
-            {{ getCellValue(row, primaryCol) || "—" }}
+            <span
+              v-if="primaryCol.key === 'status' && getCellValue(row, primaryCol)"
+              class="of-mobile-card__badge"
+              :style="getStatusBadge(getCellValue(row, primaryCol)).style"
+            >
+              {{ getStatusBadge(getCellValue(row, primaryCol)).label }}
+            </span>
+            <span
+              v-else-if="primaryCol.key === 'priority' && getCellValue(row, primaryCol)"
+              class="of-mobile-card__badge"
+              :style="getPriorityBadge(getCellValue(row, primaryCol)).style"
+            >
+              {{ getPriorityBadge(getCellValue(row, primaryCol)).label }}
+            </span>
+            <span v-else>{{ getCellValue(row, primaryCol) || "—" }}</span>
           </slot>
         </div>
 
@@ -116,6 +142,13 @@ function handleCardKeyDown(event: KeyboardEvent, row: TableRow) {
                 :style="getStatusBadge(getCellValue(row, col)).style"
               >
                 {{ getStatusBadge(getCellValue(row, col)).label }}
+              </span>
+              <span
+                v-else-if="col.key === 'priority' && getCellValue(row, col)"
+                class="of-mobile-card__badge"
+                :style="getPriorityBadge(getCellValue(row, col)).style"
+              >
+                {{ getPriorityBadge(getCellValue(row, col)).label }}
               </span>
               <span v-else-if="getCellValue(row, col)" class="of-mobile-card__tag">
                 {{ col.label }}: {{ getCellValue(row, col) }}

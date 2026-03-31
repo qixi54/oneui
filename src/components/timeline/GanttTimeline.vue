@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import GanttRow from "./GanttRow.vue";
+import type { ColorMap } from "../../types";
 import type { DataRecord, GanttItem, TableSchema, Task, ViewConfig } from "../../types";
 import { taskToDataRecord, buildGanttItems } from "../../types";
 
@@ -23,6 +24,8 @@ const props = withDefaults(
     startFieldId?: string;
     endFieldId?: string;
     labelFieldId?: string;
+    priorityColorMap?: ColorMap;
+    statusColorMap?: ColorMap;
     // 兼容旧接口
     items?: GanttItem[];
     data?: Task[];
@@ -36,6 +39,8 @@ const props = withDefaults(
     startFieldId: "startDate",
     endFieldId: "endDate",
     labelFieldId: "title",
+    priorityColorMap: undefined,
+    statusColorMap: undefined,
     items: undefined,
     data: undefined,
     startDate: undefined,
@@ -292,6 +297,8 @@ function handleRowChange(payload: {
         :duration-days="entry.durationDays"
         :day-width="DAY_WIDTH"
         :total-days="totalDays"
+        :priority-color-map="props.priorityColorMap"
+        :status-color-map="props.statusColorMap"
         @change="handleRowChange"
         @click="emit('row-click', entry.row)"
       />
