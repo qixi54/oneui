@@ -52,6 +52,12 @@ import { useDataTableSelection } from "@/composables/useDataTableSelection";
 import { useDataTableDetailSheet } from "@/composables/useDataTableDetailSheet";
 import { useTableEditing } from "@/composables/useTableEditing";
 import { useTableColumnSchema } from "@/composables/useTableColumnSchema";
+import {
+  DEFAULT_PRIORITY_MAP,
+  DEFAULT_STATUS_MAP,
+  mergeColorMap,
+  resolveBadge,
+} from "@/composables/useBadge";
 import type {
   Density,
   Task,
@@ -356,6 +362,27 @@ const { groupedItems, collapsedGroups, toggleGroup, isGroupHeader } = useTableGr
 // ── Virtual List ───────────────────────────────────────────────────────────
 
 const hasFixedColumns = computed(() => (props.fixedColumns?.length ?? 0) > 0);
+const mergedPriorityMap = computed(() => mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap));
+const mergedStatusMap = computed(() => mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap));
+
+function getCellStringValue(item: T, col: TableColumn): string {
+  const value = getRowValue(item, col.key);
+  return typeof value === "string" ? value : value != null ? String(value) : "";
+}
+
+function getCellDisplayValue(item: T, col: TableColumn): string {
+  const value = getRowValue(item, col.key);
+  return value != null && value !== "" ? String(value) : "-";
+}
+
+function getPriorityBadge(item: T, col: TableColumn) {
+  return resolveBadge(getCellStringValue(item, col), mergedPriorityMap.value);
+}
+
+function getStatusBadge(item: T, col: TableColumn) {
+  return resolveBadge(getCellStringValue(item, col), mergedStatusMap.value);
+}
+
 const scrollLeft = ref(0);
 const showFixedShadow = computed(() => scrollLeft.value > 0);
 
@@ -909,18 +936,29 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :style="bodyCellStyle(col)"
                   >
                     <slot name="cell" :row="item" :col="col">
-                      <FieldCell
-                        v-if="fieldDefs?.length"
-                        :row-id="getRowId(item as T)"
-                        :field="getFieldDef(col.key)"
-                        :value="getRowValue(item as T, col.key)"
-                        :editing="isCellEditing(getRowId(item as T), col.key)"
-                        :state="cellState(getRowId(item as T), col.key)"
-                        @commit="onCellCommit"
-                        @request-edit="onCellRequestEdit"
-                        @request-cancel="onCellRequestCancel"
-                      />
-                      <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
+                      <template v-if="col.key === 'status'">
+                        <span class="of-badge" :style="getStatusBadge(item as T, col).style">
+                          {{ getStatusBadge(item as T, col).label }}
+                        </span>
+                      </template>
+                      <template v-else-if="col.key === 'priority'">
+                        <span class="of-badge" :style="getPriorityBadge(item as T, col).style">
+                          {{ getPriorityBadge(item as T, col).label }}
+                        </span>
+                      </template>
+                      <template v-else-if="fieldDefs?.length">
+                        <FieldCell
+                          :row-id="getRowId(item as T)"
+                          :field="getFieldDef(col.key)"
+                          :value="getRowValue(item as T, col.key)"
+                          :editing="isCellEditing(getRowId(item as T), col.key)"
+                          :state="cellState(getRowId(item as T), col.key)"
+                          @commit="onCellCommit"
+                          @request-edit="onCellRequestEdit"
+                          @request-cancel="onCellRequestCancel"
+                        />
+                      </template>
+                      <span v-else class="of-td-text">{{ getCellDisplayValue(item as T, col) }}</span>
                     </slot>
                   </div>
                   <div
@@ -995,18 +1033,29 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                 :style="bodyCellStyle(col)"
               >
                 <slot name="cell" :row="item" :col="col">
-                  <FieldCell
-                    v-if="fieldDefs?.length"
-                    :row-id="getRowId(item as T)"
-                    :field="getFieldDef(col.key)"
-                    :value="getRowValue(item as T, col.key)"
-                    :editing="isCellEditing(getRowId(item as T), col.key)"
-                    :state="cellState(getRowId(item as T), col.key)"
-                    @commit="onCellCommit"
-                    @request-edit="onCellRequestEdit"
-                    @request-cancel="onCellRequestCancel"
-                  />
-                  <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
+                  <template v-if="col.key === 'status'">
+                    <span class="of-badge" :style="getStatusBadge(item as T, col).style">
+                      {{ getStatusBadge(item as T, col).label }}
+                    </span>
+                  </template>
+                  <template v-else-if="col.key === 'priority'">
+                    <span class="of-badge" :style="getPriorityBadge(item as T, col).style">
+                      {{ getPriorityBadge(item as T, col).label }}
+                    </span>
+                  </template>
+                  <template v-else-if="fieldDefs?.length">
+                    <FieldCell
+                      :row-id="getRowId(item as T)"
+                      :field="getFieldDef(col.key)"
+                      :value="getRowValue(item as T, col.key)"
+                      :editing="isCellEditing(getRowId(item as T), col.key)"
+                      :state="cellState(getRowId(item as T), col.key)"
+                      @commit="onCellCommit"
+                      @request-edit="onCellRequestEdit"
+                      @request-cancel="onCellRequestCancel"
+                    />
+                  </template>
+                  <span v-else class="of-td-text">{{ getCellDisplayValue(item as T, col) }}</span>
                 </slot>
               </div>
               <div
@@ -1081,18 +1130,29 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     :style="bodyCellStyle(col)"
                   >
                     <slot name="cell" :row="item" :col="col">
-                      <FieldCell
-                        v-if="fieldDefs?.length"
-                        :row-id="getRowId(item as T)"
-                        :field="getFieldDef(col.key)"
-                        :value="getRowValue(item as T, col.key)"
-                        :editing="isCellEditing(getRowId(item as T), col.key)"
-                        :state="cellState(getRowId(item as T), col.key)"
-                        @commit="onCellCommit"
-                        @request-edit="onCellRequestEdit"
-                        @request-cancel="onCellRequestCancel"
-                      />
-                      <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
+                      <template v-if="col.key === 'status'">
+                        <span class="of-badge" :style="getStatusBadge(item as T, col).style">
+                          {{ getStatusBadge(item as T, col).label }}
+                        </span>
+                      </template>
+                      <template v-else-if="col.key === 'priority'">
+                        <span class="of-badge" :style="getPriorityBadge(item as T, col).style">
+                          {{ getPriorityBadge(item as T, col).label }}
+                        </span>
+                      </template>
+                      <template v-else-if="fieldDefs?.length">
+                        <FieldCell
+                          :row-id="getRowId(item as T)"
+                          :field="getFieldDef(col.key)"
+                          :value="getRowValue(item as T, col.key)"
+                          :editing="isCellEditing(getRowId(item as T), col.key)"
+                          :state="cellState(getRowId(item as T), col.key)"
+                          @commit="onCellCommit"
+                          @request-edit="onCellRequestEdit"
+                          @request-cancel="onCellRequestCancel"
+                        />
+                      </template>
+                      <span v-else class="of-td-text">{{ getCellDisplayValue(item as T, col) }}</span>
                     </slot>
                   </div>
                 </div>
@@ -1127,18 +1187,29 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                 :style="bodyCellStyle(col)"
               >
                 <slot name="cell" :row="item" :col="col">
-                  <FieldCell
-                    v-if="fieldDefs?.length"
-                    :row-id="getRowId(item as T)"
-                    :field="getFieldDef(col.key)"
-                    :value="getRowValue(item as T, col.key)"
-                    :editing="isCellEditing(getRowId(item as T), col.key)"
-                    :state="cellState(getRowId(item as T), col.key)"
-                    @commit="onCellCommit"
-                    @request-edit="onCellRequestEdit"
-                    @request-cancel="onCellRequestCancel"
-                  />
-                  <span v-else class="of-td-text">{{ getRowValue(item as T, col.key) ?? "-" }}</span>
+                  <template v-if="col.key === 'status'">
+                    <span class="of-badge" :style="getStatusBadge(item as T, col).style">
+                      {{ getStatusBadge(item as T, col).label }}
+                    </span>
+                  </template>
+                  <template v-else-if="col.key === 'priority'">
+                    <span class="of-badge" :style="getPriorityBadge(item as T, col).style">
+                      {{ getPriorityBadge(item as T, col).label }}
+                    </span>
+                  </template>
+                  <template v-else-if="fieldDefs?.length">
+                    <FieldCell
+                      :row-id="getRowId(item as T)"
+                      :field="getFieldDef(col.key)"
+                      :value="getRowValue(item as T, col.key)"
+                      :editing="isCellEditing(getRowId(item as T), col.key)"
+                      :state="cellState(getRowId(item as T), col.key)"
+                      @commit="onCellCommit"
+                      @request-edit="onCellRequestEdit"
+                      @request-cancel="onCellRequestCancel"
+                    />
+                  </template>
+                  <span v-else class="of-td-text">{{ getCellDisplayValue(item as T, col) }}</span>
                 </slot>
               </div>
             </div>
@@ -1197,8 +1268,18 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                 >
                   <template #cell="{ row: slotRow, col }">
                     <slot name="cell" :row="slotRow" :col="col">
+                      <template v-if="col.key === 'status'">
+                        <span class="of-badge" :style="getStatusBadge(slotRow as T, col).style">
+                          {{ getStatusBadge(slotRow as T, col).label }}
+                        </span>
+                      </template>
+                      <template v-else-if="col.key === 'priority'">
+                        <span class="of-badge" :style="getPriorityBadge(slotRow as T, col).style">
+                          {{ getPriorityBadge(slotRow as T, col).label }}
+                        </span>
+                      </template>
                       <FieldCell
-                        v-if="fieldDefs?.length"
+                        v-else-if="fieldDefs?.length"
                         :row-id="getRowId(slotRow as T)"
                         :field="getFieldDef(col.key)"
                         :value="slotRow[col.key] as CellValue"
@@ -1213,9 +1294,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                         @request-cancel="onCellRequestCancel"
                         @click.stop="enableKeyboard && setActiveCell(getRowId(slotRow as T), col.key)"
                       />
-                      <span v-else class="of-td-text">
-                        {{ getRowValue(slotRow as Record<string, unknown>, col.key) ?? "-" }}
-                      </span>
+                      <span v-else class="of-td-text">{{ getCellDisplayValue(slotRow as T, col) }}</span>
                     </slot>
                   </template>
                 </TableDataRow>
@@ -1247,8 +1326,18 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
             >
               <template #cell="{ row: slotRow, col }">
                 <slot name="cell" :row="slotRow" :col="col">
+                  <template v-if="col.key === 'status'">
+                    <span class="of-badge" :style="getStatusBadge(slotRow as T, col).style">
+                      {{ getStatusBadge(slotRow as T, col).label }}
+                    </span>
+                  </template>
+                  <template v-else-if="col.key === 'priority'">
+                    <span class="of-badge" :style="getPriorityBadge(slotRow as T, col).style">
+                      {{ getPriorityBadge(slotRow as T, col).label }}
+                    </span>
+                  </template>
                   <FieldCell
-                    v-if="fieldDefs?.length"
+                    v-else-if="fieldDefs?.length"
                     :row-id="getRowId(slotRow as T)"
                     :field="getFieldDef(col.key)"
                     :value="slotRow[col.key] as CellValue"
@@ -1263,9 +1352,7 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
                     @request-cancel="onCellRequestCancel"
                     @click.stop="enableKeyboard && setActiveCell(getRowId(slotRow as T), col.key)"
                   />
-                  <span v-else class="of-td-text">
-                    {{ getRowValue(slotRow as Record<string, unknown>, col.key) ?? "-" }}
-                  </span>
+                  <span v-else class="of-td-text">{{ getCellDisplayValue(slotRow as T, col) }}</span>
                 </slot>
               </template>
             </TableDataRow>
@@ -1497,5 +1584,18 @@ function handleDetailSave(payload: { rowId: string; fields: Record<string, unkno
   border-radius: var(--of-radius-lg, 8px);
   box-shadow: var(--of-shadow-overlay-lg);
   border: 1px solid var(--of-border-subtle, var(--of-color-gray-200));
+}
+
+.of-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 var(--of-spacing-2);
+  border-radius: var(--of-radius-full, 999px);
+  font-size: var(--of-font-size-xs, 12px);
+  font-weight: var(--of-font-weight-medium, 500);
+  line-height: 1;
+  white-space: nowrap;
 }
 </style>

@@ -123,6 +123,8 @@ function handleKanbanCardMove(
       :schema="props.schema ?? undefined"
       :view="props.view"
       :columns="props.columns"
+      :priority-color-map="props.priorityColorMap"
+      :status-color-map="props.statusColorMap"
       :readonly="props.readonly"
       :enable-field-management="props.enableFieldManagement"
       @cell-edit="emit('cell-edit', $event)"

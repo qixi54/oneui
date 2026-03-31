@@ -1,6 +1,6 @@
 {
   "name": "@oneflowui/ui",
-  "version": "0.9.2",
+  "version": "0.9.5",
   "description": "OneFlow UI Component Library - Vue3 components for task management views",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,10 @@
     "./theme": {
       "types": "./dist/theme.d.ts",
       "import": "./dist/theme.js"
+    },
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "import": "./dist/tokens.js"
     },
     "./styles": "./dist/style.css",
     "./*": {

@@ -174,6 +174,10 @@ export {
 // ─── Overlay ─────────────────────────────────────────────────────────────────
 export { Modal, Dialog, Drawer, SidePanel } from "./components/overlay";
 
+// ─── Tokens ──────────────────────────────────────────────────────────────────
+export { tokens } from "./tokens";
+export type { Tokens } from "./tokens";
+
 // ─── Toast ───────────────────────────────────────────────────────────────────
 export { ToastContainer, ToastItem } from "./components/toast";
 

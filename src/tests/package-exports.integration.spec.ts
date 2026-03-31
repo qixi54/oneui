@@ -25,6 +25,10 @@ describe("package exports", () => {
         types: "./dist/theme.d.ts",
         import: "./dist/theme.js",
       },
+      "./tokens": {
+        types: "./dist/tokens.d.ts",
+        import: "./dist/tokens.js",
+      },
       "./types": {
         types: "./dist/types/index.d.ts",
         import: "./dist/types/index.js",

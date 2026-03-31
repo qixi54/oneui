@@ -148,6 +148,44 @@ import '@oneflowui/ui/theme'
 
 This structure is meant to keep the component layer reusable while letting product-specific styling live above it.
 
+### Token Override / Theme Bridge
+
+If your app already owns its own design tokens, keep them as the source of truth and bridge them into OneUI through CSS variables. The runtime theme files follow the same idea: `src/styles/variables.css` defines the default `--of-*` surface, while `src/styles/themes/neutral.css` and `src/styles/themes/ops-console.css` only override the semantic layer.
+
+```css
+:root {
+  --app-surface-canvas: #f6f7f9;
+  --app-surface-panel: #ffffff;
+  --app-text-primary: #0f172a;
+  --app-text-secondary: #526071;
+  --app-border-subtle: rgba(15, 23, 42, 0.08);
+  --app-accent-default: #334155;
+
+  --of-surface-canvas: var(--app-surface-canvas);
+  --of-surface-elevated: var(--app-surface-panel);
+  --of-text-primary: var(--app-text-primary);
+  --of-text-secondary: var(--app-text-secondary);
+  --of-border-subtle: var(--app-border-subtle);
+  --of-accent-default: var(--app-accent-default);
+}
+```
+
+For local theming, scope the bridge to a wrapper instead of mutating the document root:
+
+```css
+.ops-preview {
+  --app-surface-canvas: #edf3f8;
+  --app-surface-panel: rgba(255, 255, 255, 0.88);
+  --app-accent-default: #0f4c81;
+
+  --of-surface-canvas: var(--app-surface-canvas);
+  --of-surface-elevated: var(--app-surface-panel);
+  --of-accent-default: var(--app-accent-default);
+}
+```
+
+The full token reference, grouped by surface / text / border / accent / state / shadow / radius / spacing / z-index, lives in [`docs/CSS-TOKENS.md`](docs/CSS-TOKENS.md).
+
 ### ThemeScope Wrapper
 
 When a single page needs two visual contexts at once, prefer the `ThemeScope` component. It automatically writes `data-of-theme` and `data-of-theme-scope` on the wrapper, so consumers do not need to hand-write attributes.

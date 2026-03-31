@@ -15,7 +15,9 @@ describe("package entrypoints", () => {
 
     expect(packageJson).toContain('"./composables"');
     expect(packageJson).toContain('"./theme"');
+    expect(packageJson).toContain('"./tokens"');
     expect(packageJson).toContain('"./dist/theme.js"');
+    expect(packageJson).toContain('"./dist/tokens.js"');
     expect(packageJson).toContain('"./dist/plugin.js"');
     expect(packageJson).toContain('"**/*.css"');
 
@@ -28,8 +30,10 @@ describe("package entrypoints", () => {
     expect(themeEntry).toContain('./styles/markdown.css');
 
     expect(readme).toContain("@oneflowui/ui/theme");
+    expect(readme).toContain("docs/CSS-TOKENS.md");
     expect(readme).toContain("@oneflowui/ui/composables");
     expect(readmeEn).toContain("@oneflowui/ui/theme");
+    expect(readmeEn).toContain("docs/CSS-TOKENS.md");
     expect(readmeEn).toContain("@oneflowui/ui/composables");
   });
 });

@@ -139,6 +139,44 @@ import '@oneflowui/ui/theme'
 2. 业务系统通过主题皮肤注入品牌感或中控台气质
 3. 后续可继续扩展更多主题，而不需要修改组件 API
 
+### Token Override / Theme Bridge
+
+如果你的应用已经有自己的设计系统 token，建议保留它们作为真源，再通过 CSS 变量桥接到 OneUI 的 `--of-*` 命名空间。运行时主题文件本身也遵循这个原则：`src/styles/variables.css` 负责默认 `--of-*` 变量面，`src/styles/themes/neutral.css` 和 `src/styles/themes/ops-console.css` 只覆盖语义层。
+
+```css
+:root {
+  --app-surface-canvas: #f6f7f9;
+  --app-surface-panel: #ffffff;
+  --app-text-primary: #0f172a;
+  --app-text-secondary: #526071;
+  --app-border-subtle: rgba(15, 23, 42, 0.08);
+  --app-accent-default: #334155;
+
+  --of-surface-canvas: var(--app-surface-canvas);
+  --of-surface-elevated: var(--app-surface-panel);
+  --of-text-primary: var(--app-text-primary);
+  --of-text-secondary: var(--app-text-secondary);
+  --of-border-subtle: var(--app-border-subtle);
+  --of-accent-default: var(--app-accent-default);
+}
+```
+
+局部换肤时，优先把 bridge 绑到 wrapper 上，而不是改全局根节点：
+
+```css
+.ops-preview {
+  --app-surface-canvas: #edf3f8;
+  --app-surface-panel: rgba(255, 255, 255, 0.88);
+  --app-accent-default: #0f4c81;
+
+  --of-surface-canvas: var(--app-surface-canvas);
+  --of-surface-elevated: var(--app-surface-panel);
+  --of-accent-default: var(--app-accent-default);
+}
+```
+
+完整 token 参考按 surface / text / border / accent / state / shadow / radius / spacing / z-index 分类收录在 [`docs/CSS-TOKENS.md`](docs/CSS-TOKENS.md)。
+
 ### ThemeScope 包装组件
 
 如果同一页面里需要并存两种视觉语境，优先使用 `ThemeScope`。这个组件会自动给 wrapper 注入 `data-of-theme` 和 `data-of-theme-scope`，业务方不需要手写属性。

@@ -284,6 +284,68 @@ describe("Table + Detail 集成", () => {
     }
   });
 
+  it("DataTable 固定列桌面分支会渲染 status / priority 彩色 badge", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1280);
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          fixedColumns: ["title"],
+          columns: [
+            { key: "title", label: "标题", width: 220 },
+            { key: "status", label: "状态", width: 120 },
+            { key: "priority", label: "优先级", width: 100 },
+          ],
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      const badges = wrapper.findAll(".of-badge").map((node) => node.text());
+      expect(badges).toContain("进行中");
+      expect(badges).toContain("待处理");
+      expect(badges).toContain("P1");
+      expect(badges).toContain("P2");
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
+  it("DataTable 桌面标准分支会保留 status / priority badge fallback", async () => {
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1280);
+    const fieldDefs: FieldDef[] = [
+      { id: "title", type: "text", label: "标题" },
+      { id: "status", type: "select", label: "状态", options: [] },
+      { id: "priority", type: "select", label: "优先级", options: [] },
+    ];
+    try {
+      const wrapper = mount(DataTable, {
+        props: {
+          tasks,
+          columns: [
+            { key: "title", label: "标题" },
+            { key: "status", label: "状态" },
+            { key: "priority", label: "优先级" },
+          ],
+          fieldDefs,
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      const badges = wrapper.findAll(".of-badge").map((node) => node.text());
+      expect(badges).toContain("进行中");
+      expect(badges).toContain("待处理");
+      expect(badges).toContain("P1");
+      expect(badges).toContain("P2");
+      expect(wrapper.findAll(".of-field-cell")).toHaveLength(tasks.length);
+    } finally {
+      setViewportWidth(originalWidth);
+    }
+  });
+
   it("DataTable 预留 density=compact 的契约位", async () => {
     const originalWidth = window.innerWidth;
     setViewportWidth(1280);

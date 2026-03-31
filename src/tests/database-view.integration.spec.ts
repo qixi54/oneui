@@ -187,9 +187,24 @@ const TableToolbarStub = defineComponent({
 
 const DataTableStub = defineComponent({
   name: "DataTable",
+  props: {
+    priorityColorMap: {
+      type: Object,
+      default: undefined,
+    },
+    statusColorMap: {
+      type: Object,
+      default: undefined,
+    },
+  },
   emits: ["cell-edit", "schema-add-field"],
   template: `
-    <div data-view="table" data-role="table-view">
+    <div
+      data-view="table"
+      data-role="table-view"
+      :data-priority-label="priorityColorMap?.P0?.label ?? ''"
+      :data-status-label="statusColorMap?.todo?.label ?? ''"
+    >
       <button
         data-role="emit-cell-edit"
         @click="$emit('cell-edit', { rowId: 'R-1', fieldId: 'title', value: 'updated' })"
@@ -1127,6 +1142,42 @@ describe("DatabaseView 页面级集成", () => {
       record: buildRecords()[0],
       fields: buildRecords()[0].fields,
     });
+  });
+
+  it("DatabaseViewContent 应该把 table colorMap 透传给 DataTable", async () => {
+    const wrapper = mount(DatabaseViewContent, {
+      props: {
+        viewType: "table",
+        records: buildRecords(),
+        schema: buildSchema(),
+        view: buildViews()[0],
+        columns: [],
+        priorityColorMap: {
+          P0: {
+            label: "最高",
+            text: "#991b1b",
+            bg: "#fee2e2",
+          },
+        },
+        statusColorMap: {
+          todo: {
+            label: "待处理",
+            text: "#9a3412",
+            bg: "#ffedd5",
+            dot: "#ff5500",
+          },
+        },
+      },
+      global: {
+        stubs: {
+          DataTable: DataTableStub,
+        },
+      },
+    });
+
+    const probe = wrapper.get('[data-role="table-view"]');
+    expect(probe.attributes("data-priority-label")).toBe("最高");
+    expect(probe.attributes("data-status-label")).toBe("待处理");
   });
 
   it("DatabaseView 应该把 kanban update:columns 归并回 update:records", async () => {
