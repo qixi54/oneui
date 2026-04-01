@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useMarkdown } from "@/composables/useMarkdown";
+import { useMarkdown, useTextOverflow } from "@/composables";
 
 const props = withDefaults(
   defineProps<{
@@ -18,6 +18,8 @@ const props = withDefaults(
 );
 
 const { renderMarkdown } = useMarkdown();
+const previewFont = "14px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const previewLineHeight = 19.6;
 
 /** 截断预览：提取纯文本，去掉 markdown 标记 */
 const previewText = computed(() => {
@@ -25,16 +27,21 @@ const previewText = computed(() => {
   return stripMarkdown(props.content);
 });
 
+const {
+  targetRef: previewRef,
+  isOverflowing: isTruncated,
+} = useTextOverflow({
+  text: previewText,
+  font: previewFont,
+  lineHeight: previewLineHeight,
+  maxLines: () => props.maxLines,
+  whiteSpace: "normal",
+});
+
 /** 完整渲染的 HTML */
 const renderedHtml = computed(() => {
   if (!props.content) return "";
   return renderMarkdown(props.content);
-});
-
-/** 是否有内容需要截断 */
-const isTruncated = computed(() => {
-  if (!props.content) return false;
-  return props.content.length > 100 || props.content.includes("\n");
 });
 
 /**
@@ -77,6 +84,7 @@ function stripMarkdown(md: string): string {
     <!-- 截断预览模式 -->
     <span
       v-if="!expanded"
+      ref="previewRef"
       class="of-field-md-preview__text"
       :style="{ '-webkit-line-clamp': maxLines }"
     >

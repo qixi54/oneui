@@ -1,0 +1,52 @@
+{
+  "creator": "ARCH",
+  "title": "OneUI Pretext Text Layout Upgrade",
+  "brief": "为 OneUI 增加统一文本布局适配层，并首批升级 AI 消息列表与 Kanban 虚拟卡片的文本高度预测。",
+  "description": "# Part 1 执行摘要\n当前 OneUI 已具备虚拟列表与真实行高测量能力，但文本高度预估仍散落在组件侧，未形成统一文本布局内核。证据见 /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/ai/AiMessageList.vue:28、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanColumn.vue:111、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/gallery/GalleryCard.vue:74、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/composables/useVirtualList.ts:20。本计划统一收口 ONEUI-ARCH-00063、ONEUI-FE-00147、ONEUI-FE-00149，执行顺序冻结为：先补文本布局适配层，再接入 AI 消息列表与 Kanban 虚拟卡片，最后补 Gallery 接口预留、验证与留痕。\n\n# Part 2 需求分析\nP0：引入统一文本布局 adapter，避免组件重复维护字符数估高公式。P0：AiMessageList 改为文本驱动的预测高度，减少多语言、emoji、streaming 场景下的滚动跳动。P1：Kanban 虚拟卡片由固定 120px 改为文本驱动预测高度，并为 Gallery 预留统一布局接入点。\n\n# Part 3 详细方案\n改动范围固定为 /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/ai/AiMessageList.vue、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/kanban/KanbanColumn.vue、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/gallery/GalleryCard.vue、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/composables/useVirtualList.ts，以及新增文本布局 adapter 与相关测试文件。保留 measured correction，不把预测高度当成唯一真相；RichTextEditor 不纳入本轮。\n\n# Part 4 实现路线图\nPhase A：引入 @chenglou/pretext 与 adapter。Phase B：并行升级 AiMessageList 与 Kanban 虚拟卡片。Phase C：补 Gallery 接口预留、测试、门禁和验证回填。\n\n# Part 5 工作量估计\nARCH 约 1.5 天，FE 约 0.5 天，另预留 0.5 天缓冲，总预算 2.5 天。\n\n# Part 6 风险评估\n高风险一：把纯文本内核误用于富文本编辑态；缓解动作是保持 RichTextEditor 非目标。高风险二：字体声明与真实 CSS 不一致导致预测失真；缓解动作是在 adapter API 中显式要求 font/lineHeight，并覆盖测试。中风险：Kanban 自定义卡片 slot 高度不可预测；缓解动作是自定义卡片继续禁用虚拟化或退回旧策略。\n\n# Part 7 验收标准\n1. 存在可复用文本布局 adapter 并通过相关测试。2. AiMessageList 不再直接按字符数估高。3. Kanban 虚拟卡片使用文本驱动预测高度。4. type-check 与 build 通过。\n\n# Part 8 回滚方案\n若接入效果不稳定，先回滚消费方接入，再回滚 adapter 与依赖。本轮不改服务器和共享数据，因此只需本地代码回退。\n\n# Part 9 架构决策记录\n先沉淀 adapter，再接入消费方；保留 measured correction；RichTextEditor 不纳入本轮。\n\n# Part 10 参考和附录\nissue: ONEUI-ARCH-00063, ONEUI-FE-00147, ONEUI-FE-00149; 预期执行 task: ONEUI-ARCH-00064, ONEUI-FE-00148, ONEUI-FE-00150; 文档路径: docs/plans/2026-04-01-oneui-pretext-upgrade-plan.md",
+  "plan_type": "feature",
+  "priority": "P1",
+  "execution_mode": "interactive",
+  "acceptance_criteria": [
+    {
+      "title": "adapter exists",
+      "criterion": "OneUI contains a reusable text layout adapter backed by pretext and the adapter test passes.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/useTextLayout.integration.spec.ts'"
+    },
+    {
+      "title": "ai list upgraded",
+      "criterion": "AiMessageList no longer relies on raw character-count estimation and related tests pass.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/ai-message-list.integration.spec.ts src/tests/useVirtualList.integration.spec.ts'"
+    },
+    {
+      "title": "kanban virtual height upgraded",
+      "criterion": "Kanban virtual mode uses text-driven predicted height and kanban tests pass.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/kanban.integration.spec.ts'"
+    },
+    {
+      "title": "type-check passes",
+      "criterion": "type-check passes after the upgrade; build evidence is recorded separately in verification artifacts.",
+      "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npm run type-check'"
+    }
+  ],
+  "tags": [
+    "pretext",
+    "text-layout",
+    "virtual-list",
+    "ai-message-list",
+    "kanban",
+    "issue:ONEUI-ARCH-00063",
+    "issue:ONEUI-FE-00147",
+    "issue:ONEUI-FE-00149"
+  ],
+  "meta": {
+    "delivery_profile": "standard_delivery",
+    "issues": [
+      "ONEUI-ARCH-00063",
+      "ONEUI-FE-00147",
+      "ONEUI-FE-00149"
+    ],
+    "artifacts": [
+      "docs/plans/2026-04-01-oneui-pretext-upgrade-plan.md"
+    ]
+  }
+}

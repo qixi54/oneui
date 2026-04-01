@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from "vue";
+import { useTextOverflow } from "@/composables";
 import { useInlineEdit } from "@/composables/useInlineEdit";
 import type {
   TableCellEditState,
@@ -111,6 +112,26 @@ const FieldMarkdownPreviewAsync = defineAsyncComponent(
 );
 
 const currentEditor = computed(() => editorMap[props.field.type]);
+const isRichtextPreview = computed(
+  () => props.field.type === "richtext" && typeof props.value === "string" && props.value.length > 0,
+);
+function stripMarkdownPreviewText(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, "[代码]")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*{1,3}(.*?)\*{1,3}/g, "$1")
+    .replace(/_{1,3}(.*?)_{1,3}/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "[图片]")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^[\s]*[-*+]\s+/gm, "")
+    .replace(/^[\s]*\d+\.\s+/gm, "")
+    .replace(/^>\s+/gm, "")
+    .replace(/^---+$/gm, "")
+    .replace(/\n{2,}/g, " — ")
+    .replace(/\n/g, " ")
+    .trim();
+}
 
 const displayValue = computed(() => {
   const v = props.value;
@@ -118,13 +139,45 @@ const displayValue = computed(() => {
   if (Array.isArray(v)) return v.join(", ");
   if (typeof v === "boolean") return v ? "✓" : "—";
   if (props.field.formatter) {
-    return props.field.formatter(v, {
-      rowId: props.rowId,
-      fieldId: props.field.id,
-      originalValue: props.state?.originalValue,
-    });
+    return String(
+      props.field.formatter(v, {
+        rowId: props.rowId,
+        fieldId: props.field.id,
+        originalValue: props.state?.originalValue,
+      }),
+    );
   }
   return String(v);
+});
+
+const previewText = computed(() => {
+  if (!isRichtextPreview.value) return displayValue.value;
+  return stripMarkdownPreviewText(String(props.value));
+});
+
+const previewFont = computed(() =>
+  isRichtextPreview.value
+    ? "14px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    : "14px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
+);
+
+const previewLineHeight = computed(() => (isRichtextPreview.value ? 20 : 20));
+const previewMaxLines = computed(() => (isRichtextPreview.value ? 2 : 1));
+
+const textOverflow = useTextOverflow({
+  text: previewText,
+  font: previewFont,
+  lineHeight: previewLineHeight,
+  maxLines: previewMaxLines,
+  whiteSpace: "normal",
+});
+
+const contentRef = textOverflow.targetRef;
+const predictedHeight = computed(() => Math.round(textOverflow.predictedHeight.value));
+const clampHeight = computed(() => Math.round(textOverflow.clampHeight.value));
+const overflowState = computed<"fit" | "overflow" | "unknown">(() => {
+  if (isEffectivelyEditing.value) return "unknown";
+  return textOverflow.isOverflowing.value ? "overflow" : "fit";
 });
 </script>
 
@@ -139,6 +192,11 @@ const displayValue = computed(() => {
       'of-field-cell--error': hasError,
     }"
     :data-edit-phase="state?.phase ?? (isEffectivelyEditing ? 'editing' : 'idle')"
+    :data-field-cell-content-kind="isRichtextPreview ? 'richtext' : 'text'"
+    :data-field-cell-overflow-state="overflowState"
+    :data-field-cell-text-length="previewText.length"
+    :data-field-cell-predicted-height="predictedHeight"
+    :data-field-cell-clamp-height="clampHeight"
     :type="isReadonly || isEffectivelyEditing ? undefined : 'button'"
     :aria-label="`${field.label}字段`"
     :title="isReadonly ? undefined : `点击编辑 ${field.label}`"
@@ -163,12 +221,32 @@ const displayValue = computed(() => {
     </template>
 
     <template v-else>
-      <FieldMarkdownPreviewAsync
-        v-if="field.type === 'richtext' && typeof value === 'string' && value"
-        :content="value"
-        :max-lines="2"
-      />
-      <span v-else class="of-field-cell__display">{{ displayValue }}</span>
+      <div
+        v-if="isRichtextPreview"
+        ref="contentRef"
+        class="of-field-cell__preview"
+        data-field-cell-preview-mode="richtext"
+        :data-field-cell-content-kind="isRichtextPreview ? 'richtext' : 'text'"
+        :data-field-cell-overflow-state="overflowState"
+        :data-field-cell-text-length="previewText.length"
+        :data-field-cell-predicted-height="predictedHeight"
+        :data-field-cell-clamp-height="clampHeight"
+      >
+        <FieldMarkdownPreviewAsync :content="String(value)" :max-lines="2" />
+      </div>
+      <span
+        v-else
+        ref="contentRef"
+        class="of-field-cell__display"
+        data-field-cell-preview-mode="text"
+        :data-field-cell-content-kind="isRichtextPreview ? 'richtext' : 'text'"
+        :data-field-cell-overflow-state="overflowState"
+        :data-field-cell-text-length="previewText.length"
+        :data-field-cell-predicted-height="predictedHeight"
+        :data-field-cell-clamp-height="clampHeight"
+      >
+        {{ displayValue }}
+      </span>
     </template>
 
     <span v-if="hasError" class="of-field-cell__error">{{ errorMessage }}</span>
@@ -213,12 +291,23 @@ const displayValue = computed(() => {
 }
 
 .of-field-cell__display {
+  display: block;
+  flex: 1;
+  min-width: 0;
   font-size: var(--of-font-size-base);
   color: var(--of-text-primary, var(--of-color-gray-700));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+.of-field-cell__preview {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 .of-field-cell__loading {

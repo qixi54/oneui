@@ -1,0 +1,59 @@
+{
+  "config": {
+    "project": "oneui",
+    "channel": "main"
+  },
+  "plan": {
+    "title": "OneUI Text Preview And Overflow Upgrade",
+    "brief": "为 OneUI 展示态文本补真实溢出检测与统一可观测层，首批覆盖 Markdown 预览、InfoCard 和 FieldCell。",
+    "creator": "ARCH",
+    "description": "# Part 1 执行摘要\nOneUI 已完成第一批 pretext 文本布局接入，但展示态文本仍存在三类未收口问题：Markdown 预览仍按字符数判断截断、InfoCard 仍完全依赖 CSS clamp、表格 FieldCell 缺少真实溢出状态。证据见 /opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/field/FieldMarkdownPreview.vue:31、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/base/InfoCard.vue:268、/opt/Oneflow/flowlab/项目/oneui/code/develop/src/components/table/FieldCell.vue:156。本计划收口 ONEUI-FE-00153、ONEUI-FE-00155、ONEUI-FE-00157，目标是为展示态文本补统一的真实溢出检测和可观测层，不改富文本编辑器本体。执行顺序固定为：先冻结展示态 contract 与测试口径，再并行实现 Markdown 预览、InfoCard、FieldCell 三块，最后做验证与留痕。\n\n# Part 2 需求分析\nP0：Markdown 预览从字符数判断切到真实溢出检测。P0：InfoCard 增加标题和摘要的可观测文本布局入口。P1：FieldCell 对齐普通文本与 richtext 预览的展示态溢出规则。\n\n# Part 3 详细方案\n新增轻量展示态文本检测 composable，输出 isOverflowing、预测高度或等效 data 属性；消费方限定为 FieldMarkdownPreview、InfoCard、FieldCell。保持 RichTextEditor/Quill 非目标，保持 DataTable 主体虚拟化链路不变。\n\n# Part 4 实现路线图\nPhase A：冻结 contract 与测试口径。Phase B：并行实现 FieldMarkdownPreview、InfoCard、FieldCell。Phase C：整合、验证、回填 FlowAPI。\n\n# Part 5 工作量估计\nARCH 0.5 天，FE 三个子项各 0.5 天，缓冲 0.5 天，总计约 2.5 天。\n\n# Part 6 风险评估\n高风险一：DOM 尺寸依赖导致测试不稳定；缓解动作为 mock ResizeObserver 和 DOM metrics。高风险二：共享 composable 与现有改动冲突；缓解动作为按消费方拆写入边界并由主代理整合。中风险：InfoCard data 属性命名漂移；缓解动作是先冻结命名。\n\n# Part 7 验收标准\n1. FieldMarkdownPreview 不再直接用纯字符数判断是否截断。2. InfoCard 暴露标题/内容溢出可观测属性。3. FieldCell 暴露真实溢出状态或对齐 richtext 预览规则。4. targeted vitest 与 type-check 通过。\n\n# Part 8 回滚方案\n若公共 composable 引入不稳定，先回滚消费方接入，再回滚公共层。本轮不改服务器和共享数据库，仅涉及本地代码与 FlowAPI 留痕。\n\n# Part 9 架构决策记录\n继续把 pretext 能力限制在展示态文本预测，不直接推进到编辑态富文本；DataTable 主虚拟化链路保持现状，只补展示态 overflow-check。\n\n# Part 10 参考和附录\nissue: ONEUI-FE-00153, ONEUI-FE-00155, ONEUI-FE-00157; 文档路径: docs/plans/2026-04-01-oneui-text-preview-overflow-plan.md",
+    "plan_type": "feature",
+    "priority": "P1",
+    "execution_mode": "interactive",
+    "delivery_profile": "standard_delivery",
+    "created_by": "ARCH",
+    "tags": [
+      "text-layout",
+      "overflow-check",
+      "markdown-preview",
+      "info-card",
+      "field-cell",
+      "issue:ONEUI-FE-00153",
+      "issue:ONEUI-FE-00155",
+      "issue:ONEUI-FE-00157"
+    ],
+    "acceptance_criteria": [
+      {
+        "title": "markdown preview upgraded",
+        "criterion": "FieldMarkdownPreview uses real overflow detection instead of a raw character-count rule and markdown preview tests pass.",
+        "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/field-markdown-preview.integration.spec.ts'"
+      },
+      {
+        "title": "info card observable",
+        "criterion": "InfoCard exposes title/content overflow observability and related tests pass.",
+        "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/info-card.integration.spec.ts'"
+      },
+      {
+        "title": "field cell aligned",
+        "criterion": "FieldCell exposes real overflow state or aligned richtext preview behavior and table tests pass.",
+        "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npx vitest run src/tests/table-detail.integration.spec.ts'"
+      },
+      {
+        "title": "type-check passes",
+        "criterion": "type-check passes after the overflow-check upgrade.",
+        "verify_command": "bash -lc 'cd /opt/Oneflow/flowlab/项目/oneui/code/develop && npm run type-check'"
+      }
+    ],
+    "meta": {
+      "issues": [
+        "ONEUI-FE-00153",
+        "ONEUI-FE-00155",
+        "ONEUI-FE-00157"
+      ],
+      "artifacts": [
+        "docs/plans/2026-04-01-oneui-text-preview-overflow-plan.md"
+      ]
+    }
+  }
+}

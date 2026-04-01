@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { CircleIcon, TagIcon, UserIcon, CalendarIcon, FolderIcon } from "lucide-vue-next";
+import { measureTextBlock } from "@/composables";
 import type { ColorMap, GalleryItem } from "../../types";
 import {
   DEFAULT_PRIORITY_MAP,
@@ -60,10 +61,71 @@ const formattedDate = computed(() => {
   const date = new Date(d);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 });
+
+const CARD_CONTENT_WIDTH = 260 - 16 * 2;
+const GALLERY_TITLE_FONT = "600 16px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const GALLERY_BODY_FONT = "400 14px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const GALLERY_TAG_FONT = "500 12px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const GALLERY_TITLE_LINE_HEIGHT = 22;
+const GALLERY_BODY_LINE_HEIGHT = 20;
+const GALLERY_META_LINE_HEIGHT = 16;
+const GALLERY_TAG_LINE_HEIGHT = 18;
+
+function estimateGalleryCardHeight() {
+  const titleLayout = measureTextBlock({
+    text: props.item.title,
+    font: GALLERY_TITLE_FONT,
+    maxWidth: CARD_CONTENT_WIDTH,
+    lineHeight: GALLERY_TITLE_LINE_HEIGHT,
+    minHeight: GALLERY_TITLE_LINE_HEIGHT,
+  });
+  const descriptionLayout = props.item.description
+    ? measureTextBlock({
+        text: props.item.description,
+        font: GALLERY_BODY_FONT,
+        maxWidth: CARD_CONTENT_WIDTH,
+        lineHeight: GALLERY_BODY_LINE_HEIGHT,
+      })
+    : null;
+  const badgeLayout = measureTextBlock({
+    text: [statusBadge.value.label, priorityBadge.value.label].filter(Boolean).join(" "),
+    font: GALLERY_TAG_FONT,
+    maxWidth: CARD_CONTENT_WIDTH,
+    lineHeight: GALLERY_TAG_LINE_HEIGHT,
+    minHeight: GALLERY_TAG_LINE_HEIGHT,
+  });
+  const propRows = visibleProps.value.length > 0 ? visibleProps.value.length : 0;
+  const coverHeight = hasImageCover.value ? 120 : 6;
+  const bodyPadding = 28;
+  const propsHeight = propRows > 0 ? propRows * GALLERY_META_LINE_HEIGHT + (propRows - 1) * 8 : 0;
+  const footerHeight = GALLERY_META_LINE_HEIGHT;
+
+  return Math.max(
+    180,
+    coverHeight +
+      bodyPadding +
+      titleLayout.height +
+      (descriptionLayout ? 10 + descriptionLayout.height : 0) +
+      8 +
+      badgeLayout.height +
+      (propsHeight > 0 ? 10 + propsHeight : 0) +
+      10 +
+      footerHeight +
+      24,
+  );
+}
+
+const predictedHeight = computed(() => estimateGalleryCardHeight());
 </script>
 
 <template>
-  <button class="gallery-card" type="button" @click="emit('click', item)">
+  <button
+    class="gallery-card"
+    type="button"
+    :style="{ '--of-gallery-card-predicted-height': `${predictedHeight}px` }"
+    :data-gallery-card-predicted-height="predictedHeight"
+    @click="emit('click', item)"
+  >
     <!-- Cover -->
     <img v-if="hasImageCover" class="gallery-card__cover" :src="item.cover" alt="" />
     <div v-else class="gallery-card__banner" :style="{ backgroundColor: bannerColor }" />

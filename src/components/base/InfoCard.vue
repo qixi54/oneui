@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { computed, type CSSProperties, type VNode } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  type CSSProperties,
+  type VNode,
+} from "vue";
 
 export interface InfoCardProps {
   variant?: "memo" | "notify" | "history";
@@ -50,6 +59,15 @@ defineSlots<{
   icon?: () => VNode[];
 }>();
 
+const cardRef = ref<HTMLElement | null>(null);
+const titleRef = ref<HTMLElement | null>(null);
+const contentRef = ref<HTMLElement | null>(null);
+const overflowState = ref({
+  title: false,
+  content: false,
+});
+let overflowObserver: ResizeObserver | null = null;
+
 // ── Border color resolution ──────────────────────────────────────────────────
 
 const TYPE_COLOR_MAP: Record<string, string> = {
@@ -93,6 +111,51 @@ const contentStyle = computed<CSSProperties>(
     ({
       "--of-ic-clamp": String(props.contentLines ?? 3),
     }) as CSSProperties,
+);
+
+function isElementOverflowing(el: HTMLElement | null, multiLine = false): boolean {
+  if (!el) return false;
+  if (multiLine) {
+    return el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
+  }
+  return el.scrollWidth > el.clientWidth + 1;
+}
+
+function refreshOverflowState() {
+  overflowState.value = {
+    title: isElementOverflowing(titleRef.value, false),
+    content: isElementOverflowing(contentRef.value, true),
+  };
+}
+
+function scheduleOverflowRefresh() {
+  void nextTick(refreshOverflowState);
+}
+
+function bindOverflowObserver() {
+  if (typeof ResizeObserver === "undefined" || !cardRef.value) return;
+  overflowObserver = new ResizeObserver(() => {
+    refreshOverflowState();
+  });
+  overflowObserver.observe(cardRef.value);
+}
+
+onMounted(() => {
+  scheduleOverflowRefresh();
+  bindOverflowObserver();
+});
+
+onBeforeUnmount(() => {
+  overflowObserver?.disconnect();
+  overflowObserver = null;
+});
+
+watch(
+  () => [props.title, props.content, props.contentLines, props.variant],
+  () => {
+    scheduleOverflowRefresh();
+  },
+  { immediate: true, flush: "post" },
 );
 
 // ── Tag badge style ──────────────────────────────────────────────────────────
@@ -148,9 +211,12 @@ function handleKeydown(e: KeyboardEvent) {
 
 <template>
   <div
+    ref="cardRef"
     class="of-info-card"
     :class="[`of-info-card--${variant}`, { 'of-info-card--disabled': disabled }]"
     :style="cardStyle"
+    :data-info-card-title-overflow="String(overflowState.title)"
+    :data-info-card-content-overflow="String(overflowState.content)"
     role="button"
     tabindex="0"
     :aria-disabled="disabled || undefined"
@@ -164,9 +230,10 @@ function handleKeydown(e: KeyboardEvent) {
         <slot name="icon" />
       </div>
       <div class="of-info-card__body">
-        <div class="of-info-card__title">{{ title }}</div>
+        <div ref="titleRef" class="of-info-card__title">{{ title }}</div>
         <div
           v-if="content"
+          ref="contentRef"
           class="of-info-card__content of-info-card__content--clamp"
           :style="contentStyle"
         >
@@ -192,9 +259,10 @@ function handleKeydown(e: KeyboardEvent) {
     <template v-else-if="variant === 'notify'">
       <span class="of-info-card__dot" />
       <div class="of-info-card__body">
-        <div class="of-info-card__title">{{ title }}</div>
+        <div ref="titleRef" class="of-info-card__title">{{ title }}</div>
         <div
           v-if="content"
+          ref="contentRef"
           class="of-info-card__content of-info-card__content--clamp"
           :style="contentStyle"
         >
@@ -214,10 +282,11 @@ function handleKeydown(e: KeyboardEvent) {
         <slot name="icon" />
       </div>
       <div class="of-info-card__body">
-        <div class="of-info-card__title">{{ title }}</div>
+        <div ref="titleRef" class="of-info-card__title">{{ title }}</div>
         <div v-if="subtitle" class="of-info-card__subtitle">{{ subtitle }}</div>
         <div
           v-if="content"
+          ref="contentRef"
           class="of-info-card__content of-info-card__content--clamp"
           :style="contentStyle"
         >

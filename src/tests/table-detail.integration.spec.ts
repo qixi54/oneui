@@ -1,12 +1,42 @@
-import { describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { mount, shallowMount } from "@vue/test-utils";
 import DataTable from "../components/table/DataTable.vue";
 import TableDataRow from "../components/table/TableDataRow.vue";
 import DetailLayout from "../components/detail/DetailLayout.vue";
+import FieldCell from "../components/table/FieldCell.vue";
 import type { FieldDef } from "../components/table/FieldCell.vue";
 import type { Task } from "../types";
 
+const { measureTextBlockMock } = vi.hoisted(() => ({
+  measureTextBlockMock: vi.fn((options: {
+    text: string;
+    lineHeight: number;
+    maxWidth: number;
+    chromeHeight?: number;
+    minHeight?: number;
+  }) => {
+    const charsPerLine = Math.max(1, Math.floor(Math.max(options.maxWidth, 1) / 8));
+    const lineCount = Math.max(1, Math.ceil(options.text.length / charsPerLine));
+    const contentHeight = Math.max(options.lineHeight, lineCount * options.lineHeight);
+    return {
+      height: Math.max(options.minHeight ?? 0, (options.chromeHeight ?? 0) + contentHeight),
+      contentHeight,
+      lineCount,
+      isApproximate: false,
+    };
+  }),
+}));
+
+vi.mock("../composables/useTextLayout", () => ({
+  measureTextBlock: measureTextBlockMock,
+}));
+
 describe("Table + Detail 集成", () => {
+  const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientWidth");
+  const originalScrollWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollWidth");
+  const originalClientHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientHeight");
+  const originalScrollHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollHeight");
+
   const tasks: Task[] = [
     {
       id: "T-1",
@@ -37,6 +67,112 @@ describe("Table + Detail 集成", () => {
       .findAll(".of-table-row")
       .map((row) => Number.parseFloat((row.element as HTMLElement).style.height || "0"));
   }
+
+  function installFieldCellMetrics() {
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      get() {
+        const el = this as HTMLElement;
+        if (el.dataset.fieldCellPreviewMode === "richtext") return 160;
+        return 120;
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+      configurable: true,
+      get() {
+        const el = this as HTMLElement;
+        const length = Number(el.dataset.fieldCellTextLength ?? "0");
+        if (el.dataset.fieldCellPreviewMode === "richtext") {
+          return length > 36 ? 320 : 140;
+        }
+        return length > 16 ? 240 : 100;
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+      configurable: true,
+      get() {
+        const el = this as HTMLElement;
+        return el.dataset.fieldCellPreviewMode === "richtext" ? 40 : 20;
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+      configurable: true,
+      get() {
+        const el = this as HTMLElement;
+        const length = Number(el.dataset.fieldCellTextLength ?? "0");
+        if (el.dataset.fieldCellPreviewMode === "richtext") {
+          return length > 36 ? 84 : 36;
+        }
+        return 20;
+      },
+    });
+  }
+
+  beforeEach(() => {
+    measureTextBlockMock.mockClear();
+    installFieldCellMetrics();
+  });
+
+  afterEach(() => {
+    if (originalClientWidth) Object.defineProperty(HTMLElement.prototype, "clientWidth", originalClientWidth);
+    if (originalScrollWidth) Object.defineProperty(HTMLElement.prototype, "scrollWidth", originalScrollWidth);
+    if (originalClientHeight) Object.defineProperty(HTMLElement.prototype, "clientHeight", originalClientHeight);
+    if (originalScrollHeight) Object.defineProperty(HTMLElement.prototype, "scrollHeight", originalScrollHeight);
+  });
+
+  it("FieldCell 会暴露 text / richtext 的真实溢出状态和可观测属性", async () => {
+    const textWrapper = mount(FieldCell, {
+      props: {
+        rowId: "T-1",
+        field: { id: "summary", type: "text", label: "摘要" } as FieldDef,
+        value: "This is a deliberately long field cell text to trigger overflow",
+      },
+    });
+
+    await textWrapper.vm.$nextTick();
+    await textWrapper.vm.$nextTick();
+
+    expect(textWrapper.attributes("data-field-cell-content-kind")).toBe("text");
+    expect(textWrapper.attributes("data-field-cell-overflow-state")).toBe("overflow");
+    expect(Number(textWrapper.attributes("data-field-cell-text-length"))).toBeGreaterThan(16);
+
+    const richWrapper = shallowMount(FieldCell, {
+      props: {
+        rowId: "T-2",
+        field: { id: "body", type: "richtext", label: "正文" } as FieldDef,
+        value: "# Heading\n\nThis markdown preview text is intentionally long to wrap across lines.",
+      },
+      global: {
+        stubs: {
+          FieldMarkdownPreview: true,
+        },
+      },
+    });
+
+    await richWrapper.vm.$nextTick();
+    await richWrapper.vm.$nextTick();
+
+    expect(richWrapper.attributes("data-field-cell-content-kind")).toBe("richtext");
+    expect(richWrapper.attributes("data-field-cell-overflow-state")).toBe("overflow");
+    expect(Number(richWrapper.attributes("data-field-cell-predicted-height"))).toBeGreaterThan(0);
+    expect(measureTextBlockMock).toHaveBeenCalled();
+  });
+
+  it("FieldCell 在显式 editing=false 时仍会透传 request-edit 行为", async () => {
+    const wrapper = mount(FieldCell, {
+      props: {
+        rowId: "T-3",
+        field: { id: "title", type: "text", label: "标题" } as FieldDef,
+        value: "原始值",
+        editing: false,
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.trigger("click");
+
+    expect(wrapper.emitted("request-edit")?.[0]).toEqual(["T-3", "title"]);
+  });
 
   it("DataTable 点击行会透出 row-click 事件", async () => {
     const onRowClick = vi.fn();

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, computed } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
+import { measureTextBlock } from "@/composables/useTextLayout";
 import AiMessageBubble from "./AiMessageBubble.vue";
 import UserMessageBubble from "./UserMessageBubble.vue";
 import AiThinking from "./AiThinking.vue";
@@ -22,16 +23,63 @@ const props = defineProps<{
   isThinking?: boolean;
 }>();
 
+const AI_MESSAGE_LAYOUT = {
+  font: "14px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
+  lineHeightPx: 22.4,
+  bubblePaddingX: 14,
+  bubblePaddingY: 10,
+  avatarAndGapPx: 44,
+} as const;
+
 const listRef = ref<HTMLElement | null>(null);
+const listWidth = ref(0);
 const virtualizationState = createVirtualListState();
+let resizeObserver: ResizeObserver | null = null;
+
+function syncListWidth(nextWidth?: number) {
+  listWidth.value = Math.max(
+    0,
+    Math.round(nextWidth ?? listRef.value?.clientWidth ?? 0),
+  );
+}
+
+function bindResizeObserver() {
+  if (typeof ResizeObserver === "undefined" || !listRef.value) return;
+
+  resizeObserver = new ResizeObserver((entries) => {
+    // ResizeObserver drives the width used by the text-layout estimator.
+    const nextWidth = entries[0]?.contentRect.width ?? listRef.value?.clientWidth ?? 0;
+    syncListWidth(nextWidth);
+  });
+  resizeObserver.observe(listRef.value);
+}
+
+onMounted(() => {
+  syncListWidth();
+  bindResizeObserver();
+});
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+});
 
 const estimateHeight = (index: number): number => {
   const msg = props.messages[index];
   if (!msg) return 80;
-  if (msg.role === "user") return 60;
 
-  const contentLines = Math.ceil((msg.content?.length ?? 0) / 60);
-  return Math.max(80, 48 + contentLines * 24);
+  const bubbleWidth = Math.max(0, listWidth.value - AI_MESSAGE_LAYOUT.avatarAndGapPx);
+  if (bubbleWidth <= 0) return 80;
+
+  return measureTextBlock({
+    text: msg.content,
+    font: AI_MESSAGE_LAYOUT.font,
+    maxWidth: Math.max(0, bubbleWidth - AI_MESSAGE_LAYOUT.bubblePaddingX * 2),
+    lineHeight: AI_MESSAGE_LAYOUT.lineHeightPx,
+    whiteSpace: "pre-wrap",
+    chromeHeight: AI_MESSAGE_LAYOUT.bubblePaddingY * 2,
+    minHeight: AI_MESSAGE_LAYOUT.bubblePaddingY * 2 + AI_MESSAGE_LAYOUT.lineHeightPx,
+  }).height;
 };
 
 const {
@@ -45,6 +93,7 @@ const {
   overscan: 3,
   containerRef: listRef,
   state: virtualizationState,
+  invalidateKey: listWidth,
 });
 
 function scrollToBottom() {

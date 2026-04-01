@@ -154,3 +154,8 @@ export type {
 
 export { useSearch } from "./useSearch";
 export type { UseSearchOptions, SearchHighlight } from "./useSearch";
+
+export { measureTextBlock, clearTextLayoutCache, setTextLayoutLocale } from "./useTextLayout";
+export type { MeasureTextBlockOptions, MeasureTextBlockResult } from "./useTextLayout";
+export { useTextOverflow } from "./useTextOverflow";
+export type { UseTextOverflowOptions, UseTextOverflowReturn } from "./useTextOverflow";

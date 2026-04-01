@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, watch, useSlots } from "vue";
+import { computed, ref, useSlots, watch, type ComponentPublicInstance } from "vue";
 import { Plus } from "lucide-vue-next";
 import { VueDraggable } from "vue-draggable-plus";
+import { measureTextBlock } from "@/composables";
 import { createVirtualListState, useVirtualList } from "@/composables/useVirtualList";
 import KanbanCard from "./KanbanCard.vue";
 import type { KanbanColumnData, Task, ColorMap } from "../../types";
-import { DEFAULT_STATUS_MAP, mergeColorMap, resolveBadge } from "../../composables/useBadge";
+import {
+  DEFAULT_PRIORITY_MAP,
+  DEFAULT_STATUS_MAP,
+  mergeColorMap,
+  resolveBadge,
+} from "../../composables/useBadge";
 
 type BadgeState = ReturnType<typeof resolveBadge>;
 
@@ -88,6 +94,78 @@ const hasCustomCardContent = computed(
   () => Boolean(slots.card || slots.title || slots.meta || slots.tags),
 );
 
+const COLUMN_CONTENT_WIDTH = 280 - 14 * 2;
+const KANBAN_TITLE_FONT = "600 16px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const KANBAN_BODY_FONT = "400 14px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const KANBAN_TAG_FONT = "500 12px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif";
+const KANBAN_TITLE_LINE_HEIGHT = 22;
+const KANBAN_BODY_LINE_HEIGHT = 20;
+const KANBAN_META_LINE_HEIGHT = 16;
+const KANBAN_TAG_LINE_HEIGHT = 18;
+const KANBAN_CARD_PADDING_VERTICAL = 24;
+const KANBAN_CARD_GAP = 10;
+const KANBAN_CARD_COMPACT_GAP = 8;
+
+const mergedPriorityMap = computed(() => mergeColorMap(DEFAULT_PRIORITY_MAP, props.priorityColorMap));
+const mergedStatusMap = computed(() => mergeColorMap(DEFAULT_STATUS_MAP, props.statusColorMap));
+
+function getBadgeLabels(task: Task): { priorityLabel: string; statusLabel: string } {
+  return {
+    priorityLabel: resolveBadge(task.priority, mergedPriorityMap.value).label,
+    statusLabel: resolveBadge(task.status, mergedStatusMap.value).label,
+  };
+}
+
+function estimateTaskHeight(task: Task | undefined): number {
+  if (!task) return 120;
+
+  const { priorityLabel, statusLabel } = getBadgeLabels(task);
+  const titleLayout = measureTextBlock({
+    text: task.title,
+    font: KANBAN_TITLE_FONT,
+    maxWidth: COLUMN_CONTENT_WIDTH,
+    lineHeight: KANBAN_TITLE_LINE_HEIGHT,
+    minHeight: KANBAN_TITLE_LINE_HEIGHT,
+  });
+  const descriptionLayout = task.description
+    ? measureTextBlock({
+        text: task.description,
+        font: KANBAN_BODY_FONT,
+        maxWidth: COLUMN_CONTENT_WIDTH,
+        lineHeight: KANBAN_BODY_LINE_HEIGHT,
+      })
+    : null;
+  const badgeLayout = measureTextBlock({
+    text: [priorityLabel, statusLabel].filter(Boolean).join(" "),
+    font: KANBAN_TAG_FONT,
+    maxWidth: COLUMN_CONTENT_WIDTH,
+    lineHeight: KANBAN_TAG_LINE_HEIGHT,
+    minHeight: KANBAN_TAG_LINE_HEIGHT,
+  });
+
+  const cardGap = props.cardVariant === "compact" ? KANBAN_CARD_COMPACT_GAP : KANBAN_CARD_GAP;
+  const contentHeight =
+    titleLayout.height +
+    (descriptionLayout ? cardGap + descriptionLayout.height : 0) +
+    cardGap +
+    KANBAN_META_LINE_HEIGHT +
+    cardGap +
+    badgeLayout.height;
+
+  return Math.max(108, KANBAN_CARD_PADDING_VERTICAL + contentHeight);
+}
+
+function resolveObservedElement(el: Element | ComponentPublicInstance | null): HTMLElement | null {
+  if (!el) return null;
+  if (el instanceof HTMLElement) return el;
+  const componentEl = (el as ComponentPublicInstance & { $el?: unknown }).$el;
+  return componentEl instanceof HTMLElement ? componentEl : null;
+}
+
+function trackObservedCard(el: Element | ComponentPublicInstance | null, index: number) {
+  observeRow(resolveObservedElement(el), index);
+}
+
 // 本地任务副本，用于双向绑定拖拽
 const localTasks = ref<Task[]>([...props.column.tasks]);
 
@@ -116,12 +194,14 @@ const {
   visibleItems: visibleCards,
   totalHeight: cardsTotalHeight,
   offsetY: cardsOffsetY,
+  observeRow,
 } = useVirtualList({
   items: localTasks,
-  itemHeight: 120,
+  itemHeight: (index: number) => estimateTaskHeight(localTasks.value[index]),
   overscan: 3,
   containerRef: cardContainerRef,
   state: virtualizationState,
+  measureRow: true,
 });
 
 // 列头圆点颜色：优先用 column.color，否则从 statusColorMap 里按列 id/title 查找 dot 颜色
@@ -210,8 +290,9 @@ const dotColor = computed(() => {
       <div :style="{ height: cardsTotalHeight + 'px', position: 'relative' }">
         <div :style="{ transform: `translateY(${cardsOffsetY}px)` }">
           <KanbanCard
-            v-for="{ data: task } in visibleCards"
+            v-for="{ data: task, index } in visibleCards"
             :key="task.id"
+            :ref="(el) => trackObservedCard(el, index)"
             :task="task"
             :variant="cardVariant"
             :priority-color-map="priorityColorMap"
