@@ -266,13 +266,13 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 If you need to review the current traceable release materials, start with these docs:
 
-- Current release proof: [`docs/plans/2026-05-07-release-0.9.8-proof.md`](docs/plans/2026-05-07-release-0.9.8-proof.md)
-- Changelog: [`docs/CHANGELOG-v0.9.8.md`](docs/CHANGELOG-v0.9.8.md)
+- `0.9.8` publish blocker record: [`docs/plans/2026-05-07-release-0.9.8-proof.md`](docs/plans/2026-05-07-release-0.9.8-proof.md)
+- `0.9.8` changelog: [`docs/CHANGELOG-v0.9.8.md`](docs/CHANGELOG-v0.9.8.md)
 - Overlay remediation plan: [`docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md`](docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md)
 - Pre-release smoke: [`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
 - Package entrypoints verification: [`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
 
-The current published version is `0.9.8`; publish, pack, dry-run, consumer smoke, and publish receipt evidence for this round are closed out in `docs/plans/2026-05-07-release-0.9.8-proof.md`.
+The current npm-published version is still `0.9.7`; the in-repo `0.9.8` validation trace and publish blocker are recorded in `docs/plans/2026-05-07-release-0.9.8-proof.md`.
 
 ---
 

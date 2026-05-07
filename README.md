@@ -257,13 +257,13 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 如果你需要核对当前可追溯的发布材料，优先看这几份文档：
 
-- 当前发布 proof：[`docs/plans/2026-05-07-release-0.9.8-proof.md`](docs/plans/2026-05-07-release-0.9.8-proof.md)
-- 版本日志：[`docs/CHANGELOG-v0.9.8.md`](docs/CHANGELOG-v0.9.8.md)
+- `0.9.8` 发布阻塞记录：[`docs/plans/2026-05-07-release-0.9.8-proof.md`](docs/plans/2026-05-07-release-0.9.8-proof.md)
+- `0.9.8` 版本日志：[`docs/CHANGELOG-v0.9.8.md`](docs/CHANGELOG-v0.9.8.md)
 - Overlay 修复计划：[`docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md`](docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md)
 - 预发布验证：[`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
 - 子路径入口治理：[`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
 
-当前已发布版本为 `0.9.8`；本轮发布前验证、pack、dry-run、consumer smoke 与实际发布回执统一收口在 `docs/plans/2026-05-07-release-0.9.8-proof.md`。
+当前 npm 主站已发布版本仍为 `0.9.7`；仓库内下一版 `0.9.8` 的验证与 publish 阻塞信息统一收口在 `docs/plans/2026-05-07-release-0.9.8-proof.md`。
 
 ---
 

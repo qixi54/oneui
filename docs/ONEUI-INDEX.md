@@ -35,7 +35,7 @@
 
 ## Release & Verification
 
-### 0.9.8 已发布（Overlay SidePanel Configurable Hotfix）
+### 0.9.8 待发布（Overlay SidePanel Configurable Hotfix）
 
 - `docs/plans/2026-05-07-release-0.9.8-proof.md`
 - `docs/CHANGELOG-v0.9.8.md`
