@@ -35,6 +35,12 @@
 
 ## Release & Verification
 
+### 0.9.8 已发布（Overlay SidePanel Configurable Hotfix）
+
+- `docs/plans/2026-05-07-release-0.9.8-proof.md`
+- `docs/CHANGELOG-v0.9.8.md`
+- `docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md`
+
 ### 0.8.8 已发布（DatabaseView Kanban Customization Closeout）
 
 - `docs/plans/2026-03-23-release-0.8.8-proof.md`

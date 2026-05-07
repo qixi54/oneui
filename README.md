@@ -257,13 +257,13 @@ const { visibleItems, totalHeight, offsetY } = useVirtualList({
 
 如果你需要核对当前可追溯的发布材料，优先看这几份文档：
 
-- 当前发布 proof：[`docs/plans/2026-03-23-release-0.8.8-proof.md`](docs/plans/2026-03-23-release-0.8.8-proof.md)
-- 版本日志：[`docs/CHANGELOG-v0.8.8.md`](docs/CHANGELOG-v0.8.8.md)
-- 对应缺陷验收：[`docs/oneui-arch-00053-verification-20260323.md`](docs/oneui-arch-00053-verification-20260323.md)
+- 当前发布 proof：[`docs/plans/2026-05-07-release-0.9.8-proof.md`](docs/plans/2026-05-07-release-0.9.8-proof.md)
+- 版本日志：[`docs/CHANGELOG-v0.9.8.md`](docs/CHANGELOG-v0.9.8.md)
+- Overlay 修复计划：[`docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md`](docs/plans/2026-03-30-oneui-issues-136-138-remediation-plan.md)
 - 预发布验证：[`docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md`](docs/plans/2026-03-22-oneui-theme-scope-middleware-composer-pre-release-verification.md)
 - 子路径入口治理：[`docs/plans/2026-03-22-oneui-package-entrypoints-verification.md`](docs/plans/2026-03-22-oneui-package-entrypoints-verification.md)
 
-当前已发布版本为 `0.8.8`；本轮发布前验证、pack、dry-run、consumer smoke 与实际发布回执统一收口在 `docs/plans/2026-03-23-release-0.8.8-proof.md`。
+当前已发布版本为 `0.9.8`；本轮发布前验证、pack、dry-run、consumer smoke 与实际发布回执统一收口在 `docs/plans/2026-05-07-release-0.9.8-proof.md`。
 
 ---
 
