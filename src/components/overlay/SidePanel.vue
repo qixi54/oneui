@@ -12,6 +12,8 @@ export interface SidePanelProps {
   resizable?: boolean;
   minWidth?: number;
   maxWidth?: number;
+  lockScroll?: boolean;
+  trapFocus?: boolean;
 }
 
 const props = withDefaults(defineProps<SidePanelProps>(), {
@@ -22,6 +24,8 @@ const props = withDefaults(defineProps<SidePanelProps>(), {
   resizable: false,
   minWidth: 360,
   maxWidth: 1320,
+  lockScroll: true,
+  trapFocus: true,
 });
 
 const emit = defineEmits<{
@@ -45,6 +49,8 @@ function close() {
 const { containerRef: sidePanelRef } = useOverlay({
   open: () => props.modelValue,
   onClose: close,
+  lockScroll: props.lockScroll,
+  trapFocus: props.trapFocus,
 });
 
 function clampWidth(width: number): number {

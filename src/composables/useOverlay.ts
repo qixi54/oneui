@@ -6,10 +6,11 @@ export interface UseOverlayOptions {
   onClose: () => void;
   escapeClose?: boolean;
   lockScroll?: boolean;
+  trapFocus?: boolean;
 }
 
 export function useOverlay(options: UseOverlayOptions) {
-  const { onClose, escapeClose = true, lockScroll = true } = options;
+  const { onClose, escapeClose = true, lockScroll = true, trapFocus = true } = options;
   const openSource = options.open;
   const {
     containerRef,
@@ -34,10 +35,14 @@ export function useOverlay(options: UseOverlayOptions) {
       }
       if (isOpen) {
         document.addEventListener("keydown", onKeydown);
-        activateTrap();
+        if (trapFocus) {
+          activateTrap();
+        }
       } else {
         document.removeEventListener("keydown", onKeydown);
-        deactivateTrap();
+        if (trapFocus) {
+          deactivateTrap();
+        }
       }
     },
     { immediate: true },
@@ -49,7 +54,9 @@ export function useOverlay(options: UseOverlayOptions) {
       document.body.style.overflow = "";
     }
     document.removeEventListener("keydown", onKeydown);
-    deactivateTrap();
+    if (trapFocus) {
+      deactivateTrap();
+    }
   });
 
   return {
